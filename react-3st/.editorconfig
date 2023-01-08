@@ -1,0 +1,16 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = crlf
+charset = utf-8
+trim_trailing_whitespace = false
+insert_final_newline = true
+
+#{} 안에 띄어쓰기 넣으면 작동을 안한다. 예) *.{html, js} 는 작동 안함, *{html,js} 는 작동
+[*.{html,css,js,jsx,json}]
+indent_size = 2
