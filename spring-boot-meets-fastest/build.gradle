@@ -1,0 +1,26 @@
+
+allprojects {
+    group 'com.ikpil.book_spring_boot_meets_fastest'
+    version '1.0'
+}
+
+
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'java-library'
+    apply plugin: 'idea'
+
+    sourceCompatibility = 11
+
+    compileJava.options.encoding = "UTF-8"
+    compileTestJava.options.encoding = "UTF-8"
+
+    repositories {
+        mavenCentral()
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+}
+
