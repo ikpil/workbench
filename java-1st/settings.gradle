@@ -1,0 +1,6 @@
+rootProject.name = 'hellojava'
+
+include 'hj-core'
+include 'hj-app'
+include 'hj-spring'
+
