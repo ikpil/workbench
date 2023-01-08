@@ -1,0 +1,8 @@
+.bsp
+target
+*.class
+*.log
+.gradle
+.idea
+build
+tmp.*.txt
