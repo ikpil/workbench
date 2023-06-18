@@ -10,14 +10,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        home: Scaffold(
-      appBar: AppBar(title: Text('앰임'),),
-      body: Text('안녕'),
-      bottomNavigationBar: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [Icon(Icons.phone), Icon(Icons.message), Icon(Icons.contact_page)],
+      home: Scaffold(
+        appBar: AppBar(title: Text('앰임')),
+        body: Align(
+          alignment: Alignment.topCenter,
+          child: Container(
+            width: double.infinity,
+            height: 50,
+            color: Colors.blue,
+          ),
+        ),
       ),
-    ));
+    );
   }
 }
