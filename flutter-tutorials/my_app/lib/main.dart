@@ -12,36 +12,22 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       home: Scaffold(
           appBar: AppBar(),
-          body: Container(
-            height: 150,
-            padding: EdgeInsets.all(10),
-            child: Row(
-              children: [
-                Image.asset(
-                  'camera.jpg',
-                  width: 150,
-                ),
-                Container(
-                  width: 200,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('카메라팝니다', style: TextStyle()),
-                      Text('금호동 3가'),
-                      Text('7000원'),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Icon(Icons.favorite),
-                          Text('4'),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
+          body: ListView(
+            children: [
+              Text('안녕'),
+            ],
           )),
+    );
+  }
+}
+
+class ShopItem extends StatelessWidget {
+  const ShopItem({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      child: Text('안녕'),
     );
   }
 }
