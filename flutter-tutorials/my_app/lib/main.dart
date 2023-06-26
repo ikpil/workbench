@@ -1,33 +1,36 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-          appBar: AppBar(),
-          body: ListView(
-            children: [
-              Text('안녕'),
-            ],
-          )),
+      title: 'First app',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: MyHomePage(),
     );
   }
 }
 
-class ShopItem extends StatelessWidget {
-  const ShopItem({super.key});
-
+class MyHomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      child: Text('안녕'),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('First App'),
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            Text('Hello'),
+            Text('Hello'),
+            Text('Hello'),
+          ],
+        ),
+      ),
     );
   }
 }
