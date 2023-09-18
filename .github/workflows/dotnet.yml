@@ -32,9 +32,9 @@ jobs:
 
       - name: Restore dependencies
         run: | 
-        pwd
-        ls -al
-        dotnet restore
+          pwd
+          ls -al
+          dotnet restore
         working-directory: ${{ env.working-directory }}
 
       - name: Build
