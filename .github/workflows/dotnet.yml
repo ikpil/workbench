@@ -31,10 +31,16 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: | 
+        pwd
+        ls -al
+        dotnet restore
+        working-directory: ${{ env.working-directory }}
 
       - name: Build
         run: dotnet build -c Release --no-restore
+        working-directory: ${{ env.working-directory }}
 
       - name: Test
         run: dotnet test -c Release --no-build --verbosity normal
+        working-directory: ${{ env.working-directory }}
