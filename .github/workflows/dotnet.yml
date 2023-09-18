@@ -1,0 +1,43 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+  push:
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'dotnet-workflow/**.cs'
+      - 'dotnet-workflow/**.csproj'
+      - 'dotnet-workflow/**.sln'
+
+jobs:
+  build-and-test:
+    name: build-and-test-${{matrix.os}}
+    runs-on: ${{ matrix.os }}
+    env:
+      working-directory: ./dotnet-workflow
+    strategy:
+      matrix:
+        dotnet-version: [ '7.0.x' ]
+        os: [ ubuntu-latest ]
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Restore dependencies
+        run: dotnet restore
+        working-directory: ${{ env.working-directory }}
+
+      - name: Build
+        run: dotnet build -c Release --no-restore
+        working-directory: ${{ env.working-directory }}
+
+      - name: Test
+        run: dotnet test -c Release --no-build --verbosity normal
+        working-directory: ${{ env.working-directory }}
