@@ -29,7 +29,7 @@ jobs:
 
       - name: publish
         working-directory: ${{ env.working-directory }}
-        run: dotnet publish -c Release publish
+        run: dotnet publish -c Release -p:PublishTrimmed=true
 
       - name: version
         id: version
