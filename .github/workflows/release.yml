@@ -29,7 +29,7 @@ jobs:
 
       - name: publish
         working-directory: ${{ env.working-directory }}
-        run: dotnet publish src/Workflow.Run -c Release --no-restore --output working-temp
+        run: dotnet publish src/Workflow.Run -c Release --no-restore --no-self-contained --output working-temp
 
       - name: version
         id: version
@@ -45,7 +45,7 @@ jobs:
         working-directory: ${{ env.working-directory }}
         run: |
           cd working-temp
-          echo "dotnet run Workflow.Run.dll" > run.bat
+          echo "dotnet Workflow.Run.dll" > run.bat
           zip -r ../hello-world-${{ steps.version.outputs.version}}.zip ./
         if: success()
 
