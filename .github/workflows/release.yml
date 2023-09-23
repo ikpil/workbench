@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     env:
       working-directory: ./dotnet-workflow
 
@@ -25,11 +25,11 @@ jobs:
 
       - name: build
         working-directory: ${{ env.working-directory }}
-        run: dotnet build -c Release
+        run: dotnet build -c Release --no-restore
 
       - name: publish
         working-directory: ${{ env.working-directory }}
-        run: dotnet publish -c Release
+        run: dotnet publish -c Release --no-restore
 
       - name: version
         id: version
@@ -44,7 +44,8 @@ jobs:
       - name: Zip
         run: |
           cd ${{ env.working-directory }}/src/Workflow.Run/bin/Release/net7.0/publish/
-          zip -r ~/hello-world-${{ steps.version.outputs.version}}.win64.zip ./
+          echo "dotnet run Workflow.Run.dll" > run.bat
+          zip -r ~/hello-world-${{ steps.version.outputs.version}}.zip ./
         if: success()
 
       - uses: release-drafter/release-drafter@master
