@@ -25,11 +25,11 @@ jobs:
 
       - name: build
         working-directory: ${{ env.working-directory }}
-        run: dotnet build -c Release --no-restore
+        run: dotnet build -c Release -r win-x64 --no-restore
 
       - name: publish
         working-directory: ${{ env.working-directory }}
-        run: dotnet publish -c Release -p:PublishReadyToRun=true
+        run: dotnet publish -c Release -r win-x64 -p:PublishReadyToRun=true
 
       - name: version
         id: version
@@ -44,7 +44,7 @@ jobs:
       - name: Zip
         run: |
           cd ${{ env.working-directory }}/src/Workflow.Run/bin/Release/net7.0/publish/
-          zip -r ~/hello-world-${{ steps.version.outputs.version}}.win.zip ./
+          zip -r ~/hello-world-${{ steps.version.outputs.version}}.win64.zip ./
         if: success()
 
       - uses: release-drafter/release-drafter@master
