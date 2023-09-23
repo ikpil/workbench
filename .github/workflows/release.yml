@@ -11,14 +11,6 @@ jobs:
       working-directory: ./dotnet-workflow
 
     steps:
-      - name: Get absolute path
-        working-directory: ${{ env.working-directory }}
-        id: root_path
-        run: |
-          current_path=$(pwd)
-          root_path=$(readlink -f "$current_path")
-          echo "working-directory=${root_path}" >> $GITHUB_ENV
-
       - name: Checkout
         uses: actions/checkout@v3
 
