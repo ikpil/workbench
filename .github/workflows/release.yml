@@ -40,6 +40,10 @@ jobs:
           echo "tag=${tag}" >> $GITHUB_OUTPUT
           echo "version=${version}" >> $GITHUB_OUTPUT
           echo "major=${major}" >> $GITHUB_OUTPUT
+      
+      - name: Zip
+        run: zip -r hello-world-${{ steps.version.outputs.version}}.zip ${{ env.working-directory }}/src/Workflow.Run/bin/Release/net7.0/publish/
+        if: success()
 
       - uses: release-drafter/release-drafter@master
         with:
@@ -48,17 +52,12 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build
-        run: echo ${{ github.sha }} > Release.txt
-
-      - name: Test
-        run: cat Release.txt
-
-      - name: Release
+      - name: zip Upload 
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            Release.txt
+            hello-world-${{ steps.version.outputs.version}}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
         
