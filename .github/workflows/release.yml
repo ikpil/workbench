@@ -42,6 +42,7 @@ jobs:
           echo "major=${major}" >> $GITHUB_OUTPUT
       
       - name: Zip
+        working-directory: ${{ env.working-directory }}
         run: |
           cd working-temp
           echo "dotnet run Workflow.Run.dll" > run.bat
