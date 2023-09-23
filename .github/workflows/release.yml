@@ -11,6 +11,14 @@ jobs:
       working-directory: ./dotnet-workflow
 
     steps:
+      - name: Get absolute path
+        working-directory: ${{ env.working-directory }}
+        id: root_path
+        run: |
+          current_path=$(pwd)
+          root_path=$(readlink -f "$current_path")
+          echo "working-directory=${root_path}" >> $GITHUB_ENV
+
       - name: Checkout
         uses: actions/checkout@v3
 
@@ -45,7 +53,7 @@ jobs:
         run: |
           cd ${{ env.working-directory }}/src/Workflow.Run/bin/Release/net7.0/publish/
           echo "dotnet run Workflow.Run.dll" > run.bat
-          zip -r ~/hello-world-${{ steps.version.outputs.version}}.zip ./
+          zip -r ${{ env.working-directory }}/hello-world-${{ steps.version.outputs.version}}.zip ./
         if: success()
 
       - uses: release-drafter/release-drafter@master
