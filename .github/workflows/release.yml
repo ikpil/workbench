@@ -6,7 +6,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     env:
       working-directory: ./dotnet-workflow
 
@@ -25,15 +25,15 @@ jobs:
 
       - name: build
         working-directory: ${{ env.working-directory }}
-        run: dotnet build -c Release --os win --no-restore
+        run: dotnet build -c Release --no-restore
 
       - name: publish
         working-directory: ${{ env.working-directory }}
-        run: dotnet publish -c Release --os win -p:PublishReadyToRun=true
+        run: dotnet publish -c Release -p:PublishReadyToRun=true
 
       - name: version
         id: version
-        run: t
+        run: |
           tag=${GITHUB_REF/refs\/tags\//}
           version=${tag}
           major=${version%%.*}
