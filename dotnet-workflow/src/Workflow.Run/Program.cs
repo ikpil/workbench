@@ -10,3 +10,4 @@ Console.WriteLine($"test3 - {Calculator.Add(1, 2)}");
 Console.WriteLine($"test4 - {Calculator.Add(1, 2)}");
 Console.WriteLine($"test5 - {Calculator.Add(1, 2)}");
 Console.WriteLine($"2023.3.4-rc.1 {Calculator.Add(1, 2)}");
+Console.WriteLine($"2023.3.4-rc.2 {Calculator.Add(1, 2)}");
