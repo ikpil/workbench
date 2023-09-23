@@ -20,7 +20,7 @@ jobs:
       working-directory: ./dotnet-workflow
     strategy:
       matrix:
-        dotnet-version: [ '7.0.x' ]
+        dotnet-version: [ '7.x' ]
         os: [ ubuntu-latest ]
 
     steps:
