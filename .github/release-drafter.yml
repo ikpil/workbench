@@ -8,20 +8,15 @@ template: |
   **Full Changelog**: https://github.com/$OWNER/$REPOSITORY/compare/$PREVIOUS_TAG...$RESOLVED_VERSION
 
 categories:
-  - title: 'Breaking'
-    label: 'type: breaking'
-  - title: 'New'
-    label: 'type: feature'
+  - title: 'Changes'
+    labels: 
+      - 'feature'
+      - 'feat'
+
   - title: 'Bug Fixes'
-    label: 'type: bug'
-  - title: 'Maintenance'
-    label: 'type: maintenance'
-  - title: 'Documentation'
-    label: 'type: docs'
-  - title: 'Other changes'
-  - title: 'Dependency Updates'
-    label: 'type: dependencies'
-    collapse-after: 5
+    labels: 
+      - 'bug'
+      - 'fix'
 
 version-resolver:
   major:
