@@ -29,7 +29,7 @@ jobs:
 
       - name: publish
         working-directory: ${{ env.working-directory }}
-        run: dotnet publish -c Release --no-restore
+        run: dotnet publish -c Release --no-restore --output working-temp
 
       - name: version
         id: version
@@ -43,8 +43,6 @@ jobs:
       
       - name: Zip
         run: |
-          mkdir -p working-temp
-          cp -Rfv ${{ env.working-directory }}/src/Workflow.Run/bin/Release/net7.0/publish/ working-temp/
           cd working-temp
           echo "dotnet run Workflow.Run.dll" > run.bat
           zip -r ../hello-world-${{ steps.version.outputs.version}}.zip ./
@@ -61,7 +59,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            ~/hello-world-${{ steps.version.outputs.version}}.zip
+            hello-world-${{ steps.version.outputs.version}}.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
