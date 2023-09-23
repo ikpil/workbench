@@ -25,11 +25,11 @@ jobs:
 
       - name: build
         working-directory: ${{ env.working-directory }}
-        run: dotnet build -c Release -r win-x64 --no-restore
+        run: dotnet build -c Release
 
       - name: publish
         working-directory: ${{ env.working-directory }}
-        run: dotnet publish -c Release -r win-x64 -p:PublishReadyToRun=true
+        run: dotnet publish -c Release
 
       - name: version
         id: version
