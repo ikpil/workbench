@@ -44,7 +44,7 @@ jobs:
       - name: Zip
         run: |
           mkdir -p working-temp
-          cp -Rfvc ${{ env.working-directory }}/src/Workflow.Run/bin/Release/net7.0/publish/ working-temp/
+          cp -Rfv ${{ env.working-directory }}/src/Workflow.Run/bin/Release/net7.0/publish/ working-temp/
           cd working-temp
           echo "dotnet run Workflow.Run.dll" > run.bat
           zip -r ../hello-world-${{ steps.version.outputs.version}}.zip ./
