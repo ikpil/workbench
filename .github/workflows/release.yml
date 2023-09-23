@@ -29,7 +29,7 @@ jobs:
 
       - name: publish
         working-directory: ${{ env.working-directory }}
-        run: dotnet publish -c Release --no-restore --output working-temp
+        run: dotnet publish src/Workflow.Run -c Release --no-restore --output working-temp
 
       - name: version
         id: version
