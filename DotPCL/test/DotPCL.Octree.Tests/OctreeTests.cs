@@ -49,12 +49,12 @@ public class OctreeTests
         int[] data = new int[256];
 
         // create octree instance
-        OctreeBase<int> octreeA = new OctreeBase<int>();
-        OctreeBase<int> octreeB = new OctreeBase<int>();
+        var octreeA = new OctreeBase<int, OctreeContainerEmpty>();
+        var octreeB = new OctreeBase<int, OctreeContainerEmpty>();
 
         // set octree depth
-        octreeA.SetTreeDepth(8);
-        octreeB.SetTreeDepth(8);
+        octreeA.setTreeDepth(8);
+        octreeB.setTreeDepth(8);
     }
 //
 //   struct MyVoxel
