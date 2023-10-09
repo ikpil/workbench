@@ -55,15 +55,18 @@ public class OctreeTests
         // set octree depth
         octreeA.setTreeDepth(8);
         octreeB.setTreeDepth(8);
-    }
-//
-//   struct MyVoxel
-//   {
-//     unsigned int x;
-//     unsigned int y;
-//     unsigned int z;
-//   };
-//   MyVoxel voxels[256];
+
+
+    public struct MyVoxel
+    {
+        int x;
+        int y;
+        int z;
+    };
+
+    MyVoxel[] voxels = new MyVoxel[256];
+}
+
 //
 //   srand (static_cast<unsigned int> (time (nullptr)));
 //
