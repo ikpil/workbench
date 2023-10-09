@@ -47,10 +47,16 @@
 // #include <vector>
 //
 
+using System;
 using static DotPCL.Octree.PCLBridgeCommon;
 
 namespace DotPCL.Octree
 {
+    public class LeafContainer<T>
+    {
+        public T value;
+    }
+
     /** \brief Octree class
      * \note The tree depth defines the maximum amount of octree voxels / leaf nodes (should
      * be initially defined).
@@ -60,13 +66,15 @@ namespace DotPCL.Octree
      * \author Julius Kammerl (julius@kammerl.de)
      */
     //template <typename LeafContainerT = index_t,typename BranchContainerT = OctreeContainerEmpty>
-    public class OctreeBase<LeafContainerT, BranchContainerT> where BranchContainerT : IOctreeBranchNodeContainer
+    public class OctreeBase<LeafContainerT, BranchContainerT>
+        where BranchContainerT : IOctreeBranchNodeContainer
     {
+
 // public:
 //   using OctreeT = OctreeBase<LeafContainerT, BranchContainerT>;
 //
 //   using BranchNode = OctreeBranchNode<BranchContainerT>;
-//   using LeafNode = OctreeLeafNode<LeafContainerT>;
+//    using LeafNode = OctreeLeafNode<LeafContainerT>;
 //
 //   using BranchContainer = BranchContainerT;
 //   using LeafContainer = LeafContainerT;
@@ -76,26 +84,26 @@ namespace DotPCL.Octree
 //   // Members
 //   ///////////////////////////////////////////////////////////////////////
 //
-        /** \brief Amount of leaf nodes   **/
-        protected ulong leaf_count_;
+    /** \brief Amount of leaf nodes   **/
+    protected ulong leaf_count_;
 
-        /** \brief Amount of branch nodes   **/
-        protected ulong branch_count_ = 1;
+    /** \brief Amount of branch nodes   **/
+    protected ulong branch_count_ = 1;
 
-        /** \brief Pointer to root branch node of octree   **/
-        protected OctreeBranchNode<BranchContainerT> root_node_;
+    /** \brief Pointer to root branch node of octree   **/
+    protected OctreeBranchNode<BranchContainerT> root_node_;
 
-        /** \brief Depth mask based on octree depth   **/
-        protected uint depth_mask_;
+    /** \brief Depth mask based on octree depth   **/
+    protected uint depth_mask_;
 
-        /** \brief Octree depth */
-        protected uint octree_depth_;
+    /** \brief Octree depth */
+    protected uint octree_depth_;
 
-        /** \brief Enable dynamic_depth **/
-        protected bool dynamic_depth_enabled_;
+    /** \brief Enable dynamic_depth **/
+    protected bool dynamic_depth_enabled_;
 
-        /** \brief key range */
-        protected OctreeKey max_key_;
+    /** \brief key range */
+    protected OctreeKey max_key_;
 
 //
 // public:
@@ -310,32 +318,32 @@ namespace DotPCL.Octree
 //     return ConstLeafNodeBreadthFirstIterator(this, 0, nullptr);
 //   };
 //
-        /** \brief Empty constructor. */
-        public OctreeBase()
-        {
-            root_node_ = new OctreeBranchNode<BranchContainerT>();
-            max_key_ = new OctreeKey();
-        }
+    /** \brief Empty constructor. */
+    public OctreeBase()
+    {
+        root_node_ = new OctreeBranchNode<BranchContainerT>();
+        max_key_ = new OctreeKey();
+    }
 
-        ///** \brief Empty deconstructor. */
-        // ~OctreeBase()
-        // {
-        //     // deallocate tree structure
-        //     deleteTree();
-        //     delete (root_node_);
-        // }
+    ///** \brief Empty deconstructor. */
+    // ~OctreeBase()
+    // {
+    //     // deallocate tree structure
+    //     deleteTree();
+    //     delete (root_node_);
+    // }
 
-        /** \brief Copy constructor. */
-        public OctreeBase(OctreeBase<LeafContainerT, BranchContainerT> source)
-        {
-            leaf_count_ = source.leaf_count_;
-            branch_count_ = source.branch_count_;
-            root_node_ = new OctreeBranchNode<BranchContainerT>(source.root_node_);
-            depth_mask_ = source.depth_mask_;
-            octree_depth_ = source.octree_depth_;
-            dynamic_depth_enabled_ = source.dynamic_depth_enabled_;
-            max_key_ = source.max_key_;
-        }
+    /** \brief Copy constructor. */
+    public OctreeBase(OctreeBase<LeafContainerT, BranchContainerT> source)
+    {
+        leaf_count_ = source.leaf_count_;
+        branch_count_ = source.branch_count_;
+        root_node_ = new OctreeBranchNode<BranchContainerT>(source.root_node_);
+        depth_mask_ = source.depth_mask_;
+        octree_depth_ = source.octree_depth_;
+        dynamic_depth_enabled_ = source.dynamic_depth_enabled_;
+        max_key_ = source.max_key_;
+    }
 
 //
 //   /** \brief Copy operator. */
@@ -360,32 +368,32 @@ namespace DotPCL.Octree
 //   void
 //   setMaxVoxelIndex(uindex_t max_voxel_index_arg);
 //
-        /** \brief Set the maximum depth of the octree.
-        *  \param max_depth_arg: maximum depth of octree
-        */
-        public void setTreeDepth(uint depth_arg)
+    /** \brief Set the maximum depth of the octree.
+    *  \param max_depth_arg: maximum depth of octree
+    */
+    public void setTreeDepth(uint depth_arg)
+    {
+        if (depth_arg <= 0)
         {
-            if (depth_arg <= 0)
-            {
-                PCL_ERROR("[pcl::octree::OctreeBase::setTreeDepth] Tree depth (%lu) must be > 0!\n", depth_arg);
-                return;
-            }
-
-            if (depth_arg > OctreeKey.maxDepth)
-            {
-                PCL_ERROR("[pcl::octree::OctreeBase::setTreeDepth] Tree depth (%lu) must be <= max depth(%lu)!\n", depth_arg, OctreeKey.maxDepth);
-                return;
-            }
-
-            // set octree depth
-            octree_depth_ = depth_arg;
-
-            // define depth_mask_ by setting a single bit to 1 at bit position == tree depth
-            depth_mask_ = (uint)(1 << ((int)depth_arg - 1));
-
-            // define max_key_
-            max_key_.x = max_key_.y = max_key_.z = (uint)((1 << (int)depth_arg) - 1);
+            PCL_ERROR("[pcl::octree::OctreeBase::setTreeDepth] Tree depth (%lu) must be > 0!\n", depth_arg);
+            return;
         }
+
+        if (depth_arg > OctreeKey.maxDepth)
+        {
+            PCL_ERROR("[pcl::octree::OctreeBase::setTreeDepth] Tree depth (%lu) must be <= max depth(%lu)!\n", depth_arg, OctreeKey.maxDepth);
+            return;
+        }
+
+        // set octree depth
+        octree_depth_ = depth_arg;
+
+        // define depth_mask_ by setting a single bit to 1 at bit position == tree depth
+        depth_mask_ = (uint)(1 << ((int)depth_arg - 1));
+
+        // define max_key_
+        max_key_.x = max_key_.y = max_key_.z = (uint)((1 << (int)depth_arg) - 1);
+    }
 
 //
 //   /** \brief Get the maximum depth of the octree.
@@ -397,15 +405,22 @@ namespace DotPCL.Octree
 //     return this->octree_depth_;
 //   }
 //
-//   /** \brief Create new leaf node at (idx_x_arg, idx_y_arg, idx_z_arg).
-//    *  \note If leaf node already exist, this method returns the existing node
-//    *  \param idx_x_arg: index of leaf node in the X axis.
-//    *  \param idx_y_arg: index of leaf node in the Y axis.
-//    *  \param idx_z_arg: index of leaf node in the Z axis.
-//    *  \return pointer to new leaf node container.
-//    */
-//   LeafContainerT*
-//   createLeaf(uindex_t idx_x_arg, uindex_t idx_y_arg, uindex_t idx_z_arg);
+    /** \brief Create new leaf node at (idx_x_arg, idx_y_arg, idx_z_arg).
+     *  \note If leaf node already exist, this method returns the existing node
+     *  \param idx_x_arg: index of leaf node in the X axis.
+     *  \param idx_y_arg: index of leaf node in the Y axis.
+     *  \param idx_z_arg: index of leaf node in the Z axis.
+     *  \return pointer to new leaf node container.
+     */
+    public LeafContainerT createLeaf(uint idx_x_arg, uint idx_y_arg, uint idx_z_arg)
+    {
+        // generate key
+        OctreeKey key = new OctreeKey(idx_x_arg, idx_y_arg, idx_z_arg);
+
+        // check if key exist in octree
+        return (createLeaf(key));
+    }
+
 //
 //   /** \brief Find leaf node at (idx_x_arg, idx_y_arg, idx_z_arg).
 //    *  \note If leaf node already exist, this method returns the existing node
@@ -508,24 +523,21 @@ namespace DotPCL.Octree
 //   // Protected octree methods based on octree keys
 //   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
-//   /** \brief Create a leaf node
-//    *  \param key_arg: octree key addressing a leaf node.
-//    *  \return pointer to leaf node
-//    */
-//   LeafContainerT*
-//   createLeaf(const OctreeKey& key_arg)
-//   {
-//
-//     LeafNode* leaf_node = nullptr;
-//     BranchNode* leaf_node_parent;
-//
-//     createLeafRecursive(key_arg, depth_mask_, root_node_, leaf_node, leaf_node_parent);
-//
-//     LeafContainerT* ret = leaf_node->getContainerPtr();
-//
-//     return ret;
-//   }
-//
+    /** \brief Create a leaf node
+     *  \param key_arg: octree key addressing a leaf node.
+     *  \return pointer to leaf node
+     */
+    protected ref LeafContainerT createLeaf(OctreeKey key_arg)
+    {
+        // LeafNode* leaf_node = nullptr;
+        // BranchNode* leaf_node_parent;
+
+        createLeafRecursive(key_arg, depth_mask_, root_node_, out var leaf_node, out var leaf_node_parent);
+
+        ref LeafContainerT ret = ref leaf_node.getContainer();
+        return ref ret;
+    }
+
 //   /** \brief Find leaf node
 //    *  \param key_arg: octree key addressing a leaf node.
 //    *  \return pointer to leaf node. If leaf node is not found, this pointer returns 0.
@@ -695,27 +707,82 @@ namespace DotPCL.Octree
 //     return new_leaf_child;
 //   }
 //
-//   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//   // Recursive octree methods
-//   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//
-//   /** \brief Create a leaf node at octree key. If leaf node does already exist, it is
-//    * returned.
-//    * \param key_arg: reference to an octree key
-//    * \param depth_mask_arg: depth mask used for octree key analysis and for branch depth
-//    * indicator
-//    * \param branch_arg: current branch node
-//    * \param return_leaf_arg: return pointer to leaf node
-//    * \param parent_of_leaf_arg: return pointer to parent of leaf node
-//    * \return depth mask at which leaf node was created
-//    **/
-//   uindex_t
-//   createLeafRecursive(const OctreeKey& key_arg,
-//                       uindex_t depth_mask_arg,
-//                       BranchNode* branch_arg,
-//                       LeafNode*& return_leaf_arg,
-//                       BranchNode*& parent_of_leaf_arg);
-//
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Recursive octree methods
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /** \brief Create a leaf node at octree key. If leaf node does already exist, it is
+     * returned.
+     * \param key_arg: reference to an octree key
+     * \param depth_mask_arg: depth mask used for octree key analysis and for branch depth
+     * indicator
+     * \param branch_arg: current branch node
+     * \param return_leaf_arg: return pointer to leaf node
+     * \param parent_of_leaf_arg: return pointer to parent of leaf node
+     * \return depth mask at which leaf node was created
+     **/
+    public uint createLeafRecursive(OctreeKey key_arg, uint depth_mask_arg, OctreeBranchNode<BranchContainerT>[] branch_arg,
+        out OctreeLeafNode<LeafContainerT> return_leaf_arg, out OctreeBranchNode<BranchContainerT> parent_of_leaf_arg)
+    {
+        return_leaf_arg = null;
+        parent_of_leaf_arg = null;
+
+        // index to branch child
+        byte child_idx;
+
+        // find branch child from key
+        child_idx = key_arg.getChildIdxWithDepthMask(depth_mask_arg);
+
+        OctreeNode child_node = branch_arg[child_idx];
+
+        if (null != child_node)
+        {
+            if ((!dynamic_depth_enabled_) && (depth_mask_arg > 1))
+            {
+                // if required branch does not exist -> create it
+                OctreeBranchNode<BranchContainerT> childBranch = createBranchChild(branch_arg, child_idx);
+
+                branch_count_++;
+
+                // recursively proceed with indexed child branch
+                return createLeafRecursive(key_arg,
+                    depth_mask_arg >> 1,
+                    childBranch,
+                    return_leaf_arg,
+                    parent_of_leaf_arg);
+            }
+
+            // if leaf node at child_idx does not exist
+            LeafNode* leaf_node = createLeafChild(*branch_arg, child_idx);
+            return_leaf_arg = leaf_node;
+            parent_of_leaf_arg = branch_arg;
+            this->leaf_count_++;
+        }
+        else
+        {
+            // Node exists already
+            switch (child_node.getNodeType())
+            {
+                case node_type_t.BRANCH_NODE:
+                    // recursively proceed with indexed child branch
+                    return createLeafRecursive(key_arg,
+                        depth_mask_arg >> 1,
+                        static_cast<BranchNode*>(child_node),
+                        return_leaf_arg,
+                        parent_of_leaf_arg);
+                    break;
+
+                case node_type_t.LEAF_NODE:
+                    return_leaf_arg = static_cast<LeafNode*>(child_node);
+                    parent_of_leaf_arg = branch_arg;
+                    break;
+            }
+        }
+
+        return (depth_mask_arg >> 1);
+    }
+
+
 //   /** \brief Recursively search for a given leaf node and return a pointer.
 //    *  \note  If leaf node does not exist, a 0 pointer is returned.
 //    *  \param key_arg: reference to an octree key
@@ -812,7 +879,8 @@ namespace DotPCL.Octree
 //     return (true);
 //   }
 // };
-    }
+}
+
 }
 //
 // #ifdef PCL_NO_PRECOMPILE

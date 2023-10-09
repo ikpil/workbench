@@ -82,19 +82,6 @@ OctreeBase<LeafContainerT, BranchContainerT>::findLeaf(uindex_t idx_x_arg,
   return (findLeaf(key));
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-template <typename LeafContainerT, typename BranchContainerT>
-LeafContainerT*
-OctreeBase<LeafContainerT, BranchContainerT>::createLeaf(uindex_t idx_x_arg,
-                                                         uindex_t idx_y_arg,
-                                                         uindex_t idx_z_arg)
-{
-  // generate key
-  OctreeKey key(idx_x_arg, idx_y_arg, idx_z_arg);
-
-  // create a leaf node addressed by key
-  return (createLeaf(key));
-}
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 template <typename LeafContainerT, typename BranchContainerT>
@@ -248,65 +235,6 @@ OctreeBase<LeafContainerT, BranchContainerT>::deserializeTree(
                            &leaf_vector_it_end);
 }
 
-//////////////////////////////////////////////////////////////////////////////////////////////
-template <typename LeafContainerT, typename BranchContainerT>
-uindex_t
-OctreeBase<LeafContainerT, BranchContainerT>::createLeafRecursive(
-    const OctreeKey& key_arg,
-    uindex_t depth_mask_arg,
-    BranchNode* branch_arg,
-    LeafNode*& return_leaf_arg,
-    BranchNode*& parent_of_leaf_arg)
-{
-  // index to branch child
-  unsigned char child_idx;
-
-  // find branch child from key
-  child_idx = key_arg.getChildIdxWithDepthMask(depth_mask_arg);
-
-  OctreeNode* child_node = (*branch_arg)[child_idx];
-
-  if (!child_node) {
-    if ((!dynamic_depth_enabled_) && (depth_mask_arg > 1)) {
-      // if required branch does not exist -> create it
-      BranchNode* childBranch = createBranchChild(*branch_arg, child_idx);
-
-      branch_count_++;
-
-      // recursively proceed with indexed child branch
-      return createLeafRecursive(key_arg,
-                                 depth_mask_arg >> 1,
-                                 childBranch,
-                                 return_leaf_arg,
-                                 parent_of_leaf_arg);
-    }
-    // if leaf node at child_idx does not exist
-    LeafNode* leaf_node = createLeafChild(*branch_arg, child_idx);
-    return_leaf_arg = leaf_node;
-    parent_of_leaf_arg = branch_arg;
-    this->leaf_count_++;
-  }
-  else {
-    // Node exists already
-    switch (child_node->getNodeType()) {
-    case BRANCH_NODE:
-      // recursively proceed with indexed child branch
-      return createLeafRecursive(key_arg,
-                                 depth_mask_arg >> 1,
-                                 static_cast<BranchNode*>(child_node),
-                                 return_leaf_arg,
-                                 parent_of_leaf_arg);
-      break;
-
-    case LEAF_NODE:
-      return_leaf_arg = static_cast<LeafNode*>(child_node);
-      parent_of_leaf_arg = branch_arg;
-      break;
-    }
-  }
-
-  return (depth_mask_arg >> 1);
-}
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 template <typename LeafContainerT, typename BranchContainerT>

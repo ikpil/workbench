@@ -43,6 +43,13 @@ namespace DotPCL.Octree.Tests;
 
 public class OctreeTests
 {
+    public struct MyVoxel
+    {
+        public int x;
+        public int y;
+        public int z;
+    }
+
     [Test(Description = "Octree_Test")]
     public void TestOctree()
     {
@@ -57,32 +64,25 @@ public class OctreeTests
         octreeB.setTreeDepth(8);
 
 
-    public struct MyVoxel
-    {
-        int x;
-        int y;
-        int z;
-    };
+        MyVoxel[] voxels = new MyVoxel[256];
 
-    MyVoxel[] voxels = new MyVoxel[256];
-}
+        // srand (static_cast<unsigned int> (time (nullptr)));
 
-//
-//   srand (static_cast<unsigned int> (time (nullptr)));
-//
-//   // generate some voxel indices
-//   for (unsigned int i = 0; i < 256; i++)
-//   {
-//     data[i] = i;
-//
-//     voxels[i].x = i;
-//     voxels[i].y = 255 - i;
-//     voxels[i].z = i;
-//
-//     // add data to leaf node voxel
-//     int* voxel_container = octreeA.createLeaf(voxels[i].x, voxels[i].y, voxels[i].z);
-//     *voxel_container = data[i];
-//   }
+        // generate some voxel indices
+        for (int i = 0; i < 256; i++)
+        {
+            data[i] = i;
+
+            voxels[i].x = i;
+            voxels[i].y = 255 - i;
+            voxels[i].z = i;
+
+            // add data to leaf node voxel
+            int* voxel_container = octreeA.createLeaf(voxels[i].x, voxels[i].y, voxels[i].z);
+            *voxel_container = data[i];
+        }
+    }
+
 //
 //   for (unsigned int i = 0; i < 128; i++)
 //   {
