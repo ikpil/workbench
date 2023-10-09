@@ -1,0 +1,13 @@
+{
+  "name": "vcpkg-test",
+  "version": "1.0.0",
+  "dependencies": [
+    {
+      "name": "fmt",
+      "version>=": "10.1.1",
+      "platform": "x64 & windows"
+    },
+    "zlib"
+  ],
+  "builtin-baseline": "cc97b4536ae749ec0e4f643488b600b217540fb3"
+}
