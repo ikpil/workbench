@@ -5,12 +5,12 @@ name: .NET
 
 on:
   push:
-  pull_request:
-    branches: [ main ]
+    branches:
+      - main
     paths:
-      - 'dotnet-workflow/**.cs'
-      - 'dotnet-workflow/**.csproj'
-      - 'dotnet-workflow/**.sln'
+      - '**/*.cs'
+      - '**/*.csproj'
+      - '**/*.sln'
 
 jobs:
   build-and-test:
