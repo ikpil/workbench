@@ -52,11 +52,6 @@ using static DotPCL.Octree.PCLBridgeCommon;
 
 namespace DotPCL.Octree
 {
-    public class LeafContainer<T>
-    {
-        public T value;
-    }
-
     /** \brief Octree class
      * \note The tree depth defines the maximum amount of octree voxels / leaf nodes (should
      * be initially defined).
@@ -80,10 +75,10 @@ namespace DotPCL.Octree
 //   using LeafContainer = LeafContainerT;
 //
 // protected:
-//   ///////////////////////////////////////////////////////////////////////
-//   // Members
-//   ///////////////////////////////////////////////////////////////////////
-//
+   ///////////////////////////////////////////////////////////////////////
+   // Members
+   ///////////////////////////////////////////////////////////////////////
+
     /** \brief Amount of leaf nodes   **/
     protected ulong leaf_count_;
 
@@ -412,13 +407,13 @@ namespace DotPCL.Octree
      *  \param idx_z_arg: index of leaf node in the Z axis.
      *  \return pointer to new leaf node container.
      */
-    public LeafContainerT createLeaf(uint idx_x_arg, uint idx_y_arg, uint idx_z_arg)
+    public ref LeafContainerT createLeaf(uint idx_x_arg, uint idx_y_arg, uint idx_z_arg)
     {
         // generate key
         OctreeKey key = new OctreeKey(idx_x_arg, idx_y_arg, idx_z_arg);
 
         // check if key exist in octree
-        return (createLeaf(key));
+        return ref createLeaf(key);
     }
 
 //
@@ -721,7 +716,7 @@ namespace DotPCL.Octree
      * \param parent_of_leaf_arg: return pointer to parent of leaf node
      * \return depth mask at which leaf node was created
      **/
-    public uint createLeafRecursive(OctreeKey key_arg, uint depth_mask_arg, OctreeBranchNode<BranchContainerT>[] branch_arg,
+    public uint createLeafRecursive(OctreeKey key_arg, uint depth_mask_arg, OctreeBranchNode<BranchContainerT> branch_arg,
         out OctreeLeafNode<LeafContainerT> return_leaf_arg, out OctreeBranchNode<BranchContainerT> parent_of_leaf_arg)
     {
         return_leaf_arg = null;

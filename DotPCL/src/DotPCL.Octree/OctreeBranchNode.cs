@@ -1,4 +1,6 @@
-﻿namespace DotPCL.Octree
+﻿using System.Diagnostics;
+
+namespace DotPCL.Octree
 {
     public interface IOctreeBranchNodeContainer
     {
@@ -36,7 +38,7 @@
         /** \brief Copy operator. */
         public void CopyFrom(OctreeBranchNode<ContainerT> source)
         {
-            for (int i = 0; i < 8; ++i) 
+            for (int i = 0; i < 8; ++i)
             {
                 if (null != source.child_node_array_[i])
                 {
@@ -55,16 +57,19 @@
             return new OctreeBranchNode<ContainerT>(this);
         }
 
-//   /** \brief Access operator.
-//    *  \param child_idx_arg: index to child node, must be less than 8
-//    *  \return OctreeNode pointer
-//    * */
-//   inline OctreeNode*&
-//   operator[](unsigned char child_idx_arg)
-//   {
-//     assert(child_idx_arg < 8);
-//     return child_node_array_[child_idx_arg];
-//   }
+        /** \brief Access operator.
+         *  \param child_idx_arg: index to child node, must be less than 8
+         *  \return OctreeNode pointer
+         * */
+        public OctreeNode this[int child_idx_arg]
+        {
+            get
+            {
+                Debug.Assert(child_idx_arg < 8);
+                return child_node_array_[child_idx_arg];
+            }
+        }
+
 //
 //   /** \brief Get pointer to child
 //    *  \param child_idx_arg: index to child node, must be less than 8
@@ -135,7 +140,7 @@
             {
                 child_node_array_[i] = null;
             }
-            
+
             container_.reset();
         }
 //

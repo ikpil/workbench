@@ -45,9 +45,9 @@ public class OctreeTests
 {
     public struct MyVoxel
     {
-        public int x;
-        public int y;
-        public int z;
+        public uint x;
+        public uint y;
+        public uint z;
     }
 
     [Test(Description = "Octree_Test")]
@@ -69,17 +69,18 @@ public class OctreeTests
         // srand (static_cast<unsigned int> (time (nullptr)));
 
         // generate some voxel indices
-        for (int i = 0; i < 256; i++)
+        for (uint i = 0; i < 256; i++)
         {
-            data[i] = i;
+            data[i] = (int)i;
 
             voxels[i].x = i;
             voxels[i].y = 255 - i;
             voxels[i].z = i;
 
+            octreeA.createLeaf(voxels[i].x, voxels[i].y, voxels[i].z);
             // add data to leaf node voxel
-            int* voxel_container = octreeA.createLeaf(voxels[i].x, voxels[i].y, voxels[i].z);
-            *voxel_container = data[i];
+            ref int voxel_container = ref octreeA.createLeaf(voxels[i].x, voxels[i].y, voxels[i].z);
+            voxel_container = data[i];
         }
     }
 
