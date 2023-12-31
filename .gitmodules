@@ -1,0 +1,3 @@
+[submodule "EntitasBox/contrib/Entitas"]
+	path = EntitasBox/contrib/Entitas
+	url = https://github.com/sschmid/Entitas.git

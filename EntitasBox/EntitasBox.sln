@@ -1,0 +1,44 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F7A59048-1A63-482B-A5FB-56C339AA1544}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{954CE158-669B-4467-8E49-2C7C460A1C3F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Box", "src\Box\Box.csproj", "{4B5E40F4-ED59-4238-BA13-25326BA19350}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "contrib", "contrib", "{F3925D2E-5848-47A3-BF25-CB0C623F410B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Entitas", "Entitas", "{F64E37C5-DE5F-40C6-AB1F-8EA9FB62AD34}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5D49968D-9DBF-4993-84B7-8BE4A0706B61}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Entitas", "contrib\Entitas\src\Entitas\Entitas.csproj", "{D66B660A-FA2C-41A2-BA8D-5E696B5CE2EB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4B5E40F4-ED59-4238-BA13-25326BA19350}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B5E40F4-ED59-4238-BA13-25326BA19350}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B5E40F4-ED59-4238-BA13-25326BA19350}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B5E40F4-ED59-4238-BA13-25326BA19350}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D66B660A-FA2C-41A2-BA8D-5E696B5CE2EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D66B660A-FA2C-41A2-BA8D-5E696B5CE2EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D66B660A-FA2C-41A2-BA8D-5E696B5CE2EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D66B660A-FA2C-41A2-BA8D-5E696B5CE2EB}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4B5E40F4-ED59-4238-BA13-25326BA19350} = {F7A59048-1A63-482B-A5FB-56C339AA1544}
+		{F64E37C5-DE5F-40C6-AB1F-8EA9FB62AD34} = {F3925D2E-5848-47A3-BF25-CB0C623F410B}
+		{5D49968D-9DBF-4993-84B7-8BE4A0706B61} = {F64E37C5-DE5F-40C6-AB1F-8EA9FB62AD34}
+		{D66B660A-FA2C-41A2-BA8D-5E696B5CE2EB} = {5D49968D-9DBF-4993-84B7-8BE4A0706B61}
+	EndGlobalSection
+EndGlobal
