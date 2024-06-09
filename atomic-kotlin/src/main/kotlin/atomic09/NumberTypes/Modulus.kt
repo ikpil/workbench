@@ -1,4 +1,4 @@
-package org.example.NumberTypes
+package org.example.atomic09.NumberTypes
 
 fun main() {
     val numerator: Int = 19

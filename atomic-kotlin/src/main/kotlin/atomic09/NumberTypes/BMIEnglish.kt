@@ -1,4 +1,4 @@
-package org.example.NumberTypes
+package org.example.atomic09.NumberTypes
 
 fun bmiEnglish (
     weight: Int,

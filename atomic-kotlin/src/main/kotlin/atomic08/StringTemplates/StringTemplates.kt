@@ -1,4 +1,4 @@
-package org.example.StringTemplates
+package org.example.atomic08.StringTemplates
 
 fun main() {
     val answer = 42
