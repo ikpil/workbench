@@ -1,4 +1,4 @@
-package org.example.atomic10.Booleans
+package org.example.atomic10.booleans
 
 fun isClosed(hour: Int) {
     val open = 9

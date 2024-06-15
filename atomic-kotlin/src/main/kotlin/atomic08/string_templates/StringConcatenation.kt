@@ -1,4 +1,4 @@
-package org.example.atomic08.StringTemplates
+package org.example.atomic08.string_templates
 
 fun main() {
     val s = "hi\n"
