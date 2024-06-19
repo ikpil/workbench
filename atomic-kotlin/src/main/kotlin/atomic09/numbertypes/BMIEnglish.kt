@@ -1,4 +1,4 @@
-package org.example.atomic09.number_types
+package org.example.atomic09.numbertypes
 
 fun bmiEnglish (
     weight: Int,

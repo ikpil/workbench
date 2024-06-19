@@ -1,4 +1,4 @@
-package org.example.atomic27.property_accessors
+package org.example.atomic27.propertyaccessors
 
 import atomictest.eq
 
