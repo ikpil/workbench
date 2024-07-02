@@ -1,4 +1,4 @@
-package org.example.atomic45.introgenerics
+package org.example.atomic41.introgenerics
 
 import atomictest.eq
 
