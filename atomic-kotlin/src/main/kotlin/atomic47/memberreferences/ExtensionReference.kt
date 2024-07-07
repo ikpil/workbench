@@ -1,4 +1,4 @@
-package org.example.atomic047.memberreferences
+package org.example.atomic47.memberreferences
 
 import atomictest.eq
 
