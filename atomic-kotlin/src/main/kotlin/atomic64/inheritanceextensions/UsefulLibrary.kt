@@ -10,7 +10,7 @@ fun utility1(lt: LibType) {
     lt.f2()
 }
 
-fun utility(lt: LibType) {
+fun utility2(lt: LibType) {
     lt.f2()
     lt.f1()
 }
