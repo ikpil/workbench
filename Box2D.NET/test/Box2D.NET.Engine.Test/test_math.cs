@@ -10,7 +10,7 @@ namespace Box2D.NET.Engine.Test;
 
 public class test_math : test_macros
 {
-// 0.0023 degrees
+    // 0.0023 degrees
     public const float ATAN_TOL = 0.00004f;
 
     [Test]
@@ -97,8 +97,8 @@ public class test_math : test_macros
         }
 
         b2Vec2 zero = b2Vec2_zero;
-        b2Vec2 one = { 1.0f, 1.0f };
-        b2Vec2 two = { 2.0f, 2.0f };
+        b2Vec2 one = new b2Vec2 { x = 1.0f, y = 1.0f };
+        b2Vec2 two = new b2Vec2 { x = 2.0f, y = 2.0f };
 
         b2Vec2 v = b2Add(one, two);
         ENSURE(v.x == 3.0f && v.y == 3.0f);
@@ -109,8 +109,8 @@ public class test_math : test_macros
         v = b2Add(two, two);
         ENSURE(v.x != 5.0f && v.y != 5.0f);
 
-        b2Transform transform1 = { { -2.0f, 3.0f }, b2MakeRot(1.0f) };
-        b2Transform transform2 = { { 1.0f, 0.0f }, b2MakeRot(-2.0f) };
+        b2Transform transform1 = new b2Transform { p = new b2Vec2 { x = -2.0f, y = 3.0f }, q = b2MakeRot(1.0f) };
+        b2Transform transform2 = new b2Transform { p = new b2Vec2 { x = 1.0f, y = 0.0f }, q = b2MakeRot(-2.0f) };
 
         b2Transform transform = b2MulTransforms(transform2, transform1);
 
@@ -127,8 +127,9 @@ public class test_math : test_macros
         ENSURE_SMALL(v.x - two.x, 8.0f * float.Epsilon);
         ENSURE_SMALL(v.y - two.y, 8.0f * float.Epsilon);
 
-        v = b2Normalize((b2Vec2){
-            0.2f, -0.5f
+        v = b2Normalize(new b2Vec2
+        {
+            x = 0.2f, y = -0.5f
         });
         for (float y = -1.0f; y <= 1.0f; y += 0.01f)
         {
@@ -139,9 +140,10 @@ public class test_math : test_macros
                     continue;
                 }
 
-                u = b2Normalize(new b2Vec2{
+                u = b2Normalize(new b2Vec2
+                {
                     x = x, y = y
-                } );
+                });
 
                 b2Rot r = b2ComputeRotationBetweenUnitVectors(v, u);
 
