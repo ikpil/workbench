@@ -23,7 +23,7 @@ static b2Polygon b2MakeCapsule( b2Vec2 p1, b2Vec2 p2, float radius )
 	shape.centroid = b2Lerp( p1, p2, 0.5f );
 
 	b2Vec2 d = b2Sub( p2, p1 );
-	Debug.Assert( b2LengthSquared( d ) > float.Epsilon );
+	Debug.Assert( b2LengthSquared( d ) > Epsilon );
 	b2Vec2 axis = b2Normalize( d );
 	b2Vec2 normal = b2RightPerp( axis );
 
@@ -185,7 +185,7 @@ b2Manifold b2CollidePolygonAndCircle( const b2Polygon* polygonA, b2Transform xfA
 	float u1 = b2Dot( b2Sub( center, v1 ), b2Sub( v2, v1 ) );
 	float u2 = b2Dot( b2Sub( center, v2 ), b2Sub( v1, v2 ) );
 
-	if ( u1 < 0.0f && separation > float.Epsilon )
+	if ( u1 < 0.0f && separation > Epsilon )
 	{
 		// Circle center is closest to v1 and safely outside the polygon
 		b2Vec2 normal = b2Normalize( b2Sub( center, v1 ) );
@@ -208,7 +208,7 @@ b2Manifold b2CollidePolygonAndCircle( const b2Polygon* polygonA, b2Transform xfA
 		mp->id = 0;
 		manifold.pointCount = 1;
 	}
-	else if ( u2 < 0.0f && separation > float.Epsilon )
+	else if ( u2 < 0.0f && separation > Epsilon )
 	{
 		// Circle center is closest to v2 and safely outside the polygon
 		b2Vec2 normal = b2Normalize( b2Sub( center, v2 ) );
@@ -283,7 +283,7 @@ b2Manifold b2CollideCapsules( const b2Capsule* capsuleA, b2Transform xfA, const 
 	float dd1 = b2Dot( d1, d1 );
 	float dd2 = b2Dot( d2, d2 );
 
-	const float epsSqr = float.Epsilon * float.Epsilon;
+	const float epsSqr = Epsilon * Epsilon;
 	Debug.Assert( dd1 > epsSqr && dd2 > epsSqr );
 
 	b2Vec2 r = b2Sub( p1, p2 );
@@ -602,7 +602,7 @@ static b2Manifold b2ClipPolygons( const b2Polygon* polyA, const b2Polygon* polyB
 	//}
 
 	b2Vec2 vLower;
-	if ( lower2 < lower1 && upper2 - lower2 > float.Epsilon )
+	if ( lower2 < lower1 && upper2 - lower2 > Epsilon )
 	{
 		vLower = b2Lerp( v22, v21, ( lower1 - lower2 ) / ( upper2 - lower2 ) );
 	}
@@ -612,7 +612,7 @@ static b2Manifold b2ClipPolygons( const b2Polygon* polyA, const b2Polygon* polyB
 	}
 
 	b2Vec2 vUpper;
-	if ( upper2 > upper1 && upper2 - lower2 > float.Epsilon )
+	if ( upper2 > upper1 && upper2 - lower2 > Epsilon )
 	{
 		vUpper = b2Lerp( v22, v21, ( upper1 - lower2 ) / ( upper2 - lower2 ) );
 	}
@@ -1097,7 +1097,7 @@ static b2Manifold b2ClipSegments( b2Vec2 a1, b2Vec2 a2, b2Vec2 b1, b2Vec2 b2, b2
 	}
 
 	b2Vec2 vLower;
-	if ( lower2 < lower1 && upper2 - lower2 > float.Epsilon )
+	if ( lower2 < lower1 && upper2 - lower2 > Epsilon )
 	{
 		vLower = b2Lerp( b2, b1, ( lower1 - lower2 ) / ( upper2 - lower2 ) );
 	}
@@ -1107,7 +1107,7 @@ static b2Manifold b2ClipSegments( b2Vec2 a1, b2Vec2 a2, b2Vec2 b1, b2Vec2 b2, b2
 	}
 
 	b2Vec2 vUpper;
-	if ( upper2 > upper1 && upper2 - lower2 > float.Epsilon )
+	if ( upper2 > upper1 && upper2 - lower2 > Epsilon )
 	{
 		vUpper = b2Lerp( b2, b1, ( upper1 - lower2 ) / ( upper2 - lower2 ) );
 	}

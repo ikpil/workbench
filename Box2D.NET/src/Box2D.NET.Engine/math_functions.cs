@@ -339,7 +339,7 @@ public static class math_function
     public static b2Vec2 b2Normalize( b2Vec2 v )
     {
         float length = MathF.Sqrt( v.x * v.x + v.y * v.y );
-        if ( length < float.Epsilon )
+        if ( length < Epsilon )
         {
             return b2Vec2_zero;
         }
@@ -354,7 +354,7 @@ public static class math_function
     public static b2Vec2 b2GetLengthAndNormalize( ref float length, b2Vec2 v )
     {
         length = b2Length( v );
-        if ( length < float.Epsilon )
+        if ( length < Epsilon )
         {
             return b2Vec2_zero;
         }
@@ -819,11 +819,13 @@ public static class math_function
         return cs;
     }
 
+    public const float Epsilon = 1.1920929e-7f;
+
     /// Compute the rotation between two unit vectors
     public static b2Rot b2ComputeRotationBetweenUnitVectors(b2Vec2 v1, b2Vec2 v2)
     {
-        Debug.Assert( b2AbsFloat( 1.0f - b2Length( v1 ) ) < 100.0f * float.Epsilon );
-        Debug.Assert( b2AbsFloat( 1.0f - b2Length( v2 ) ) < 100.0f * float.Epsilon );
+        Debug.Assert( b2AbsFloat( 1.0f - b2Length( v1 ) ) < 100.0f * Epsilon );
+        Debug.Assert( b2AbsFloat( 1.0f - b2Length( v2 ) ) < 100.0f * Epsilon );
 
         b2Rot rot;
         rot.c = b2Dot( v1, v2 );

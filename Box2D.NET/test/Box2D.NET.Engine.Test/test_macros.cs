@@ -42,13 +42,13 @@ public class test_macros
         return 0;
     }
 
-    public static int ENSURE_SMALL(float C, float tol)
+    public static int ENSURE_SMALL(float c, float tol)
     {
         do
         {
-            if ((C) < -(tol) || (tol) < (C))
+            if ((c) < -(tol) || (tol) < (c))
             {
-                Assert.That(false, $"condition false: abs({C}) < {tol}");
+                Assert.That(false, $"condition false: abs({c}) < {tol}");
                 return 1;
             }
         } while (false);

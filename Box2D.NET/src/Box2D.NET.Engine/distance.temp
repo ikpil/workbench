@@ -45,7 +45,7 @@ b2SegmentDistanceResult b2SegmentDistance( b2Vec2 p1, b2Vec2 q1, b2Vec2 p2, b2Ve
 	float rd1 = b2Dot( r, d1 );
 	float rd2 = b2Dot( r, d2 );
 
-	const float epsSqr = float.Epsilon * float.Epsilon;
+	const float epsSqr = Epsilon * Epsilon;
 
 	if ( dd1 < epsSqr || dd2 < epsSqr )
 	{
@@ -533,7 +533,7 @@ b2DistanceOutput b2ShapeDistance( b2SimplexCache* cache, const b2DistanceInput* 
 		b2Vec2 d = b2ComputeSimplexSearchDirection( &simplex );
 
 		// Ensure the search direction is numerically fit.
-		if ( b2Dot( d, d ) < float.Epsilon * float.Epsilon )
+		if ( b2Dot( d, d ) < Epsilon * Epsilon )
 		{
 			// The origin is probably contained by a line segment
 			// or triangle. Thus the shapes are overlapped.
@@ -595,7 +595,7 @@ b2DistanceOutput b2ShapeDistance( b2SimplexCache* cache, const b2DistanceInput* 
 	// Apply radii if requested
 	if ( input->useRadii )
 	{
-		if ( output.distance < float.Epsilon )
+		if ( output.distance < Epsilon )
 		{
 			// Shapes are too close to safely compute normal
 			b2Vec2 p = ( b2Vec2 ){ 0.5f * ( output.pointA.x + output.pointB.x ), 0.5f * ( output.pointA.y + output.pointB.y ) };

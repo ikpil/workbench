@@ -79,7 +79,7 @@ public class aabb
         b2Vec2 normal = b2Vec2_zero;
 
         // x-coordinate
-        if (absD.x < float.Epsilon)
+        if (absD.x < Epsilon)
         {
             // parallel
             if (p.x < a.lowerBound.x || a.upperBound.x < p.x)
@@ -122,7 +122,7 @@ public class aabb
         }
 
         // y-coordinate
-        if (absD.y < float.Epsilon)
+        if (absD.y < Epsilon)
         {
             // parallel
             if (p.y < a.lowerBound.y || a.upperBound.y < p.y)

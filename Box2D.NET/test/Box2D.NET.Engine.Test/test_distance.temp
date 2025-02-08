@@ -14,13 +14,13 @@ public class test_distance : test_macros
 
         b2SegmentDistanceResult result = b2SegmentDistance( p1, q1, p2, q2 );
 
-        ENSURE_SMALL( result.fraction1 - 0.5f, float.Epsilon );
-        ENSURE_SMALL( result.fraction2 - 1.0f, float.Epsilon );
-        ENSURE_SMALL( result.closest1.x + 1.0f, float.Epsilon );
-        ENSURE_SMALL( result.closest1.y, float.Epsilon );
-        ENSURE_SMALL( result.closest2.x - 1.0f, float.Epsilon );
-        ENSURE_SMALL( result.closest2.y, float.Epsilon );
-        ENSURE_SMALL( result.distanceSquared - 4.0f, float.Epsilon );
+        ENSURE_SMALL( result.fraction1 - 0.5f, Epsilon );
+        ENSURE_SMALL( result.fraction2 - 1.0f, Epsilon );
+        ENSURE_SMALL( result.closest1.x + 1.0f, Epsilon );
+        ENSURE_SMALL( result.closest1.y, Epsilon );
+        ENSURE_SMALL( result.closest2.x - 1.0f, Epsilon );
+        ENSURE_SMALL( result.closest2.y, Epsilon );
+        ENSURE_SMALL( result.distanceSquared - 4.0f, Epsilon );
     }
 
     public void ShapeDistanceTest()
@@ -42,7 +42,7 @@ public class test_distance : test_macros
         b2SimplexCache cache = { 0 };
         b2DistanceOutput output = b2ShapeDistance( &cache, &input, NULL, 0 );
 
-        ENSURE_SMALL( output.distance - 1.0f, float.Epsilon );
+        ENSURE_SMALL( output.distance - 1.0f, Epsilon );
     }
 
     public void ShapeCastTest()

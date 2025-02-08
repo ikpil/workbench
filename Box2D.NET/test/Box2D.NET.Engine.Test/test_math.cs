@@ -118,14 +118,14 @@ public class test_math : test_macros
 
         b2Vec2 u = b2TransformPoint(transform, two);
 
-        ENSURE_SMALL(u.x - v.x, 10.0f * float.Epsilon);
-        ENSURE_SMALL(u.y - v.y, 10.0f * float.Epsilon);
+        ENSURE_SMALL(u.x - v.x, 10.0f * Epsilon);
+        ENSURE_SMALL(u.y - v.y, 10.0f * Epsilon);
 
         v = b2TransformPoint(transform1, two);
         v = b2InvTransformPoint(transform1, v);
 
-        ENSURE_SMALL(v.x - two.x, 8.0f * float.Epsilon);
-        ENSURE_SMALL(v.y - two.y, 8.0f * float.Epsilon);
+        ENSURE_SMALL(v.x - two.x, 8.0f * Epsilon);
+        ENSURE_SMALL(v.y - two.y, 8.0f * Epsilon);
 
         v = b2Normalize(new b2Vec2
         {
@@ -148,8 +148,8 @@ public class test_math : test_macros
                 b2Rot r = b2ComputeRotationBetweenUnitVectors(v, u);
 
                 b2Vec2 w = b2RotateVector(r, v);
-                ENSURE_SMALL(w.x - u.x, 4.0f * float.Epsilon);
-                ENSURE_SMALL(w.y - u.y, 4.0f * float.Epsilon);
+                ENSURE_SMALL(w.x - u.x, 4.0f * Epsilon);
+                ENSURE_SMALL(w.y - u.y, 4.0f * Epsilon);
             }
         }
     }

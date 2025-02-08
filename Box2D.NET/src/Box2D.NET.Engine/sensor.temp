@@ -118,7 +118,7 @@ static bool b2SensorQueryCallback( int proxyId, int shapeId, void* context )
 	b2SimplexCache cache = { 0 };
 	b2DistanceOutput output = b2ShapeDistance( &cache, &input, NULL, 0 );
 
-	bool overlaps = output.distance < 10.0f * float.Epsilon;
+	bool overlaps = output.distance < 10.0f * Epsilon;
 	if ( overlaps == false )
 	{
 		return true;

@@ -2843,7 +2843,7 @@ static bool ExplosionCallback( int proxyId, int shapeId, void* context )
 	}
 
 	b2Vec2 direction = b2Sub( closestPoint, explosionContext->position );
-	if ( b2LengthSquared( direction ) > 100.0f * float.Epsilon * float.Epsilon )
+	if ( b2LengthSquared( direction ) > 100.0f * Epsilon * Epsilon )
 	{
 		direction = b2Normalize( direction );
 	}
