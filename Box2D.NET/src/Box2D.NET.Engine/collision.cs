@@ -635,6 +635,128 @@ void b2DynamicTree_Validate( const b2DynamicTree* tree );
 void b2DynamicTree_ValidateNoEnlarged( const b2DynamicTree* tree );
 
 
+/// Validate ray cast input data (NaN, etc)
+bool b2IsValidRay( const b2RayCastInput* input );
+
+/// Make a convex polygon from a convex hull. This will assert if the hull is not valid.
+/// @warning Do not manually fill in the hull data, it must come directly from b2ComputeHull
+b2Polygon b2MakePolygon( const b2Hull* hull, float radius );
+
+/// Make an offset convex polygon from a convex hull. This will assert if the hull is not valid.
+/// @warning Do not manually fill in the hull data, it must come directly from b2ComputeHull
+b2Polygon b2MakeOffsetPolygon( const b2Hull* hull, b2Vec2 position, b2Rot rotation );
+
+/// Make an offset convex polygon from a convex hull. This will assert if the hull is not valid.
+/// @warning Do not manually fill in the hull data, it must come directly from b2ComputeHull
+b2Polygon b2MakeOffsetRoundedPolygon( const b2Hull* hull, b2Vec2 position, b2Rot rotation, float radius );
+
+/// Make a square polygon, bypassing the need for a convex hull.
+/// @param halfWidth the half-width
+b2Polygon b2MakeSquare( float halfWidth );
+
+/// Make a box (rectangle) polygon, bypassing the need for a convex hull.
+/// @param halfWidth the half-width (x-axis)
+/// @param halfHeight the half-height (y-axis)
+b2Polygon b2MakeBox( float halfWidth, float halfHeight );
+
+/// Make a rounded box, bypassing the need for a convex hull.
+/// @param halfWidth the half-width (x-axis)
+/// @param halfHeight the half-height (y-axis)
+/// @param radius the radius of the rounded extension
+b2Polygon b2MakeRoundedBox( float halfWidth, float halfHeight, float radius );
+
+/// Make an offset box, bypassing the need for a convex hull.
+/// @param halfWidth the half-width (x-axis)
+/// @param halfHeight the half-height (y-axis)
+/// @param center the local center of the box
+/// @param rotation the local rotation of the box
+b2Polygon b2MakeOffsetBox( float halfWidth, float halfHeight, b2Vec2 center, b2Rot rotation );
+
+/// Make an offset rounded box, bypassing the need for a convex hull.
+/// @param halfWidth the half-width (x-axis)
+/// @param halfHeight the half-height (y-axis)
+/// @param center the local center of the box
+/// @param rotation the local rotation of the box
+/// @param radius the radius of the rounded extension
+b2Polygon b2MakeOffsetRoundedBox( float halfWidth, float halfHeight, b2Vec2 center, b2Rot rotation, float radius );
+
+/// Transform a polygon. This is useful for transferring a shape from one body to another.
+b2Polygon b2TransformPolygon( b2Transform transform, const b2Polygon* polygon );
+
+/// Compute mass properties of a circle
+b2MassData b2ComputeCircleMass( const b2Circle* shape, float density );
+
+/// Compute mass properties of a capsule
+b2MassData b2ComputeCapsuleMass( const b2Capsule* shape, float density );
+
+/// Compute mass properties of a polygon
+b2MassData b2ComputePolygonMass( const b2Polygon* shape, float density );
+
+/// Compute the bounding box of a transformed circle
+b2AABB b2ComputeCircleAABB( const b2Circle* shape, b2Transform transform );
+
+/// Compute the bounding box of a transformed capsule
+b2AABB b2ComputeCapsuleAABB( const b2Capsule* shape, b2Transform transform );
+
+/// Compute the bounding box of a transformed polygon
+b2AABB b2ComputePolygonAABB( const b2Polygon* shape, b2Transform transform );
+
+/// Compute the bounding box of a transformed line segment
+b2AABB b2ComputeSegmentAABB( const b2Segment* shape, b2Transform transform );
+
+/// Test a point for overlap with a circle in local space
+bool b2PointInCircle( b2Vec2 point, const b2Circle* shape );
+
+/// Test a point for overlap with a capsule in local space
+bool b2PointInCapsule( b2Vec2 point, const b2Capsule* shape );
+
+/// Test a point for overlap with a convex polygon in local space
+bool b2PointInPolygon( b2Vec2 point, const b2Polygon* shape );
+
+/// Ray cast versus circle shape in local space. Initial overlap is treated as a miss.
+b2CastOutput b2RayCastCircle( const b2RayCastInput* input, const b2Circle* shape );
+
+/// Ray cast versus capsule shape in local space. Initial overlap is treated as a miss.
+b2CastOutput b2RayCastCapsule( const b2RayCastInput* input, const b2Capsule* shape );
+
+/// Ray cast versus segment shape in local space. Optionally treat the segment as one-sided with hits from
+/// the left side being treated as a miss.
+b2CastOutput b2RayCastSegment( const b2RayCastInput* input, const b2Segment* shape, bool oneSided );
+
+/// Ray cast versus polygon shape in local space. Initial overlap is treated as a miss.
+b2CastOutput b2RayCastPolygon( const b2RayCastInput* input, const b2Polygon* shape );
+
+/// Shape cast versus a circle. Initial overlap is treated as a miss.
+b2CastOutput b2ShapeCastCircle( const b2ShapeCastInput* input, const b2Circle* shape );
+
+/// Shape cast versus a capsule. Initial overlap is treated as a miss.
+b2CastOutput b2ShapeCastCapsule( const b2ShapeCastInput* input, const b2Capsule* shape );
+
+/// Shape cast versus a line segment. Initial overlap is treated as a miss.
+b2CastOutput b2ShapeCastSegment( const b2ShapeCastInput* input, const b2Segment* shape );
+
+/// Shape cast versus a convex polygon. Initial overlap is treated as a miss.
+b2CastOutput b2ShapeCastPolygon( const b2ShapeCastInput* input, const b2Polygon* shape );
+
+
+/// Compute the convex hull of a set of points. Returns an empty hull if it fails.
+/// Some failure cases:
+/// - all points very close together
+/// - all points on a line
+/// - less than 3 points
+/// - more than B2_MAX_POLYGON_VERTICES points
+/// This welds close points and removes collinear points.
+/// @warning Do not modify a hull once it has been computed
+b2Hull b2ComputeHull( const b2Vec2* points, int count );
+
+/// This determines if a hull is valid. Checks for:
+/// - convexity
+/// - collinear points
+/// This is expensive and should not be called at runtime.
+bool b2ValidateHull( const b2Hull* hull );
+
+/// Compute the distance between two line segments, clamping at the end points if needed.
+b2SegmentDistanceResult b2SegmentDistance( b2Vec2 p1, b2Vec2 q1, b2Vec2 p2, b2Vec2 q2 );
 
 /**@}*/
 
