@@ -4,7 +4,7 @@
 
 namespace Box2D.NET.Engine.Test;
 
-public class test_bitset
+public class test_bitset : test_macros
 {
 
     private const int COUNT = 169;

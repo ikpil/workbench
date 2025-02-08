@@ -3,7 +3,7 @@
 
 namespace Box2D.NET.Engine.Test;
 
-public class test_id
+public class test_id : test_macros
 {
     public void IdTest()
     {

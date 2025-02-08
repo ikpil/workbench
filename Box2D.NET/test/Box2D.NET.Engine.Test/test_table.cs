@@ -3,7 +3,7 @@
 
 namespace Box2D.NET.Engine.Test;
 
-public class test_table
+public class test_table : test_macros
 {
 
 
@@ -85,15 +85,15 @@ public class test_table
             }
 
             // ulong ticks = b2GetTicks(&timer);
-            // printf("set ticks = %llu\n", ticks);
+            // Console.Write("set ticks = %llu\n", ticks);
 
             float ms = b2GetMilliseconds(ticks);
-            printf("set: count = %d, b2ContainsKey = %.5f ms, ave = %.5f us\n", itemCount, ms, 1000.0f * ms / itemCount);
+            Console.Write("set: count = %d, b2ContainsKey = %.5f ms, ave = %.5f us\n", itemCount, ms, 1000.0f * ms / itemCount);
 
 #if B2_SNOOP_TABLE_COUNTERS
 		int probeCount = b2AtomicLoadInt( &b2_probeCount );
 		float aveProbeCount = (float)probeCount / (float)itemCount;
-		printf( "item count = %d, probe count = %d, ave probe count %.2f\n", itemCount, probeCount, aveProbeCount );
+		Console.Write( "item count = %d, probe count = %d, ave probe count %.2f\n", itemCount, probeCount, aveProbeCount );
 #endif
 
             // Remove all keys from set

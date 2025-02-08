@@ -3,7 +3,7 @@
 
 namespace Box2D.NET.Engine.Test;
 
-public class test_shape
+public class test_shape : test_macros
 {
     static b2Capsule capsule = { { -1.0f, 0.0f }, { 1.0f, 0.0f }, 1.0f };
     static b2Circle circle = { { 1.0f, 0.0f }, 1.0f };
@@ -37,16 +37,16 @@ public class test_shape
             float angle = -0.5f * B2_PI;
             for (int i = 0; i < N; ++i)
             {
-                points[i].x = 1.0f + radius * cosf(angle);
-                points[i].y = radius * sinf(angle);
+                points[i].x = 1.0f + radius * MathF.Cos(angle);
+                points[i].y = radius * MathF.Sin(angle);
                 angle += d;
             }
 
             angle = 0.5f * B2_PI;
             for (int i = N; i < 2 * N; ++i)
             {
-                points[i].x = -1.0f + radius * cosf(angle);
-                points[i].y = radius * sinf(angle);
+                points[i].x = -1.0f + radius * MathF.Cos(angle);
+                points[i].y = radius * MathF.Sin(angle);
                 angle += d;
             }
 

@@ -2,24 +2,29 @@
 // SPDX-License-Identifier: MIT
 
 
+using System;
+using NUnit.Framework;
+using static Box2D.NET.Engine.math_function;
+
 namespace Box2D.NET.Engine.Test;
 
-public class test_math
+public class test_math : test_macros
 {
 // 0.0023 degrees
     public const float ATAN_TOL = 0.00004f;
 
+    [Test]
     public void MathTest()
     {
         for (float t = -10.0f; t < 10.0f; t += 0.01f)
         {
             float angle = B2_PI * t;
             b2Rot r = b2MakeRot(angle);
-            float c = cosf(angle);
-            float s = sinf(angle);
+            float c = MathF.Cos(angle);
+            float s = MathF.Sin(angle);
 
             // The cosine and sine approximations are accurate to about 0.1 degrees (0.002 radians)
-            // printf( "%g %g\n", r.c - c, r.s - s );
+            // Console.Write( "%g %g\n", r.c - c, r.s - s );
             ENSURE_SMALL(r.c - c, 0.002f);
             ENSURE_SMALL(r.s - s, 0.002f);
 
@@ -44,7 +49,7 @@ public class test_math
             for (float x = -1.0f; x <= 1.0f; x += 0.01f)
             {
                 float a1 = b2Atan2(y, x);
-                float a2 = atan2f(y, x);
+                float a2 = MathF.Atan2(y, x);
                 float diff = b2AbsFloat(a1 - a2);
                 ENSURE(b2IsValidFloat(a1));
                 ENSURE_SMALL(diff, ATAN_TOL);
@@ -53,7 +58,7 @@ public class test_math
 
         {
             float a1 = b2Atan2(1.0f, 0.0f);
-            float a2 = atan2f(1.0f, 0.0f);
+            float a2 = MathF.Atan2(1.0f, 0.0f);
             float diff = b2AbsFloat(a1 - a2);
             ENSURE(b2IsValidFloat(a1));
             ENSURE_SMALL(diff, ATAN_TOL);
@@ -61,7 +66,7 @@ public class test_math
 
         {
             float a1 = b2Atan2(-1.0f, 0.0f);
-            float a2 = atan2f(-1.0f, 0.0f);
+            float a2 = MathF.Atan2(-1.0f, 0.0f);
             float diff = b2AbsFloat(a1 - a2);
             ENSURE(b2IsValidFloat(a1));
             ENSURE_SMALL(diff, ATAN_TOL);
@@ -69,7 +74,7 @@ public class test_math
 
         {
             float a1 = b2Atan2(0.0f, 1.0f);
-            float a2 = atan2f(0.0f, 1.0f);
+            float a2 = MathF.Atan2(0.0f, 1.0f);
             float diff = b2AbsFloat(a1 - a2);
             ENSURE(b2IsValidFloat(a1));
             ENSURE_SMALL(diff, ATAN_TOL);
@@ -77,7 +82,7 @@ public class test_math
 
         {
             float a1 = b2Atan2(0.0f, -1.0f);
-            float a2 = atan2f(0.0f, -1.0f);
+            float a2 = MathF.Atan2(0.0f, -1.0f);
             float diff = b2AbsFloat(a1 - a2);
             ENSURE(b2IsValidFloat(a1));
             ENSURE_SMALL(diff, ATAN_TOL);
@@ -85,7 +90,7 @@ public class test_math
 
         {
             float a1 = b2Atan2(0.0f, 0.0f);
-            float a2 = atan2f(0.0f, 0.0f);
+            float a2 = MathF.Atan2(0.0f, 0.0f);
             float diff = b2AbsFloat(a1 - a2);
             ENSURE(b2IsValidFloat(a1));
             ENSURE_SMALL(diff, ATAN_TOL);
@@ -134,8 +139,8 @@ public class test_math
                     continue;
                 }
 
-                u = b2Normalize((b2Vec2){
-                    x, y
+                u = b2Normalize(new b2Vec2{
+                    x = x, y = y
                 } );
 
                 b2Rot r = b2ComputeRotationBetweenUnitVectors(v, u);

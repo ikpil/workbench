@@ -724,13 +724,13 @@ public static class math_function
     }
 
     /// Compute an approximate arctangent in the range [-pi, pi]
-    /// This is hand coded for cross-platform determinism. The atan2f
+    /// This is hand coded for cross-platform determinism. The MathF.Atan2
     /// function in the standard library is not cross-platform deterministic.
     ///	Accurate to around 0.0023 degrees
     // https://stackoverflow.com/questions/46210708/atan2-approximation-with-11bits-in-mantissa-on-x86with-sse2-and-armwith-vfpv4
     public static float b2Atan2( float y, float x )
     {
-        // Added check for (0,0) to match atan2f and avoid NaN
+        // Added check for (0,0) to match MathF.Atan2 and avoid NaN
         if (x == 0.0f && y == 0.0f)
         {
             return 0.0f;
@@ -772,7 +772,7 @@ public static class math_function
 
     /// Compute the cosine and sine of an angle in radians. Implemented
     /// for cross-platform determinism.
-    // Approximate cosine and sine for determinism. In my testing cosf and sinf produced
+    // Approximate cosine and sine for determinism. In my testing MathF.Cos and MathF.Sin produced
     // the same results on x64 and ARM using MSVC, GCC, and Clang. However, I don't trust
     // this result.
     // https://en.wikipedia.org/wiki/Bh%C4%81skara_I%27s_sine_approximation_formula

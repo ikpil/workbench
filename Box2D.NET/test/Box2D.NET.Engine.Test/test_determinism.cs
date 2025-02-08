@@ -4,7 +4,7 @@
 
 namespace Box2D.NET.Engine.Test;
 
-public class test_determinism
+public class test_determinism : test_macros
 {
 
 enum
@@ -305,7 +305,7 @@ static int CrossPlatformTest()
 				}
 
 				sleepStep = stepCount;
-				printf( "step = %d, hash = 0x%08x\n", sleepStep, hash );
+				Console.Write( "step = %d, hash = 0x%08x\n", sleepStep, hash );
 
 				break;
 			}

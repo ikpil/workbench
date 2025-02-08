@@ -2,9 +2,11 @@
 // SPDX-License-Identifier: MIT
 
 
+using NUnit.Framework;
+
 namespace Box2D.NET.Engine.Test;
 
-public class test_world
+public class test_world : test_macros
 {
 
     // This is a simple example of building and running a simulation
@@ -12,7 +14,8 @@ public class test_world
     // box.
     // There are no graphics for this example. Box2D is meant to be used
     // with your rendering engine in your game engine.
-    int HelloWorld()
+    [Test(ExpectedResult = 0)]
+    public int HelloWorld()
     {
         // Construct a world object, which will hold and simulate the rigid bodies.
         b2WorldDef worldDef = b2DefaultWorldDef();
@@ -80,7 +83,7 @@ public class test_world
             position = b2Body_GetPosition( bodyId );
             rotation = b2Body_GetRotation( bodyId );
 
-            // printf("%4.2f %4.2f %4.2f\n", position.x, position.y, b2Rot_GetAngle(rotation));
+            // Console.Write("%4.2f %4.2f %4.2f\n", position.x, position.y, b2Rot_GetAngle(rotation));
         }
 
         // When the world destructor is called, all bodies and joints are freed. This can
@@ -94,7 +97,8 @@ public class test_world
         return 0;
     }
 
-    int EmptyWorld()
+    [Test(ExpectedResult = 0)]
+    public int EmptyWorld()
     {
         b2WorldDef worldDef = b2DefaultWorldDef();
         b2WorldId worldId = b2CreateWorld( &worldDef );
@@ -116,7 +120,9 @@ public class test_world
     }
 
     #define BODY_COUNT 10
-    int DestroyAllBodiesWorld()
+    
+    [Test(ExpectedResult = 0)]
+    public int DestroyAllBodiesWorld()
     {
         b2WorldDef worldDef = b2DefaultWorldDef();
         b2WorldId worldId = b2CreateWorld( &worldDef );
@@ -167,7 +173,8 @@ public class test_world
         return 0;
     }
 
-    static int TestIsValid()
+    [Test(ExpectedResult = 0)]
+    public int TestIsValid()
     {
         b2WorldDef worldDef = b2DefaultWorldDef();
         b2WorldId worldId = b2CreateWorld( &worldDef );
@@ -198,7 +205,8 @@ public class test_world
 
     #define WORLD_COUNT ( B2_MAX_WORLDS / 2 )
 
-    int TestWorldRecycle()
+    [Test(ExpectedResult = 0)]
+    public int TestWorldRecycle()
     {
         _Static_assert( WORLD_COUNT > 0, "world count" );
 
@@ -258,7 +266,8 @@ public class test_world
     }
 
     // This test is here to ensure all API functions link correctly.
-    int TestWorldCoverage()
+    [Test(ExpectedResult = 0)]
+    public int TestWorldCoverage()
     {
         b2WorldDef worldDef = b2DefaultWorldDef();
 
@@ -322,7 +331,8 @@ public class test_world
         return 0;
     }
 
-    static int TestSensor()
+    [Test(ExpectedResult = 0)]
+    public int TestSensor()
     {
         b2WorldDef worldDef = b2DefaultWorldDef();
         b2WorldId worldId = b2CreateWorld( &worldDef );
@@ -360,7 +370,7 @@ public class test_world
             b2World_Step( worldId, timeStep, subStepCount );
 
             b2Vec2 bulletPos = b2Body_GetPosition( bulletId );
-            //printf( "Bullet pos: %g %g\n", bulletPos.x, bulletPos.y );
+            //Console.Write( "Bullet pos: %g %g\n", bulletPos.x, bulletPos.y );
 
             b2SensorEvents events = b2World_GetSensorEvents( worldId );
 

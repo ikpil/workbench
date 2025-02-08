@@ -1104,7 +1104,7 @@ b2TOIOutput b2TimeOfImpact( const b2TOIInput* input )
 				sweepB.GetTransform(&xfB, x);
 				float f = fcn.Evaluate(xfA, xfB) - target;
 
-				printf("%g %g\n", x, f);
+				Console.Write("%g %g\n", x, f);
 
 				xs[i] = x;
 				fs[i] = f;
