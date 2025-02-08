@@ -1,52 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.1</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Box2D.NET.Core\Box2D.NET.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ClCompile Include="aabb.c" />
-    <ClCompile Include="arena_allocator.c" />
-    <ClCompile Include="array.c" />
-    <ClCompile Include="bitset.c" />
-    <ClCompile Include="body.c" />
-    <ClCompile Include="broad_phase.c" />
-    <ClCompile Include="constraint_graph.c" />
-    <ClCompile Include="contact.c" />
-    <ClCompile Include="contact_solver.c" />
-    <ClCompile Include="core.c" />
-    <ClCompile Include="distance.c" />
-    <ClCompile Include="distance_joint.c" />
-    <ClCompile Include="dynamic_tree.c" />
-    <ClCompile Include="geometry.c" />
-    <ClCompile Include="hull.c" />
-    <ClCompile Include="id_pool.c" />
-    <ClCompile Include="island.c" />
-    <ClCompile Include="joint.c" />
-    <ClCompile Include="manifold.c" />
-    <ClCompile Include="math_functions.c" />
-    <ClCompile Include="motor_joint.c" />
-    <ClCompile Include="mouse_joint.c" />
-    <ClCompile Include="prismatic_joint.c" />
-    <ClCompile Include="revolute_joint.c" />
-    <ClCompile Include="sensor.c" />
-    <ClCompile Include="shape.c" />
-    <ClCompile Include="solver.c" />
-    <ClCompile Include="solver_set.c" />
-    <ClCompile Include="table.c" />
-    <ClCompile Include="timer.c" />
-    <ClCompile Include="types.c" />
-    <ClCompile Include="weld_joint.c" />
-    <ClCompile Include="wheel_joint.c" />
-    <ClCompile Include="world.c" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Natvis Include="box2d.natvis" />
   </ItemGroup>
 
 </Project>
