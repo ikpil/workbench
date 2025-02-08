@@ -13,7 +13,7 @@ public class atomic
 
 #endif
 
-    staticvoid b2AtomicStoreInt(b2AtomicInt* a, int value)
+    static void b2AtomicStoreInt(b2AtomicInt* a, int value)
     {
 #if defined( _MSC_VER )
 	(void)_InterlockedExchange( (long*)&a->value, value );
@@ -58,7 +58,7 @@ public class atomic
 #endif
     }
 
-    staticvoid b2AtomicStoreU32(b2AtomicU32* a, uint value)
+    static void b2AtomicStoreU32(b2AtomicU32* a, uint value)
     {
 #if defined( _MSC_VER )
 	(void)_InterlockedExchange( (long*)&a->value, value );

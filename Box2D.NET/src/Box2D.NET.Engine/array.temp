@@ -50,7 +50,7 @@ public class array
 // Inline array functions that need the type T to be defined
 #define B2_ARRAY_INLINE( T, PREFIX )                                                                                             \
 	/* Resize */                                                                                                                 \
-	staticvoid PREFIX##Array_Resize( PREFIX##Array* a, int count )                                                       \
+	static void PREFIX##Array_Resize( PREFIX##Array* a, int count )                                                       \
 	{                                                                                                                            \
 		PREFIX##Array_Reserve( a, count );                                                                                       \
 		a->count = count;                                                                                                        \
@@ -73,7 +73,7 @@ public class array
 		return a->data + ( a->count - 1 );                                                                                       \
 	}                                                                                                                            \
 	/* Push */                                                                                                                   \
-	staticvoid PREFIX##Array_Push( PREFIX##Array* a, T value )                                                           \
+	static void PREFIX##Array_Push( PREFIX##Array* a, T value )                                                           \
 	{                                                                                                                            \
 		if ( a->count == a->capacity )                                                                                           \
 		{                                                                                                                        \
@@ -84,7 +84,7 @@ public class array
 		a->count += 1;                                                                                                           \
 	}                                                                                                                            \
 	/* Set */                                                                                                                    \
-	staticvoid PREFIX##Array_Set( PREFIX##Array* a, int index, T value )                                                 \
+	static void PREFIX##Array_Set( PREFIX##Array* a, int index, T value )                                                 \
 	{                                                                                                                            \
 		Debug.Assert( 0 <= index && index < a->count );                                                                             \
 		a->data[index] = value;                                                                                                  \
@@ -111,7 +111,7 @@ public class array
 		return value;                                                                                                            \
 	}                                                                                                                            \
 	/* Clear */                                                                                                                  \
-	staticvoid PREFIX##Array_Clear( PREFIX##Array* a )                                                                   \
+	static void PREFIX##Array_Clear( PREFIX##Array* a )                                                                   \
 	{                                                                                                                            \
 		a->count = 0;                                                                                                            \
 	}                                                                                                                            \

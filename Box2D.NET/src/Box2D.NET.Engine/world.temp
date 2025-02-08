@@ -742,7 +742,7 @@ static void b2Collide( b2StepContext* context )
 	b2TracyCZoneNC( contact_state, "Contact State", b2_colorLightSlateGray, true );
 
 	// Bitwise OR all contact bits
-	b2BitSet* bitSet = &world->taskContexts.data[0].contactStateBitSet;
+	b2BitSet bitSet = &world->taskContexts.data[0].contactStateBitSet;
 	for ( int i = 1; i < world->workerCount; ++i )
 	{
 		b2InPlaceUnion( bitSet, &world->taskContexts.data[i].contactStateBitSet );

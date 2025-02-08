@@ -693,6 +693,7 @@ public static class math_function
         return true;
     }
 
+    /// Is this a valid vector? Not NaN or infinity.
     public static bool b2IsValidVec2( b2Vec2 v )
     {
         if ( float.IsNaN( v.x ) || float.IsNaN( v.y ) )
@@ -708,6 +709,7 @@ public static class math_function
         return true;
     }
 
+    /// Is this a valid rotation? Not NaN or infinity. Is normalized.
     public static bool b2IsValidRotation( b2Rot q )
     {
         if ( float.IsNaN( q.s ) || float.IsNaN( q.c ) )

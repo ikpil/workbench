@@ -257,7 +257,7 @@ void b2OverlapSensors( b2World* world )
 
 	b2TracyCZoneNC( sensor_state, "Events", b2_colorLightSlateGray, true );
 
-	b2BitSet* bitSet = &world->sensorTaskContexts.data[0].eventBits;
+	b2BitSet bitSet = &world->sensorTaskContexts.data[0].eventBits;
 	for ( int i = 1; i < world->workerCount; ++i )
 	{
 		b2InPlaceUnion( bitSet, &world->sensorTaskContexts.data[i].eventBits );

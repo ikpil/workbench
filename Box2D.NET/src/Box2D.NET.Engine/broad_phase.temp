@@ -74,7 +74,7 @@ void b2ValidateNoEnlarged( const b2BroadPhase* bp );
 
 // This is what triggers new contact pairs to be created
 // Warning: this must be called in deterministic order
-staticvoid b2BufferMove( b2BroadPhase* bp, int queryProxy )
+static void b2BufferMove( b2BroadPhase* bp, int queryProxy )
 {
 	// Adding 1 because 0 is the sentinel
 	bool alreadyAdded = b2AddKey( &bp->moveSet, queryProxy + 1 );
@@ -134,7 +134,7 @@ void b2DestroyBroadPhase( b2BroadPhase* bp )
 	// }
 }
 
-staticvoid b2UnBufferMove( b2BroadPhase* bp, int proxyKey )
+static void b2UnBufferMove( b2BroadPhase* bp, int proxyKey )
 {
 	bool found = b2RemoveKey( &bp->moveSet, proxyKey + 1 );
 

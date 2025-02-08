@@ -54,6 +54,7 @@ public class aabb
     }
 
 
+    /// Is this a valid bounding box? Not Nan or infinity. Upper bound greater than or equal to lower bound.
     bool b2IsValidAABB(b2AABB a)
     {
         b2Vec2 d = b2Sub(a.upperBound, a.lowerBound);

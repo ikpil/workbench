@@ -33,8 +33,7 @@ public class test_macros
         {
             if ((C) == false)
             {
-                Console.Write("condition false: " + nameof(C) + "\n");
-                Assert.That(false);
+                Assert.That(false, "condition false: " + nameof(C));
                 return 1;
             }
         } while (false);

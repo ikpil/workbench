@@ -154,28 +154,28 @@ void b2Solve( b2World* world, b2StepContext* stepContext );
 
 
 #if ( defined( __GNUC__ ) || defined( __clang__ ) ) && ( defined( __i386__ ) || defined( __x86_64__ ) )
-staticvoid b2Pause()
+static void b2Pause()
 {
 	__asm__ __volatile__( "pause\n" );
 }
 #elif ( defined( __arm__ ) && defined( __ARM_ARCH ) && __ARM_ARCH >= 7 ) || defined( __aarch64__ )
-staticvoid b2Pause()
+static void b2Pause()
 {
 	__asm__ __volatile__( "yield" ::: "memory" );
 }
 #elif defined( _MSC_VER ) && ( defined( _M_IX86 ) || defined( _M_X64 ) )
 //
-staticvoid b2Pause()
+static void b2Pause()
 {
 	_mm_pause();
 }
 #elif defined( _MSC_VER ) && ( defined( _M_ARM ) || defined( _M_ARM64 ) )
-staticvoid b2Pause()
+static void b2Pause()
 {
 	__yield();
 }
 #else
-staticvoid b2Pause()
+static void b2Pause()
 {
 }
 #endif
@@ -676,8 +676,8 @@ static void b2FinalizeBodiesTask( int startIndex, int endIndex, uint threadIndex
 	Debug.Assert( endIndex <= world->bodyMoveEvents.count );
 	b2BodyMoveEvent* moveEvents = world->bodyMoveEvents.data;
 
-	b2BitSet* enlargedSimBitSet = &world->taskContexts.data[threadIndex].enlargedSimBitSet;
-	b2BitSet* awakeIslandBitSet = &world->taskContexts.data[threadIndex].awakeIslandBitSet;
+	b2BitSet enlargedSimBitSet = &world->taskContexts.data[threadIndex].enlargedSimBitSet;
+	b2BitSet awakeIslandBitSet = &world->taskContexts.data[threadIndex].awakeIslandBitSet;
 	b2TaskContext* taskContext = world->taskContexts.data + threadIndex;
 
 	bool enableContinuous = world->enableContinuous;
@@ -1940,7 +1940,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 		b2ValidateNoEnlarged( &world->broadPhase );
 
 		// Gather bits for all sim bodies that have enlarged AABBs
-		b2BitSet* enlargedBodyBitSet = &world->taskContexts.data[0].enlargedSimBitSet;
+		b2BitSet enlargedBodyBitSet = &world->taskContexts.data[0].enlargedSimBitSet;
 		for ( int i = 1; i < world->workerCount; ++i )
 		{
 			b2InPlaceUnion( enlargedBodyBitSet, &world->taskContexts.data[i].enlargedSimBitSet );
@@ -2128,7 +2128,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 			}
 		}
 
-		b2BitSet* awakeIslandBitSet = &world->taskContexts.data[0].awakeIslandBitSet;
+		b2BitSet awakeIslandBitSet = &world->taskContexts.data[0].awakeIslandBitSet;
 		for ( int i = 1; i < world->workerCount; ++i )
 		{
 			b2InPlaceUnion( awakeIslandBitSet, &world->taskContexts.data[i].awakeIslandBitSet );
