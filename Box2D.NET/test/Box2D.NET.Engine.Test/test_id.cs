@@ -1,13 +1,17 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
+using NUnit.Framework;
+using static Box2D.NET.Engine.id;
+
 namespace Box2D.NET.Engine.Test;
 
 public class test_id : test_macros
 {
+    [Test]
     public void IdTest()
     {
-        ulong x = 0x0123456789ABCDEFull;
+        ulong x = 0x0123456789ABCDEFul;
 
         {
             b2BodyId id = b2LoadBodyId(x);
@@ -33,5 +37,4 @@ public class test_id : test_macros
             ENSURE(x == y);
         }
     }
-
 }
