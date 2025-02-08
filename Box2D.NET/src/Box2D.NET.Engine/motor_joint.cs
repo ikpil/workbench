@@ -101,7 +101,7 @@ public class motor_joint
 
     void b2PrepareMotorJoint(b2JointSim* base, b2StepContext* context)
     {
-        B2_ASSERT(base->type == b2_motorJoint);
+        Debug.Assert(base->type == b2_motorJoint);
 
         // chase body id to the solver set where the body lives
         int idA = base->bodyIdA;
@@ -112,7 +112,7 @@ public class motor_joint
         b2Body* bodyA = b2BodyArray_Get(&world->bodies, idA);
         b2Body* bodyB = b2BodyArray_Get(&world->bodies, idB);
 
-        B2_ASSERT(bodyA->setIndex == b2_awakeSet || bodyB->setIndex == b2_awakeSet);
+        Debug.Assert(bodyA->setIndex == b2_awakeSet || bodyB->setIndex == b2_awakeSet);
 
         b2SolverSet* setA = b2SolverSetArray_Get(&world->solverSets, bodyA->setIndex);
         b2SolverSet* setB = b2SolverSetArray_Get(&world->solverSets, bodyB->setIndex);
@@ -190,7 +190,7 @@ public class motor_joint
     void b2SolveMotorJoint(b2JointSim* base, b2StepContext* context, bool useBias)
     {
         B2_UNUSED(useBias);
-        B2_ASSERT(base->type == b2_motorJoint);
+        Debug.Assert(base->type == b2_motorJoint);
 
         float mA = base->invMassA;
         float mB = base->invMassB;

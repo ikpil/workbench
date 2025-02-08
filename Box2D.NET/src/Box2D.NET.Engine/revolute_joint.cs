@@ -209,7 +209,7 @@ public class revolute_joint
 
     void b2PrepareRevoluteJoint(b2JointSim* base, b2StepContext* context)
     {
-        B2_ASSERT(base->type == b2_revoluteJoint);
+        Debug.Assert(base->type == b2_revoluteJoint);
 
         // chase body id to the solver set where the body lives
         int idA = base->bodyIdA;
@@ -220,7 +220,7 @@ public class revolute_joint
         b2Body* bodyA = b2BodyArray_Get(&world->bodies, idA);
         b2Body* bodyB = b2BodyArray_Get(&world->bodies, idB);
 
-        B2_ASSERT(bodyA->setIndex == b2_awakeSet || bodyB->setIndex == b2_awakeSet);
+        Debug.Assert(bodyA->setIndex == b2_awakeSet || bodyB->setIndex == b2_awakeSet);
         b2SolverSet* setA = b2SolverSetArray_Get(&world->solverSets, bodyA->setIndex);
         b2SolverSet* setB = b2SolverSetArray_Get(&world->solverSets, bodyB->setIndex);
 
@@ -269,7 +269,7 @@ public class revolute_joint
 
     void b2WarmStartRevoluteJoint(b2JointSim* base, b2StepContext* context)
     {
-        B2_ASSERT(base->type == b2_revoluteJoint);
+        Debug.Assert(base->type == b2_revoluteJoint);
 
         float mA = base->invMassA;
         float mB = base->invMassB;
@@ -297,7 +297,7 @@ public class revolute_joint
 
     void b2SolveRevoluteJoint(b2JointSim* base, b2StepContext* context, bool useBias)
     {
-        B2_ASSERT(base->type == b2_revoluteJoint);
+        Debug.Assert(base->type == b2_revoluteJoint);
 
         float mA = base->invMassA;
         float mB = base->invMassB;
@@ -493,7 +493,7 @@ public class revolute_joint
 
     void b2DrawRevoluteJoint(b2DebugDraw* draw, b2JointSim* base, b2Transform transformA, b2Transform transformB, float drawSize)
     {
-        B2_ASSERT(base->type == b2_revoluteJoint);
+        Debug.Assert(base->type == b2_revoluteJoint);
 
         b2RevoluteJoint* joint = &base->revoluteJoint;
 

@@ -19,13 +19,13 @@ public class constraint_graph
 
 typedef struct b2Body b2Body;
 typedef struct b2ContactSim b2ContactSim;
-typedef struct b2Contact b2Contact;
+
 typedef struct b2ContactConstraint b2ContactConstraint;
 typedef struct b2ContactConstraintSIMD b2ContactConstraintSIMD;
 typedef struct b2JointSim b2JointSim;
-typedef struct b2Joint b2Joint;
+
 typedef struct b2StepContext b2StepContext;
-typedef struct b2World b2World;
+
 
 // This holds constraints that cannot fit the graph color limit. This happens when a single dynamic body
 // is touching many other bodies.
@@ -97,7 +97,7 @@ void b2DestroyGraph( b2ConstraintGraph* graph )
 		b2GraphColor* color = graph->colors + i;
 
 		// The bit set should never be used on the overflow color
-		B2_ASSERT( i != B2_OVERFLOW_INDEX || color->bodySet.bits == NULL );
+		Debug.Assert( i != B2_OVERFLOW_INDEX || color->bodySet.bits == NULL );
 
 		b2DestroyBitSet( &color->bodySet );
 
@@ -111,9 +111,9 @@ void b2DestroyGraph( b2ConstraintGraph* graph )
 // todo maybe kinematic bodies should not go into graph
 void b2AddContactToGraph( b2World* world, b2ContactSim* contactSim, b2Contact* contact )
 {
-	B2_ASSERT( contactSim->manifold.pointCount > 0 );
-	B2_ASSERT( contactSim->simFlags & b2_simTouchingFlag );
-	B2_ASSERT( contact->flags & b2_contactTouchingFlag );
+	Debug.Assert( contactSim->manifold.pointCount > 0 );
+	Debug.Assert( contactSim->simFlags & b2_simTouchingFlag );
+	Debug.Assert( contact->flags & b2_contactTouchingFlag );
 
 	b2ConstraintGraph* graph = &world->constraintGraph;
 	int colorIndex = B2_OVERFLOW_INDEX;
@@ -124,7 +124,7 @@ void b2AddContactToGraph( b2World* world, b2ContactSim* contactSim, b2Contact* c
 	b2Body* bodyB = b2BodyArray_Get( &world->bodies, bodyIdB );
 	bool staticA = bodyA->setIndex == b2_staticSet;
 	bool staticB = bodyB->setIndex == b2_staticSet;
-	B2_ASSERT( staticA == false || staticB == false );
+	Debug.Assert( staticA == false || staticB == false );
 
 #if B2_FORCE_OVERFLOW == 0
 	if ( staticA == false && staticB == false )
@@ -194,7 +194,7 @@ void b2AddContactToGraph( b2World* world, b2ContactSim* contactSim, b2Contact* c
 	}
 	else
 	{
-		B2_ASSERT( bodyA->setIndex == b2_awakeSet );
+		Debug.Assert( bodyA->setIndex == b2_awakeSet );
 		b2SolverSet* awakeSet = b2SolverSetArray_Get( &world->solverSets, b2_awakeSet );
 
 		int localIndex = bodyA->localIndex;
@@ -213,7 +213,7 @@ void b2AddContactToGraph( b2World* world, b2ContactSim* contactSim, b2Contact* c
 	}
 	else
 	{
-		B2_ASSERT( bodyB->setIndex == b2_awakeSet );
+		Debug.Assert( bodyB->setIndex == b2_awakeSet );
 		b2SolverSet* awakeSet = b2SolverSetArray_Get( &world->solverSets, b2_awakeSet );
 
 		int localIndex = bodyB->localIndex;
@@ -229,7 +229,7 @@ void b2RemoveContactFromGraph( b2World* world, int bodyIdA, int bodyIdB, int col
 {
 	b2ConstraintGraph* graph = &world->constraintGraph;
 
-	B2_ASSERT( 0 <= colorIndex && colorIndex < B2_GRAPH_COLOR_COUNT );
+	Debug.Assert( 0 <= colorIndex && colorIndex < B2_GRAPH_COLOR_COUNT );
 	b2GraphColor* color = graph->colors + colorIndex;
 
 	if ( colorIndex != B2_OVERFLOW_INDEX )
@@ -248,16 +248,16 @@ void b2RemoveContactFromGraph( b2World* world, int bodyIdA, int bodyIdB, int col
 		// Fix moved contact
 		int movedId = movedContactSim->contactId;
 		b2Contact* movedContact = b2ContactArray_Get( &world->contacts, movedId );
-		B2_ASSERT( movedContact->setIndex == b2_awakeSet );
-		B2_ASSERT( movedContact->colorIndex == colorIndex );
-		B2_ASSERT( movedContact->localIndex == movedIndex );
+		Debug.Assert( movedContact->setIndex == b2_awakeSet );
+		Debug.Assert( movedContact->colorIndex == colorIndex );
+		Debug.Assert( movedContact->localIndex == movedIndex );
 		movedContact->localIndex = localIndex;
 	}
 }
 
 static int b2AssignJointColor( b2ConstraintGraph* graph, int bodyIdA, int bodyIdB, bool staticA, bool staticB )
 {
-	B2_ASSERT( staticA == false || staticB == false );
+	Debug.Assert( staticA == false || staticB == false );
 
 #if B2_FORCE_OVERFLOW == 0
 	if ( staticA == false && staticB == false )
@@ -341,7 +341,7 @@ void b2RemoveJointFromGraph( b2World* world, int bodyIdA, int bodyIdB, int color
 {
 	b2ConstraintGraph* graph = &world->constraintGraph;
 
-	B2_ASSERT( 0 <= colorIndex && colorIndex < B2_GRAPH_COLOR_COUNT );
+	Debug.Assert( 0 <= colorIndex && colorIndex < B2_GRAPH_COLOR_COUNT );
 	b2GraphColor* color = graph->colors + colorIndex;
 
 	if ( colorIndex != B2_OVERFLOW_INDEX )
@@ -358,9 +358,9 @@ void b2RemoveJointFromGraph( b2World* world, int bodyIdA, int bodyIdB, int color
 		b2JointSim* movedJointSim = color->jointSims.data + localIndex;
 		int movedId = movedJointSim->jointId;
 		b2Joint* movedJoint = b2JointArray_Get( &world->joints, movedId );
-		B2_ASSERT( movedJoint->setIndex == b2_awakeSet );
-		B2_ASSERT( movedJoint->colorIndex == colorIndex );
-		B2_ASSERT( movedJoint->localIndex == movedIndex );
+		Debug.Assert( movedJoint->setIndex == b2_awakeSet );
+		Debug.Assert( movedJoint->colorIndex == colorIndex );
+		Debug.Assert( movedJoint->localIndex == movedIndex );
 		movedJoint->localIndex = localIndex;
 	}
 }

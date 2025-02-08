@@ -10,15 +10,13 @@ public class bitset
 
 
 
-// Bit set provides fast operations on large arrays of bits.
+    // Bit set provides fast operations on large arrays of bits.
     typedef struct b2BitSet
     {
-        ulong* bits;
+        ulong[] bits;
         uint blockCapacity;
         uint blockCount;
     }
-
-    b2BitSet;
 
     b2BitSet b2CreateBitSet(uint bitCapacity);
     void b2DestroyBitSet(b2BitSet* bitSet);
@@ -29,7 +27,7 @@ public class bitset
     staticvoid b2SetBit(b2BitSet* bitSet, uint bitIndex)
     {
         uint blockIndex = bitIndex / 64;
-        B2_ASSERT(blockIndex < bitSet->blockCount);
+        Debug.Assert(blockIndex < bitSet->blockCount);
         bitSet->bits[blockIndex] |= ((ulong)1 << bitIndex % 64);
     }
 
@@ -66,7 +64,7 @@ public class bitset
         return (bitSet->bits[blockIndex] & ((ulong)1 << bitIndex % 64)) != 0;
     }
 
-    staticint b2GetBitSetBytes(b2BitSet* bitSet)
+    static int b2GetBitSetBytes(b2BitSet* bitSet)
     {
         return bitSet->blockCapacity * sizeof(ulong);
     }
@@ -109,14 +107,14 @@ public class bitset
 
     void b2GrowBitSet(b2BitSet* bitSet, uint blockCount)
     {
-        B2_ASSERT(blockCount > bitSet->blockCount);
+        Debug.Assert(blockCount > bitSet->blockCount);
         if (blockCount > bitSet->blockCapacity)
         {
             uint oldCapacity = bitSet->blockCapacity;
             bitSet->blockCapacity = blockCount + blockCount / 2;
-            ulong* newBits = b2Alloc(bitSet->blockCapacity * sizeof(ulong));
+            ulong[] newBits = b2Alloc(bitSet->blockCapacity * sizeof(ulong));
             memset(newBits, 0, bitSet->blockCapacity * sizeof(ulong));
-            B2_ASSERT(bitSet->bits != NULL);
+            Debug.Assert(bitSet->bits != NULL);
             memcpy(newBits, bitSet->bits, oldCapacity * sizeof(ulong));
             b2Free(bitSet->bits, oldCapacity * sizeof(ulong));
             bitSet->bits = newBits;
@@ -127,7 +125,7 @@ public class bitset
 
     void b2InPlaceUnion(b2BitSet* B2_RESTRICT setA, const b2BitSet* B2_RESTRICT setB )
     {
-        B2_ASSERT(setA->blockCount == setB->blockCount);
+        Debug.Assert(setA->blockCount == setB->blockCount);
         uint blockCount = setA->blockCount;
         for (uint i = 0; i < blockCount; ++i)
         {

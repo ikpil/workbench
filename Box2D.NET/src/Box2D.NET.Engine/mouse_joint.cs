@@ -16,7 +16,7 @@ public class mouse_joint
 
     void b2MouseJoint_SetTarget(b2JointId jointId, b2Vec2 target)
     {
-        B2_ASSERT(b2IsValidVec2(target));
+        Debug.Assert(b2IsValidVec2(target));
         b2JointSim * base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
         base->mouseJoint.targetA = target;
     }
@@ -29,7 +29,7 @@ public class mouse_joint
 
     void b2MouseJoint_SetSpringHertz(b2JointId jointId, float hertz)
     {
-        B2_ASSERT(b2IsValidFloat(hertz) && hertz >= 0.0f);
+        Debug.Assert(b2IsValidFloat(hertz) && hertz >= 0.0f);
         b2JointSim * base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
         base->mouseJoint.hertz = hertz;
     }
@@ -42,7 +42,7 @@ public class mouse_joint
 
     void b2MouseJoint_SetSpringDampingRatio(b2JointId jointId, float dampingRatio)
     {
-        B2_ASSERT(b2IsValidFloat(dampingRatio) && dampingRatio >= 0.0f);
+        Debug.Assert(b2IsValidFloat(dampingRatio) && dampingRatio >= 0.0f);
         b2JointSim * base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
         base->mouseJoint.dampingRatio = dampingRatio;
     }
@@ -55,7 +55,7 @@ public class mouse_joint
 
     void b2MouseJoint_SetMaxForce(b2JointId jointId, float maxForce)
     {
-        B2_ASSERT(b2IsValidFloat(maxForce) && maxForce >= 0.0f);
+        Debug.Assert(b2IsValidFloat(maxForce) && maxForce >= 0.0f);
         b2JointSim * base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
         base->mouseJoint.maxForce = maxForce;
     }
@@ -79,7 +79,7 @@ public class mouse_joint
 
     void b2PrepareMouseJoint(b2JointSim* base, b2StepContext* context)
     {
-        B2_ASSERT(base->type == b2_mouseJoint);
+        Debug.Assert(base->type == b2_mouseJoint);
 
         // chase body id to the solver set where the body lives
         int idB = base->bodyIdB;
@@ -88,7 +88,7 @@ public class mouse_joint
 
         b2Body* bodyB = b2BodyArray_Get(&world->bodies, idB);
 
-        B2_ASSERT(bodyB->setIndex == b2_awakeSet);
+        Debug.Assert(bodyB->setIndex == b2_awakeSet);
         b2SolverSet* setB = b2SolverSetArray_Get(&world->solverSets, bodyB->setIndex);
 
         int localIndexB = bodyB->localIndex;
@@ -132,7 +132,7 @@ public class mouse_joint
 
     void b2WarmStartMouseJoint(b2JointSim* base, b2StepContext* context)
     {
-        B2_ASSERT(base->type == b2_mouseJoint);
+        Debug.Assert(base->type == b2_mouseJoint);
 
         float mB = base->invMassB;
         float iB = base->invIB;

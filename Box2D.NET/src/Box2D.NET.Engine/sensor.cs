@@ -9,8 +9,8 @@ public class sensor
 
 
 
-typedef struct b2Shape b2Shape;
-typedef struct b2World b2World;
+
+
 
 typedef struct b2ShapeRef
 {
@@ -118,7 +118,7 @@ static bool b2SensorQueryCallback( int proxyId, int shapeId, void* context )
 	b2SimplexCache cache = { 0 };
 	b2DistanceOutput output = b2ShapeDistance( &cache, &input, NULL, 0 );
 
-	bool overlaps = output.distance < 10.0f * FLT_EPSILON;
+	bool overlaps = output.distance < 10.0f * float.Epsilon;
 	if ( overlaps == false )
 	{
 		return true;
@@ -164,10 +164,10 @@ static void b2SensorTask( int startIndex, int endIndex, uint threadIndex, void* 
 	b2TracyCZoneNC( sensor_task, "Overlap", b2_colorBrown, true );
 
 	b2World* world = context;
-	B2_ASSERT( (int)threadIndex < world->workerCount );
+	Debug.Assert( (int)threadIndex < world->workerCount );
 	b2SensorTaskContext* taskContext = world->sensorTaskContexts.data + threadIndex;
 
-	B2_ASSERT( startIndex < endIndex );
+	Debug.Assert( startIndex < endIndex );
 
 	b2DynamicTree* trees = world->broadPhase.trees;
 	for ( int sensorIndex = startIndex; sensorIndex < endIndex; ++sensorIndex )
@@ -191,7 +191,7 @@ static void b2SensorTask( int startIndex, int endIndex, uint threadIndex, void* 
 			.transform = transform,
 		};
 
-		B2_ASSERT( sensorShape->sensorIndex == sensorIndex );
+		Debug.Assert( sensorShape->sensorIndex == sensorIndex );
 		b2AABB queryBounds = sensorShape->aabb;
 
 		// Query all trees
@@ -237,7 +237,7 @@ void b2OverlapSensors( b2World* world )
 		return;
 	}
 
-	B2_ASSERT( world->workerCount > 0 );
+	Debug.Assert( world->workerCount > 0 );
 
 	b2TracyCZoneNC( overlap_sensors, "Sensors", b2_colorMediumPurple, true );
 
@@ -265,7 +265,7 @@ void b2OverlapSensors( b2World* world )
 
 	// Iterate sensors bits and publish events
 	// Process contact state changes. Iterate over set bits
-	ulong* bits = bitSet->bits;
+	ulong[] bits = bitSet->bits;
 	uint blockCount = bitSet->blockCount;
 
 	for ( uint k = 0; k < blockCount; ++k )

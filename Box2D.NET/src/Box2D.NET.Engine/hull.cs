@@ -78,7 +78,7 @@ static b2Hull b2RecurseHull( b2Vec2 p1, b2Vec2 p2, b2Vec2* ps, int count )
 		hull.points[hull.count++] = hull2.points[i];
 	}
 
-	B2_ASSERT( hull.count < B2_MAX_POLYGON_VERTICES );
+	Debug.Assert( hull.count < B2_MAX_POLYGON_VERTICES );
 
 	return hull;
 }
@@ -225,7 +225,7 @@ b2Hull b2ComputeHull( const b2Vec2* points, int count )
 		hull.points[hull.count++] = hull2.points[i];
 	}
 
-	B2_ASSERT( hull.count <= B2_MAX_POLYGON_VERTICES );
+	Debug.Assert( hull.count <= B2_MAX_POLYGON_VERTICES );
 
 	// merge collinear
 	bool searching = true;

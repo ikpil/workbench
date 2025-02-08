@@ -6,10 +6,7 @@ namespace Box2D.NET.Engine;
 
 public class aabb
 {
-// Ray cast an AABB
-    b2CastOutput b2AABB_RayCast(b2AABB a, b2Vec2 p1, b2Vec2 p2);
-
-// Get surface area of an AABB (the perimeter length)
+    // Get surface area of an AABB (the perimeter length)
     static float b2Perimeter(b2AABB a)
     {
         float wx = a.upperBound.x - a.lowerBound.x;
@@ -65,7 +62,8 @@ public class aabb
         return valid;
     }
 
-// From Real-time Collision Detection, p179.
+    // Ray cast an AABB
+    // From Real-time Collision Detection, p179.
     b2CastOutput b2AABB_RayCast(b2AABB a, b2Vec2 p1, b2Vec2 p2)
     {
         // Radius not handled
@@ -81,7 +79,7 @@ public class aabb
         b2Vec2 normal = b2Vec2_zero;
 
         // x-coordinate
-        if (absD.x < FLT_EPSILON)
+        if (absD.x < float.Epsilon)
         {
             // parallel
             if (p.x < a.lowerBound.x || a.upperBound.x < p.x)
@@ -124,7 +122,7 @@ public class aabb
         }
 
         // y-coordinate
-        if (absD.y < FLT_EPSILON)
+        if (absD.y < float.Epsilon)
         {
             // parallel
             if (p.y < a.lowerBound.y || a.upperBound.y < p.y)

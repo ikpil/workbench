@@ -12,7 +12,7 @@ public class body
 
 
 
-typedef struct b2World b2World;
+
 
 // Body organizational details that are not used in the solver.
 typedef struct b2Body
@@ -202,7 +202,7 @@ B2_ARRAY_SOURCE( b2BodyState, b2BodyState );
 // Get a validated body from a world using an id.
 b2Body* b2GetBodyFullId( b2World* world, b2BodyId bodyId )
 {
-	B2_ASSERT( b2Body_IsValid( bodyId ) );
+	Debug.Assert( b2Body_IsValid( bodyId ) );
 
 	// id index starts at one so that zero can represent null
 	return b2BodyArray_Get( &world->bodies, bodyId.index1 - 1 );
@@ -248,10 +248,10 @@ b2BodyState* b2GetBodyState( b2World* world, b2Body* body )
 
 static void b2CreateIslandForBody( b2World* world, int setIndex, b2Body* body )
 {
-	B2_ASSERT( body->islandId == B2_NULL_INDEX );
-	B2_ASSERT( body->islandPrev == B2_NULL_INDEX );
-	B2_ASSERT( body->islandNext == B2_NULL_INDEX );
-	B2_ASSERT( setIndex != b2_disabledSet );
+	Debug.Assert( body->islandId == B2_NULL_INDEX );
+	Debug.Assert( body->islandPrev == B2_NULL_INDEX );
+	Debug.Assert( body->islandNext == B2_NULL_INDEX );
+	Debug.Assert( setIndex != b2_disabledSet );
 
 	b2Island* island = b2CreateIsland( world, setIndex );
 
@@ -265,8 +265,8 @@ static void b2RemoveBodyFromIsland( b2World* world, b2Body* body )
 {
 	if ( body->islandId == B2_NULL_INDEX )
 	{
-		B2_ASSERT( body->islandPrev == B2_NULL_INDEX );
-		B2_ASSERT( body->islandNext == B2_NULL_INDEX );
+		Debug.Assert( body->islandPrev == B2_NULL_INDEX );
+		Debug.Assert( body->islandNext == B2_NULL_INDEX );
 		return;
 	}
 
@@ -286,7 +286,7 @@ static void b2RemoveBodyFromIsland( b2World* world, b2Body* body )
 		nextBody->islandPrev = body->islandPrev;
 	}
 
-	B2_ASSERT( island->bodyCount > 0 );
+	Debug.Assert( island->bodyCount > 0 );
 	island->bodyCount -= 1;
 	bool islandDestroyed = false;
 
@@ -297,10 +297,10 @@ static void b2RemoveBodyFromIsland( b2World* world, b2Body* body )
 		if ( island->headBody == B2_NULL_INDEX )
 		{
 			// Destroy empty island
-			B2_ASSERT( island->tailBody == body->id );
-			B2_ASSERT( island->bodyCount == 0 );
-			B2_ASSERT( island->contactCount == 0 );
-			B2_ASSERT( island->jointCount == 0 );
+			Debug.Assert( island->tailBody == body->id );
+			Debug.Assert( island->bodyCount == 0 );
+			Debug.Assert( island->contactCount == 0 );
+			Debug.Assert( island->jointCount == 0 );
 
 			// Free the island
 			b2DestroyIsland( world, island->islandId );
@@ -342,17 +342,17 @@ static void b2DestroyBodyContacts( b2World* world, b2Body* body, bool wakeBodies
 b2BodyId b2CreateBody( b2WorldId worldId, const b2BodyDef* def )
 {
 	B2_CHECK_DEF( def );
-	B2_ASSERT( b2IsValidVec2( def->position ) );
-	B2_ASSERT( b2IsValidRotation( def->rotation ) );
-	B2_ASSERT( b2IsValidVec2( def->linearVelocity ) );
-	B2_ASSERT( b2IsValidFloat( def->angularVelocity ) );
-	B2_ASSERT( b2IsValidFloat( def->linearDamping ) && def->linearDamping >= 0.0f );
-	B2_ASSERT( b2IsValidFloat( def->angularDamping ) && def->angularDamping >= 0.0f );
-	B2_ASSERT( b2IsValidFloat( def->sleepThreshold ) && def->sleepThreshold >= 0.0f );
-	B2_ASSERT( b2IsValidFloat( def->gravityScale ) );
+	Debug.Assert( b2IsValidVec2( def->position ) );
+	Debug.Assert( b2IsValidRotation( def->rotation ) );
+	Debug.Assert( b2IsValidVec2( def->linearVelocity ) );
+	Debug.Assert( b2IsValidFloat( def->angularVelocity ) );
+	Debug.Assert( b2IsValidFloat( def->linearDamping ) && def->linearDamping >= 0.0f );
+	Debug.Assert( b2IsValidFloat( def->angularDamping ) && def->angularDamping >= 0.0f );
+	Debug.Assert( b2IsValidFloat( def->sleepThreshold ) && def->sleepThreshold >= 0.0f );
+	Debug.Assert( b2IsValidFloat( def->gravityScale ) );
 
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 
 	if ( world->locked )
 	{
@@ -387,13 +387,13 @@ b2BodyId b2CreateBody( b2WorldId worldId, const b2BodyDef* def )
 		}
 		else
 		{
-			B2_ASSERT( world->solverSets.data[setId].setIndex == B2_NULL_INDEX );
+			Debug.Assert( world->solverSets.data[setId].setIndex == B2_NULL_INDEX );
 		}
 
 		world->solverSets.data[setId].setIndex = setId;
 	}
 
-	B2_ASSERT( 0 <= setId && setId < world->solverSets.count );
+	Debug.Assert( 0 <= setId && setId < world->solverSets.count );
 
 	int bodyId = b2AllocId( &world->bodyIdPool );
 
@@ -425,7 +425,7 @@ b2BodyId b2CreateBody( b2WorldId worldId, const b2BodyDef* def )
 	if ( setId == b2_awakeSet )
 	{
 		b2BodyState* bodyState = b2BodyStateArray_Add( &set->bodyStates );
-		B2_ASSERT( ( (uintptr_t)bodyState & 0x1F ) == 0 );
+		Debug.Assert( ( (uintptr_t)bodyState & 0x1F ) == 0 );
 
 		*bodyState = ( b2BodyState ){ 0 };
 		bodyState->linearVelocity = def->linearVelocity;
@@ -439,7 +439,7 @@ b2BodyId b2CreateBody( b2WorldId worldId, const b2BodyDef* def )
 	}
 	else
 	{
-		B2_ASSERT( world->bodies.data[bodyId].id == B2_NULL_INDEX );
+		Debug.Assert( world->bodies.data[bodyId].id == B2_NULL_INDEX );
 	}
 
 	b2Body* body = b2BodyArray_Get( &world->bodies, bodyId );
@@ -589,7 +589,7 @@ void b2DestroyBody( b2BodyId bodyId )
 		b2BodySim* movedSim = set->bodySims.data + body->localIndex;
 		int movedId = movedSim->bodyId;
 		b2Body* movedBody = b2BodyArray_Get( &world->bodies, movedId );
-		B2_ASSERT( movedBody->localIndex == movedIndex );
+		Debug.Assert( movedBody->localIndex == movedIndex );
 		movedBody->localIndex = body->localIndex;
 	}
 
@@ -598,7 +598,7 @@ void b2DestroyBody( b2BodyId bodyId )
 	{
 		int result = b2BodyStateArray_RemoveSwap( &set->bodyStates, body->localIndex );
 		B2_UNUSED( result );
-		B2_ASSERT( result == movedIndex );
+		Debug.Assert( result == movedIndex );
 	}
 	else if ( set->setIndex >= b2_firstSleepingSet && set->bodySims.count == 0 )
 	{
@@ -669,7 +669,7 @@ int b2Body_GetContactData( b2BodyId bodyId, b2ContactData* contactData, int capa
 		contactKey = contact->edges[edgeIndex].nextKey;
 	}
 
-	B2_ASSERT( index <= capacity );
+	Debug.Assert( index <= capacity );
 
 	return index;
 }
@@ -768,7 +768,7 @@ void b2UpdateBodyMassData( b2World* world, b2Body* body )
 	{
 		// Center the inertia about the center of mass.
 		body->inertia -= body->mass * b2Dot( localCenter, localCenter );
-		B2_ASSERT( body->inertia > 0.0f );
+		Debug.Assert( body->inertia > 0.0f );
 		bodySim->invInertia = 1.0f / body->inertia;
 	}
 	else
@@ -861,11 +861,11 @@ b2Vec2 b2Body_GetWorldVector( b2BodyId bodyId, b2Vec2 localVector )
 
 void b2Body_SetTransform( b2BodyId bodyId, b2Vec2 position, b2Rot rotation )
 {
-	B2_ASSERT( b2IsValidVec2( position ) );
-	B2_ASSERT( b2IsValidRotation( rotation ) );
-	B2_ASSERT( b2Body_IsValid( bodyId ) );
+	Debug.Assert( b2IsValidVec2( position ) );
+	Debug.Assert( b2IsValidRotation( rotation ) );
+	Debug.Assert( b2Body_IsValid( bodyId ) );
 	b2World* world = b2GetWorld( bodyId.world0 );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 
 	b2Body* body = b2GetBodyFullId( world, bodyId );
 	b2BodySim* bodySim = b2GetBodySim( world, body );
@@ -1117,12 +1117,12 @@ void b2Body_ApplyLinearImpulseToCenter( b2BodyId bodyId, b2Vec2 impulse, bool wa
 
 void b2Body_ApplyAngularImpulse( b2BodyId bodyId, float impulse, bool wake )
 {
-	B2_ASSERT( b2Body_IsValid( bodyId ) );
+	Debug.Assert( b2Body_IsValid( bodyId ) );
 	b2World* world = b2GetWorld( bodyId.world0 );
 
 	int id = bodyId.index1 - 1;
 	b2Body* body = b2BodyArray_Get( &world->bodies, id );
-	B2_ASSERT( body->generation == bodyId.generation );
+	Debug.Assert( body->generation == bodyId.generation );
 
 	if ( wake && body->setIndex >= b2_firstSleepingSet )
 	{
@@ -1213,7 +1213,7 @@ void b2Body_SetType( b2BodyId bodyId, b2BodyType type )
 	if ( originalType == b2_staticBody )
 	{
 		// Body is going from static to dynamic or kinematic. It only makes sense to move it to the awake set.
-		B2_ASSERT( body->setIndex == b2_staticSet );
+		Debug.Assert( body->setIndex == b2_staticSet );
 
 		b2SolverSet* staticSet = b2SolverSetArray_Get( &world->solverSets, b2_staticSet );
 		b2SolverSet* awakeSet = b2SolverSetArray_Get( &world->solverSets, b2_awakeSet );
@@ -1252,7 +1252,7 @@ void b2Body_SetType( b2BodyId bodyId, b2BodyType type )
 			else
 			{
 				// Otherwise the joint must be disabled.
-				B2_ASSERT( joint->setIndex == b2_disabledSet );
+				Debug.Assert( joint->setIndex == b2_disabledSet );
 			}
 
 			jointKey = joint->edges[edgeIndex].nextKey;
@@ -1274,7 +1274,7 @@ void b2Body_SetType( b2BodyId bodyId, b2BodyType type )
 	else if ( type == b2_staticBody )
 	{
 		// The body is going from dynamic/kinematic to static. It should be awake.
-		B2_ASSERT( body->setIndex == b2_awakeSet );
+		Debug.Assert( body->setIndex == b2_awakeSet );
 
 		b2SolverSet* staticSet = b2SolverSetArray_Get( &world->solverSets, b2_staticSet );
 		b2SolverSet* awakeSet = b2SolverSetArray_Get( &world->solverSets, b2_awakeSet );
@@ -1305,12 +1305,12 @@ void b2Body_SetType( b2BodyId bodyId, b2BodyType type )
 			if ( joint->setIndex == b2_disabledSet )
 			{
 				// Joint is disable, should be connected to a disabled body
-				B2_ASSERT( otherBody->setIndex == b2_disabledSet );
+				Debug.Assert( otherBody->setIndex == b2_disabledSet );
 				continue;
 			}
 
 			// Since the body was not static, the joint must be awake.
-			B2_ASSERT( joint->setIndex == b2_awakeSet );
+			Debug.Assert( joint->setIndex == b2_awakeSet );
 
 			// Only transfer joint to static set if both bodies are static.
 			if ( otherBody->setIndex == b2_staticSet )
@@ -1320,10 +1320,10 @@ void b2Body_SetType( b2BodyId bodyId, b2BodyType type )
 			else
 			{
 				// The other body must be awake.
-				B2_ASSERT( otherBody->setIndex == b2_awakeSet );
+				Debug.Assert( otherBody->setIndex == b2_awakeSet );
 
 				// The joint must live in a graph color.
-				B2_ASSERT( 0 <= joint->colorIndex && joint->colorIndex < B2_GRAPH_COLOR_COUNT );
+				Debug.Assert( 0 <= joint->colorIndex && joint->colorIndex < B2_GRAPH_COLOR_COUNT );
 
 				// In this case the joint must be re-inserted into the constraint graph to ensure the correct
 				// graph color.
@@ -1350,8 +1350,8 @@ void b2Body_SetType( b2BodyId bodyId, b2BodyType type )
 	}
 	else
 	{
-		B2_ASSERT( originalType == b2_dynamicBody || originalType == b2_kinematicBody );
-		B2_ASSERT( type == b2_dynamicBody || type == b2_kinematicBody );
+		Debug.Assert( originalType == b2_dynamicBody || originalType == b2_kinematicBody );
+		Debug.Assert( type == b2_dynamicBody || type == b2_kinematicBody );
 
 		// Recreate shape proxies in static tree.
 		b2Transform transform = b2GetBodyTransformQuick( world, body );
@@ -1477,9 +1477,9 @@ b2Vec2 b2Body_GetWorldCenterOfMass( b2BodyId bodyId )
 
 void b2Body_SetMassData( b2BodyId bodyId, b2MassData massData )
 {
-	B2_ASSERT( b2IsValidFloat( massData.mass ) && massData.mass >= 0.0f );
-	B2_ASSERT( b2IsValidFloat( massData.rotationalInertia ) && massData.rotationalInertia >= 0.0f );
-	B2_ASSERT( b2IsValidVec2( massData.center ) );
+	Debug.Assert( b2IsValidFloat( massData.mass ) && massData.mass >= 0.0f );
+	Debug.Assert( b2IsValidFloat( massData.rotationalInertia ) && massData.rotationalInertia >= 0.0f );
+	Debug.Assert( b2IsValidVec2( massData.center ) );
 
 	b2World* world = b2GetWorldLocked( bodyId.world0 );
 	if ( world == NULL )
@@ -1525,7 +1525,7 @@ void b2Body_ApplyMassFromShapes( b2BodyId bodyId )
 
 void b2Body_SetLinearDamping( b2BodyId bodyId, float linearDamping )
 {
-	B2_ASSERT( b2IsValidFloat( linearDamping ) && linearDamping >= 0.0f );
+	Debug.Assert( b2IsValidFloat( linearDamping ) && linearDamping >= 0.0f );
 
 	b2World* world = b2GetWorldLocked( bodyId.world0 );
 	if ( world == NULL )
@@ -1548,7 +1548,7 @@ float b2Body_GetLinearDamping( b2BodyId bodyId )
 
 void b2Body_SetAngularDamping( b2BodyId bodyId, float angularDamping )
 {
-	B2_ASSERT( b2IsValidFloat( angularDamping ) && angularDamping >= 0.0f );
+	Debug.Assert( b2IsValidFloat( angularDamping ) && angularDamping >= 0.0f );
 
 	b2World* world = b2GetWorldLocked( bodyId.world0 );
 	if ( world == NULL )
@@ -1571,8 +1571,8 @@ float b2Body_GetAngularDamping( b2BodyId bodyId )
 
 void b2Body_SetGravityScale( b2BodyId bodyId, float gravityScale )
 {
-	B2_ASSERT( b2Body_IsValid( bodyId ) );
-	B2_ASSERT( b2IsValidFloat( gravityScale ) );
+	Debug.Assert( b2Body_IsValid( bodyId ) );
+	Debug.Assert( b2IsValidFloat( gravityScale ) );
 
 	b2World* world = b2GetWorldLocked( bodyId.world0 );
 	if ( world == NULL )
@@ -1587,7 +1587,7 @@ void b2Body_SetGravityScale( b2BodyId bodyId, float gravityScale )
 
 float b2Body_GetGravityScale( b2BodyId bodyId )
 {
-	B2_ASSERT( b2Body_IsValid( bodyId ) );
+	Debug.Assert( b2Body_IsValid( bodyId ) );
 	b2World* world = b2GetWorld( bodyId.world0 );
 	b2Body* body = b2GetBodyFullId( world, bodyId );
 	b2BodySim* bodySim = b2GetBodySim( world, body );
@@ -1729,7 +1729,7 @@ void b2Body_Disable( b2BodyId bodyId )
 			continue;
 		}
 
-		B2_ASSERT( joint->setIndex == set->setIndex || set->setIndex == b2_staticSet );
+		Debug.Assert( joint->setIndex == set->setIndex || set->setIndex == b2_staticSet );
 
 		// Remove joint from island
 		if ( joint->islandId != B2_NULL_INDEX )
@@ -1795,8 +1795,8 @@ void b2Body_Enable( b2BodyId bodyId )
 		int edgeIndex = jointKey & 1;
 
 		b2Joint* joint = b2JointArray_Get( &world->joints, jointId );
-		B2_ASSERT( joint->setIndex == b2_disabledSet );
-		B2_ASSERT( joint->islandId == B2_NULL_INDEX );
+		Debug.Assert( joint->setIndex == b2_disabledSet );
+		Debug.Assert( joint->islandId == B2_NULL_INDEX );
 
 		jointKey = joint->edges[edgeIndex].nextKey;
 

@@ -113,14 +113,14 @@ public class test_math
 
         b2Vec2 u = b2TransformPoint(transform, two);
 
-        ENSURE_SMALL(u.x - v.x, 10.0f * FLT_EPSILON);
-        ENSURE_SMALL(u.y - v.y, 10.0f * FLT_EPSILON);
+        ENSURE_SMALL(u.x - v.x, 10.0f * float.Epsilon);
+        ENSURE_SMALL(u.y - v.y, 10.0f * float.Epsilon);
 
         v = b2TransformPoint(transform1, two);
         v = b2InvTransformPoint(transform1, v);
 
-        ENSURE_SMALL(v.x - two.x, 8.0f * FLT_EPSILON);
-        ENSURE_SMALL(v.y - two.y, 8.0f * FLT_EPSILON);
+        ENSURE_SMALL(v.x - two.x, 8.0f * float.Epsilon);
+        ENSURE_SMALL(v.y - two.y, 8.0f * float.Epsilon);
 
         v = b2Normalize((b2Vec2){
             0.2f, -0.5f
@@ -141,8 +141,8 @@ public class test_math
                 b2Rot r = b2ComputeRotationBetweenUnitVectors(v, u);
 
                 b2Vec2 w = b2RotateVector(r, v);
-                ENSURE_SMALL(w.x - u.x, 4.0f * FLT_EPSILON);
-                ENSURE_SMALL(w.y - u.y, 4.0f * FLT_EPSILON);
+                ENSURE_SMALL(w.x - u.x, 4.0f * float.Epsilon);
+                ENSURE_SMALL(w.y - u.y, 4.0f * float.Epsilon);
             }
         }
     }

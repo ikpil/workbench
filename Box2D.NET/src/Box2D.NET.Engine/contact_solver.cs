@@ -94,7 +94,7 @@ void b2PrepareOverflowContacts( b2StepContext* context )
 		const b2Manifold* manifold = &contactSim->manifold;
 		int pointCount = manifold->pointCount;
 
-		B2_ASSERT( 0 < pointCount && pointCount <= 2 );
+		Debug.Assert( 0 < pointCount && pointCount <= 2 );
 
 		int indexA = contactSim->bodySimIndexA;
 		int indexB = contactSim->bodySimIndexB;
@@ -102,11 +102,11 @@ void b2PrepareOverflowContacts( b2StepContext* context )
 #if B2_VALIDATE
 		b2Body* bodyA = bodies + contactSim->bodyIdA;
 		int validIndexA = bodyA->setIndex == b2_awakeSet ? bodyA->localIndex : B2_NULL_INDEX;
-		B2_ASSERT( indexA == validIndexA );
+		Debug.Assert( indexA == validIndexA );
 
 		b2Body* bodyB = bodies + contactSim->bodyIdB;
 		int validIndexB = bodyB->setIndex == b2_awakeSet ? bodyB->localIndex : B2_NULL_INDEX;
-		B2_ASSERT( indexB == validIndexB );
+		Debug.Assert( indexB == validIndexB );
 #endif
 
 		b2ContactConstraint* constraint = constraints + i;
@@ -1079,7 +1079,7 @@ typedef struct b2BodyStateW
 static b2BodyStateW b2GatherBodies( const b2BodyState* B2_RESTRICT states, int* B2_RESTRICT indices )
 {
 	_Static_assert( sizeof( b2BodyState ) == 32, "b2BodyState not 32 bytes" );
-	B2_ASSERT( ( (uintptr_t)states & 0x1F ) == 0 );
+	Debug.Assert( ( (uintptr_t)states & 0x1F ) == 0 );
 	// b2BodyState b2_identityBodyState = {{0.0f, 0.0f}, 0.0f, 0, {0.0f, 0.0f}, {1.0f, 0.0f}};
 	b2FloatW identity = _mm256_setr_ps( 0.0f, 0.0f, 0.0f, 0, 0.0f, 0.0f, 1.0f, 0.0f );
 	b2FloatW b0 = indices[0] == B2_NULL_INDEX ? identity : _mm256_load_ps( (float*)( states + indices[0] ) );
@@ -1124,7 +1124,7 @@ static b2BodyStateW b2GatherBodies( const b2BodyState* B2_RESTRICT states, int* 
 static void b2ScatterBodies( b2BodyState* B2_RESTRICT states, int* B2_RESTRICT indices, const b2BodyStateW* B2_RESTRICT simdBody )
 {
 	_Static_assert( sizeof( b2BodyState ) == 32, "b2BodyState not 32 bytes" );
-	B2_ASSERT( ( (uintptr_t)states & 0x1F ) == 0 );
+	Debug.Assert( ( (uintptr_t)states & 0x1F ) == 0 );
 	b2FloatW t0 = _mm256_unpacklo_ps( simdBody->v.X, simdBody->v.Y );
 	b2FloatW t1 = _mm256_unpackhi_ps( simdBody->v.X, simdBody->v.Y );
 	b2FloatW t2 = _mm256_unpacklo_ps( simdBody->w, simdBody->flags );
@@ -1168,7 +1168,7 @@ static void b2ScatterBodies( b2BodyState* B2_RESTRICT states, int* B2_RESTRICT i
 static b2BodyStateW b2GatherBodies( const b2BodyState* B2_RESTRICT states, int* B2_RESTRICT indices )
 {
 	_Static_assert( sizeof( b2BodyState ) == 32, "b2BodyState not 32 bytes" );
-	B2_ASSERT( ( (uintptr_t)states & 0x1F ) == 0 );
+	Debug.Assert( ( (uintptr_t)states & 0x1F ) == 0 );
 
 	// [vx vy w flags]
 	b2FloatW identityA = b2ZeroW();
@@ -1222,7 +1222,7 @@ static b2BodyStateW b2GatherBodies( const b2BodyState* B2_RESTRICT states, int* 
 static void b2ScatterBodies( b2BodyState* B2_RESTRICT states, int* B2_RESTRICT indices, const b2BodyStateW* B2_RESTRICT simdBody )
 {
 	_Static_assert( sizeof( b2BodyState ) == 32, "b2BodyState not 32 bytes" );
-	B2_ASSERT( ( (uintptr_t)states & 0x1F ) == 0 );
+	Debug.Assert( ( (uintptr_t)states & 0x1F ) == 0 );
 
 	//	b2FloatW x = b2SetW(0.0f, 1.0f, 2.0f, 3.0f);
 	//	b2FloatW y = b2SetW(4.0f, 5.0f, 6.0f, 7.0f);
@@ -1274,7 +1274,7 @@ static void b2ScatterBodies( b2BodyState* B2_RESTRICT states, int* B2_RESTRICT i
 static b2BodyStateW b2GatherBodies( const b2BodyState* B2_RESTRICT states, int* B2_RESTRICT indices )
 {
 	_Static_assert( sizeof( b2BodyState ) == 32, "b2BodyState not 32 bytes" );
-	B2_ASSERT( ( (uintptr_t)states & 0x1F ) == 0 );
+	Debug.Assert( ( (uintptr_t)states & 0x1F ) == 0 );
 
 	// [vx vy w flags]
 	b2FloatW identityA = b2ZeroW();
@@ -1326,7 +1326,7 @@ static b2BodyStateW b2GatherBodies( const b2BodyState* B2_RESTRICT states, int* 
 static void b2ScatterBodies( b2BodyState* B2_RESTRICT states, int* B2_RESTRICT indices, const b2BodyStateW* B2_RESTRICT simdBody )
 {
 	_Static_assert( sizeof( b2BodyState ) == 32, "b2BodyState not 32 bytes" );
-	B2_ASSERT( ( (uintptr_t)states & 0x1F ) == 0 );
+	Debug.Assert( ( (uintptr_t)states & 0x1F ) == 0 );
 
 	// [vx1 vy1 vx2 vy2]
 	b2FloatW t1 = b2UnpackLoW( simdBody->v.X, simdBody->v.Y );
@@ -1465,8 +1465,8 @@ void b2PrepareContactsTask( int startIndex, int endIndex, b2StepContext* context
 				b2Body* bodyB = bodies + contactSim->bodyIdB;
 				int validIndexB = bodyB->setIndex == b2_awakeSet ? bodyB->localIndex : B2_NULL_INDEX;
 
-				B2_ASSERT( indexA == validIndexA );
-				B2_ASSERT( indexB == validIndexB );
+				Debug.Assert( indexA == validIndexA );
+				Debug.Assert( indexB == validIndexB );
 #endif
 				constraint->indexA[j] = indexA;
 				constraint->indexB[j] = indexB;
@@ -1555,7 +1555,7 @@ void b2PrepareContactsTask( int startIndex, int endIndex, b2StepContext* context
 				}
 
 				int pointCount = manifold->pointCount;
-				B2_ASSERT( 0 < pointCount && pointCount <= 2 );
+				Debug.Assert( 0 < pointCount && pointCount <= 2 );
 
 				if ( pointCount == 2 )
 				{

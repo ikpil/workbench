@@ -1,138 +1,132 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
-
-
 namespace Box2D.NET.Engine;
-
-
-public class contract
-{
-
-
-
-
-
-typedef struct b2Shape b2Shape;
-typedef struct b2World b2World;
-
-enum b2ContactFlags
-{
-	// Set when the solid shapes are touching.
-	b2_contactTouchingFlag = 0x00000001,
-
-	// Contact has a hit event
-	b2_contactHitEventFlag = 0x00000002,
-
-	// This contact wants contact events
-	b2_contactEnableContactEvents = 0x00000004,
-};
 
 // A contact edge is used to connect bodies and contacts together
 // in a contact graph where each body is a node and each contact
 // is an edge. A contact edge belongs to a doubly linked list
 // maintained in each attached body. Each contact has two contact
 // edges, one for each attached body.
-typedef struct b2ContactEdge
+
+public enum b2ContactFlags
 {
-	int bodyId;
-	int prevKey;
-	int nextKey;
-} b2ContactEdge;
+    // Set when the solid shapes are touching.
+    b2_contactTouchingFlag = 0x00000001,
+
+    // Contact has a hit event
+    b2_contactHitEventFlag = 0x00000002,
+
+    // This contact wants contact events
+    b2_contactEnableContactEvents = 0x00000004,
+}
+
+public struct b2ContactEdge
+{
+    int bodyId;
+    int prevKey;
+    int nextKey;
+}
 
 // Cold contact data. Used as a persistent handle and for persistent island
 // connectivity.
-typedef struct b2Contact
+public struct b2Contact
 {
-	// index of simulation set stored in b2World
-	// B2_NULL_INDEX when slot is free
-	int setIndex;
+    // index of simulation set stored in b2World
+    // B2_NULL_INDEX when slot is free
+    int setIndex;
 
-	// index into the constraint graph color array
-	// B2_NULL_INDEX for non-touching or sleeping contacts
-	// B2_NULL_INDEX when slot is free
-	int colorIndex;
+    // index into the constraint graph color array
+    // B2_NULL_INDEX for non-touching or sleeping contacts
+    // B2_NULL_INDEX when slot is free
+    int colorIndex;
 
-	// contact index within set or graph color
-	// B2_NULL_INDEX when slot is free
-	int localIndex;
+    // contact index within set or graph color
+    // B2_NULL_INDEX when slot is free
+    int localIndex;
 
-	b2ContactEdge edges[2];
-	int shapeIdA;
-	int shapeIdB;
+    b2ContactEdge edges[2];
+    int shapeIdA;
+    int shapeIdB;
 
-	// A contact only belongs to an island if touching, otherwise B2_NULL_INDEX.
-	int islandPrev;
-	int islandNext;
-	int islandId;
+    // A contact only belongs to an island if touching, otherwise B2_NULL_INDEX.
+    int islandPrev;
+    int islandNext;
+    int islandId;
 
-	int contactId;
+    int contactId;
 
-	// b2ContactFlags
-	uint flags;
+    // b2ContactFlags
+    uint flags;
 
-	bool isMarked;
-} b2Contact;
+    bool isMarked;
+};
 
 // Shifted to be distinct from b2ContactFlags
-enum b2ContactSimFlags
+public enum b2ContactSimFlags
 {
-	// Set when the shapes are touching, including sensors
-	b2_simTouchingFlag = 0x00010000,
+    // Set when the shapes are touching, including sensors
+    b2_simTouchingFlag = 0x00010000,
 
-	// This contact no longer has overlapping AABBs
-	b2_simDisjoint = 0x00020000,
+    // This contact no longer has overlapping AABBs
+    b2_simDisjoint = 0x00020000,
 
-	// This contact started touching
-	b2_simStartedTouching = 0x00040000,
+    // This contact started touching
+    b2_simStartedTouching = 0x00040000,
 
-	// This contact stopped touching
-	b2_simStoppedTouching = 0x00080000,
+    // This contact stopped touching
+    b2_simStoppedTouching = 0x00080000,
 
-	// This contact has a hit event
-	b2_simEnableHitEvent = 0x00100000,
+    // This contact has a hit event
+    b2_simEnableHitEvent = 0x00100000,
 
-	// This contact wants pre-solve events
-	b2_simEnablePreSolveEvents = 0x00200000,
-};
+    // This contact wants pre-solve events
+    b2_simEnablePreSolveEvents = 0x00200000,
+}
 
 /// The class manages contact between two shapes. A contact exists for each overlapping
 /// AABB in the broad-phase (except if filtered). Therefore a contact object may exist
 /// that has no contact points.
-typedef struct b2ContactSim
+public struct b2ContactSim
 {
-	int contactId;
+    int contactId;
 
 #if B2_VALIDATE
 	int bodyIdA;
 	int bodyIdB;
 #endif
 
-	int bodySimIndexA;
-	int bodySimIndexB;
+    int bodySimIndexA;
+    int bodySimIndexB;
 
-	int shapeIdA;
-	int shapeIdB;
+    int shapeIdA;
+    int shapeIdB;
 
-	float invMassA;
-	float invIA;
+    float invMassA;
+    float invIA;
 
-	float invMassB;
-	float invIB;
+    float invMassB;
+    float invIB;
 
-	b2Manifold manifold;
+    b2Manifold manifold;
 
-	// Mixed friction and restitution
-	float friction;
-	float restitution;
-	float rollingResistance;
-	float tangentSpeed;
+    // Mixed friction and restitution
+    float friction;
+    float restitution;
+    float rollingResistance;
+    float tangentSpeed;
 
-	// b2ContactSimFlags
-	uint simFlags;
+    // b2ContactSimFlags
+    uint simFlags;
 
-	b2SimplexCache cache;
-} b2ContactSim;
+    b2SimplexCache cache;
+}
+
+
+public class contract
+{
+
+
 
 void b2InitializeContactRegisters();
 
@@ -150,19 +144,6 @@ b2Manifold b2ComputeManifold( b2Shape* shapeA, b2Transform transformA, b2Shape* 
 
 B2_ARRAY_INLINE( b2Contact, b2Contact );
 B2_ARRAY_INLINE( b2ContactSim, b2ContactSim );
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 B2_ARRAY_SOURCE( b2Contact, b2Contact );
@@ -297,8 +278,8 @@ static b2Manifold b2ChainSegmentAndPolygonManifold( const b2Shape* shapeA, b2Tra
 
 static void b2AddType( b2ManifoldFcn* fcn, b2ShapeType type1, b2ShapeType type2 )
 {
-	B2_ASSERT( 0 <= type1 && type1 < b2_shapeTypeCount );
-	B2_ASSERT( 0 <= type2 && type2 < b2_shapeTypeCount );
+	Debug.Assert( 0 <= type1 && type1 < b2_shapeTypeCount );
+	Debug.Assert( 0 <= type2 && type2 < b2_shapeTypeCount );
 
 	s_registers[type1][type2].fcn = fcn;
 	s_registers[type1][type2].primary = true;
@@ -335,8 +316,8 @@ void b2CreateContact( b2World* world, b2Shape* shapeA, b2Shape* shapeB )
 	b2ShapeType type1 = shapeA->type;
 	b2ShapeType type2 = shapeB->type;
 
-	B2_ASSERT( 0 <= type1 && type1 < b2_shapeTypeCount );
-	B2_ASSERT( 0 <= type2 && type2 < b2_shapeTypeCount );
+	Debug.Assert( 0 <= type1 && type1 < b2_shapeTypeCount );
+	Debug.Assert( 0 <= type2 && type2 < b2_shapeTypeCount );
 
 	if ( s_registers[type1][type2].fcn == NULL )
 	{
@@ -354,8 +335,8 @@ void b2CreateContact( b2World* world, b2Shape* shapeA, b2Shape* shapeB )
 	b2Body* bodyA = b2BodyArray_Get( &world->bodies, shapeA->bodyId );
 	b2Body* bodyB = b2BodyArray_Get( &world->bodies, shapeB->bodyId );
 
-	B2_ASSERT( bodyA->setIndex != b2_disabledSet && bodyB->setIndex != b2_disabledSet );
-	B2_ASSERT( bodyA->setIndex != b2_staticSet || bodyB->setIndex != b2_staticSet );
+	Debug.Assert( bodyA->setIndex != b2_disabledSet && bodyB->setIndex != b2_disabledSet );
+	Debug.Assert( bodyA->setIndex != b2_staticSet || bodyB->setIndex != b2_staticSet );
 
 	int setIndex;
 	if ( bodyA->setIndex == b2_awakeSet || bodyB->setIndex == b2_awakeSet )
@@ -395,7 +376,7 @@ void b2CreateContact( b2World* world, b2Shape* shapeA, b2Shape* shapeB )
 	contact->isMarked = false;
 	contact->flags = 0;
 
-	B2_ASSERT( shapeA->sensorIndex == B2_NULL_INDEX && shapeB->sensorIndex == B2_NULL_INDEX );
+	Debug.Assert( shapeA->sensorIndex == B2_NULL_INDEX && shapeB->sensorIndex == B2_NULL_INDEX );
 
 	if ( shapeA->enableContactEvents || shapeB->enableContactEvents )
 	{
@@ -568,13 +549,13 @@ void b2DestroyContact( b2World* world, b2Contact* contact, bool wakeBodies )
 	if ( contact->colorIndex != B2_NULL_INDEX )
 	{
 		// contact is an active constraint
-		B2_ASSERT( contact->setIndex == b2_awakeSet );
+		Debug.Assert( contact->setIndex == b2_awakeSet );
 		b2RemoveContactFromGraph( world, bodyIdA, bodyIdB, contact->colorIndex, contact->localIndex );
 	}
 	else
 	{
 		// contact is non-touching or is sleeping or is a sensor
-		B2_ASSERT( contact->setIndex != b2_awakeSet || ( contact->flags & b2_contactTouchingFlag ) == 0 );
+		Debug.Assert( contact->setIndex != b2_awakeSet || ( contact->flags & b2_contactTouchingFlag ) == 0 );
 		b2SolverSet* set = b2SolverSetArray_Get( &world->solverSets, contact->setIndex );
 		int movedIndex = b2ContactSimArray_RemoveSwap( &set->contactSims, contact->localIndex );
 		if ( movedIndex != B2_NULL_INDEX )
@@ -604,7 +585,7 @@ b2ContactSim* b2GetContactSim( b2World* world, b2Contact* contact )
 	if ( contact->setIndex == b2_awakeSet && contact->colorIndex != B2_NULL_INDEX )
 	{
 		// contact lives in constraint graph
-		B2_ASSERT( 0 <= contact->colorIndex && contact->colorIndex < B2_GRAPH_COLOR_COUNT );
+		Debug.Assert( 0 <= contact->colorIndex && contact->colorIndex < B2_GRAPH_COLOR_COUNT );
 		b2GraphColor* color = world->constraintGraph.colors + contact->colorIndex;
 		return b2ContactSimArray_Get( &color->contactSims, contact->localIndex );
 	}

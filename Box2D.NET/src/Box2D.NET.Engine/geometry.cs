@@ -45,7 +45,7 @@ static b2Vec2 b2ComputePolygonCentroid( const b2Vec2* vertices, int count )
 		area += a;
 	}
 
-	B2_ASSERT( area > FLT_EPSILON );
+	Debug.Assert( area > float.Epsilon );
 	float invArea = 1.0f / area;
 	center.x *= invArea;
 	center.y *= invArea;
@@ -58,7 +58,7 @@ static b2Vec2 b2ComputePolygonCentroid( const b2Vec2* vertices, int count )
 
 b2Polygon b2MakePolygon( const b2Hull* hull, float radius )
 {
-	B2_ASSERT( b2ValidateHull( hull ) );
+	Debug.Assert( b2ValidateHull( hull ) );
 
 	if ( hull->count < 3 )
 	{
@@ -82,7 +82,7 @@ b2Polygon b2MakePolygon( const b2Hull* hull, float radius )
 		int i1 = i;
 		int i2 = i + 1 < shape.count ? i + 1 : 0;
 		b2Vec2 edge = b2Sub( shape.vertices[i2], shape.vertices[i1] );
-		B2_ASSERT( b2Dot( edge, edge ) > FLT_EPSILON * FLT_EPSILON );
+		Debug.Assert( b2Dot( edge, edge ) > float.Epsilon * float.Epsilon );
 		shape.normals[i] = b2Normalize( b2CrossVS( edge, 1.0f ) );
 	}
 
@@ -98,7 +98,7 @@ b2Polygon b2MakeOffsetPolygon( const b2Hull* hull, b2Vec2 position, b2Rot rotati
 
 b2Polygon b2MakeOffsetRoundedPolygon( const b2Hull* hull, b2Vec2 position, b2Rot rotation, float radius )
 {
-	B2_ASSERT( b2ValidateHull( hull ) );
+	Debug.Assert( b2ValidateHull( hull ) );
 
 	if ( hull->count < 3 )
 	{
@@ -124,7 +124,7 @@ b2Polygon b2MakeOffsetRoundedPolygon( const b2Hull* hull, b2Vec2 position, b2Rot
 		int i1 = i;
 		int i2 = i + 1 < shape.count ? i + 1 : 0;
 		b2Vec2 edge = b2Sub( shape.vertices[i2], shape.vertices[i1] );
-		B2_ASSERT( b2Dot( edge, edge ) > FLT_EPSILON * FLT_EPSILON );
+		Debug.Assert( b2Dot( edge, edge ) > float.Epsilon * float.Epsilon );
 		shape.normals[i] = b2Normalize( b2CrossVS( edge, 1.0f ) );
 	}
 
@@ -140,8 +140,8 @@ b2Polygon b2MakeSquare( float halfWidth )
 
 b2Polygon b2MakeBox( float halfWidth, float halfHeight )
 {
-	B2_ASSERT( b2IsValidFloat( halfWidth ) && halfWidth > 0.0f );
-	B2_ASSERT( b2IsValidFloat( halfHeight ) && halfHeight > 0.0f );
+	Debug.Assert( b2IsValidFloat( halfWidth ) && halfWidth > 0.0f );
+	Debug.Assert( b2IsValidFloat( halfHeight ) && halfHeight > 0.0f );
 
 	b2Polygon shape = { 0 };
 	shape.count = 4;
@@ -160,7 +160,7 @@ b2Polygon b2MakeBox( float halfWidth, float halfHeight )
 
 b2Polygon b2MakeRoundedBox( float halfWidth, float halfHeight, float radius )
 {
-	B2_ASSERT( b2IsValidFloat( radius ) && radius >= 0.0f );
+	Debug.Assert( b2IsValidFloat( radius ) && radius >= 0.0f );
 	b2Polygon shape = b2MakeBox( halfWidth, halfHeight );
 	shape.radius = radius;
 	return shape;
@@ -187,7 +187,7 @@ b2Polygon b2MakeOffsetBox( float halfWidth, float halfHeight, b2Vec2 center, b2R
 
 b2Polygon b2MakeOffsetRoundedBox( float halfWidth, float halfHeight, b2Vec2 center, b2Rot rotation, float radius )
 {
-	B2_ASSERT( b2IsValidFloat( radius ) && radius >= 0.0f );
+	Debug.Assert( b2IsValidFloat( radius ) && radius >= 0.0f );
 	b2Transform xf = { center, rotation };
 
 	b2Polygon shape = { 0 };
@@ -302,7 +302,7 @@ b2MassData b2ComputePolygonMass( const b2Polygon* shape, float density )
 	//
 	// The rest of the derivation is handled by computer algebra.
 
-	B2_ASSERT( shape->count > 0 );
+	Debug.Assert( shape->count > 0 );
 
 	if ( shape->count == 1 )
 	{
@@ -386,7 +386,7 @@ b2MassData b2ComputePolygonMass( const b2Polygon* shape, float density )
 	massData.mass = density * area;
 
 	// Center of mass, shift back from origin at r
-	B2_ASSERT( area > FLT_EPSILON );
+	Debug.Assert( area > float.Epsilon );
 	float invArea = 1.0f / area;
 	center.x *= invArea;
 	center.y *= invArea;
@@ -425,7 +425,7 @@ b2AABB b2ComputeCapsuleAABB( const b2Capsule* shape, b2Transform xf )
 
 b2AABB b2ComputePolygonAABB( const b2Polygon* shape, b2Transform xf )
 {
-	B2_ASSERT( shape->count > 0 );
+	Debug.Assert( shape->count > 0 );
 	b2Vec2 lower = b2TransformPoint( xf, shape->vertices[0] );
 	b2Vec2 upper = lower;
 
@@ -508,7 +508,7 @@ bool b2PointInPolygon( b2Vec2 point, const b2Polygon* shape )
 // http://www.codercorner.com/blog/?p=321
 b2CastOutput b2RayCastCircle( const b2RayCastInput* input, const b2Circle* shape )
 {
-	B2_ASSERT( b2IsValidRay( input ) );
+	Debug.Assert( b2IsValidRay( input ) );
 
 	b2Vec2 p = shape->center;
 
@@ -543,7 +543,7 @@ b2CastOutput b2RayCastCircle( const b2RayCastInput* input, const b2Circle* shape
 	}
 
 	// Pythagoras
-	float h = sqrtf( rr - cc );
+	float h = MathF.Sqrt( rr - cc );
 
 	float fraction = t - h;
 
@@ -566,7 +566,7 @@ b2CastOutput b2RayCastCircle( const b2RayCastInput* input, const b2Circle* shape
 
 b2CastOutput b2RayCastCapsule( const b2RayCastInput* input, const b2Capsule* shape )
 {
-	B2_ASSERT( b2IsValidRay( input ) );
+	Debug.Assert( b2IsValidRay( input ) );
 
 	b2CastOutput output = { 0 };
 
@@ -578,7 +578,7 @@ b2CastOutput b2RayCastCapsule( const b2RayCastInput* input, const b2Capsule* sha
 	float capsuleLength;
 	b2Vec2 a = b2GetLengthAndNormalize( &capsuleLength, e );
 
-	if ( capsuleLength < FLT_EPSILON )
+	if ( capsuleLength < float.Epsilon )
 	{
 		// Capsule is really a circle
 		b2Circle circle = { v1, shape->radius };
@@ -635,7 +635,7 @@ b2CastOutput b2RayCastCapsule( const b2RayCastInput* input, const b2Capsule* sha
 
 	// Cramer's rule [a -u]
 	float den = -a.x * u.y + u.x * a.y;
-	if ( -FLT_EPSILON < den && den < FLT_EPSILON )
+	if ( -float.Epsilon < den && den < float.Epsilon )
 	{
 		// Ray is parallel to capsule and outside infinite length capsule
 		return output;
@@ -781,7 +781,7 @@ b2CastOutput b2RayCastSegment( const b2RayCastInput* input, const b2Segment* sha
 
 b2CastOutput b2RayCastPolygon( const b2RayCastInput* input, const b2Polygon* shape )
 {
-	B2_ASSERT( b2IsValidRay( input ) );
+	Debug.Assert( b2IsValidRay( input ) );
 
 	if ( shape->radius == 0.0f )
 	{
@@ -831,7 +831,7 @@ b2CastOutput b2RayCastPolygon( const b2RayCastInput* input, const b2Polygon* sha
 				}
 			}
 
-			// The use of epsilon here causes the B2_ASSERT on lower to trip
+			// The use of epsilon here causes the Debug.Assert on lower to trip
 			// in some cases. Apparently the use of epsilon was to make edge
 			// shapes work, but now those are handled separately.
 			// if (upper < lower - b2_epsilon)
@@ -841,7 +841,7 @@ b2CastOutput b2RayCastPolygon( const b2RayCastInput* input, const b2Polygon* sha
 			}
 		}
 
-		B2_ASSERT( 0.0f <= lower && lower <= input->maxFraction );
+		Debug.Assert( 0.0f <= lower && lower <= input->maxFraction );
 
 		if ( index >= 0 )
 		{

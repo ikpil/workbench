@@ -24,7 +24,7 @@ public class atomic
 #endif
     }
 
-    staticint b2AtomicLoadInt(b2AtomicInt* a)
+    static int b2AtomicLoadInt(b2AtomicInt* a)
     {
 #if defined( _MSC_VER )
 	return _InterlockedOr( (long*)&a->value, 0 );
@@ -35,7 +35,7 @@ public class atomic
 #endif
     }
 
-    staticint b2AtomicFetchAddInt(b2AtomicInt* a, int increment)
+    static int b2AtomicFetchAddInt(b2AtomicInt* a, int increment)
     {
 #if defined( _MSC_VER )
 	return _InterlockedExchangeAdd( (long*)&a->value, (long)increment );
@@ -69,7 +69,7 @@ public class atomic
 #endif
     }
 
-    staticuint b2AtomicLoadU32(b2AtomicU32* a)
+    static uint b2AtomicLoadU32(b2AtomicU32* a)
     {
 #if defined( _MSC_VER )
 	return (uint)_InterlockedOr( (long*)&a->value, 0 );

@@ -5,36 +5,6 @@ namespace Box2D.NET.Engine;
 
 public class base
 {
-
-
-// clang-format off
-// 
-// Shared library macros
-#if defined( _MSC_VER ) && defined( box2d_EXPORTS )
-	// build the Windows DLL
-	#define BOX2D_EXPORT __declspec( dllexport )
-#elif defined( _MSC_VER ) && defined( BOX2D_DLL )
-	// using the Windows DLL
-	#define BOX2D_EXPORT __declspec( dllimport )
-#elif defined( box2d_EXPORTS )
-	// building or using the shared library
-	#define BOX2D_EXPORT __attribute__( ( visibility( "default" ) ) )
-#else
-    // static library
-#define BOX2D_EXPORT
-#endif
-
-// C++ macros
-#ifdef __cplusplus
-#define extern "C" BOX2D_EXPORT
-#define B2_LITERAL(T) T
-#define B2_ZERO_INIT {}
-#else
-#define BOX2D_EXPORT
-    /// Used for C literals like (b2Vec2){1.0f, 2.0f} where C++ requires b2Vec2{1.0f, 2.0f}
-#define B2_LITERAL(T) (T)
-#define B2_ZERO_INIT {0}
-#endif
 // clang-format on
 
     /**
@@ -68,21 +38,10 @@ public class base
     /// @param assertFcn a non-null assert callback
     void b2SetAssertFcn(b2AssertFcn* assertFcn);
 
-// see https://github.com/scottt/debugbreak
-#if defined( _MSC_VER )
-#define B2_BREAKPOINT __debugbreak()
-#elif defined( __GNUC__ ) || defined( __clang__ )
-#define B2_BREAKPOINT __builtin_trap()
-#else
-// Unknown compiler
-
-#define B2_BREAKPOINT assert( 0 )
-#endif
-
 #if !defined( NDEBUG ) || defined( B2_ENABLE_ASSERT )
     int b2InternalAssertFcn(
     const char* condition,  const char* fileName,  int lineNumber );
-#define B2_ASSERT( condition ) \
+#define Debug.Assert( condition ) \
     do \
     { \
         if (!(condition) && b2InternalAssertFcn( #condition, __FILE__, (int)__LINE__ ) ) \
@@ -90,7 +49,7 @@ public class base
     } \
     while (0)
 #else
-#define B2_ASSERT( ... ) ( (void)0 )
+#define Debug.Assert( ... ) ( (void)0 )
 #endif
 
         /// Version numbering scheme.
@@ -122,7 +81,7 @@ public class base
     float b2GetMilliseconds(ulong ticks);
 
     /// Get the milliseconds passed from an initial tick value.
-    float b2GetMillisecondsAndReset(ulong* ticks);
+    float b2GetMillisecondsAndReset(ulong[] ticks);
 
     /// Yield to be used in a busy loop.
     void b2Yield();

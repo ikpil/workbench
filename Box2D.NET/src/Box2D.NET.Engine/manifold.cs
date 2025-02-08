@@ -23,7 +23,7 @@ static b2Polygon b2MakeCapsule( b2Vec2 p1, b2Vec2 p2, float radius )
 	shape.centroid = b2Lerp( p1, p2, 0.5f );
 
 	b2Vec2 d = b2Sub( p2, p1 );
-	B2_ASSERT( b2LengthSquared( d ) > FLT_EPSILON );
+	Debug.Assert( b2LengthSquared( d ) > float.Epsilon );
 	b2Vec2 axis = b2Normalize( d );
 	b2Vec2 normal = b2RightPerp( axis );
 
@@ -185,7 +185,7 @@ b2Manifold b2CollidePolygonAndCircle( const b2Polygon* polygonA, b2Transform xfA
 	float u1 = b2Dot( b2Sub( center, v1 ), b2Sub( v2, v1 ) );
 	float u2 = b2Dot( b2Sub( center, v2 ), b2Sub( v1, v2 ) );
 
-	if ( u1 < 0.0f && separation > FLT_EPSILON )
+	if ( u1 < 0.0f && separation > float.Epsilon )
 	{
 		// Circle center is closest to v1 and safely outside the polygon
 		b2Vec2 normal = b2Normalize( b2Sub( center, v1 ) );
@@ -208,7 +208,7 @@ b2Manifold b2CollidePolygonAndCircle( const b2Polygon* polygonA, b2Transform xfA
 		mp->id = 0;
 		manifold.pointCount = 1;
 	}
-	else if ( u2 < 0.0f && separation > FLT_EPSILON )
+	else if ( u2 < 0.0f && separation > float.Epsilon )
 	{
 		// Circle center is closest to v2 and safely outside the polygon
 		b2Vec2 normal = b2Normalize( b2Sub( center, v2 ) );
@@ -283,8 +283,8 @@ b2Manifold b2CollideCapsules( const b2Capsule* capsuleA, b2Transform xfA, const 
 	float dd1 = b2Dot( d1, d1 );
 	float dd2 = b2Dot( d2, d2 );
 
-	const float epsSqr = FLT_EPSILON * FLT_EPSILON;
-	B2_ASSERT( dd1 > epsSqr && dd2 > epsSqr );
+	const float epsSqr = float.Epsilon * float.Epsilon;
+	Debug.Assert( dd1 > epsSqr && dd2 > epsSqr );
 
 	b2Vec2 r = b2Sub( p1, p2 );
 	float rd1 = b2Dot( r, d1 );
@@ -332,7 +332,7 @@ b2Manifold b2CollideCapsules( const b2Capsule* capsuleA, b2Transform xfA, const 
 		return manifold;
 	}
 
-	float distance = sqrtf( distanceSquared );
+	float distance = MathF.Sqrt( distanceSquared );
 
 	float length1, length2;
 	b2Vec2 u1 = b2GetLengthAndNormalize( &length1, d1 );
@@ -509,7 +509,7 @@ b2Manifold b2CollideCapsules( const b2Capsule* capsuleA, b2Transform xfA, const 
 
 		manifold.normal = normal;
 		manifold.points[0].anchorA = b2Lerp( c1, c2, 0.5f );
-		manifold.points[0].separation = sqrtf( distanceSquared ) - radius;
+		manifold.points[0].separation = MathF.Sqrt( distanceSquared ) - radius;
 		manifold.points[0].id = B2_MAKE_ID( i1, i2 );
 		manifold.pointCount = 1;
 	}
@@ -597,12 +597,12 @@ static b2Manifold b2ClipPolygons( const b2Polygon* polyA, const b2Polygon* polyB
 	// if (upper2 < lower1 || upper1 < lower2)
 	//{
 	//	// numeric failure
-	//	B2_ASSERT(false);
+	//	Debug.Assert(false);
 	//	return manifold;
 	//}
 
 	b2Vec2 vLower;
-	if ( lower2 < lower1 && upper2 - lower2 > FLT_EPSILON )
+	if ( lower2 < lower1 && upper2 - lower2 > float.Epsilon )
 	{
 		vLower = b2Lerp( v22, v21, ( lower1 - lower2 ) / ( upper2 - lower2 ) );
 	}
@@ -612,7 +612,7 @@ static b2Manifold b2ClipPolygons( const b2Polygon* polyA, const b2Polygon* polyB
 	}
 
 	b2Vec2 vUpper;
-	if ( upper2 > upper1 && upper2 - lower2 > FLT_EPSILON )
+	if ( upper2 > upper1 && upper2 - lower2 > float.Epsilon )
 	{
 		vUpper = b2Lerp( v22, v21, ( upper1 - lower2 ) / ( upper2 - lower2 ) );
 	}
@@ -850,8 +850,8 @@ b2Manifold b2CollidePolygons( const b2Polygon* polygonA, b2Transform xfA, const 
 		{
 			// v11 - v21
 			b2Vec2 normal = b2Sub( v21, v11 );
-			B2_ASSERT( result.distanceSquared > 0.0f );
-			float distance = sqrtf( result.distanceSquared );
+			Debug.Assert( result.distanceSquared > 0.0f );
+			float distance = MathF.Sqrt( result.distanceSquared );
 			if ( distance > B2_SPECULATIVE_DISTANCE + radius )
 			{
 				return manifold;
@@ -873,8 +873,8 @@ b2Manifold b2CollidePolygons( const b2Polygon* polygonA, b2Transform xfA, const 
 		{
 			// v11 - v22
 			b2Vec2 normal = b2Sub( v22, v11 );
-			B2_ASSERT( result.distanceSquared > 0.0f );
-			float distance = sqrtf( result.distanceSquared );
+			Debug.Assert( result.distanceSquared > 0.0f );
+			float distance = MathF.Sqrt( result.distanceSquared );
 			if ( distance > B2_SPECULATIVE_DISTANCE + radius )
 			{
 				return manifold;
@@ -896,8 +896,8 @@ b2Manifold b2CollidePolygons( const b2Polygon* polygonA, b2Transform xfA, const 
 		{
 			// v12 - v21
 			b2Vec2 normal = b2Sub( v21, v12 );
-			B2_ASSERT( result.distanceSquared > 0.0f );
-			float distance = sqrtf( result.distanceSquared );
+			Debug.Assert( result.distanceSquared > 0.0f );
+			float distance = MathF.Sqrt( result.distanceSquared );
 			if ( distance > B2_SPECULATIVE_DISTANCE + radius )
 			{
 				return manifold;
@@ -919,8 +919,8 @@ b2Manifold b2CollidePolygons( const b2Polygon* polygonA, b2Transform xfA, const 
 		{
 			// v12 - v22
 			b2Vec2 normal = b2Sub( v22, v12 );
-			B2_ASSERT( result.distanceSquared > 0.0f );
-			float distance = sqrtf( result.distanceSquared );
+			Debug.Assert( result.distanceSquared > 0.0f );
+			float distance = MathF.Sqrt( result.distanceSquared );
 			if ( distance > B2_SPECULATIVE_DISTANCE + radius )
 			{
 				return manifold;
@@ -1097,7 +1097,7 @@ static b2Manifold b2ClipSegments( b2Vec2 a1, b2Vec2 a2, b2Vec2 b1, b2Vec2 b2, b2
 	}
 
 	b2Vec2 vLower;
-	if ( lower2 < lower1 && upper2 - lower2 > FLT_EPSILON )
+	if ( lower2 < lower1 && upper2 - lower2 > float.Epsilon )
 	{
 		vLower = b2Lerp( b2, b1, ( lower1 - lower2 ) / ( upper2 - lower2 ) );
 	}
@@ -1107,7 +1107,7 @@ static b2Manifold b2ClipSegments( b2Vec2 a1, b2Vec2 a2, b2Vec2 b1, b2Vec2 b2, b2
 	}
 
 	b2Vec2 vUpper;
-	if ( upper2 > upper1 && upper2 - lower2 > FLT_EPSILON )
+	if ( upper2 > upper1 && upper2 - lower2 > float.Epsilon )
 	{
 		vUpper = b2Lerp( b2, b1, ( upper1 - lower2 ) / ( upper2 - lower2 ) );
 	}
@@ -1329,7 +1329,7 @@ b2Manifold b2CollideChainSegmentAndPolygon( const b2ChainSegment* segmentA, b2Tr
 		else
 		{
 			// vertex-edge collision
-			B2_ASSERT( cache->count == 2 );
+			Debug.Assert( cache->count == 2 );
 
 			int ia1 = cache->indexA[0];
 			int ia2 = cache->indexA[1];
@@ -1339,7 +1339,7 @@ b2Manifold b2CollideChainSegmentAndPolygon( const b2ChainSegment* segmentA, b2Tr
 			if ( ia1 == ia2 )
 			{
 				// 1 point on A, expect 2 points on B
-				B2_ASSERT( ib1 != ib2 );
+				Debug.Assert( ib1 != ib2 );
 
 				// Find polygon normal most aligned with vector between closest points.
 				// This effectively sorts ib1 and ib2
@@ -1553,7 +1553,7 @@ b2Manifold b2CollideChainSegmentAndPolygon( const b2ChainSegment* segmentA, b2Tr
 		// fall through segment normal axis
 	}
 
-	B2_ASSERT( incidentNormal != -1 || incidentIndex != -1 );
+	Debug.Assert( incidentNormal != -1 || incidentIndex != -1 );
 
 	// Segment normal
 

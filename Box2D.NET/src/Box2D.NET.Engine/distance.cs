@@ -45,7 +45,7 @@ b2SegmentDistanceResult b2SegmentDistance( b2Vec2 p1, b2Vec2 q1, b2Vec2 p2, b2Ve
 	float rd1 = b2Dot( r, d1 );
 	float rd2 = b2Dot( r, d2 );
 
-	const float epsSqr = FLT_EPSILON * FLT_EPSILON;
+	const float epsSqr = float.Epsilon * float.Epsilon;
 
 	if ( dd1 < epsSqr || dd2 < epsSqr )
 	{
@@ -153,7 +153,7 @@ static int b2FindSupport( const b2ShapeProxy* proxy, b2Vec2 direction )
 static b2Simplex b2MakeSimplexFromCache( const b2SimplexCache* cache, const b2ShapeProxy* proxyA, b2Transform transformA,
 										 const b2ShapeProxy* proxyB, b2Transform transformB )
 {
-	B2_ASSERT( cache->count <= 3 );
+	Debug.Assert( cache->count <= 3 );
 	b2Simplex s;
 
 	// Copy data from cache.
@@ -235,7 +235,7 @@ static b2Vec2 b2ComputeSimplexSearchDirection( const b2Simplex* simplex )
 		}
 
 		default:
-			B2_ASSERT( false );
+			Debug.Assert( false );
 			return b2Vec2_zero;
 	}
 }
@@ -245,7 +245,7 @@ static b2Vec2 b2ComputeSimplexClosestPoint( const b2Simplex* s )
 	switch ( s->count )
 	{
 		case 0:
-			B2_ASSERT( false );
+			Debug.Assert( false );
 			return b2Vec2_zero;
 
 		case 1:
@@ -258,7 +258,7 @@ static b2Vec2 b2ComputeSimplexClosestPoint( const b2Simplex* s )
 			return b2Vec2_zero;
 
 		default:
-			B2_ASSERT( false );
+			Debug.Assert( false );
 			return b2Vec2_zero;
 	}
 }
@@ -268,7 +268,7 @@ static void b2ComputeSimplexWitnessPoints( b2Vec2* a, b2Vec2* b, const b2Simplex
 	switch ( s->count )
 	{
 		case 0:
-			B2_ASSERT( false );
+			Debug.Assert( false );
 			break;
 
 		case 1:
@@ -289,7 +289,7 @@ static void b2ComputeSimplexWitnessPoints( b2Vec2* a, b2Vec2* b, const b2Simplex
 			break;
 
 		default:
-			B2_ASSERT( false );
+			Debug.Assert( false );
 			break;
 	}
 }
@@ -514,7 +514,7 @@ b2DistanceOutput b2ShapeDistance( b2SimplexCache* cache, const b2DistanceInput* 
 				break;
 
 			default:
-				B2_ASSERT( false );
+				Debug.Assert( false );
 		}
 
 		// If we have 3 points, then the origin is in the corresponding triangle.
@@ -533,7 +533,7 @@ b2DistanceOutput b2ShapeDistance( b2SimplexCache* cache, const b2DistanceInput* 
 		b2Vec2 d = b2ComputeSimplexSearchDirection( &simplex );
 
 		// Ensure the search direction is numerically fit.
-		if ( b2Dot( d, d ) < FLT_EPSILON * FLT_EPSILON )
+		if ( b2Dot( d, d ) < float.Epsilon * float.Epsilon )
 		{
 			// The origin is probably contained by a line segment
 			// or triangle. Thus the shapes are overlapped.
@@ -595,7 +595,7 @@ b2DistanceOutput b2ShapeDistance( b2SimplexCache* cache, const b2DistanceInput* 
 	// Apply radii if requested
 	if ( input->useRadii )
 	{
-		if ( output.distance < FLT_EPSILON )
+		if ( output.distance < float.Epsilon )
 		{
 			// Shapes are too close to safely compute normal
 			b2Vec2 p = ( b2Vec2 ){ 0.5f * ( output.pointA.x + output.pointB.x ), 0.5f * ( output.pointA.y + output.pointB.y ) };
@@ -641,7 +641,7 @@ b2CastOutput b2ShapeCast( const b2ShapeCastPairInput* input )
 	b2ShapeProxy proxyB;
 	proxyB.count = input->proxyB.count;
 	proxyB.radius = input->proxyB.radius;
-	B2_ASSERT( proxyB.count <= B2_MAX_POLYGON_VERTICES );
+	Debug.Assert( proxyB.count <= B2_MAX_POLYGON_VERTICES );
 
 	for ( int i = 0; i < proxyB.count; ++i )
 	{
@@ -677,7 +677,7 @@ b2CastOutput b2ShapeCast( const b2ShapeCastPairInput* input )
 	int iter = 0;
 	while ( iter < k_maxIters && b2Length( v ) > sigma + 0.5f * linearSlop )
 	{
-		B2_ASSERT( simplex.count < 3 );
+		Debug.Assert( simplex.count < 3 );
 
 		output.iterations += 1;
 
@@ -740,7 +740,7 @@ b2CastOutput b2ShapeCast( const b2ShapeCastPairInput* input )
 				break;
 
 			default:
-				B2_ASSERT( false );
+				Debug.Assert( false );
 		}
 
 		// If we have 3 points, then the origin is in the corresponding triangle.
@@ -815,7 +815,7 @@ static b2SeparationFunction b2MakeSeparationFunction( const b2SimplexCache* cach
 	f.proxyA = proxyA;
 	f.proxyB = proxyB;
 	int count = cache->count;
-	B2_ASSERT( 0 < count && count < 3 );
+	Debug.Assert( 0 < count && count < 3 );
 
 	f.sweepA = *sweepA;
 	f.sweepB = *sweepB;
@@ -943,7 +943,7 @@ static float b2FindMinSeparation( const b2SeparationFunction* f, int* indexA, in
 		}
 
 		default:
-			B2_ASSERT( false );
+			Debug.Assert( false );
 			*indexA = -1;
 			*indexB = -1;
 			return 0.0f;
@@ -995,7 +995,7 @@ static float b2EvaluateSeparation( const b2SeparationFunction* f, int indexA, in
 		}
 
 		default:
-			B2_ASSERT( false );
+			Debug.Assert( false );
 			return 0.0f;
 	}
 }
@@ -1015,8 +1015,8 @@ b2TOIOutput b2TimeOfImpact( const b2TOIInput* input )
 
 	b2Sweep sweepA = input->sweepA;
 	b2Sweep sweepB = input->sweepB;
-	B2_ASSERT( b2IsNormalized( sweepA.q1 ) && b2IsNormalized( sweepA.q2 ) );
-	B2_ASSERT( b2IsNormalized( sweepB.q1 ) && b2IsNormalized( sweepB.q2 ) );
+	Debug.Assert( b2IsNormalized( sweepA.q1 ) && b2IsNormalized( sweepA.q2 ) );
+	Debug.Assert( b2IsNormalized( sweepB.q1 ) && b2IsNormalized( sweepB.q2 ) );
 
 	// todo_erin
 	// c1 can be at the origin yet the points are far away
@@ -1032,7 +1032,7 @@ b2TOIOutput b2TimeOfImpact( const b2TOIInput* input )
 	// float target = b2MaxFloat( B2_LINEAR_SLOP, totalRadius );
 	float target = b2MaxFloat( B2_LINEAR_SLOP, totalRadius - B2_LINEAR_SLOP );
 	float tolerance = 0.25f * B2_LINEAR_SLOP;
-	B2_ASSERT( target > tolerance );
+	Debug.Assert( target > tolerance );
 
 	float t1 = 0.0f;
 	const int k_maxIterations = 20;

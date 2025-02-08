@@ -228,29 +228,29 @@ B2_ARRAY_SOURCE( b2TaskContext, b2TaskContext );
 
 b2World* b2GetWorldFromId( b2WorldId id )
 {
-	B2_ASSERT( 1 <= id.index1 && id.index1 <= B2_MAX_WORLDS );
+	Debug.Assert( 1 <= id.index1 && id.index1 <= B2_MAX_WORLDS );
 	b2World* world = b2_worlds + ( id.index1 - 1 );
-	B2_ASSERT( id.index1 == world->worldId + 1 );
-	B2_ASSERT( id.generation == world->generation );
+	Debug.Assert( id.index1 == world->worldId + 1 );
+	Debug.Assert( id.generation == world->generation );
 	return world;
 }
 
 b2World* b2GetWorld( int index )
 {
-	B2_ASSERT( 0 <= index && index < B2_MAX_WORLDS );
+	Debug.Assert( 0 <= index && index < B2_MAX_WORLDS );
 	b2World* world = b2_worlds + index;
-	B2_ASSERT( world->worldId == index );
+	Debug.Assert( world->worldId == index );
 	return world;
 }
 
 b2World* b2GetWorldLocked( int index )
 {
-	B2_ASSERT( 0 <= index && index < B2_MAX_WORLDS );
+	Debug.Assert( 0 <= index && index < B2_MAX_WORLDS );
 	b2World* world = b2_worlds + index;
-	B2_ASSERT( world->worldId == index );
+	Debug.Assert( world->worldId == index );
 	if ( world->locked )
 	{
-		B2_ASSERT( false );
+		Debug.Assert( false );
 		return NULL;
 	}
 
@@ -272,7 +272,7 @@ static void b2DefaultFinishTaskFcn( void* userTask, void* userContext )
 static float b2DefaultFrictionCallback( float frictionA, int materialA, float frictionB, int materialB )
 {
 	B2_UNUSED( materialA, materialB );
-	return sqrtf( frictionA * frictionB );
+	return MathF.Sqrt( frictionA * frictionB );
 }
 
 static float b2DefaultRestitutionCallback( float restitutionA, int materialA, float restitutionB, int materialB )
@@ -328,17 +328,17 @@ b2WorldId b2CreateWorld( const b2WorldDef* def )
 	// static set
 	set.setIndex = b2AllocId( &world->solverSetIdPool );
 	b2SolverSetArray_Push( &world->solverSets, set );
-	B2_ASSERT( world->solverSets.data[b2_staticSet].setIndex == b2_staticSet );
+	Debug.Assert( world->solverSets.data[b2_staticSet].setIndex == b2_staticSet );
 
 	// disabled set
 	set.setIndex = b2AllocId( &world->solverSetIdPool );
 	b2SolverSetArray_Push( &world->solverSets, set );
-	B2_ASSERT( world->solverSets.data[b2_disabledSet].setIndex == b2_disabledSet );
+	Debug.Assert( world->solverSets.data[b2_disabledSet].setIndex == b2_disabledSet );
 
 	// awake set
 	set.setIndex = b2AllocId( &world->solverSetIdPool );
 	b2SolverSetArray_Push( &world->solverSets, set );
-	B2_ASSERT( world->solverSets.data[b2_awakeSet].setIndex == b2_awakeSet );
+	Debug.Assert( world->solverSets.data[b2_awakeSet].setIndex == b2_awakeSet );
 
 	world->shapeIdPool = b2CreateIdPool();
 	world->shapes = b2ShapeArray_Create( 16 );
@@ -484,8 +484,8 @@ void b2DestroyWorld( b2WorldId worldId )
 		}
 		else
 		{
-			B2_ASSERT( chain->shapeIndices == NULL );
-			B2_ASSERT( chain->materials == NULL );
+			Debug.Assert( chain->shapeIndices == NULL );
+			Debug.Assert( chain->materials == NULL );
 		}
 	}
 
@@ -544,13 +544,13 @@ static void b2CollideTask( int startIndex, int endIndex, uint threadIndex, void*
 
 	b2StepContext* stepContext = context;
 	b2World* world = stepContext->world;
-	B2_ASSERT( (int)threadIndex < world->workerCount );
+	Debug.Assert( (int)threadIndex < world->workerCount );
 	b2TaskContext* taskContext = world->taskContexts.data + threadIndex;
 	b2ContactSim** contactSims = stepContext->contacts;
 	b2Shape* shapes = world->shapes.data;
 	b2Body* bodies = world->bodies.data;
 
-	B2_ASSERT( startIndex < endIndex );
+	Debug.Assert( startIndex < endIndex );
 
 	for ( int i = startIndex; i < endIndex; ++i )
 	{
@@ -631,7 +631,7 @@ static void b2UpdateTreesTask( int startIndex, int endIndex, uint threadIndex, v
 
 static void b2AddNonTouchingContact( b2World* world, b2Contact* contact, b2ContactSim* contactSim )
 {
-	B2_ASSERT( contact->setIndex == b2_awakeSet );
+	Debug.Assert( contact->setIndex == b2_awakeSet );
 	b2SolverSet* set = b2SolverSetArray_Get( &world->solverSets, b2_awakeSet );
 	contact->colorIndex = B2_NULL_INDEX;
 	contact->localIndex = set->contactSims.count;
@@ -648,9 +648,9 @@ static void b2RemoveNonTouchingContact( b2World* world, int setIndex, int localI
 	{
 		b2ContactSim* movedContactSim = set->contactSims.data + localIndex;
 		b2Contact* movedContact = b2ContactArray_Get( &world->contacts, movedContactSim->contactId );
-		B2_ASSERT( movedContact->setIndex == setIndex );
-		B2_ASSERT( movedContact->localIndex == movedIndex );
-		B2_ASSERT( movedContact->colorIndex == B2_NULL_INDEX );
+		Debug.Assert( movedContact->setIndex == setIndex );
+		Debug.Assert( movedContact->localIndex == movedIndex );
+		Debug.Assert( movedContact->colorIndex == B2_NULL_INDEX );
 		movedContact->localIndex = localIndex;
 	}
 }
@@ -660,7 +660,7 @@ static void b2Collide( b2StepContext* context )
 {
 	b2World* world = context->world;
 
-	B2_ASSERT( world->workerCount > 0 );
+	Debug.Assert( world->workerCount > 0 );
 
 	b2TracyCZoneNC( collide, "Narrow Phase", b2_colorDodgerBlue, true );
 
@@ -713,7 +713,7 @@ static void b2Collide( b2StepContext* context )
 		}
 	}
 
-	B2_ASSERT( contactIndex == contactCount );
+	Debug.Assert( contactIndex == contactCount );
 
 	context->contacts = contactSims;
 
@@ -765,7 +765,7 @@ static void b2Collide( b2StepContext* context )
 			int contactId = (int)( 64 * k + ctz );
 
 			b2Contact* contact = b2ContactArray_Get( &world->contacts, contactId );
-			B2_ASSERT( contact->setIndex == b2_awakeSet );
+			Debug.Assert( contact->setIndex == b2_awakeSet );
 
 			int colorIndex = contact->colorIndex;
 			int localIndex = contact->localIndex;
@@ -774,7 +774,7 @@ static void b2Collide( b2StepContext* context )
 			if ( colorIndex != B2_NULL_INDEX )
 			{
 				// contact lives in constraint graph
-				B2_ASSERT( 0 <= colorIndex && colorIndex < B2_GRAPH_COLOR_COUNT );
+				Debug.Assert( 0 <= colorIndex && colorIndex < B2_GRAPH_COLOR_COUNT );
 				b2GraphColor* color = graphColors + colorIndex;
 				contactSim = b2ContactSimArray_Get( &color->contactSims, localIndex );
 			}
@@ -799,7 +799,7 @@ static void b2Collide( b2StepContext* context )
 			}
 			else if ( simFlags & b2_simStartedTouching )
 			{
-				B2_ASSERT( contact->islandId == B2_NULL_INDEX );
+				Debug.Assert( contact->islandId == B2_NULL_INDEX );
 				// Contact is solid
 				if ( flags & b2_contactEnableContactEvents )
 				{
@@ -807,8 +807,8 @@ static void b2Collide( b2StepContext* context )
 					b2ContactBeginTouchEventArray_Push( &world->contactBeginEvents, event );
 				}
 
-				B2_ASSERT( contactSim->manifold.pointCount > 0 );
-				B2_ASSERT( contact->setIndex == b2_awakeSet );
+				Debug.Assert( contactSim->manifold.pointCount > 0 );
+				Debug.Assert( contact->setIndex == b2_awakeSet );
 
 				// Link first because this wakes colliding bodies and ensures the body sims
 				// are in the correct place.
@@ -816,8 +816,8 @@ static void b2Collide( b2StepContext* context )
 				b2LinkContact( world, contact );
 
 				// Make sure these didn't change
-				B2_ASSERT( contact->colorIndex == B2_NULL_INDEX );
-				B2_ASSERT( contact->localIndex == localIndex );
+				Debug.Assert( contact->colorIndex == B2_NULL_INDEX );
+				Debug.Assert( contact->localIndex == localIndex );
 
 				// Contact sim pointer may have become orphaned due to awake set growth,
 				// so I just need to refresh it.
@@ -842,7 +842,7 @@ static void b2Collide( b2StepContext* context )
 					b2ContactEndTouchEventArray_Push( world->contactEndEvents + endEventArrayIndex, event );
 				}
 
-				B2_ASSERT( contactSim->manifold.pointCount == 0 );
+				Debug.Assert( contactSim->manifold.pointCount == 0 );
 
 				b2UnlinkContact( world, contact );
 				int bodyIdA = contact->edges[0].bodyId;
@@ -869,7 +869,7 @@ static void b2Collide( b2StepContext* context )
 void b2World_Step( b2WorldId worldId, float timeStep, int subStepCount )
 {
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return;
@@ -966,13 +966,13 @@ void b2World_Step( b2WorldId worldId, float timeStep, int subStepCount )
 
 	world->profile.step = b2GetMilliseconds( stepTicks );
 
-	B2_ASSERT( b2GetArenaAllocation( &world->stackAllocator ) == 0 );
+	Debug.Assert( b2GetArenaAllocation( &world->stackAllocator ) == 0 );
 
 	// Ensure stack is large enough
 	b2GrowArena( &world->stackAllocator );
 
 	// Make sure all tasks that were started were also finished
-	B2_ASSERT( world->activeTaskCount == 0 );
+	Debug.Assert( world->activeTaskCount == 0 );
 
 	b2TracyCZoneEnd( world_step );
 
@@ -1051,7 +1051,7 @@ static bool DrawQueryCallback( int proxyId, int shapeId, void* context )
 	b2DebugDraw* draw = drawContext->draw;
 
 	b2Shape* shape = b2ShapeArray_Get( &world->shapes, shapeId );
-	B2_ASSERT( shape->id == shapeId );
+	Debug.Assert( shape->id == shapeId );
 
 	b2SetBit( &world->debugBodySet, shape->bodyId );
 
@@ -1130,7 +1130,7 @@ static bool DrawQueryCallback( int proxyId, int shapeId, void* context )
 // solution: display order by shape id modulus 3, keep 3 buckets in GLSolid* and flush in 3 passes.
 static void b2DrawWithBounds( b2World* world, b2DebugDraw* draw )
 {
-	B2_ASSERT( b2IsValidAABB( draw->drawingBounds ) );
+	Debug.Assert( b2IsValidAABB( draw->drawingBounds ) );
 
 	const float k_impulseScale = 1.0f;
 	const float k_axisScale = 0.3f;
@@ -1163,7 +1163,7 @@ static void b2DrawWithBounds( b2World* world, b2DebugDraw* draw )
 	}
 
 	uint wordCount = world->debugBodySet.blockCount;
-	ulong* bits = world->debugBodySet.bits;
+	ulong[] bits = world->debugBodySet.bits;
 	for ( uint k = 0; k < wordCount; ++k )
 	{
 		ulong word = bits[k];
@@ -1246,7 +1246,7 @@ static void b2DrawWithBounds( b2World* world, b2DebugDraw* draw )
 					// avoid double draw
 					if ( b2GetBit( &world->debugContactSet, contactId ) == false )
 					{
-						B2_ASSERT( 0 <= contact->colorIndex && contact->colorIndex < B2_GRAPH_COLOR_COUNT );
+						Debug.Assert( 0 <= contact->colorIndex && contact->colorIndex < B2_GRAPH_COLOR_COUNT );
 
 						b2GraphColor* gc = world->constraintGraph.colors + contact->colorIndex;
 						b2ContactSim* contactSim = b2ContactSimArray_Get( &gc->contactSims, contact->localIndex );
@@ -1328,7 +1328,7 @@ static void b2DrawWithBounds( b2World* world, b2DebugDraw* draw )
 void b2World_Draw( b2WorldId worldId, b2DebugDraw* draw )
 {
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return;
@@ -1352,7 +1352,7 @@ void b2World_Draw( b2WorldId worldId, b2DebugDraw* draw )
 			{
 				b2BodySim* bodySim = set->bodySims.data + bodyIndex;
 				b2Body* body = b2BodyArray_Get( &world->bodies, bodySim->bodyId );
-				B2_ASSERT( body->setIndex == setIndex );
+				Debug.Assert( body->setIndex == setIndex );
 
 				b2Transform xf = bodySim->transform;
 				int shapeId = body->headShapeId;
@@ -1447,7 +1447,7 @@ void b2World_Draw( b2WorldId worldId, b2DebugDraw* draw )
 				draw->DrawString( bodySim->center, buffer, b2_colorWhite, draw->context );
 
 				b2Body* body = b2BodyArray_Get( &world->bodies, bodySim->bodyId );
-				B2_ASSERT( body->setIndex == setIndex );
+				Debug.Assert( body->setIndex == setIndex );
 
 				int shapeId = body->headShapeId;
 				while ( shapeId != B2_NULL_INDEX )
@@ -1606,7 +1606,7 @@ void b2World_Draw( b2WorldId worldId, b2DebugDraw* draw )
 b2BodyEvents b2World_GetBodyEvents( b2WorldId worldId )
 {
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return ( b2BodyEvents ){ 0 };
@@ -1620,7 +1620,7 @@ b2BodyEvents b2World_GetBodyEvents( b2WorldId worldId )
 b2SensorEvents b2World_GetSensorEvents( b2WorldId worldId )
 {
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return ( b2SensorEvents ){ 0 };
@@ -1644,7 +1644,7 @@ b2SensorEvents b2World_GetSensorEvents( b2WorldId worldId )
 b2ContactEvents b2World_GetContactEvents( b2WorldId worldId )
 {
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return ( b2ContactEvents ){ 0 };
@@ -1715,7 +1715,7 @@ bool b2Body_IsValid( b2BodyId id )
 		return false;
 	}
 
-	B2_ASSERT( body->localIndex != B2_NULL_INDEX );
+	Debug.Assert( body->localIndex != B2_NULL_INDEX );
 
 	if ( body->generation != id.generation )
 	{
@@ -1753,7 +1753,7 @@ bool b2Shape_IsValid( b2ShapeId id )
 		return false;
 	}
 
-	B2_ASSERT( shape->id == shapeId );
+	Debug.Assert( shape->id == shapeId );
 
 	return id.generation == shape->generation;
 }
@@ -1785,7 +1785,7 @@ bool b2Chain_IsValid( b2ChainId id )
 		return false;
 	}
 
-	B2_ASSERT( chain->id == chainId );
+	Debug.Assert( chain->id == chainId );
 
 	return id.generation == chain->generation;
 }
@@ -1817,7 +1817,7 @@ bool b2Joint_IsValid( b2JointId id )
 		return false;
 	}
 
-	B2_ASSERT( joint->jointId == jointId );
+	Debug.Assert( joint->jointId == jointId );
 
 	return id.generation == joint->generation;
 }
@@ -1825,7 +1825,7 @@ bool b2Joint_IsValid( b2JointId id )
 void b2World_EnableSleeping( b2WorldId worldId, bool flag )
 {
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return;
@@ -1861,7 +1861,7 @@ bool b2World_IsSleepingEnabled( b2WorldId worldId )
 void b2World_EnableWarmStarting( b2WorldId worldId, bool flag )
 {
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return;
@@ -1886,7 +1886,7 @@ int b2World_GetAwakeBodyCount( b2WorldId worldId )
 void b2World_EnableContinuous( b2WorldId worldId, bool flag )
 {
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return;
@@ -1904,7 +1904,7 @@ bool b2World_IsContinuousEnabled( b2WorldId worldId )
 void b2World_SetRestitutionThreshold( b2WorldId worldId, float value )
 {
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return;
@@ -1922,7 +1922,7 @@ float b2World_GetRestitutionThreshold( b2WorldId worldId )
 void b2World_SetHitEventThreshold( b2WorldId worldId, float value )
 {
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return;
@@ -1940,7 +1940,7 @@ float b2World_GetHitEventThreshold( b2WorldId worldId )
 void b2World_SetContactTuning( b2WorldId worldId, float hertz, float dampingRatio, float pushSpeed )
 {
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return;
@@ -1954,7 +1954,7 @@ void b2World_SetContactTuning( b2WorldId worldId, float hertz, float dampingRati
 void b2World_SetJointTuning( b2WorldId worldId, float hertz, float dampingRatio )
 {
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return;
@@ -1966,10 +1966,10 @@ void b2World_SetJointTuning( b2WorldId worldId, float hertz, float dampingRatio 
 
 void b2World_SetMaximumLinearSpeed( b2WorldId worldId, float maximumLinearSpeed )
 {
-	B2_ASSERT( b2IsValidFloat( maximumLinearSpeed ) && maximumLinearSpeed > 0.0f );
+	Debug.Assert( b2IsValidFloat( maximumLinearSpeed ) && maximumLinearSpeed > 0.0f );
 
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return;
@@ -2202,13 +2202,13 @@ b2TreeStats b2World_OverlapAABB( b2WorldId worldId, b2AABB aabb, b2QueryFilter f
 	b2TreeStats treeStats = { 0 };
 
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return treeStats;
 	}
 
-	B2_ASSERT( b2IsValidAABB( aabb ) );
+	Debug.Assert( b2IsValidAABB( aabb ) );
 
 	WorldQueryContext worldContext = { world, fcn, filter, context };
 
@@ -2287,14 +2287,14 @@ b2TreeStats b2World_OverlapCircle( b2WorldId worldId, const b2Circle* circle, b2
 	b2TreeStats treeStats = { 0 };
 
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return treeStats;
 	}
 
-	B2_ASSERT( b2IsValidVec2( transform.p ) );
-	B2_ASSERT( b2IsValidRotation( transform.q ) );
+	Debug.Assert( b2IsValidVec2( transform.p ) );
+	Debug.Assert( b2IsValidRotation( transform.q ) );
 
 	b2AABB aabb = b2ComputeCircleAABB( circle, transform );
 	WorldOverlapContext worldContext = {
@@ -2319,14 +2319,14 @@ b2TreeStats b2World_OverlapCapsule( b2WorldId worldId, const b2Capsule* capsule,
 	b2TreeStats treeStats = { 0 };
 
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return treeStats;
 	}
 
-	B2_ASSERT( b2IsValidVec2( transform.p ) );
-	B2_ASSERT( b2IsValidRotation( transform.q ) );
+	Debug.Assert( b2IsValidVec2( transform.p ) );
+	Debug.Assert( b2IsValidRotation( transform.q ) );
 
 	b2AABB aabb = b2ComputeCapsuleAABB( capsule, transform );
 	WorldOverlapContext worldContext = {
@@ -2351,14 +2351,14 @@ b2TreeStats b2World_OverlapPolygon( b2WorldId worldId, const b2Polygon* polygon,
 	b2TreeStats treeStats = { 0 };
 
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return treeStats;
 	}
 
-	B2_ASSERT( b2IsValidVec2( transform.p ) );
-	B2_ASSERT( b2IsValidRotation( transform.q ) );
+	Debug.Assert( b2IsValidVec2( transform.p ) );
+	Debug.Assert( b2IsValidRotation( transform.q ) );
 
 	b2AABB aabb = b2ComputePolygonAABB( polygon, transform );
 	WorldOverlapContext worldContext = {
@@ -2429,14 +2429,14 @@ b2TreeStats b2World_CastRay( b2WorldId worldId, b2Vec2 origin, b2Vec2 translatio
 	b2TreeStats treeStats = { 0 };
 
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return treeStats;
 	}
 
-	B2_ASSERT( b2IsValidVec2( origin ) );
-	B2_ASSERT( b2IsValidVec2( translation ) );
+	Debug.Assert( b2IsValidVec2( origin ) );
+	Debug.Assert( b2IsValidVec2( translation ) );
 
 	b2RayCastInput input = { origin, translation, 1.0f };
 
@@ -2477,14 +2477,14 @@ b2RayResult b2World_CastRayClosest( b2WorldId worldId, b2Vec2 origin, b2Vec2 tra
 	b2RayResult result = { 0 };
 
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return result;
 	}
 
-	B2_ASSERT( b2IsValidVec2( origin ) );
-	B2_ASSERT( b2IsValidVec2( translation ) );
+	Debug.Assert( b2IsValidVec2( origin ) );
+	Debug.Assert( b2IsValidVec2( translation ) );
 
 	b2RayCastInput input = { origin, translation, 1.0f };
 	WorldRayCastContext worldContext = { world, b2RayCastClosestFcn, filter, 1.0f, &result };
@@ -2545,15 +2545,15 @@ b2TreeStats b2World_CastCircle( b2WorldId worldId, const b2Circle* circle, b2Tra
 	b2TreeStats treeStats = { 0 };
 
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return treeStats;
 	}
 
-	B2_ASSERT( b2IsValidVec2( originTransform.p ) );
-	B2_ASSERT( b2IsValidRotation( originTransform.q ) );
-	B2_ASSERT( b2IsValidVec2( translation ) );
+	Debug.Assert( b2IsValidVec2( originTransform.p ) );
+	Debug.Assert( b2IsValidRotation( originTransform.q ) );
+	Debug.Assert( b2IsValidVec2( translation ) );
 
 	b2ShapeCastInput input;
 	input.points[0] = b2TransformPoint( originTransform, circle->center );
@@ -2588,15 +2588,15 @@ b2TreeStats b2World_CastCapsule( b2WorldId worldId, const b2Capsule* capsule, b2
 	b2TreeStats treeStats = { 0 };
 
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return treeStats;
 	}
 
-	B2_ASSERT( b2IsValidVec2( originTransform.p ) );
-	B2_ASSERT( b2IsValidRotation( originTransform.q ) );
-	B2_ASSERT( b2IsValidVec2( translation ) );
+	Debug.Assert( b2IsValidVec2( originTransform.p ) );
+	Debug.Assert( b2IsValidRotation( originTransform.q ) );
+	Debug.Assert( b2IsValidVec2( translation ) );
 
 	b2ShapeCastInput input;
 	input.points[0] = b2TransformPoint( originTransform, capsule->center1 );
@@ -2632,15 +2632,15 @@ b2TreeStats b2World_CastPolygon( b2WorldId worldId, const b2Polygon* polygon, b2
 	b2TreeStats treeStats = { 0 };
 
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return treeStats;
 	}
 
-	B2_ASSERT( b2IsValidVec2( originTransform.p ) );
-	B2_ASSERT( b2IsValidRotation( originTransform.q ) );
-	B2_ASSERT( b2IsValidVec2( translation ) );
+	Debug.Assert( b2IsValidVec2( originTransform.p ) );
+	Debug.Assert( b2IsValidRotation( originTransform.q ) );
+	Debug.Assert( b2IsValidVec2( translation ) );
 
 	b2ShapeCastInput input;
 	for ( int i = 0; i < polygon->count; ++i )
@@ -2676,7 +2676,7 @@ b2TreeStats b2World_CastPolygon( b2WorldId worldId, const b2Polygon* polygon, b2
 
 void b2World_ShiftOrigin(b2WorldId worldId, b2Vec2 newOrigin)
 {
-	B2_ASSERT(m_locked == false);
+	Debug.Assert(m_locked == false);
 	if (m_locked)
 	{
 		return;
@@ -2807,7 +2807,7 @@ static bool ExplosionCallback( int proxyId, int shapeId, void* context )
 	b2Shape* shape = b2ShapeArray_Get( &world->shapes, shapeId );
 
 	b2Body* body = b2BodyArray_Get( &world->bodies, shape->bodyId );
-	B2_ASSERT( body->type == b2_dynamicBody );
+	Debug.Assert( body->type == b2_dynamicBody );
 
 	b2Transform transform = b2GetBodyTransformQuick( world, body );
 
@@ -2843,7 +2843,7 @@ static bool ExplosionCallback( int proxyId, int shapeId, void* context )
 	}
 
 	b2Vec2 direction = b2Sub( closestPoint, explosionContext->position );
-	if ( b2LengthSquared( direction ) > 100.0f * FLT_EPSILON * FLT_EPSILON )
+	if ( b2LengthSquared( direction ) > 100.0f * float.Epsilon * float.Epsilon )
 	{
 		direction = b2Normalize( direction );
 	}
@@ -2881,13 +2881,13 @@ void b2World_Explode( b2WorldId worldId, const b2ExplosionDef* explosionDef )
 	float falloff = explosionDef->falloff;
 	float impulsePerLength = explosionDef->impulsePerLength;
 
-	B2_ASSERT( b2IsValidVec2( position ) );
-	B2_ASSERT( b2IsValidFloat( radius ) && radius >= 0.0f );
-	B2_ASSERT( b2IsValidFloat( falloff ) && falloff >= 0.0f );
-	B2_ASSERT( b2IsValidFloat( impulsePerLength ) );
+	Debug.Assert( b2IsValidVec2( position ) );
+	Debug.Assert( b2IsValidFloat( radius ) && radius >= 0.0f );
+	Debug.Assert( b2IsValidFloat( falloff ) && falloff >= 0.0f );
+	Debug.Assert( b2IsValidFloat( impulsePerLength ) );
 
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return;
@@ -2907,7 +2907,7 @@ void b2World_Explode( b2WorldId worldId, const b2ExplosionDef* explosionDef )
 void b2World_RebuildStaticTree( b2WorldId worldId )
 {
 	b2World* world = b2GetWorldFromId( worldId );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return;
@@ -2962,7 +2962,7 @@ void b2ValidateConnectivity( b2World* world )
 			continue;
 		}
 
-		B2_ASSERT( bodyIndex == body->id );
+		Debug.Assert( bodyIndex == body->id );
 
 		// Need to get the root island because islands are not merged until the next time step
 		int bodyIslandId = b2GetRootIslandId( world, body->islandId );
@@ -2982,12 +2982,12 @@ void b2ValidateConnectivity( b2World* world )
 				if ( bodySetIndex != b2_staticSet )
 				{
 					int contactIslandId = b2GetRootIslandId( world, contact->islandId );
-					B2_ASSERT( contactIslandId == bodyIslandId );
+					Debug.Assert( contactIslandId == bodyIslandId );
 				}
 			}
 			else
 			{
-				B2_ASSERT( contact->islandId == B2_NULL_INDEX );
+				Debug.Assert( contact->islandId == B2_NULL_INDEX );
 			}
 
 			contactKey = contact->edges[edgeIndex].nextKey;
@@ -3007,19 +3007,19 @@ void b2ValidateConnectivity( b2World* world )
 
 			if ( bodySetIndex == b2_disabledSet || otherBody->setIndex == b2_disabledSet )
 			{
-				B2_ASSERT( joint->islandId == B2_NULL_INDEX );
+				Debug.Assert( joint->islandId == B2_NULL_INDEX );
 			}
 			else if ( bodySetIndex == b2_staticSet )
 			{
 				if ( otherBody->setIndex == b2_staticSet )
 				{
-					B2_ASSERT( joint->islandId == B2_NULL_INDEX );
+					Debug.Assert( joint->islandId == B2_NULL_INDEX );
 				}
 			}
 			else
 			{
 				int jointIslandId = b2GetRootIslandId( world, joint->islandId );
-				B2_ASSERT( jointIslandId == bodyIslandId );
+				Debug.Assert( jointIslandId == bodyIslandId );
 			}
 
 			jointKey = joint->edges[edgeIndex].nextKey;
@@ -3030,11 +3030,11 @@ void b2ValidateConnectivity( b2World* world )
 // Validates solver sets, but not island connectivity
 void b2ValidateSolverSets( b2World* world )
 {
-	B2_ASSERT( b2GetIdCapacity( &world->bodyIdPool ) == world->bodies.count );
-	B2_ASSERT( b2GetIdCapacity( &world->contactIdPool ) == world->contacts.count );
-	B2_ASSERT( b2GetIdCapacity( &world->jointIdPool ) == world->joints.count );
-	B2_ASSERT( b2GetIdCapacity( &world->islandIdPool ) == world->islands.count );
-	B2_ASSERT( b2GetIdCapacity( &world->solverSetIdPool ) == world->solverSets.count );
+	Debug.Assert( b2GetIdCapacity( &world->bodyIdPool ) == world->bodies.count );
+	Debug.Assert( b2GetIdCapacity( &world->contactIdPool ) == world->contacts.count );
+	Debug.Assert( b2GetIdCapacity( &world->jointIdPool ) == world->joints.count );
+	Debug.Assert( b2GetIdCapacity( &world->islandIdPool ) == world->islands.count );
+	Debug.Assert( b2GetIdCapacity( &world->solverSetIdPool ) == world->solverSets.count );
 
 	int activeSetCount = 0;
 	int totalBodyCount = 0;
@@ -3053,44 +3053,44 @@ void b2ValidateSolverSets( b2World* world )
 
 			if ( setIndex == b2_staticSet )
 			{
-				B2_ASSERT( set->contactSims.count == 0 );
-				B2_ASSERT( set->islandSims.count == 0 );
-				B2_ASSERT( set->bodyStates.count == 0 );
+				Debug.Assert( set->contactSims.count == 0 );
+				Debug.Assert( set->islandSims.count == 0 );
+				Debug.Assert( set->bodyStates.count == 0 );
 			}
 			else if ( setIndex == b2_awakeSet )
 			{
-				B2_ASSERT( set->bodySims.count == set->bodyStates.count );
-				B2_ASSERT( set->jointSims.count == 0 );
+				Debug.Assert( set->bodySims.count == set->bodyStates.count );
+				Debug.Assert( set->jointSims.count == 0 );
 			}
 			else if ( setIndex == b2_disabledSet )
 			{
-				B2_ASSERT( set->islandSims.count == 0 );
-				B2_ASSERT( set->bodyStates.count == 0 );
+				Debug.Assert( set->islandSims.count == 0 );
+				Debug.Assert( set->bodyStates.count == 0 );
 			}
 			else
 			{
-				B2_ASSERT( set->bodyStates.count == 0 );
+				Debug.Assert( set->bodyStates.count == 0 );
 			}
 
 			// Validate bodies
 			{
 				b2Body* bodies = world->bodies.data;
-				B2_ASSERT( set->bodySims.count >= 0 );
+				Debug.Assert( set->bodySims.count >= 0 );
 				totalBodyCount += set->bodySims.count;
 				for ( int i = 0; i < set->bodySims.count; ++i )
 				{
 					b2BodySim* bodySim = set->bodySims.data + i;
 
 					int bodyId = bodySim->bodyId;
-					B2_ASSERT( 0 <= bodyId && bodyId < world->bodies.count );
+					Debug.Assert( 0 <= bodyId && bodyId < world->bodies.count );
 					b2Body* body = bodies + bodyId;
-					B2_ASSERT( body->setIndex == setIndex );
-					B2_ASSERT( body->localIndex == i );
-					B2_ASSERT( body->generation == body->generation );
+					Debug.Assert( body->setIndex == setIndex );
+					Debug.Assert( body->localIndex == i );
+					Debug.Assert( body->generation == body->generation );
 
 					if ( setIndex == b2_disabledSet )
 					{
-						B2_ASSERT( body->headContactKey == B2_NULL_INDEX );
+						Debug.Assert( body->headContactKey == B2_NULL_INDEX );
 					}
 
 					// Validate body shapes
@@ -3099,21 +3099,21 @@ void b2ValidateSolverSets( b2World* world )
 					while ( shapeId != B2_NULL_INDEX )
 					{
 						b2Shape* shape = b2ShapeArray_Get( &world->shapes, shapeId );
-						B2_ASSERT( shape->id == shapeId );
-						B2_ASSERT( shape->prevShapeId == prevShapeId );
+						Debug.Assert( shape->id == shapeId );
+						Debug.Assert( shape->prevShapeId == prevShapeId );
 
 						if ( setIndex == b2_disabledSet )
 						{
-							B2_ASSERT( shape->proxyKey == B2_NULL_INDEX );
+							Debug.Assert( shape->proxyKey == B2_NULL_INDEX );
 						}
 						else if ( setIndex == b2_staticSet )
 						{
-							B2_ASSERT( B2_PROXY_TYPE( shape->proxyKey ) == b2_staticBody );
+							Debug.Assert( B2_PROXY_TYPE( shape->proxyKey ) == b2_staticBody );
 						}
 						else
 						{
 							b2BodyType proxyType = B2_PROXY_TYPE( shape->proxyKey );
-							B2_ASSERT( proxyType == b2_kinematicBody || proxyType == b2_dynamicBody );
+							Debug.Assert( proxyType == b2_kinematicBody || proxyType == b2_dynamicBody );
 						}
 
 						prevShapeId = shapeId;
@@ -3128,8 +3128,8 @@ void b2ValidateSolverSets( b2World* world )
 						int edgeIndex = contactKey & 1;
 
 						b2Contact* contact = b2ContactArray_Get( &world->contacts, contactId );
-						B2_ASSERT( contact->setIndex != b2_staticSet );
-						B2_ASSERT( contact->edges[0].bodyId == bodyId || contact->edges[1].bodyId == bodyId );
+						Debug.Assert( contact->setIndex != b2_staticSet );
+						Debug.Assert( contact->edges[0].bodyId == bodyId || contact->edges[1].bodyId == bodyId );
 						contactKey = contact->edges[edgeIndex].nextKey;
 					}
 
@@ -3148,25 +3148,25 @@ void b2ValidateSolverSets( b2World* world )
 
 						if ( setIndex == b2_disabledSet || otherBody->setIndex == b2_disabledSet )
 						{
-							B2_ASSERT( joint->setIndex == b2_disabledSet );
+							Debug.Assert( joint->setIndex == b2_disabledSet );
 						}
 						else if ( setIndex == b2_staticSet && otherBody->setIndex == b2_staticSet )
 						{
-							B2_ASSERT( joint->setIndex == b2_staticSet );
+							Debug.Assert( joint->setIndex == b2_staticSet );
 						}
 						else if ( setIndex == b2_awakeSet )
 						{
-							B2_ASSERT( joint->setIndex == b2_awakeSet );
+							Debug.Assert( joint->setIndex == b2_awakeSet );
 						}
 						else if ( setIndex >= b2_firstSleepingSet )
 						{
-							B2_ASSERT( joint->setIndex == setIndex );
+							Debug.Assert( joint->setIndex == setIndex );
 						}
 
 						b2JointSim* jointSim = b2GetJointSim( world, joint );
-						B2_ASSERT( jointSim->jointId == jointId );
-						B2_ASSERT( jointSim->bodyIdA == joint->edges[0].bodyId );
-						B2_ASSERT( jointSim->bodyIdB == joint->edges[1].bodyId );
+						Debug.Assert( jointSim->jointId == jointId );
+						Debug.Assert( jointSim->bodyIdA == joint->edges[0].bodyId );
+						Debug.Assert( jointSim->bodyIdB == joint->edges[1].bodyId );
 
 						jointKey = joint->edges[edgeIndex].nextKey;
 					}
@@ -3175,7 +3175,7 @@ void b2ValidateSolverSets( b2World* world )
 
 			// Validate contacts
 			{
-				B2_ASSERT( set->contactSims.count >= 0 );
+				Debug.Assert( set->contactSims.count >= 0 );
 				totalContactCount += set->contactSims.count;
 				for ( int i = 0; i < set->contactSims.count; ++i )
 				{
@@ -3185,78 +3185,78 @@ void b2ValidateSolverSets( b2World* world )
 					{
 						// contact should be non-touching if awake
 						// or it could be this contact hasn't been transferred yet
-						B2_ASSERT( contactSim->manifold.pointCount == 0 ||
+						Debug.Assert( contactSim->manifold.pointCount == 0 ||
 								   ( contactSim->simFlags & b2_simStartedTouching ) != 0 );
 					}
-					B2_ASSERT( contact->setIndex == setIndex );
-					B2_ASSERT( contact->colorIndex == B2_NULL_INDEX );
-					B2_ASSERT( contact->localIndex == i );
+					Debug.Assert( contact->setIndex == setIndex );
+					Debug.Assert( contact->colorIndex == B2_NULL_INDEX );
+					Debug.Assert( contact->localIndex == i );
 				}
 			}
 
 			// Validate joints
 			{
-				B2_ASSERT( set->jointSims.count >= 0 );
+				Debug.Assert( set->jointSims.count >= 0 );
 				totalJointCount += set->jointSims.count;
 				for ( int i = 0; i < set->jointSims.count; ++i )
 				{
 					b2JointSim* jointSim = set->jointSims.data + i;
 					b2Joint* joint = b2JointArray_Get( &world->joints, jointSim->jointId );
-					B2_ASSERT( joint->setIndex == setIndex );
-					B2_ASSERT( joint->colorIndex == B2_NULL_INDEX );
-					B2_ASSERT( joint->localIndex == i );
+					Debug.Assert( joint->setIndex == setIndex );
+					Debug.Assert( joint->colorIndex == B2_NULL_INDEX );
+					Debug.Assert( joint->localIndex == i );
 				}
 			}
 
 			// Validate islands
 			{
-				B2_ASSERT( set->islandSims.count >= 0 );
+				Debug.Assert( set->islandSims.count >= 0 );
 				totalIslandCount += set->islandSims.count;
 				for ( int i = 0; i < set->islandSims.count; ++i )
 				{
 					b2IslandSim* islandSim = set->islandSims.data + i;
 					b2Island* island = b2IslandArray_Get( &world->islands, islandSim->islandId );
-					B2_ASSERT( island->setIndex == setIndex );
-					B2_ASSERT( island->localIndex == i );
+					Debug.Assert( island->setIndex == setIndex );
+					Debug.Assert( island->localIndex == i );
 				}
 			}
 		}
 		else
 		{
-			B2_ASSERT( set->bodySims.count == 0 );
-			B2_ASSERT( set->contactSims.count == 0 );
-			B2_ASSERT( set->jointSims.count == 0 );
-			B2_ASSERT( set->islandSims.count == 0 );
-			B2_ASSERT( set->bodyStates.count == 0 );
+			Debug.Assert( set->bodySims.count == 0 );
+			Debug.Assert( set->contactSims.count == 0 );
+			Debug.Assert( set->jointSims.count == 0 );
+			Debug.Assert( set->islandSims.count == 0 );
+			Debug.Assert( set->bodyStates.count == 0 );
 		}
 	}
 
 	int setIdCount = b2GetIdCount( &world->solverSetIdPool );
-	B2_ASSERT( activeSetCount == setIdCount );
+	Debug.Assert( activeSetCount == setIdCount );
 
 	int bodyIdCount = b2GetIdCount( &world->bodyIdPool );
-	B2_ASSERT( totalBodyCount == bodyIdCount );
+	Debug.Assert( totalBodyCount == bodyIdCount );
 
 	int islandIdCount = b2GetIdCount( &world->islandIdPool );
-	B2_ASSERT( totalIslandCount == islandIdCount );
+	Debug.Assert( totalIslandCount == islandIdCount );
 
 	// Validate constraint graph
 	for ( int colorIndex = 0; colorIndex < B2_GRAPH_COLOR_COUNT; ++colorIndex )
 	{
 		b2GraphColor* color = world->constraintGraph.colors + colorIndex;
 		{
-			B2_ASSERT( color->contactSims.count >= 0 );
+			Debug.Assert( color->contactSims.count >= 0 );
 			totalContactCount += color->contactSims.count;
 			for ( int i = 0; i < color->contactSims.count; ++i )
 			{
 				b2ContactSim* contactSim = color->contactSims.data + i;
 				b2Contact* contact = b2ContactArray_Get( &world->contacts, contactSim->contactId );
 				// contact should be touching in the constraint graph or awaiting transfer to non-touching
-				B2_ASSERT( contactSim->manifold.pointCount > 0 ||
+				Debug.Assert( contactSim->manifold.pointCount > 0 ||
 						   ( contactSim->simFlags & ( b2_simStoppedTouching | b2_simDisjoint ) ) != 0 );
-				B2_ASSERT( contact->setIndex == b2_awakeSet );
-				B2_ASSERT( contact->colorIndex == colorIndex );
-				B2_ASSERT( contact->localIndex == i );
+				Debug.Assert( contact->setIndex == b2_awakeSet );
+				Debug.Assert( contact->colorIndex == colorIndex );
+				Debug.Assert( contact->localIndex == i );
 
 				int bodyIdA = contact->edges[0].bodyId;
 				int bodyIdB = contact->edges[1].bodyId;
@@ -3265,22 +3265,22 @@ void b2ValidateSolverSets( b2World* world )
 				{
 					b2Body* bodyA = b2BodyArray_Get( &world->bodies, bodyIdA );
 					b2Body* bodyB = b2BodyArray_Get( &world->bodies, bodyIdB );
-					B2_ASSERT( b2GetBit( &color->bodySet, bodyIdA ) == ( bodyA->type != b2_staticBody ) );
-					B2_ASSERT( b2GetBit( &color->bodySet, bodyIdB ) == ( bodyB->type != b2_staticBody ) );
+					Debug.Assert( b2GetBit( &color->bodySet, bodyIdA ) == ( bodyA->type != b2_staticBody ) );
+					Debug.Assert( b2GetBit( &color->bodySet, bodyIdB ) == ( bodyB->type != b2_staticBody ) );
 				}
 			}
 		}
 
 		{
-			B2_ASSERT( color->jointSims.count >= 0 );
+			Debug.Assert( color->jointSims.count >= 0 );
 			totalJointCount += color->jointSims.count;
 			for ( int i = 0; i < color->jointSims.count; ++i )
 			{
 				b2JointSim* jointSim = color->jointSims.data + i;
 				b2Joint* joint = b2JointArray_Get( &world->joints, jointSim->jointId );
-				B2_ASSERT( joint->setIndex == b2_awakeSet );
-				B2_ASSERT( joint->colorIndex == colorIndex );
-				B2_ASSERT( joint->localIndex == i );
+				Debug.Assert( joint->setIndex == b2_awakeSet );
+				Debug.Assert( joint->colorIndex == colorIndex );
+				Debug.Assert( joint->localIndex == i );
 
 				int bodyIdA = joint->edges[0].bodyId;
 				int bodyIdB = joint->edges[1].bodyId;
@@ -3289,19 +3289,19 @@ void b2ValidateSolverSets( b2World* world )
 				{
 					b2Body* bodyA = b2BodyArray_Get( &world->bodies, bodyIdA );
 					b2Body* bodyB = b2BodyArray_Get( &world->bodies, bodyIdB );
-					B2_ASSERT( b2GetBit( &color->bodySet, bodyIdA ) == ( bodyA->type != b2_staticBody ) );
-					B2_ASSERT( b2GetBit( &color->bodySet, bodyIdB ) == ( bodyB->type != b2_staticBody ) );
+					Debug.Assert( b2GetBit( &color->bodySet, bodyIdA ) == ( bodyA->type != b2_staticBody ) );
+					Debug.Assert( b2GetBit( &color->bodySet, bodyIdB ) == ( bodyB->type != b2_staticBody ) );
 				}
 			}
 		}
 	}
 
 	int contactIdCount = b2GetIdCount( &world->contactIdPool );
-	B2_ASSERT( totalContactCount == contactIdCount );
-	B2_ASSERT( totalContactCount == (int)world->broadPhase.pairSet.count );
+	Debug.Assert( totalContactCount == contactIdCount );
+	Debug.Assert( totalContactCount == (int)world->broadPhase.pairSet.count );
 
 	int jointIdCount = b2GetIdCount( &world->jointIdPool );
-	B2_ASSERT( totalJointCount == jointIdCount );
+	Debug.Assert( totalJointCount == jointIdCount );
 
 // Validate shapes
 // This is very slow on compounds
@@ -3315,16 +3315,16 @@ void b2ValidateSolverSets( b2World* world )
 			continue;
 		}
 
-		B2_ASSERT(0 <= shape->bodyId && shape->bodyId < b2Array(world->bodyArray).count);
+		Debug.Assert(0 <= shape->bodyId && shape->bodyId < b2Array(world->bodyArray).count);
 
 		b2Body* body = world->bodyArray + shape->bodyId;
-		B2_ASSERT(0 <= body->setIndex && body->setIndex < b2Array(world->solverSetArray).count);
+		Debug.Assert(0 <= body->setIndex && body->setIndex < b2Array(world->solverSetArray).count);
 
 		b2SolverSet* set = world->solverSetArray + body->setIndex;
-		B2_ASSERT(0 <= body->localIndex && body->localIndex < set->sims.count);
+		Debug.Assert(0 <= body->localIndex && body->localIndex < set->sims.count);
 
 		b2BodySim* bodySim = set->sims.data + body->localIndex;
-		B2_ASSERT(bodySim->bodyId == shape->bodyId);
+		Debug.Assert(bodySim->bodyId == shape->bodyId);
 
 		bool found = false;
 		int shapeCount = 0;
@@ -3342,8 +3342,8 @@ void b2ValidateSolverSets( b2World* world )
 			shapeCount += 1;
 		}
 
-		B2_ASSERT(found);
-		B2_ASSERT(shapeCount == body->shapeCount);
+		Debug.Assert(found);
+		Debug.Assert(shapeCount == body->shapeCount);
 	}
 #endif
 }
@@ -3352,7 +3352,7 @@ void b2ValidateSolverSets( b2World* world )
 void b2ValidateContacts( b2World* world )
 {
 	int contactCount = world->contacts.count;
-	B2_ASSERT( contactCount == b2GetIdCapacity( &world->contactIdPool ) );
+	Debug.Assert( contactCount == b2GetIdCapacity( &world->contactIdPool ) );
 	int allocatedContactCount = 0;
 
 	for ( int contactIndex = 0; contactIndex < contactCount; ++contactIndex )
@@ -3363,7 +3363,7 @@ void b2ValidateContacts( b2World* world )
 			continue;
 		}
 
-		B2_ASSERT( contact->contactId == contactIndex );
+		Debug.Assert( contact->contactId == contactIndex );
 
 		allocatedContactCount += 1;
 
@@ -3376,38 +3376,38 @@ void b2ValidateContacts( b2World* world )
 			// If touching and not a sensor
 			if ( touching )
 			{
-				B2_ASSERT( 0 <= contact->colorIndex && contact->colorIndex < B2_GRAPH_COLOR_COUNT );
+				Debug.Assert( 0 <= contact->colorIndex && contact->colorIndex < B2_GRAPH_COLOR_COUNT );
 			}
 			else
 			{
-				B2_ASSERT( contact->colorIndex == B2_NULL_INDEX );
+				Debug.Assert( contact->colorIndex == B2_NULL_INDEX );
 			}
 		}
 		else if ( setId >= b2_firstSleepingSet )
 		{
 			// Only touching contacts allowed in a sleeping set
-			B2_ASSERT( touching == true );
+			Debug.Assert( touching == true );
 		}
 		else
 		{
 			// Sleeping and non-touching contacts or sensor contacts belong in the disabled set
-			B2_ASSERT( touching == false && setId == b2_disabledSet );
+			Debug.Assert( touching == false && setId == b2_disabledSet );
 		}
 
 		b2ContactSim* contactSim = b2GetContactSim( world, contact );
-		B2_ASSERT( contactSim->contactId == contactIndex );
-		B2_ASSERT( contactSim->bodyIdA == contact->edges[0].bodyId );
-		B2_ASSERT( contactSim->bodyIdB == contact->edges[1].bodyId );
+		Debug.Assert( contactSim->contactId == contactIndex );
+		Debug.Assert( contactSim->bodyIdA == contact->edges[0].bodyId );
+		Debug.Assert( contactSim->bodyIdB == contact->edges[1].bodyId );
 
 		// Sim touching is true for solid and sensor contacts
 		bool simTouching = ( contactSim->simFlags & b2_simTouchingFlag ) != 0;
-		B2_ASSERT( touching == simTouching );
+		Debug.Assert( touching == simTouching );
 
-		B2_ASSERT( 0 <= contactSim->manifold.pointCount && contactSim->manifold.pointCount <= 2 );
+		Debug.Assert( 0 <= contactSim->manifold.pointCount && contactSim->manifold.pointCount <= 2 );
 	}
 
 	int contactIdCount = b2GetIdCount( &world->contactIdPool );
-	B2_ASSERT( allocatedContactCount == contactIdCount );
+	Debug.Assert( allocatedContactCount == contactIdCount );
 }
 
 #else

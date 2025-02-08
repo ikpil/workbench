@@ -14,7 +14,7 @@ public class joint
 
 typedef struct b2DebugDraw b2DebugDraw;
 typedef struct b2StepContext b2StepContext;
-typedef struct b2World b2World;
+
 
 /// A joint edge is used to connect bodies and joints together
 /// in a joint graph where each body is a node and each joint
@@ -426,7 +426,7 @@ b2Joint* b2GetJointFullId( b2World* world, b2JointId jointId )
 {
 	int id = jointId.index1 - 1;
 	b2Joint* joint = b2JointArray_Get( &world->joints, id );
-	B2_ASSERT( joint->jointId == id && joint->generation == jointId.generation );
+	Debug.Assert( joint->jointId == id && joint->generation == jointId.generation );
 	return joint;
 }
 
@@ -434,7 +434,7 @@ b2JointSim* b2GetJointSim( b2World* world, b2Joint* joint )
 {
 	if ( joint->setIndex == b2_awakeSet )
 	{
-		B2_ASSERT( 0 <= joint->colorIndex && joint->colorIndex < B2_GRAPH_COLOR_COUNT );
+		Debug.Assert( 0 <= joint->colorIndex && joint->colorIndex < B2_GRAPH_COLOR_COUNT );
 		b2GraphColor* color = world->constraintGraph.colors + joint->colorIndex;
 		return b2JointSimArray_Get( &color->jointSims, joint->localIndex );
 	}
@@ -448,16 +448,16 @@ b2JointSim* b2GetJointSimCheckType( b2JointId jointId, b2JointType type )
 	B2_UNUSED( type );
 
 	b2World* world = b2GetWorld( jointId.world0 );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return NULL;
 	}
 
 	b2Joint* joint = b2GetJointFullId( world, jointId );
-	B2_ASSERT( joint->type == type );
+	Debug.Assert( joint->type == type );
 	b2JointSim* jointSim = b2GetJointSim( world, joint );
-	B2_ASSERT( jointSim->type == type );
+	Debug.Assert( jointSim->type == type );
 	return jointSim;
 }
 
@@ -574,8 +574,8 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 	else
 	{
 		// joint connected between sleeping and/or static bodies
-		B2_ASSERT( bodyA->setIndex >= b2_firstSleepingSet || bodyB->setIndex >= b2_firstSleepingSet );
-		B2_ASSERT( bodyA->setIndex != b2_staticSet || bodyB->setIndex != b2_staticSet );
+		Debug.Assert( bodyA->setIndex >= b2_firstSleepingSet || bodyB->setIndex >= b2_firstSleepingSet );
+		Debug.Assert( bodyA->setIndex != b2_staticSet || bodyB->setIndex != b2_staticSet );
 
 		// joint should go into the sleeping set (not static set)
 		int setIndex = maxSetIndex;
@@ -596,7 +596,7 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 		{
 			// merge sleeping sets
 			b2MergeSolverSets( world, bodyA->setIndex, bodyB->setIndex );
-			B2_ASSERT( bodyA->setIndex == bodyB->setIndex );
+			Debug.Assert( bodyA->setIndex == bodyB->setIndex );
 
 			// fix potentially invalid set index
 			setIndex = bodyA->setIndex;
@@ -607,12 +607,12 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 			jointSim = b2JointSimArray_Get( &mergedSet->jointSims, joint->localIndex );
 		}
 
-		B2_ASSERT( joint->setIndex == setIndex );
+		Debug.Assert( joint->setIndex == setIndex );
 	}
 
-	B2_ASSERT( jointSim->jointId == jointId );
-	B2_ASSERT( jointSim->bodyIdA == bodyIdA );
-	B2_ASSERT( jointSim->bodyIdB == bodyIdB );
+	Debug.Assert( jointSim->jointId == jointId );
+	Debug.Assert( jointSim->bodyIdA == bodyIdA );
+	Debug.Assert( jointSim->bodyIdB == bodyIdB );
 
 	if ( joint->setIndex > b2_disabledSet )
 	{
@@ -671,16 +671,16 @@ b2JointId b2CreateDistanceJoint( b2WorldId worldId, const b2DistanceJointDef* de
 	B2_CHECK_DEF( def );
 	b2World* world = b2GetWorldFromId( worldId );
 
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 
 	if ( world->locked )
 	{
 		return ( b2JointId ){ 0 };
 	}
 
-	B2_ASSERT( b2Body_IsValid( def->bodyIdA ) );
-	B2_ASSERT( b2Body_IsValid( def->bodyIdB ) );
-	B2_ASSERT( b2IsValidFloat( def->length ) && def->length > 0.0f );
+	Debug.Assert( b2Body_IsValid( def->bodyIdA ) );
+	Debug.Assert( b2Body_IsValid( def->bodyIdB ) );
+	Debug.Assert( b2IsValidFloat( def->length ) && def->length > 0.0f );
 
 	b2Body* bodyA = b2GetBodyFullId( world, def->bodyIdA );
 	b2Body* bodyB = b2GetBodyFullId( world, def->bodyIdB );
@@ -724,7 +724,7 @@ b2JointId b2CreateMotorJoint( b2WorldId worldId, const b2MotorJointDef* def )
 	B2_CHECK_DEF( def );
 	b2World* world = b2GetWorldFromId( worldId );
 
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 
 	if ( world->locked )
 	{
@@ -762,7 +762,7 @@ b2JointId b2CreateMouseJoint( b2WorldId worldId, const b2MouseJointDef* def )
 	B2_CHECK_DEF( def );
 	b2World* world = b2GetWorldFromId( worldId );
 
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 
 	if ( world->locked )
 	{
@@ -798,7 +798,7 @@ b2JointId b2CreateNullJoint( b2WorldId worldId, const b2NullJointDef* def )
 	B2_CHECK_DEF( def );
 	b2World* world = b2GetWorldFromId( worldId );
 
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 
 	if ( world->locked )
 	{
@@ -825,7 +825,7 @@ b2JointId b2CreateRevoluteJoint( b2WorldId worldId, const b2RevoluteJointDef* de
 	B2_CHECK_DEF( def );
 	b2World* world = b2GetWorldFromId( worldId );
 
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 
 	if ( world->locked )
 	{
@@ -880,7 +880,7 @@ b2JointId b2CreatePrismaticJoint( b2WorldId worldId, const b2PrismaticJointDef* 
 	B2_CHECK_DEF( def );
 	b2World* world = b2GetWorldFromId( worldId );
 
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 
 	if ( world->locked )
 	{
@@ -933,7 +933,7 @@ b2JointId b2CreateWeldJoint( b2WorldId worldId, const b2WeldJointDef* def )
 	B2_CHECK_DEF( def );
 	b2World* world = b2GetWorldFromId( worldId );
 
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 
 	if ( world->locked )
 	{
@@ -975,7 +975,7 @@ b2JointId b2CreateWheelJoint( b2WorldId worldId, const b2WheelJointDef* def )
 	B2_CHECK_DEF( def );
 	b2World* world = b2GetWorldFromId( worldId );
 
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 
 	if ( world->locked )
 	{
@@ -1079,12 +1079,12 @@ void b2DestroyJointInternal( b2World* world, b2Joint* joint, bool wakeBodies )
 
 	if ( joint->islandId != B2_NULL_INDEX )
 	{
-		B2_ASSERT( joint->setIndex > b2_disabledSet );
+		Debug.Assert( joint->setIndex > b2_disabledSet );
 		b2UnlinkJoint( world, joint );
 	}
 	else
 	{
-		B2_ASSERT( joint->setIndex <= b2_disabledSet );
+		Debug.Assert( joint->setIndex <= b2_disabledSet );
 	}
 
 	// Remove joint from solver set that owns it
@@ -1105,7 +1105,7 @@ void b2DestroyJointInternal( b2World* world, b2Joint* joint, bool wakeBodies )
 			b2JointSim* movedJointSim = set->jointSims.data + localIndex;
 			int movedId = movedJointSim->jointId;
 			b2Joint* movedJoint = b2JointArray_Get( &world->joints, movedId );
-			B2_ASSERT( movedJoint->localIndex == movedIndex );
+			Debug.Assert( movedJoint->localIndex == movedIndex );
 			movedJoint->localIndex = localIndex;
 		}
 	}
@@ -1129,7 +1129,7 @@ void b2DestroyJointInternal( b2World* world, b2Joint* joint, bool wakeBodies )
 void b2DestroyJoint( b2JointId jointId )
 {
 	b2World* world = b2GetWorld( jointId.world0 );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 
 	if ( world->locked )
 	{
@@ -1299,7 +1299,7 @@ b2Vec2 b2Joint_GetConstraintForce( b2JointId jointId )
 			return b2GetWheelJointForce( world, base );
 
 		default:
-			B2_ASSERT( false );
+			Debug.Assert( false );
 			return b2Vec2_zero;
 	}
 }
@@ -1337,7 +1337,7 @@ float b2Joint_GetConstraintTorque( b2JointId jointId )
 			return b2GetWheelJointTorque( world, base );
 
 		default:
-			B2_ASSERT( false );
+			Debug.Assert( false );
 			return 0.0f;
 	}
 }
@@ -1378,7 +1378,7 @@ void b2PrepareJoint( b2JointSim* joint, b2StepContext* context )
 			break;
 
 		default:
-			B2_ASSERT( false );
+			Debug.Assert( false );
 	}
 }
 
@@ -1418,7 +1418,7 @@ void b2WarmStartJoint( b2JointSim* joint, b2StepContext* context )
 			break;
 
 		default:
-			B2_ASSERT( false );
+			Debug.Assert( false );
 	}
 }
 
@@ -1458,7 +1458,7 @@ void b2SolveJoint( b2JointSim* joint, b2StepContext* context, bool useBias )
 			break;
 
 		default:
-			B2_ASSERT( false );
+			Debug.Assert( false );
 	}
 }
 

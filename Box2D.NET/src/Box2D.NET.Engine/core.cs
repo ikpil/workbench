@@ -124,7 +124,7 @@ public class core
 #define B2_SNOOP_PAIR_COUNTERS B2_DEBUG
 #define B2_SNOOP_TOI_COUNTERS B2_DEBUG
 
-#define B2_CHECK_DEF( DEF ) B2_ASSERT( DEF->internalValue == B2_SECRET_COOKIE )
+#define B2_CHECK_DEF( DEF ) Debug.Assert( DEF->internalValue == B2_SECRET_COOKIE )
 
     void* b2Alloc(int size);
 #define B2_ALLOC_STRUCT( type ) b2Alloc(sizeof(type))
@@ -192,7 +192,7 @@ public class core
 
     void b2SetLengthUnitsPerMeter(float lengthUnits)
     {
-        B2_ASSERT(b2IsValidFloat(lengthUnits) && lengthUnits > 0.0f);
+        Debug.Assert(b2IsValidFloat(lengthUnits) && lengthUnits > 0.0f);
         b2_lengthUnitsPerMeter = lengthUnits;
     }
 
@@ -213,7 +213,7 @@ public class core
 
     void b2SetAssertFcn(b2AssertFcn* assertFcn)
     {
-        B2_ASSERT(assertFcn != NULL);
+        Debug.Assert(assertFcn != NULL);
         b2AssertHandler = assertFcn;
     }
 
@@ -338,8 +338,8 @@ public class core
             void* ptr = b2_allocFcn(size32, B2_ALIGNMENT);
             b2TracyCAlloc(ptr, size);
 
-            B2_ASSERT(ptr != NULL);
-            B2_ASSERT(((uintptr_t)ptr & 0x1F) == 0);
+            Debug.Assert(ptr != NULL);
+            Debug.Assert(((uintptr_t)ptr & 0x1F) == 0);
 
             return ptr;
         }
@@ -360,8 +360,8 @@ public class core
 
         b2TracyCAlloc(ptr, size);
 
-        B2_ASSERT(ptr != NULL);
-        B2_ASSERT(((uintptr_t)ptr & 0x1F) == 0);
+        Debug.Assert(ptr != NULL);
+        Debug.Assert(((uintptr_t)ptr & 0x1F) == 0);
 
         return ptr;
     }
@@ -393,7 +393,7 @@ public class core
 
     void* b2GrowAlloc(void* oldMem, int oldSize, int newSize)
     {
-        B2_ASSERT(newSize > oldSize);
+        Debug.Assert(newSize > oldSize);
         void* newMem = b2Alloc(newSize);
         if (oldSize > 0)
         {

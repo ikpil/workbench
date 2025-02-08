@@ -22,14 +22,14 @@ float b2WeldJoint_GetReferenceAngle( b2JointId jointId )
 
 void b2WeldJoint_SetReferenceAngle( b2JointId jointId, float angleInRadians )
 {
-	B2_ASSERT( b2IsValidFloat( angleInRadians ) );
+	Debug.Assert( b2IsValidFloat( angleInRadians ) );
 	b2JointSim* joint = b2GetJointSimCheckType( jointId, b2_weldJoint );
 	joint->weldJoint.referenceAngle = b2ClampFloat(angleInRadians, -B2_PI, B2_PI);
 }
 
 void b2WeldJoint_SetLinearHertz( b2JointId jointId, float hertz )
 {
-	B2_ASSERT( b2IsValidFloat( hertz ) && hertz >= 0.0f );
+	Debug.Assert( b2IsValidFloat( hertz ) && hertz >= 0.0f );
 	b2JointSim* joint = b2GetJointSimCheckType( jointId, b2_weldJoint );
 	joint->weldJoint.linearHertz = hertz;
 }
@@ -42,7 +42,7 @@ float b2WeldJoint_GetLinearHertz( b2JointId jointId )
 
 void b2WeldJoint_SetLinearDampingRatio( b2JointId jointId, float dampingRatio )
 {
-	B2_ASSERT( b2IsValidFloat( dampingRatio ) && dampingRatio >= 0.0f );
+	Debug.Assert( b2IsValidFloat( dampingRatio ) && dampingRatio >= 0.0f );
 	b2JointSim* joint = b2GetJointSimCheckType( jointId, b2_weldJoint );
 	joint->weldJoint.linearDampingRatio = dampingRatio;
 }
@@ -55,7 +55,7 @@ float b2WeldJoint_GetLinearDampingRatio( b2JointId jointId )
 
 void b2WeldJoint_SetAngularHertz( b2JointId jointId, float hertz )
 {
-	B2_ASSERT( b2IsValidFloat( hertz ) && hertz >= 0.0f );
+	Debug.Assert( b2IsValidFloat( hertz ) && hertz >= 0.0f );
 	b2JointSim* joint = b2GetJointSimCheckType( jointId, b2_weldJoint );
 	joint->weldJoint.angularHertz = hertz;
 }
@@ -68,7 +68,7 @@ float b2WeldJoint_GetAngularHertz( b2JointId jointId )
 
 void b2WeldJoint_SetAngularDampingRatio( b2JointId jointId, float dampingRatio )
 {
-	B2_ASSERT( b2IsValidFloat( dampingRatio ) && dampingRatio >= 0.0f );
+	Debug.Assert( b2IsValidFloat( dampingRatio ) && dampingRatio >= 0.0f );
 	b2JointSim* joint = b2GetJointSimCheckType( jointId, b2_weldJoint );
 	joint->weldJoint.angularDampingRatio = dampingRatio;
 }
@@ -106,7 +106,7 @@ float b2GetWeldJointTorque( b2World* world, b2JointSim* base )
 
 void b2PrepareWeldJoint( b2JointSim* base, b2StepContext* context )
 {
-	B2_ASSERT( base->type == b2_weldJoint );
+	Debug.Assert( base->type == b2_weldJoint );
 
 	// chase body id to the solver set where the body lives
 	int idA = base->bodyIdA;
@@ -117,7 +117,7 @@ void b2PrepareWeldJoint( b2JointSim* base, b2StepContext* context )
 	b2Body* bodyA = b2BodyArray_Get( &world->bodies, idA );
 	b2Body* bodyB = b2BodyArray_Get( &world->bodies, idB );
 
-	B2_ASSERT( bodyA->setIndex == b2_awakeSet || bodyB->setIndex == b2_awakeSet );
+	Debug.Assert( bodyA->setIndex == b2_awakeSet || bodyB->setIndex == b2_awakeSet );
 	b2SolverSet* setA = b2SolverSetArray_Get( &world->solverSets, bodyA->setIndex );
 	b2SolverSet* setB = b2SolverSetArray_Get( &world->solverSets, bodyB->setIndex );
 
@@ -205,7 +205,7 @@ void b2WarmStartWeldJoint( b2JointSim* base, b2StepContext* context )
 
 void b2SolveWeldJoint( b2JointSim* base, b2StepContext* context, bool useBias )
 {
-	B2_ASSERT( base->type == b2_weldJoint );
+	Debug.Assert( base->type == b2_weldJoint );
 
 	float mA = base->invMassA;
 	float mB = base->invMassB;

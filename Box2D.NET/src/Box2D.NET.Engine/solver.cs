@@ -12,7 +12,7 @@ typedef struct b2BodySim b2BodySim;
 typedef struct b2BodyState b2BodyState;
 typedef struct b2ContactSim b2ContactSim;
 typedef struct b2JointSim b2JointSim;
-typedef struct b2World b2World;
+
 
 typedef struct b2Softness
 {
@@ -275,8 +275,8 @@ static void b2WarmStartJointsTask( int startIndex, int endIndex, b2StepContext* 
 
 	b2GraphColor* color = context->graph->colors + colorIndex;
 	b2JointSim* joints = color->jointSims.data;
-	B2_ASSERT( 0 <= startIndex && startIndex < color->jointSims.count );
-	B2_ASSERT( startIndex <= endIndex && endIndex <= color->jointSims.count );
+	Debug.Assert( 0 <= startIndex && startIndex < color->jointSims.count );
+	Debug.Assert( startIndex <= endIndex && endIndex <= color->jointSims.count );
 
 	for ( int i = startIndex; i < endIndex; ++i )
 	{
@@ -293,8 +293,8 @@ static void b2SolveJointsTask( int startIndex, int endIndex, b2StepContext* cont
 
 	b2GraphColor* color = context->graph->colors + colorIndex;
 	b2JointSim* joints = color->jointSims.data;
-	B2_ASSERT( 0 <= startIndex && startIndex < color->jointSims.count );
-	B2_ASSERT( startIndex <= endIndex && endIndex <= color->jointSims.count );
+	Debug.Assert( 0 <= startIndex && startIndex < color->jointSims.count );
+	Debug.Assert( startIndex <= endIndex && endIndex <= color->jointSims.count );
 
 	for ( int i = startIndex; i < endIndex; ++i )
 	{
@@ -312,7 +312,7 @@ static void b2IntegratePositionsTask( int startIndex, int endIndex, b2StepContex
 	b2BodyState* states = context->states;
 	float h = context->h;
 
-	B2_ASSERT( startIndex <= endIndex );
+	Debug.Assert( startIndex <= endIndex );
 
 	for ( int i = startIndex; i < endIndex; ++i )
 	{
@@ -375,7 +375,7 @@ static bool b2ContinuousQueryCallback( int proxyId, int shapeId, void* context )
 	b2Body* body = b2BodyArray_Get( &world->bodies, shape->bodyId );
 
 	b2BodySim* bodySim = b2GetBodySim( world, body );
-	B2_ASSERT( body->type == b2_staticBody || fastBodySim->isBullet );
+	Debug.Assert( body->type == b2_staticBody || fastBodySim->isBullet );
 
 	// Skip bullets
 	if ( bodySim->isBullet )
@@ -514,7 +514,7 @@ static void b2SolveContinuous( b2World* world, int bodySimIndex )
 
 	b2SolverSet* awakeSet = b2SolverSetArray_Get( &world->solverSets, b2_awakeSet );
 	b2BodySim* fastBodySim = b2BodySimArray_Get( &awakeSet->bodySims, bodySimIndex );
-	B2_ASSERT( fastBodySim->isFast );
+	Debug.Assert( fastBodySim->isFast );
 
 	b2Sweep sweep = b2MakeSweep( fastBodySim );
 
@@ -673,7 +673,7 @@ static void b2FinalizeBodiesTask( int startIndex, int endIndex, uint threadIndex
 	ushort worldId = world->worldId;
 
 	// The body move event array has should already have the correct size
-	B2_ASSERT( endIndex <= world->bodyMoveEvents.count );
+	Debug.Assert( endIndex <= world->bodyMoveEvents.count );
 	b2BodyMoveEvent* moveEvents = world->bodyMoveEvents.data;
 
 	b2BitSet* enlargedSimBitSet = &world->taskContexts.data[threadIndex].enlargedSimBitSet;
@@ -685,7 +685,7 @@ static void b2FinalizeBodiesTask( int startIndex, int endIndex, uint threadIndex
 	const float speculativeDistance = B2_SPECULATIVE_DISTANCE;
 	const float aabbMargin = B2_AABB_MARGIN;
 
-	B2_ASSERT( startIndex <= endIndex );
+	Debug.Assert( startIndex <= endIndex );
 
 	for ( int simIndex = startIndex; simIndex < endIndex; ++simIndex )
 	{
@@ -695,8 +695,8 @@ static void b2FinalizeBodiesTask( int startIndex, int endIndex, uint threadIndex
 		b2Vec2 v = state->linearVelocity;
 		float w = state->angularVelocity;
 
-		B2_ASSERT( b2IsValidVec2( v ) );
-		B2_ASSERT( b2IsValidFloat( w ) );
+		Debug.Assert( b2IsValidVec2( v ) );
+		Debug.Assert( b2IsValidFloat( w ) );
 
 		sim->center = b2Add( sim->center, state->deltaPosition );
 		sim->transform.q = b2NormalizeRot( b2MulRot( state->deltaRotation, sim->transform.q ) );
@@ -817,7 +817,7 @@ static void b2FinalizeBodiesTask( int startIndex, int endIndex, uint threadIndex
 				aabb.upperBound.y += speculativeDistance;
 				shape->aabb = aabb;
 
-				B2_ASSERT( shape->enlargedAABB == false );
+				Debug.Assert( shape->enlargedAABB == false );
 
 				if ( b2AABB_Contains( shape->fatAABB, aabb ) == false )
 				{
@@ -940,7 +940,7 @@ static void b2ExecuteBlock( b2SolverStage* stage, b2StepContext* context, b2Solv
 	}
 }
 
-staticint GetWorkerStartIndex( int workerIndex, int blockCount, int workerCount )
+static int GetWorkerStartIndex( int workerIndex, int blockCount, int workerCount )
 {
 	if ( blockCount <= workerCount )
 	{
@@ -966,15 +966,15 @@ static void b2ExecuteStage( b2SolverStage* stage, b2StepContext* context, int pr
 		return;
 	}
 
-	B2_ASSERT( 0 <= startIndex && startIndex < blockCount );
+	Debug.Assert( 0 <= startIndex && startIndex < blockCount );
 
 	int blockIndex = startIndex;
 
 	while ( b2AtomicCompareExchangeInt( &blocks[blockIndex].syncIndex, expectedSyncIndex, syncIndex ) == true )
 	{
-		B2_ASSERT( stage->type != b2_stagePrepareContacts || syncIndex < 2 );
+		Debug.Assert( stage->type != b2_stagePrepareContacts || syncIndex < 2 );
 
-		B2_ASSERT( completedCount < blockCount );
+		Debug.Assert( completedCount < blockCount );
 
 		b2ExecuteBlock( stage, context, blocks + blockIndex );
 
@@ -1030,7 +1030,7 @@ static void b2ExecuteMainStage( b2SolverStage* stage, b2StepContext* context, ui
 		b2AtomicStoreU32( &context->atomicSyncBits, syncBits );
 
 		int syncIndex = ( syncBits >> 16 ) & 0xFFFF;
-		B2_ASSERT( syncIndex > 0 );
+		Debug.Assert( syncIndex > 0 );
 		int previousSyncIndex = syncIndex - 1;
 
 		b2ExecuteStage( stage, context, previousSyncIndex, syncIndex, 0 );
@@ -1087,7 +1087,7 @@ static void b2SolverTask( int startIndex, int endIndex, uint threadIndexIgnore, 
 		// This stage loops over all awake joints
 		uint jointSyncIndex = 1;
 		uint syncBits = ( jointSyncIndex << 16 ) | stageIndex;
-		B2_ASSERT( stages[stageIndex].type == b2_stagePrepareJoints );
+		Debug.Assert( stages[stageIndex].type == b2_stagePrepareJoints );
 		b2ExecuteMainStage( stages + stageIndex, context, syncBits );
 		stageIndex += 1;
 		jointSyncIndex += 1;
@@ -1095,7 +1095,7 @@ static void b2SolverTask( int startIndex, int endIndex, uint threadIndexIgnore, 
 		// This stage loops over all contact constraints
 		uint contactSyncIndex = 1;
 		syncBits = ( contactSyncIndex << 16 ) | stageIndex;
-		B2_ASSERT( stages[stageIndex].type == b2_stagePrepareContacts );
+		Debug.Assert( stages[stageIndex].type == b2_stagePrepareContacts );
 		b2ExecuteMainStage( stages + stageIndex, context, syncBits );
 		stageIndex += 1;
 		contactSyncIndex += 1;
@@ -1117,7 +1117,7 @@ static void b2SolverTask( int startIndex, int endIndex, uint threadIndexIgnore, 
 
 			// integrate velocities
 			syncBits = ( bodySyncIndex << 16 ) | iterStageIndex;
-			B2_ASSERT( stages[iterStageIndex].type == b2_stageIntegrateVelocities );
+			Debug.Assert( stages[iterStageIndex].type == b2_stageIntegrateVelocities );
 			b2ExecuteMainStage( stages + iterStageIndex, context, syncBits );
 			iterStageIndex += 1;
 			bodySyncIndex += 1;
@@ -1131,7 +1131,7 @@ static void b2SolverTask( int startIndex, int endIndex, uint threadIndexIgnore, 
 			for ( int colorIndex = 0; colorIndex < activeColorCount; ++colorIndex )
 			{
 				syncBits = ( graphSyncIndex << 16 ) | iterStageIndex;
-				B2_ASSERT( stages[iterStageIndex].type == b2_stageWarmStart );
+				Debug.Assert( stages[iterStageIndex].type == b2_stageWarmStart );
 				b2ExecuteMainStage( stages + iterStageIndex, context, syncBits );
 				iterStageIndex += 1;
 			}
@@ -1147,7 +1147,7 @@ static void b2SolverTask( int startIndex, int endIndex, uint threadIndexIgnore, 
 			for ( int colorIndex = 0; colorIndex < activeColorCount; ++colorIndex )
 			{
 				syncBits = ( graphSyncIndex << 16 ) | iterStageIndex;
-				B2_ASSERT( stages[iterStageIndex].type == b2_stageSolve );
+				Debug.Assert( stages[iterStageIndex].type == b2_stageSolve );
 				b2ExecuteMainStage( stages + iterStageIndex, context, syncBits );
 				iterStageIndex += 1;
 			}
@@ -1156,7 +1156,7 @@ static void b2SolverTask( int startIndex, int endIndex, uint threadIndexIgnore, 
 			profile->solveImpulses += b2GetMillisecondsAndReset( &ticks );
 
 			// integrate positions
-			B2_ASSERT( stages[iterStageIndex].type == b2_stageIntegratePositions );
+			Debug.Assert( stages[iterStageIndex].type == b2_stageIntegratePositions );
 			syncBits = ( bodySyncIndex << 16 ) | iterStageIndex;
 			b2ExecuteMainStage( stages + iterStageIndex, context, syncBits );
 			iterStageIndex += 1;
@@ -1172,7 +1172,7 @@ static void b2SolverTask( int startIndex, int endIndex, uint threadIndexIgnore, 
 			for ( int colorIndex = 0; colorIndex < activeColorCount; ++colorIndex )
 			{
 				syncBits = ( graphSyncIndex << 16 ) | iterStageIndex;
-				B2_ASSERT( stages[iterStageIndex].type == b2_stageRelax );
+				Debug.Assert( stages[iterStageIndex].type == b2_stageRelax );
 				b2ExecuteMainStage( stages + iterStageIndex, context, syncBits );
 				iterStageIndex += 1;
 			}
@@ -1193,7 +1193,7 @@ static void b2SolverTask( int startIndex, int endIndex, uint threadIndexIgnore, 
 			for ( int colorIndex = 0; colorIndex < activeColorCount; ++colorIndex )
 			{
 				syncBits = ( graphSyncIndex << 16 ) | iterStageIndex;
-				B2_ASSERT( stages[iterStageIndex].type == b2_stageRestitution );
+				Debug.Assert( stages[iterStageIndex].type == b2_stageRestitution );
 				b2ExecuteMainStage( stages + iterStageIndex, context, syncBits );
 				iterStageIndex += 1;
 			}
@@ -1206,7 +1206,7 @@ static void b2SolverTask( int startIndex, int endIndex, uint threadIndexIgnore, 
 		b2StoreOverflowImpulses( context );
 
 		syncBits = ( contactSyncIndex << 16 ) | stageIndex;
-		B2_ASSERT( stages[stageIndex].type == b2_stageStoreImpulses );
+		Debug.Assert( stages[stageIndex].type == b2_stageStoreImpulses );
 		b2ExecuteMainStage( stages + stageIndex, context, syncBits );
 
 		profile->storeImpulses += b2GetMillisecondsAndReset( &ticks );
@@ -1214,7 +1214,7 @@ static void b2SolverTask( int startIndex, int endIndex, uint threadIndexIgnore, 
 		// Signal workers to finish
 		b2AtomicStoreU32( &context->atomicSyncBits, UINT_MAX );
 
-		B2_ASSERT( stageIndex + 1 == context->stageCount );
+		Debug.Assert( stageIndex + 1 == context->stageCount );
 		return;
 	}
 
@@ -1258,10 +1258,10 @@ static void b2SolverTask( int startIndex, int endIndex, uint threadIndexIgnore, 
 		}
 
 		int stageIndex = syncBits & 0xFFFF;
-		B2_ASSERT( stageIndex < context->stageCount );
+		Debug.Assert( stageIndex < context->stageCount );
 
 		int syncIndex = ( syncBits >> 16 ) & 0xFFFF;
-		B2_ASSERT( syncIndex > 0 );
+		Debug.Assert( syncIndex > 0 );
 
 		int previousSyncIndex = syncIndex - 1;
 
@@ -1280,7 +1280,7 @@ static void b2BulletBodyTask( int startIndex, int endIndex, uint threadIndex, vo
 
 	b2StepContext* stepContext = taskContext;
 
-	B2_ASSERT( startIndex <= endIndex );
+	Debug.Assert( startIndex <= endIndex );
 
 	for ( int i = startIndex; i < endIndex; ++i )
 	{
@@ -1528,8 +1528,8 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 				jointBase += colorJointCount;
 			}
 
-			B2_ASSERT( contactBase == simdContactCount );
-			B2_ASSERT( jointBase == awakeJointCount );
+			Debug.Assert( contactBase == simdContactCount );
+			Debug.Assert( jointBase == awakeJointCount );
 		}
 
 		// Define work blocks for preparing contacts and storing contact impulses
@@ -1684,7 +1684,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 			}
 		}
 
-		B2_ASSERT( (ptrdiff_t)(baseGraphBlock - graphBlocks) == graphBlockCount );
+		Debug.Assert( (ptrdiff_t)(baseGraphBlock - graphBlocks) == graphBlockCount );
 
 		b2SolverStage* stage = stages;
 
@@ -1773,9 +1773,9 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 		b2AtomicStoreInt( &stage->completionCount, 0 );
 		stage += 1;
 
-		B2_ASSERT( (int)( stage - stages ) == stageCount );
+		Debug.Assert( (int)( stage - stages ) == stageCount );
 
-		B2_ASSERT( workerCount <= B2_MAX_WORKERS );
+		Debug.Assert( workerCount <= B2_MAX_WORKERS );
 		b2WorkerContext workerContext[B2_MAX_WORKERS];
 
 		stepContext->graph = graph;
@@ -1869,7 +1869,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 		b2TracyCZoneNC( hit_events, "Hit Events", b2_colorRosyBrown, true );
 		ulong hitTicks = b2GetTicks();
 
-		B2_ASSERT( world->contactHitEvents.count == 0 );
+		Debug.Assert( world->contactHitEvents.count == 0 );
 
 		float threshold = world->hitEventThreshold;
 		b2GraphColor* colors = world->constraintGraph.colors;
@@ -1953,7 +1953,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 		{
 			b2BroadPhase* broadPhase = &world->broadPhase;
 			uint wordCount = enlargedBodyBitSet->blockCount;
-			ulong* bits = enlargedBodyBitSet->bits;
+			ulong[] bits = enlargedBodyBitSet->bits;
 
 			// Fast array access is important here
 			b2Body* bodyArray = world->bodies.data;
@@ -2061,7 +2061,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 			bulletBodySim->enlargeAABB = false;
 
 			int bodyId = bulletBodySim->bodyId;
-			B2_ASSERT( 0 <= bodyId && bodyId < world->bodies.count );
+			Debug.Assert( 0 <= bodyId && bodyId < world->bodies.count );
 			b2Body* bulletBody = bodyArray + bodyId;
 
 			int shapeId = bulletBody->headShapeId;
@@ -2079,10 +2079,10 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 
 				int proxyKey = shape->proxyKey;
 				int proxyId = B2_PROXY_ID( proxyKey );
-				B2_ASSERT( B2_PROXY_TYPE( proxyKey ) == b2_dynamicBody );
+				Debug.Assert( B2_PROXY_TYPE( proxyKey ) == b2_dynamicBody );
 
 				// all fast bullet shapes should already be in the move buffer
-				B2_ASSERT( b2ContainsKey( &broadPhase->moveSet, proxyKey + 1 ) );
+				Debug.Assert( b2ContainsKey( &broadPhase->moveSet, proxyKey + 1 ) );
 
 				b2DynamicTree_EnlargeProxy( dynamicTree, proxyId, shape->fatAABB );
 
@@ -2108,14 +2108,14 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 		ulong sleepTicks = b2GetTicks();
 
 		// Collect split island candidate for the next time step. No need to split if sleeping is disabled.
-		B2_ASSERT( world->splitIslandId == B2_NULL_INDEX );
+		Debug.Assert( world->splitIslandId == B2_NULL_INDEX );
 		float splitSleepTimer = 0.0f;
 		for ( int i = 0; i < world->workerCount; ++i )
 		{
 			b2TaskContext* taskContext = world->taskContexts.data + i;
 			if ( taskContext->splitIslandId != B2_NULL_INDEX && taskContext->splitSleepTime >= splitSleepTimer )
 			{
-				B2_ASSERT( taskContext->splitSleepTime > 0.0f );
+				Debug.Assert( taskContext->splitSleepTime > 0.0f );
 
 				// Tie breaking for determinism. Largest island id wins. Needed due to work stealing.
 				if ( taskContext->splitSleepTime == splitSleepTimer && taskContext->splitIslandId < world->splitIslandId )

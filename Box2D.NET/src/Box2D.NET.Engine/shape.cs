@@ -11,7 +11,7 @@ public class shape
 
 
 typedef struct b2BroadPhase b2BroadPhase;
-typedef struct b2World b2World;
+
 
 typedef struct b2Shape
 {
@@ -136,7 +136,7 @@ static b2Shape* b2GetShape( b2World* world, b2ShapeId shapeId )
 {
 	int id = shapeId.index1 - 1;
 	b2Shape* shape = b2ShapeArray_Get( &world->shapes, id );
-	B2_ASSERT( shape->id == id && shape->generation == shapeId.generation );
+	Debug.Assert( shape->id == id && shape->generation == shapeId.generation );
 	return shape;
 }
 
@@ -144,7 +144,7 @@ static b2ChainShape* b2GetChainShape( b2World* world, b2ChainId chainId )
 {
 	int id = chainId.index1 - 1;
 	b2ChainShape* chain = b2ChainShapeArray_Get( &world->chainShapes, id );
-	B2_ASSERT( chain->id == id && chain->generation == chainId.generation );
+	Debug.Assert( chain->id == id && chain->generation == chainId.generation );
 	return chain;
 }
 
@@ -174,9 +174,9 @@ static void b2UpdateShapeAABBs( b2Shape* shape, b2Transform transform, b2BodyTyp
 static b2Shape* b2CreateShapeInternal( b2World* world, b2Body* body, b2Transform transform, const b2ShapeDef* def,
 									   const void* geometry, b2ShapeType shapeType )
 {
-	B2_ASSERT( b2IsValidFloat( def->density ) && def->density >= 0.0f );
-	B2_ASSERT( b2IsValidFloat( def->friction ) && def->friction >= 0.0f );
-	B2_ASSERT( b2IsValidFloat( def->restitution ) && def->restitution >= 0.0f );
+	Debug.Assert( b2IsValidFloat( def->density ) && def->density >= 0.0f );
+	Debug.Assert( b2IsValidFloat( def->friction ) && def->friction >= 0.0f );
+	Debug.Assert( b2IsValidFloat( def->restitution ) && def->restitution >= 0.0f );
 
 	int shapeId = b2AllocId( &world->shapeIdPool );
 
@@ -186,7 +186,7 @@ static b2Shape* b2CreateShapeInternal( b2World* world, b2Body* body, b2Transform
 	}
 	else
 	{
-		B2_ASSERT( world->shapes.data[shapeId].id == B2_NULL_INDEX );
+		Debug.Assert( world->shapes.data[shapeId].id == B2_NULL_INDEX );
 	}
 
 	b2Shape* shape = b2ShapeArray_Get( &world->shapes, shapeId );
@@ -214,7 +214,7 @@ static b2Shape* b2CreateShapeInternal( b2World* world, b2Body* body, b2Transform
 			break;
 
 		default:
-			B2_ASSERT( false );
+			Debug.Assert( false );
 			break;
 	}
 
@@ -281,9 +281,9 @@ static b2Shape* b2CreateShapeInternal( b2World* world, b2Body* body, b2Transform
 static b2ShapeId b2CreateShape( b2BodyId bodyId, const b2ShapeDef* def, const void* geometry, b2ShapeType shapeType )
 {
 	B2_CHECK_DEF( def );
-	B2_ASSERT( b2IsValidFloat( def->density ) && def->density >= 0.0f );
-	B2_ASSERT( b2IsValidFloat( def->friction ) && def->friction >= 0.0f );
-	B2_ASSERT( b2IsValidFloat( def->restitution ) && def->restitution >= 0.0f );
+	Debug.Assert( b2IsValidFloat( def->density ) && def->density >= 0.0f );
+	Debug.Assert( b2IsValidFloat( def->friction ) && def->friction >= 0.0f );
+	Debug.Assert( b2IsValidFloat( def->restitution ) && def->restitution >= 0.0f );
 
 	b2World* world = b2GetWorldLocked( bodyId.world0 );
 	if ( world == NULL )
@@ -326,7 +326,7 @@ b2ShapeId b2CreateCapsuleShape( b2BodyId bodyId, const b2ShapeDef* def, const b2
 
 b2ShapeId b2CreatePolygonShape( b2BodyId bodyId, const b2ShapeDef* def, const b2Polygon* polygon )
 {
-	B2_ASSERT( b2IsValidFloat( polygon->radius ) && polygon->radius >= 0.0f );
+	Debug.Assert( b2IsValidFloat( polygon->radius ) && polygon->radius >= 0.0f );
 	return b2CreateShape( bodyId, def, polygon, b2_polygonShape );
 }
 
@@ -335,7 +335,7 @@ b2ShapeId b2CreateSegmentShape( b2BodyId bodyId, const b2ShapeDef* def, const b2
 	float lengthSqr = b2DistanceSquared( segment->point1, segment->point2 );
 	if ( lengthSqr <= B2_LINEAR_SLOP * B2_LINEAR_SLOP )
 	{
-		B2_ASSERT( false );
+		Debug.Assert( false );
 		return b2_nullShapeId;
 	}
 
@@ -456,8 +456,8 @@ void b2DestroyShape( b2ShapeId shapeId, bool updateBodyMass )
 b2ChainId b2CreateChain( b2BodyId bodyId, const b2ChainDef* def )
 {
 	B2_CHECK_DEF( def );
-	B2_ASSERT( def->count >= 4 );
-	B2_ASSERT( def->materialCount == 1 || def->materialCount == def->count );
+	Debug.Assert( def->count >= 4 );
+	Debug.Assert( def->materialCount == 1 || def->materialCount == def->count );
 
 	b2World* world = b2GetWorldLocked( bodyId.world0 );
 	if ( world == NULL )
@@ -476,7 +476,7 @@ b2ChainId b2CreateChain( b2BodyId bodyId, const b2ChainDef* def )
 	}
 	else
 	{
-		B2_ASSERT( world->chainShapes.data[chainId].id == B2_NULL_INDEX );
+		Debug.Assert( world->chainShapes.data[chainId].id == B2_NULL_INDEX );
 	}
 
 	b2ChainShape* chainShape = b2ChainShapeArray_Get( &world->chainShapes, chainId );
@@ -493,10 +493,10 @@ b2ChainId b2CreateChain( b2BodyId bodyId, const b2ChainDef* def )
 	for ( int i = 0; i < materialCount; ++i )
 	{
 		const b2SurfaceMaterial* material = def->materials + i;
-		B2_ASSERT( b2IsValidFloat( material->friction ) && material->friction >= 0.0f );
-		B2_ASSERT( b2IsValidFloat( material->restitution ) && material->restitution >= 0.0f );
-		B2_ASSERT( b2IsValidFloat( material->rollingResistance ) && material->rollingResistance >= 0.0f );
-		B2_ASSERT( b2IsValidFloat( material->tangentSpeed ) );
+		Debug.Assert( b2IsValidFloat( material->friction ) && material->friction >= 0.0f );
+		Debug.Assert( b2IsValidFloat( material->restitution ) && material->restitution >= 0.0f );
+		Debug.Assert( b2IsValidFloat( material->rollingResistance ) && material->rollingResistance >= 0.0f );
+		Debug.Assert( b2IsValidFloat( material->tangentSpeed ) );
 
 		chainShape->materials[i] = *material;
 	}
@@ -653,7 +653,7 @@ void b2DestroyChain( b2ChainId chainId )
 		chainIdPtr = &( world->chainShapes.data[*chainIdPtr].nextChainId );
 	}
 
-	B2_ASSERT( found == true );
+	Debug.Assert( found == true );
 	if ( found == false )
 	{
 		return;
@@ -731,7 +731,7 @@ b2AABB b2ComputeShapeAABB( const b2Shape* shape, b2Transform xf )
 			return b2ComputeSegmentAABB( &shape->chainSegment.segment, xf );
 		default:
 		{
-			B2_ASSERT( false );
+			Debug.Assert( false );
 			b2AABB empty = { xf.p, xf.p };
 			return empty;
 		}
@@ -772,7 +772,7 @@ float b2GetShapePerimeter( const b2Shape* shape )
 			const b2Vec2* points = shape->polygon.vertices;
 			int count = shape->polygon.count;
 			float perimeter = 2.0f * B2_PI * shape->polygon.radius;
-			B2_ASSERT( count > 0 );
+			Debug.Assert( count > 0 );
 			b2Vec2 prev = points[count - 1];
 			for ( int i = 0; i < count; ++i )
 			{
@@ -811,7 +811,7 @@ float b2GetShapeProjectedPerimeter( const b2Shape* shape, b2Vec2 line )
 		{
 			const b2Vec2* points = shape->polygon.vertices;
 			int count = shape->polygon.count;
-			B2_ASSERT( count > 0 );
+			Debug.Assert( count > 0 );
 			float value = b2Dot( points[0], line );
 			float lower = value;
 			float upper = value;
@@ -871,7 +871,7 @@ b2ShapeExtent b2ComputeShapeExtent( const b2Shape* shape, b2Vec2 localCenter )
 			extent.minExtent = radius;
 			b2Vec2 c1 = b2Sub( shape->capsule.center1, localCenter );
 			b2Vec2 c2 = b2Sub( shape->capsule.center2, localCenter );
-			extent.maxExtent = sqrtf( b2MaxFloat( b2LengthSquared( c1 ), b2LengthSquared( c2 ) ) ) + radius;
+			extent.maxExtent = MathF.Sqrt( b2MaxFloat( b2LengthSquared( c1 ), b2LengthSquared( c2 ) ) ) + radius;
 		}
 		break;
 
@@ -900,7 +900,7 @@ b2ShapeExtent b2ComputeShapeExtent( const b2Shape* shape, b2Vec2 localCenter )
 			}
 
 			extent.minExtent = minExtent + poly->radius;
-			extent.maxExtent = sqrtf( maxExtentSqr ) + poly->radius;
+			extent.maxExtent = MathF.Sqrt( maxExtentSqr ) + poly->radius;
 		}
 		break;
 
@@ -909,7 +909,7 @@ b2ShapeExtent b2ComputeShapeExtent( const b2Shape* shape, b2Vec2 localCenter )
 			extent.minExtent = 0.0f;
 			b2Vec2 c1 = b2Sub( shape->segment.point1, localCenter );
 			b2Vec2 c2 = b2Sub( shape->segment.point2, localCenter );
-			extent.maxExtent = sqrtf( b2MaxFloat( b2LengthSquared( c1 ), b2LengthSquared( c2 ) ) );
+			extent.maxExtent = MathF.Sqrt( b2MaxFloat( b2LengthSquared( c1 ), b2LengthSquared( c2 ) ) );
 		}
 		break;
 
@@ -918,7 +918,7 @@ b2ShapeExtent b2ComputeShapeExtent( const b2Shape* shape, b2Vec2 localCenter )
 			extent.minExtent = 0.0f;
 			b2Vec2 c1 = b2Sub( shape->chainSegment.segment.point1, localCenter );
 			b2Vec2 c2 = b2Sub( shape->chainSegment.segment.point2, localCenter );
-			extent.maxExtent = sqrtf( b2MaxFloat( b2LengthSquared( c1 ), b2LengthSquared( c2 ) ) );
+			extent.maxExtent = MathF.Sqrt( b2MaxFloat( b2LengthSquared( c1 ), b2LengthSquared( c2 ) ) );
 		}
 		break;
 
@@ -1002,14 +1002,14 @@ b2CastOutput b2ShapeCastShape( const b2ShapeCastInput* input, const b2Shape* sha
 
 void b2CreateShapeProxy( b2Shape* shape, b2BroadPhase* bp, b2BodyType type, b2Transform transform, bool forcePairCreation )
 {
-	B2_ASSERT( shape->proxyKey == B2_NULL_INDEX );
+	Debug.Assert( shape->proxyKey == B2_NULL_INDEX );
 
 	b2UpdateShapeAABBs( shape, transform, type );
 
 	// Create proxies in the broad-phase.
 	shape->proxyKey =
 		b2BroadPhase_CreateProxy( bp, type, shape->fatAABB, shape->filter.categoryBits, shape->id, forcePairCreation );
-	B2_ASSERT( B2_PROXY_TYPE( shape->proxyKey ) < b2_bodyTypeCount );
+	Debug.Assert( B2_PROXY_TYPE( shape->proxyKey ) < b2_bodyTypeCount );
 }
 
 void b2DestroyShapeProxy( b2Shape* shape, b2BroadPhase* bp )
@@ -1037,7 +1037,7 @@ b2ShapeProxy b2MakeShapeDistanceProxy( const b2Shape* shape )
 			return b2MakeProxy( &shape->chainSegment.segment.point1, 2, 0.0f );
 		default:
 		{
-			B2_ASSERT( false );
+			Debug.Assert( false );
 			b2ShapeProxy empty = { 0 };
 			return empty;
 		}
@@ -1140,7 +1140,7 @@ b2CastOutput b2Shape_RayCast( b2ShapeId shapeId, const b2RayCastInput* input )
 			break;
 
 		default:
-			B2_ASSERT( false );
+			Debug.Assert( false );
 			return output;
 	}
 
@@ -1156,7 +1156,7 @@ b2CastOutput b2Shape_RayCast( b2ShapeId shapeId, const b2RayCastInput* input )
 
 void b2Shape_SetDensity( b2ShapeId shapeId, float density, bool updateBodyMass )
 {
-	B2_ASSERT( b2IsValidFloat( density ) && density >= 0.0f );
+	Debug.Assert( b2IsValidFloat( density ) && density >= 0.0f );
 
 	b2World* world = b2GetWorldLocked( shapeId.world0 );
 	if ( world == NULL )
@@ -1189,10 +1189,10 @@ float b2Shape_GetDensity( b2ShapeId shapeId )
 
 void b2Shape_SetFriction( b2ShapeId shapeId, float friction )
 {
-	B2_ASSERT( b2IsValidFloat( friction ) && friction >= 0.0f );
+	Debug.Assert( b2IsValidFloat( friction ) && friction >= 0.0f );
 
 	b2World* world = b2GetWorld( shapeId.world0 );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return;
@@ -1211,10 +1211,10 @@ float b2Shape_GetFriction( b2ShapeId shapeId )
 
 void b2Shape_SetRestitution( b2ShapeId shapeId, float restitution )
 {
-	B2_ASSERT( b2IsValidFloat( restitution ) && restitution >= 0.0f );
+	Debug.Assert( b2IsValidFloat( restitution ) && restitution >= 0.0f );
 
 	b2World* world = b2GetWorld( shapeId.world0 );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return;
@@ -1234,7 +1234,7 @@ float b2Shape_GetRestitution( b2ShapeId shapeId )
 void b2Shape_SetMaterial( b2ShapeId shapeId, int material )
 {
 	b2World* world = b2GetWorld( shapeId.world0 );
-	B2_ASSERT( world->locked == false );
+	Debug.Assert( world->locked == false );
 	if ( world->locked )
 	{
 		return;
@@ -1404,7 +1404,7 @@ b2Circle b2Shape_GetCircle( b2ShapeId shapeId )
 {
 	b2World* world = b2GetWorld( shapeId.world0 );
 	b2Shape* shape = b2GetShape( world, shapeId );
-	B2_ASSERT( shape->type == b2_circleShape );
+	Debug.Assert( shape->type == b2_circleShape );
 	return shape->circle;
 }
 
@@ -1412,7 +1412,7 @@ b2Segment b2Shape_GetSegment( b2ShapeId shapeId )
 {
 	b2World* world = b2GetWorld( shapeId.world0 );
 	b2Shape* shape = b2GetShape( world, shapeId );
-	B2_ASSERT( shape->type == b2_segmentShape );
+	Debug.Assert( shape->type == b2_segmentShape );
 	return shape->segment;
 }
 
@@ -1420,7 +1420,7 @@ b2ChainSegment b2Shape_GetChainSegment( b2ShapeId shapeId )
 {
 	b2World* world = b2GetWorld( shapeId.world0 );
 	b2Shape* shape = b2GetShape( world, shapeId );
-	B2_ASSERT( shape->type == b2_chainSegmentShape );
+	Debug.Assert( shape->type == b2_chainSegmentShape );
 	return shape->chainSegment;
 }
 
@@ -1428,7 +1428,7 @@ b2Capsule b2Shape_GetCapsule( b2ShapeId shapeId )
 {
 	b2World* world = b2GetWorld( shapeId.world0 );
 	b2Shape* shape = b2GetShape( world, shapeId );
-	B2_ASSERT( shape->type == b2_capsuleShape );
+	Debug.Assert( shape->type == b2_capsuleShape );
 	return shape->capsule;
 }
 
@@ -1436,7 +1436,7 @@ b2Polygon b2Shape_GetPolygon( b2ShapeId shapeId )
 {
 	b2World* world = b2GetWorld( shapeId.world0 );
 	b2Shape* shape = b2GetShape( world, shapeId );
-	B2_ASSERT( shape->type == b2_polygonShape );
+	Debug.Assert( shape->type == b2_polygonShape );
 	return shape->polygon;
 }
 
@@ -1532,7 +1532,7 @@ b2ChainId b2Shape_GetParentChain( b2ShapeId shapeId )
 
 void b2Chain_SetFriction( b2ChainId chainId, float friction )
 {
-	B2_ASSERT( b2IsValidFloat( friction ) && friction >= 0.0f );
+	Debug.Assert( b2IsValidFloat( friction ) && friction >= 0.0f );
 
 	b2World* world = b2GetWorldLocked( chainId.world0 );
 	if ( world == NULL )
@@ -1567,7 +1567,7 @@ float b2Chain_GetFriction( b2ChainId chainId )
 
 void b2Chain_SetRestitution( b2ChainId chainId, float restitution )
 {
-	B2_ASSERT( b2IsValidFloat( restitution ) );
+	Debug.Assert( b2IsValidFloat( restitution ) );
 
 	b2World* world = b2GetWorldLocked( chainId.world0 );
 	if ( world == NULL )
@@ -1694,7 +1694,7 @@ int b2Shape_GetContactData( b2ShapeId shapeId, b2ContactData* contactData, int c
 		contactKey = contact->edges[edgeIndex].nextKey;
 	}
 
-	B2_ASSERT( index <= capacity );
+	Debug.Assert( index <= capacity );
 
 	return index;
 }

@@ -19,7 +19,7 @@ public class arena_allocator
     b2ArenaEntry;
 
 // This is a stack-like arena allocator used for fast per step allocations.
-// You must nest allocate/free pairs. The code will B2_ASSERT
+// You must nest allocate/free pairs. The code will Debug.Assert
 // if you try to interleave multiple allocate/free pairs.
 // This allocator uses the heap if space is insufficient.
 // I could remove the need to free entries individually.
@@ -57,7 +57,7 @@ public class arena_allocator
 
     b2ArenaAllocator b2CreateArenaAllocator(int capacity)
     {
-        B2_ASSERT(capacity >= 0);
+        Debug.Assert(capacity >= 0);
         b2ArenaAllocator allocator = { 0 };
         allocator.capacity = capacity;
         allocator.data = b2Alloc(capacity);
@@ -88,7 +88,7 @@ public class arena_allocator
             entry.data = b2Alloc(size32);
             entry.usedMalloc = true;
 
-            B2_ASSERT(((uintptr_t)entry.data & 0x1F) == 0);
+            Debug.Assert(((uintptr_t)entry.data & 0x1F) == 0);
         }
         else
         {
@@ -96,7 +96,7 @@ public class arena_allocator
             entry.usedMalloc = false;
             alloc->index += size32;
 
-            B2_ASSERT(((uintptr_t)entry.data & 0x1F) == 0);
+            Debug.Assert(((uintptr_t)entry.data & 0x1F) == 0);
         }
 
         alloc->allocation += size32;
@@ -112,9 +112,9 @@ public class arena_allocator
     void b2FreeArenaItem(b2ArenaAllocator* alloc, void* mem)
     {
         int entryCount = alloc->entries.count;
-        B2_ASSERT(entryCount > 0);
+        Debug.Assert(entryCount > 0);
         b2ArenaEntry* entry = alloc->entries.data + (entryCount - 1);
-        B2_ASSERT(mem == entry->data);
+        Debug.Assert(mem == entry->data);
         if (entry->usedMalloc)
         {
             b2Free(mem, entry->size);
@@ -131,7 +131,7 @@ public class arena_allocator
     void b2GrowArena(b2ArenaAllocator* alloc)
     {
         // Stack must not be in use
-        B2_ASSERT(alloc->allocation == 0);
+        Debug.Assert(alloc->allocation == 0);
 
         if (alloc->maxAllocation > alloc->capacity)
         {

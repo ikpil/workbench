@@ -42,7 +42,7 @@ public class timer
         return (float)(s_invFrequency * (ticksNow - ticks));
     }
 
-    float b2GetMillisecondsAndReset(ulong* ticks)
+    float b2GetMillisecondsAndReset(ulong[] ticks)
     {
         if (s_invFrequency == 0.0)
         {
@@ -85,7 +85,7 @@ public class timer
         return (float)((ticksNow - ticks) / 1000000.0);
     }
 
-    float b2GetMillisecondsAndReset(ulong* ticks)
+    float b2GetMillisecondsAndReset(ulong[] ticks)
     {
         ulong ticksNow = b2GetTicks();
         float ms = (float)((ticksNow - *ticks) / 1000000.0);
@@ -126,7 +126,7 @@ public class timer
         return (float)(s_invFrequency * (ticksNow - ticks));
     }
 
-    float b2GetMillisecondsAndReset(ulong* ticks)
+    float b2GetMillisecondsAndReset(ulong[] ticks)
     {
         if (s_invFrequency == 0)
         {
@@ -161,7 +161,7 @@ public class timer
         return 0.0f;
     }
 
-    float b2GetMillisecondsAndReset(ulong* ticks)
+    float b2GetMillisecondsAndReset(ulong[] ticks)
     {
         ((void)(ticks));
         return 0.0f;

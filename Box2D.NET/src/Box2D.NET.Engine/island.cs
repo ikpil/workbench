@@ -12,10 +12,6 @@ public class island
 
 
 
-typedef struct b2Contact b2Contact;
-typedef struct b2Joint b2Joint;
-typedef struct b2World b2World;
-
 // Deterministic solver
 //
 // Collide all awake contacts
@@ -104,7 +100,7 @@ B2_ARRAY_SOURCE( b2IslandSim, b2IslandSim );
 
 b2Island* b2CreateIsland( b2World* world, int setIndex )
 {
-	B2_ASSERT( setIndex == b2_awakeSet || setIndex >= b2_firstSleepingSet );
+	Debug.Assert( setIndex == b2_awakeSet || setIndex >= b2_firstSleepingSet );
 
 	int islandId = b2AllocId( &world->islandIdPool );
 
@@ -115,7 +111,7 @@ b2Island* b2CreateIsland( b2World* world, int setIndex )
 	}
 	else
 	{
-		B2_ASSERT( world->islands.data[islandId].setIndex == B2_NULL_INDEX );
+		Debug.Assert( world->islands.data[islandId].setIndex == B2_NULL_INDEX );
 	}
 
 	b2SolverSet* set = b2SolverSetArray_Get( &world->solverSets, setIndex );
@@ -154,7 +150,7 @@ void b2DestroyIsland( b2World* world, int islandId )
 		b2IslandSim* movedElement = set->islandSims.data + island->localIndex;
 		int movedId = movedElement->islandId;
 		b2Island* movedIsland = b2IslandArray_Get( &world->islands, movedId );
-		B2_ASSERT( movedIsland->localIndex == movedIndex );
+		Debug.Assert( movedIsland->localIndex == movedIndex );
 		movedIsland->localIndex = island->localIndex;
 	}
 
@@ -167,9 +163,9 @@ void b2DestroyIsland( b2World* world, int islandId )
 
 static void b2AddContactToIsland( b2World* world, int islandId, b2Contact* contact )
 {
-	B2_ASSERT( contact->islandId == B2_NULL_INDEX );
-	B2_ASSERT( contact->islandPrev == B2_NULL_INDEX );
-	B2_ASSERT( contact->islandNext == B2_NULL_INDEX );
+	Debug.Assert( contact->islandId == B2_NULL_INDEX );
+	Debug.Assert( contact->islandPrev == B2_NULL_INDEX );
+	Debug.Assert( contact->islandNext == B2_NULL_INDEX );
 
 	b2Island* island = b2IslandArray_Get( &world->islands, islandId );
 
@@ -197,7 +193,7 @@ static void b2AddContactToIsland( b2World* world, int islandId, b2Contact* conta
 // https://en.wikipedia.org/wiki/Disjoint-set_data_structure
 void b2LinkContact( b2World* world, b2Contact* contact )
 {
-	B2_ASSERT( ( contact->flags & b2_contactTouchingFlag ) != 0 );
+	Debug.Assert( ( contact->flags & b2_contactTouchingFlag ) != 0 );
 
 	int bodyIdA = contact->edges[0].bodyId;
 	int bodyIdB = contact->edges[1].bodyId;
@@ -205,8 +201,8 @@ void b2LinkContact( b2World* world, b2Contact* contact )
 	b2Body* bodyA = b2BodyArray_Get( &world->bodies, bodyIdA );
 	b2Body* bodyB = b2BodyArray_Get( &world->bodies, bodyIdB );
 
-	B2_ASSERT( bodyA->setIndex != b2_disabledSet && bodyB->setIndex != b2_disabledSet );
-	B2_ASSERT( bodyA->setIndex != b2_staticSet || bodyB->setIndex != b2_staticSet );
+	Debug.Assert( bodyA->setIndex != b2_disabledSet && bodyB->setIndex != b2_disabledSet );
+	Debug.Assert( bodyA->setIndex != b2_staticSet || bodyB->setIndex != b2_staticSet );
 
 	// Wake bodyB if bodyA is awake and bodyB is sleeping
 	if ( bodyA->setIndex == b2_awakeSet && bodyB->setIndex >= b2_firstSleepingSet )
@@ -224,9 +220,9 @@ void b2LinkContact( b2World* world, b2Contact* contact )
 	int islandIdB = bodyB->islandId;
 
 	// Static bodies have null island indices.
-	B2_ASSERT( bodyA->setIndex != b2_staticSet || islandIdA == B2_NULL_INDEX );
-	B2_ASSERT( bodyB->setIndex != b2_staticSet || islandIdB == B2_NULL_INDEX );
-	B2_ASSERT( islandIdA != B2_NULL_INDEX || islandIdB != B2_NULL_INDEX );
+	Debug.Assert( bodyA->setIndex != b2_staticSet || islandIdA == B2_NULL_INDEX );
+	Debug.Assert( bodyB->setIndex != b2_staticSet || islandIdB == B2_NULL_INDEX );
+	Debug.Assert( islandIdA != B2_NULL_INDEX || islandIdB != B2_NULL_INDEX );
 
 	if ( islandIdA == islandIdB )
 	{
@@ -277,13 +273,13 @@ void b2LinkContact( b2World* world, b2Contact* contact )
 		}
 	}
 
-	B2_ASSERT( islandA != NULL || islandB != NULL );
+	Debug.Assert( islandA != NULL || islandB != NULL );
 
 	// Union-Find link island roots
 	if ( islandA != islandB && islandA != NULL && islandB != NULL )
 	{
-		B2_ASSERT( islandA != islandB );
-		B2_ASSERT( islandB->parentIsland == B2_NULL_INDEX );
+		Debug.Assert( islandA != islandB );
+		Debug.Assert( islandB->parentIsland == B2_NULL_INDEX );
 		islandB->parentIsland = islandIdA;
 	}
 
@@ -300,7 +296,7 @@ void b2LinkContact( b2World* world, b2Contact* contact )
 // This is called when a contact no longer has contact points or when a contact is destroyed.
 void b2UnlinkContact( b2World* world, b2Contact* contact )
 {
-	B2_ASSERT( contact->islandId != B2_NULL_INDEX );
+	Debug.Assert( contact->islandId != B2_NULL_INDEX );
 
 	// remove from island
 	int islandId = contact->islandId;
@@ -309,14 +305,14 @@ void b2UnlinkContact( b2World* world, b2Contact* contact )
 	if ( contact->islandPrev != B2_NULL_INDEX )
 	{
 		b2Contact* prevContact = b2ContactArray_Get( &world->contacts, contact->islandPrev);
-		B2_ASSERT( prevContact->islandNext == contact->contactId );
+		Debug.Assert( prevContact->islandNext == contact->contactId );
 		prevContact->islandNext = contact->islandNext;
 	}
 
 	if ( contact->islandNext != B2_NULL_INDEX )
 	{
 		b2Contact* nextContact = b2ContactArray_Get( &world->contacts, contact->islandNext );
-		B2_ASSERT( nextContact->islandPrev == contact->contactId );
+		Debug.Assert( nextContact->islandPrev == contact->contactId );
 		nextContact->islandPrev = contact->islandPrev;
 	}
 
@@ -330,7 +326,7 @@ void b2UnlinkContact( b2World* world, b2Contact* contact )
 		island->tailContact = contact->islandPrev;
 	}
 
-	B2_ASSERT( island->contactCount > 0 );
+	Debug.Assert( island->contactCount > 0 );
 	island->contactCount -= 1;
 	island->constraintRemoveCount += 1;
 
@@ -343,9 +339,9 @@ void b2UnlinkContact( b2World* world, b2Contact* contact )
 
 static void b2AddJointToIsland( b2World* world, int islandId, b2Joint* joint )
 {
-	B2_ASSERT( joint->islandId == B2_NULL_INDEX );
-	B2_ASSERT( joint->islandPrev == B2_NULL_INDEX );
-	B2_ASSERT( joint->islandNext == B2_NULL_INDEX );
+	Debug.Assert( joint->islandId == B2_NULL_INDEX );
+	Debug.Assert( joint->islandPrev == B2_NULL_INDEX );
+	Debug.Assert( joint->islandNext == B2_NULL_INDEX );
 
 	b2Island* island = b2IslandArray_Get( &world->islands, islandId );
 
@@ -385,7 +381,7 @@ void b2LinkJoint( b2World* world, b2Joint* joint, bool mergeIslands )
 	int islandIdA = bodyA->islandId;
 	int islandIdB = bodyB->islandId;
 
-	B2_ASSERT( islandIdA != B2_NULL_INDEX || islandIdB != B2_NULL_INDEX );
+	Debug.Assert( islandIdA != B2_NULL_INDEX || islandIdB != B2_NULL_INDEX );
 
 	if ( islandIdA == islandIdB )
 	{
@@ -432,13 +428,13 @@ void b2LinkJoint( b2World* world, b2Joint* joint, bool mergeIslands )
 		}
 	}
 
-	B2_ASSERT( islandA != NULL || islandB != NULL );
+	Debug.Assert( islandA != NULL || islandB != NULL );
 
 	// Union-Find link island roots
 	if ( islandA != islandB && islandA != NULL && islandB != NULL )
 	{
-		B2_ASSERT( islandA != islandB );
-		B2_ASSERT( islandB->parentIsland == B2_NULL_INDEX );
+		Debug.Assert( islandA != islandB );
+		Debug.Assert( islandB->parentIsland == B2_NULL_INDEX );
 		islandB->parentIsland = islandIdA;
 	}
 
@@ -463,7 +459,7 @@ void b2LinkJoint( b2World* world, b2Joint* joint, bool mergeIslands )
 
 void b2UnlinkJoint( b2World* world, b2Joint* joint )
 {
-	B2_ASSERT( joint->islandId != B2_NULL_INDEX );
+	Debug.Assert( joint->islandId != B2_NULL_INDEX );
 
 	// remove from island
 	int islandId = joint->islandId;
@@ -472,14 +468,14 @@ void b2UnlinkJoint( b2World* world, b2Joint* joint )
 	if ( joint->islandPrev != B2_NULL_INDEX )
 	{
 		b2Joint* prevJoint = b2JointArray_Get( &world->joints, joint->islandPrev );
-		B2_ASSERT( prevJoint->islandNext == joint->jointId );
+		Debug.Assert( prevJoint->islandNext == joint->jointId );
 		prevJoint->islandNext = joint->islandNext;
 	}
 
 	if ( joint->islandNext != B2_NULL_INDEX )
 	{
 		b2Joint* nextJoint = b2JointArray_Get( &world->joints, joint->islandNext );
-		B2_ASSERT( nextJoint->islandPrev == joint->jointId );
+		Debug.Assert( nextJoint->islandPrev == joint->jointId );
 		nextJoint->islandPrev = joint->islandPrev;
 	}
 
@@ -493,7 +489,7 @@ void b2UnlinkJoint( b2World* world, b2Joint* joint )
 		island->tailJoint = joint->islandPrev;
 	}
 
-	B2_ASSERT( island->jointCount > 0 );
+	Debug.Assert( island->jointCount > 0 );
 	island->jointCount -= 1;
 	island->constraintRemoveCount += 1;
 
@@ -508,11 +504,11 @@ void b2UnlinkJoint( b2World* world, b2Joint* joint )
 // todo we can assume all islands are awake here
 static void b2MergeIsland( b2World* world, b2Island* island )
 {
-	B2_ASSERT( island->parentIsland != B2_NULL_INDEX );
+	Debug.Assert( island->parentIsland != B2_NULL_INDEX );
 
 	int rootId = island->parentIsland;
 	b2Island* rootIsland = b2IslandArray_Get( &world->islands, rootId );
-	B2_ASSERT( rootIsland->parentIsland == B2_NULL_INDEX );
+	Debug.Assert( rootIsland->parentIsland == B2_NULL_INDEX );
 
 	// remap island indices
 	int bodyId = island->headBody;
@@ -540,14 +536,14 @@ static void b2MergeIsland( b2World* world, b2Island* island )
 	}
 
 	// connect body lists
-	B2_ASSERT( rootIsland->tailBody != B2_NULL_INDEX );
+	Debug.Assert( rootIsland->tailBody != B2_NULL_INDEX );
 	b2Body* tailBody = b2BodyArray_Get( &world->bodies, rootIsland->tailBody );
-	B2_ASSERT( tailBody->islandNext == B2_NULL_INDEX );
+	Debug.Assert( tailBody->islandNext == B2_NULL_INDEX );
 	tailBody->islandNext = island->headBody;
 
-	B2_ASSERT( island->headBody != B2_NULL_INDEX );
+	Debug.Assert( island->headBody != B2_NULL_INDEX );
 	b2Body* headBody = b2BodyArray_Get( &world->bodies, island->headBody );
-	B2_ASSERT( headBody->islandPrev == B2_NULL_INDEX );
+	Debug.Assert( headBody->islandPrev == B2_NULL_INDEX );
 	headBody->islandPrev = rootIsland->tailBody;
 
 	rootIsland->tailBody = island->tailBody;
@@ -557,7 +553,7 @@ static void b2MergeIsland( b2World* world, b2Island* island )
 	if ( rootIsland->headContact == B2_NULL_INDEX )
 	{
 		// Root island has no contacts
-		B2_ASSERT( rootIsland->tailContact == B2_NULL_INDEX && rootIsland->contactCount == 0 );
+		Debug.Assert( rootIsland->tailContact == B2_NULL_INDEX && rootIsland->contactCount == 0 );
 		rootIsland->headContact = island->headContact;
 		rootIsland->tailContact = island->tailContact;
 		rootIsland->contactCount = island->contactCount;
@@ -565,15 +561,15 @@ static void b2MergeIsland( b2World* world, b2Island* island )
 	else if ( island->headContact != B2_NULL_INDEX )
 	{
 		// Both islands have contacts
-		B2_ASSERT( island->tailContact != B2_NULL_INDEX && island->contactCount > 0 );
-		B2_ASSERT( rootIsland->tailContact != B2_NULL_INDEX && rootIsland->contactCount > 0 );
+		Debug.Assert( island->tailContact != B2_NULL_INDEX && island->contactCount > 0 );
+		Debug.Assert( rootIsland->tailContact != B2_NULL_INDEX && rootIsland->contactCount > 0 );
 
 		b2Contact* tailContact = b2ContactArray_Get( &world->contacts, rootIsland->tailContact );
-		B2_ASSERT( tailContact->islandNext == B2_NULL_INDEX );
+		Debug.Assert( tailContact->islandNext == B2_NULL_INDEX );
 		tailContact->islandNext = island->headContact;
 
 		b2Contact* headContact = b2ContactArray_Get( &world->contacts, island->headContact );
-		B2_ASSERT( headContact->islandPrev == B2_NULL_INDEX );
+		Debug.Assert( headContact->islandPrev == B2_NULL_INDEX );
 		headContact->islandPrev = rootIsland->tailContact;
 
 		rootIsland->tailContact = island->tailContact;
@@ -583,7 +579,7 @@ static void b2MergeIsland( b2World* world, b2Island* island )
 	if ( rootIsland->headJoint == B2_NULL_INDEX )
 	{
 		// Root island has no joints
-		B2_ASSERT( rootIsland->tailJoint == B2_NULL_INDEX && rootIsland->jointCount == 0 );
+		Debug.Assert( rootIsland->tailJoint == B2_NULL_INDEX && rootIsland->jointCount == 0 );
 		rootIsland->headJoint = island->headJoint;
 		rootIsland->tailJoint = island->tailJoint;
 		rootIsland->jointCount = island->jointCount;
@@ -591,15 +587,15 @@ static void b2MergeIsland( b2World* world, b2Island* island )
 	else if ( island->headJoint != B2_NULL_INDEX )
 	{
 		// Both islands have joints
-		B2_ASSERT( island->tailJoint != B2_NULL_INDEX && island->jointCount > 0 );
-		B2_ASSERT( rootIsland->tailJoint != B2_NULL_INDEX && rootIsland->jointCount > 0 );
+		Debug.Assert( island->tailJoint != B2_NULL_INDEX && island->jointCount > 0 );
+		Debug.Assert( rootIsland->tailJoint != B2_NULL_INDEX && rootIsland->jointCount > 0 );
 
 		b2Joint* tailJoint = b2JointArray_Get( &world->joints, rootIsland->tailJoint );
-		B2_ASSERT( tailJoint->islandNext == B2_NULL_INDEX );
+		Debug.Assert( tailJoint->islandNext == B2_NULL_INDEX );
 		tailJoint->islandNext = island->headJoint;
 
 		b2Joint* headJoint = b2JointArray_Get( &world->joints, island->headJoint );
-		B2_ASSERT( headJoint->islandPrev == B2_NULL_INDEX );
+		Debug.Assert( headJoint->islandPrev == B2_NULL_INDEX );
 		headJoint->islandPrev = rootIsland->tailJoint;
 
 		rootIsland->tailJoint = island->tailJoint;
@@ -721,7 +717,7 @@ void b2SplitIsland( b2World* world, int baseId )
 
 		nextBody = body->islandNext;
 	}
-	B2_ASSERT( index == bodyCount );
+	Debug.Assert( index == bodyCount );
 
 	// Clear contact island flags. Only need to consider contacts
 	// already in the base island.
@@ -750,7 +746,7 @@ void b2SplitIsland( b2World* world, int baseId )
 	{
 		int seedIndex = bodyIds[i];
 		b2Body* seed = bodies + seedIndex;
-		B2_ASSERT( seed->setIndex == setIndex );
+		Debug.Assert( seed->setIndex == setIndex );
 
 		if ( seed->isMarked == true )
 		{
@@ -775,8 +771,8 @@ void b2SplitIsland( b2World* world, int baseId )
 			// Grab the next body off the stack and add it to the island.
 			int bodyId = stack[--stackCount];
 			b2Body* body = bodies + bodyId;
-			B2_ASSERT( body->setIndex == b2_awakeSet );
-			B2_ASSERT( body->isMarked == true );
+			Debug.Assert( body->setIndex == b2_awakeSet );
+			Debug.Assert( body->isMarked == true );
 
 			// Add body to island
 			body->islandId = islandId;
@@ -803,7 +799,7 @@ void b2SplitIsland( b2World* world, int baseId )
 				int edgeIndex = contactKey & 1;
 
 				b2Contact* contact = b2ContactArray_Get( &world->contacts, contactId );
-				B2_ASSERT( contact->contactId == contactId );
+				Debug.Assert( contact->contactId == contactId );
 
 				// Next key
 				contactKey = contact->edges[edgeIndex].nextKey;
@@ -829,7 +825,7 @@ void b2SplitIsland( b2World* world, int baseId )
 				// Maybe add other body to stack
 				if ( otherBody->isMarked == false && otherBody->setIndex != b2_staticSet )
 				{
-					B2_ASSERT( stackCount < bodyCount );
+					Debug.Assert( stackCount < bodyCount );
 					stack[stackCount++] = otherBodyId;
 					otherBody->isMarked = true;
 				}
@@ -861,7 +857,7 @@ void b2SplitIsland( b2World* world, int baseId )
 				int edgeIndex = jointKey & 1;
 
 				b2Joint* joint = b2JointArray_Get( &world->joints, jointId );
-				B2_ASSERT( joint->jointId == jointId );
+				Debug.Assert( joint->jointId == jointId );
 
 				// Next key
 				jointKey = joint->edges[edgeIndex].nextKey;
@@ -887,7 +883,7 @@ void b2SplitIsland( b2World* world, int baseId )
 				// Maybe add other body to stack
 				if ( otherBody->isMarked == false && otherBody->setIndex == b2_awakeSet )
 				{
-					B2_ASSERT( stackCount < bodyCount );
+					Debug.Assert( stackCount < bodyCount );
 					stack[stackCount++] = otherBodyId;
 					otherBody->isMarked = true;
 				}
@@ -935,7 +931,7 @@ void b2SplitIslandTask( int startIndex, int endIndex, uint threadIndex, void* co
 	ulong ticks = b2GetTicks();
 	b2World* world = context;
 
-	B2_ASSERT( world->splitIslandId != B2_NULL_INDEX );
+	Debug.Assert( world->splitIslandId != B2_NULL_INDEX );
 
 	b2SplitIsland( world, world->splitIslandId );
 
@@ -947,103 +943,103 @@ void b2SplitIslandTask( int startIndex, int endIndex, uint threadIndex, void* co
 void b2ValidateIsland( b2World* world, int islandId )
 {
 	b2Island* island = b2IslandArray_Get( &world->islands, islandId );
-	B2_ASSERT( island->islandId == islandId );
-	B2_ASSERT( island->setIndex != B2_NULL_INDEX );
-	B2_ASSERT( island->headBody != B2_NULL_INDEX );
+	Debug.Assert( island->islandId == islandId );
+	Debug.Assert( island->setIndex != B2_NULL_INDEX );
+	Debug.Assert( island->headBody != B2_NULL_INDEX );
 
 	{
-		B2_ASSERT( island->tailBody != B2_NULL_INDEX );
-		B2_ASSERT( island->bodyCount > 0 );
+		Debug.Assert( island->tailBody != B2_NULL_INDEX );
+		Debug.Assert( island->bodyCount > 0 );
 		if ( island->bodyCount > 1 )
 		{
-			B2_ASSERT( island->tailBody != island->headBody );
+			Debug.Assert( island->tailBody != island->headBody );
 		}
-		B2_ASSERT( island->bodyCount <= b2GetIdCount( &world->bodyIdPool ) );
+		Debug.Assert( island->bodyCount <= b2GetIdCount( &world->bodyIdPool ) );
 
 		int count = 0;
 		int bodyId = island->headBody;
 		while ( bodyId != B2_NULL_INDEX )
 		{
 			b2Body* body = b2BodyArray_Get(&world->bodies, bodyId);
-			B2_ASSERT( body->islandId == islandId );
-			B2_ASSERT( body->setIndex == island->setIndex );
+			Debug.Assert( body->islandId == islandId );
+			Debug.Assert( body->setIndex == island->setIndex );
 			count += 1;
 
 			if ( count == island->bodyCount )
 			{
-				B2_ASSERT( bodyId == island->tailBody );
+				Debug.Assert( bodyId == island->tailBody );
 			}
 
 			bodyId = body->islandNext;
 		}
-		B2_ASSERT( count == island->bodyCount );
+		Debug.Assert( count == island->bodyCount );
 	}
 
 	if ( island->headContact != B2_NULL_INDEX )
 	{
-		B2_ASSERT( island->tailContact != B2_NULL_INDEX );
-		B2_ASSERT( island->contactCount > 0 );
+		Debug.Assert( island->tailContact != B2_NULL_INDEX );
+		Debug.Assert( island->contactCount > 0 );
 		if ( island->contactCount > 1 )
 		{
-			B2_ASSERT( island->tailContact != island->headContact );
+			Debug.Assert( island->tailContact != island->headContact );
 		}
-		B2_ASSERT( island->contactCount <= b2GetIdCount( &world->contactIdPool ) );
+		Debug.Assert( island->contactCount <= b2GetIdCount( &world->contactIdPool ) );
 
 		int count = 0;
 		int contactId = island->headContact;
 		while ( contactId != B2_NULL_INDEX )
 		{
 			b2Contact* contact = b2ContactArray_Get( &world->contacts, contactId );
-			B2_ASSERT( contact->setIndex == island->setIndex );
-			B2_ASSERT( contact->islandId == islandId );
+			Debug.Assert( contact->setIndex == island->setIndex );
+			Debug.Assert( contact->islandId == islandId );
 			count += 1;
 
 			if ( count == island->contactCount )
 			{
-				B2_ASSERT( contactId == island->tailContact );
+				Debug.Assert( contactId == island->tailContact );
 			}
 
 			contactId = contact->islandNext;
 		}
-		B2_ASSERT( count == island->contactCount );
+		Debug.Assert( count == island->contactCount );
 	}
 	else
 	{
-		B2_ASSERT( island->tailContact == B2_NULL_INDEX );
-		B2_ASSERT( island->contactCount == 0 );
+		Debug.Assert( island->tailContact == B2_NULL_INDEX );
+		Debug.Assert( island->contactCount == 0 );
 	}
 
 	if ( island->headJoint != B2_NULL_INDEX )
 	{
-		B2_ASSERT( island->tailJoint != B2_NULL_INDEX );
-		B2_ASSERT( island->jointCount > 0 );
+		Debug.Assert( island->tailJoint != B2_NULL_INDEX );
+		Debug.Assert( island->jointCount > 0 );
 		if ( island->jointCount > 1 )
 		{
-			B2_ASSERT( island->tailJoint != island->headJoint );
+			Debug.Assert( island->tailJoint != island->headJoint );
 		}
-		B2_ASSERT( island->jointCount <= b2GetIdCount( &world->jointIdPool ) );
+		Debug.Assert( island->jointCount <= b2GetIdCount( &world->jointIdPool ) );
 
 		int count = 0;
 		int jointId = island->headJoint;
 		while ( jointId != B2_NULL_INDEX )
 		{
 			b2Joint* joint = b2JointArray_Get( &world->joints, jointId );
-			B2_ASSERT( joint->setIndex == island->setIndex );
+			Debug.Assert( joint->setIndex == island->setIndex );
 			count += 1;
 
 			if ( count == island->jointCount )
 			{
-				B2_ASSERT( jointId == island->tailJoint );
+				Debug.Assert( jointId == island->tailJoint );
 			}
 
 			jointId = joint->islandNext;
 		}
-		B2_ASSERT( count == island->jointCount );
+		Debug.Assert( count == island->jointCount );
 	}
 	else
 	{
-		B2_ASSERT( island->tailJoint == B2_NULL_INDEX );
-		B2_ASSERT( island->jointCount == 0 );
+		Debug.Assert( island->tailJoint == B2_NULL_INDEX );
+		Debug.Assert( island->jointCount == 0 );
 	}
 }
 

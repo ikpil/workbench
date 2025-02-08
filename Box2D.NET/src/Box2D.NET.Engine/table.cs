@@ -137,7 +137,7 @@ b2AtomicInt b2_probeCount;
     {
         int index = b2FindSlot(set, key, hash);
         b2SetItem* items = set->items;
-        B2_ASSERT(items[index].hash == 0);
+        Debug.Assert(items[index].hash == 0);
 
         items[index].key = key;
         items[index].hash = hash;
@@ -171,7 +171,7 @@ b2AtomicInt b2_probeCount;
             b2AddKeyHaveCapacity(set, item->key, item->hash);
         }
 
-        B2_ASSERT(set->count == oldCount);
+        Debug.Assert(set->count == oldCount);
 
         b2Free(oldItems, oldCapacity * sizeof(b2SetItem));
     }
@@ -179,7 +179,7 @@ b2AtomicInt b2_probeCount;
     bool b2ContainsKey( const b2HashSet* set, ulong key )
     {
         // key of zero is a sentinel
-        B2_ASSERT(key != 0);
+        Debug.Assert(key != 0);
         uint hash = b2KeyHash(key);
         int index = b2FindSlot(set, key, hash);
         return set->items[index].key == key;
@@ -193,16 +193,16 @@ b2AtomicInt b2_probeCount;
     bool b2AddKey(b2HashSet* set, ulong key)
     {
         // key of zero is a sentinel
-        B2_ASSERT(key != 0);
+        Debug.Assert(key != 0);
 
         uint hash = b2KeyHash(key);
-        B2_ASSERT(hash != 0);
+        Debug.Assert(hash != 0);
 
         int index = b2FindSlot(set, key, hash);
         if (set->items[index].hash != 0)
         {
             // Already in set
-            B2_ASSERT(set->items[index].hash == hash && set->items[index].key == key);
+            Debug.Assert(set->items[index].hash == hash && set->items[index].key == key);
             return true;
         }
 
@@ -231,7 +231,7 @@ b2AtomicInt b2_probeCount;
         items[i].key = 0;
         items[i].hash = 0;
 
-        B2_ASSERT(set->count > 0);
+        Debug.Assert(set->count > 0);
         set->count -= 1;
 
         // Attempt to fill item i

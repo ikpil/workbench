@@ -58,7 +58,7 @@ public class array
 	/* Get */                                                                                                                    \
 	staticT* PREFIX##Array_Get( PREFIX##Array* a, int index )                                                            \
 	{                                                                                                                            \
-		B2_ASSERT( 0 <= index && index < a->count );                                                                             \
+		Debug.Assert( 0 <= index && index < a->count );                                                                             \
 		return a->data + index;                                                                                                  \
 	}                                                                                                                            \
 	/* Add */                                                                                                                    \
@@ -86,13 +86,13 @@ public class array
 	/* Set */                                                                                                                    \
 	staticvoid PREFIX##Array_Set( PREFIX##Array* a, int index, T value )                                                 \
 	{                                                                                                                            \
-		B2_ASSERT( 0 <= index && index < a->count );                                                                             \
+		Debug.Assert( 0 <= index && index < a->count );                                                                             \
 		a->data[index] = value;                                                                                                  \
 	}                                                                                                                            \
 	/* RemoveSwap */                                                                                                             \
-	staticint PREFIX##Array_RemoveSwap( PREFIX##Array* a, int index )                                                    \
+	static int PREFIX##Array_RemoveSwap( PREFIX##Array* a, int index )                                                    \
 	{                                                                                                                            \
-		B2_ASSERT( 0 <= index && index < a->count );                                                                             \
+		Debug.Assert( 0 <= index && index < a->count );                                                                             \
 		int movedIndex = B2_NULL_INDEX;                                                                                          \
 		if ( index != a->count - 1 )                                                                                             \
 		{                                                                                                                        \
@@ -105,7 +105,7 @@ public class array
 	/* Pop */                                                                                                                    \
 	staticT PREFIX##Array_Pop( PREFIX##Array* a )                                                                        \
 	{                                                                                                                            \
-		B2_ASSERT( a->count > 0 );                                                                                               \
+		Debug.Assert( a->count > 0 );                                                                                               \
 		T value = a->data[a->count - 1];                                                                                         \
 		a->count -= 1;                                                                                                           \
 		return value;                                                                                                            \
@@ -116,7 +116,7 @@ public class array
 		a->count = 0;                                                                                                            \
 	}                                                                                                                            \
 	/* ByteCount */                                                                                                              \
-	staticint PREFIX##Array_ByteCount( PREFIX##Array* a )                                                                \
+	static int PREFIX##Array_ByteCount( PREFIX##Array* a )                                                                \
 	{                                                                                                                            \
 		return (int)( a->capacity * sizeof( T ) );                                                                               \
 	}

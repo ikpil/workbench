@@ -164,9 +164,9 @@ float b2PrismaticJoint_GetSpeed(b2JointId jointId)
 {
 	b2World* world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
-	B2_ASSERT( joint->type == b2_prismaticJoint );
+	Debug.Assert( joint->type == b2_prismaticJoint );
 	b2JointSim* jointSim = b2GetJointSim( world, joint );
-	B2_ASSERT( jointSim->type == b2_prismaticJoint );
+	Debug.Assert( jointSim->type == b2_prismaticJoint );
 
 	b2Body* bodyA = b2BodyArray_Get( &world->bodies, jointSim->bodyIdA );
 	b2Body* bodyB = b2BodyArray_Get( &world->bodies, jointSim->bodyIdB );
@@ -267,7 +267,7 @@ float b2GetPrismaticJointTorque( b2World* world, b2JointSim* base )
 
 void b2PreparePrismaticJoint( b2JointSim* base, b2StepContext* context )
 {
-	B2_ASSERT( base->type == b2_prismaticJoint );
+	Debug.Assert( base->type == b2_prismaticJoint );
 
 	// chase body id to the solver set where the body lives
 	int idA = base->bodyIdA;
@@ -278,7 +278,7 @@ void b2PreparePrismaticJoint( b2JointSim* base, b2StepContext* context )
 	b2Body* bodyA = b2BodyArray_Get( &world->bodies, idA );
 	b2Body* bodyB = b2BodyArray_Get( &world->bodies, idB );
 
-	B2_ASSERT( bodyA->setIndex == b2_awakeSet || bodyB->setIndex == b2_awakeSet );
+	Debug.Assert( bodyA->setIndex == b2_awakeSet || bodyB->setIndex == b2_awakeSet );
 	b2SolverSet* setA = b2SolverSetArray_Get( &world->solverSets, bodyA->setIndex );
 	b2SolverSet* setB = b2SolverSetArray_Get( &world->solverSets, bodyB->setIndex );
 
@@ -337,7 +337,7 @@ void b2PreparePrismaticJoint( b2JointSim* base, b2StepContext* context )
 
 void b2WarmStartPrismaticJoint( b2JointSim* base, b2StepContext* context )
 {
-	B2_ASSERT( base->type == b2_prismaticJoint );
+	Debug.Assert( base->type == b2_prismaticJoint );
 
 	float mA = base->invMassA;
 	float mB = base->invMassB;
@@ -382,7 +382,7 @@ void b2WarmStartPrismaticJoint( b2JointSim* base, b2StepContext* context )
 
 void b2SolvePrismaticJoint( b2JointSim* base, b2StepContext* context, bool useBias )
 {
-	B2_ASSERT( base->type == b2_prismaticJoint );
+	Debug.Assert( base->type == b2_prismaticJoint );
 
 	float mA = base->invMassA;
 	float mB = base->invMassB;
@@ -621,7 +621,7 @@ void b2PrismaticJoint::Dump()
 
 void b2DrawPrismaticJoint( b2DebugDraw* draw, b2JointSim* base, b2Transform transformA, b2Transform transformB )
 {
-	B2_ASSERT( base->type == b2_prismaticJoint );
+	Debug.Assert( base->type == b2_prismaticJoint );
 
 	b2PrismaticJoint* joint = &base->prismaticJoint;
 

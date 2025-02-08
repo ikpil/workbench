@@ -23,17 +23,17 @@ public class id_pool
     void b2FreeId(b2IdPool* pool, int id);
     void b2ValidateFreeId(b2IdPool* pool, int id);
 
-    staticint b2GetIdCount(b2IdPool* pool)
+    static int b2GetIdCount(b2IdPool* pool)
     {
         return pool->nextIndex - pool->freeArray.count;
     }
 
-    staticint b2GetIdCapacity(b2IdPool* pool)
+    static int b2GetIdCapacity(b2IdPool* pool)
     {
         return pool->nextIndex;
     }
 
-    staticint b2GetIdBytes(b2IdPool* pool)
+    static int b2GetIdBytes(b2IdPool* pool)
     {
         return b2IntArray_ByteCount(&pool->freeArray);
     }
@@ -71,8 +71,8 @@ public class id_pool
 
     void b2FreeId(b2IdPool* pool, int id)
     {
-        B2_ASSERT(pool->nextIndex > 0);
-        B2_ASSERT(0 <= id && id < pool->nextIndex);
+        Debug.Assert(pool->nextIndex > 0);
+        Debug.Assert(0 <= id && id < pool->nextIndex);
 
         if (id == pool->nextIndex)
         {
@@ -96,7 +96,7 @@ void b2ValidateFreeId( b2IdPool* pool, int id )
 		}
 	}
 
-	B2_ASSERT( 0 );
+	Debug.Assert( 0 );
 }
 
 #else

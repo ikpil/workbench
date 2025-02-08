@@ -11,11 +11,11 @@ public class board_phase
 
 
 
-typedef struct b2Shape b2Shape;
+
 typedef struct b2MovePair b2MovePair;
 typedef struct b2MoveResult b2MoveResult;
 typedef struct b2ArenaAllocator b2ArenaAllocator;
-typedef struct b2World b2World;
+
 
 // Store the proxy type in the lower 2 bits of the proxy key. This leaves 30 bits for the id.
 #define B2_PROXY_TYPE( KEY ) ( (b2BodyType)( ( KEY ) & 3 ) )
@@ -157,7 +157,7 @@ staticvoid b2UnBufferMove( b2BroadPhase* bp, int proxyKey )
 int b2BroadPhase_CreateProxy( b2BroadPhase* bp, b2BodyType proxyType, b2AABB aabb, ulong categoryBits, int shapeIndex,
 							  bool forcePairCreation )
 {
-	B2_ASSERT( 0 <= proxyType && proxyType < b2_bodyTypeCount );
+	Debug.Assert( 0 <= proxyType && proxyType < b2_bodyTypeCount );
 	int proxyId = b2DynamicTree_CreateProxy( bp->trees + proxyType, aabb, categoryBits, shapeIndex );
 	int proxyKey = B2_PROXY_KEY( proxyId, proxyType );
 	if ( proxyType != b2_staticBody || forcePairCreation )
@@ -169,7 +169,7 @@ int b2BroadPhase_CreateProxy( b2BroadPhase* bp, b2BodyType proxyType, b2AABB aab
 
 void b2BroadPhase_DestroyProxy( b2BroadPhase* bp, int proxyKey )
 {
-	B2_ASSERT( bp->moveArray.count == (int)bp->moveSet.count );
+	Debug.Assert( bp->moveArray.count == (int)bp->moveSet.count );
 	b2UnBufferMove( bp, proxyKey );
 
 	--bp->proxyCount;
@@ -177,7 +177,7 @@ void b2BroadPhase_DestroyProxy( b2BroadPhase* bp, int proxyKey )
 	b2BodyType proxyType = B2_PROXY_TYPE( proxyKey );
 	int proxyId = B2_PROXY_ID( proxyKey );
 
-	B2_ASSERT( 0 <= proxyType && proxyType <= b2_bodyTypeCount );
+	Debug.Assert( 0 <= proxyType && proxyType <= b2_bodyTypeCount );
 	b2DynamicTree_DestroyProxy( bp->trees + proxyType, proxyId );
 }
 
@@ -192,11 +192,11 @@ void b2BroadPhase_MoveProxy( b2BroadPhase* bp, int proxyKey, b2AABB aabb )
 
 void b2BroadPhase_EnlargeProxy( b2BroadPhase* bp, int proxyKey, b2AABB aabb )
 {
-	B2_ASSERT( proxyKey != B2_NULL_INDEX );
+	Debug.Assert( proxyKey != B2_NULL_INDEX );
 	int typeIndex = B2_PROXY_TYPE( proxyKey );
 	int proxyId = B2_PROXY_ID( proxyKey );
 
-	B2_ASSERT( typeIndex != b2_staticBody );
+	Debug.Assert( typeIndex != b2_staticBody );
 
 	b2DynamicTree_EnlargeProxy( bp->trees + typeIndex, proxyId, aabb );
 	b2BufferMove( bp, proxyKey );
@@ -269,7 +269,7 @@ static bool b2PairQueryCallback( int proxyId, int shapeId, void* context )
 	}
 	else
 	{
-		B2_ASSERT( treeType == b2_dynamicBody );
+		Debug.Assert( treeType == b2_dynamicBody );
 		bool moved = b2ContainsKey( &broadPhase->moveSet, proxyKey + 1 );
 		if ( moved )
 		{
@@ -444,7 +444,7 @@ void b2UpdateBroadPhasePairs( b2World* world )
 	b2BroadPhase* bp = &world->broadPhase;
 
 	int moveCount = bp->moveArray.count;
-	B2_ASSERT( moveCount == (int)bp->moveSet.count );
+	Debug.Assert( moveCount == (int)bp->moveSet.count );
 
 	if ( moveCount == 0 )
 	{
