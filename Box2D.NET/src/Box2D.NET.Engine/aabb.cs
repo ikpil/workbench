@@ -4,10 +4,12 @@
 
 namespace Box2D.NET.Engine;
 
-public class aabb
+using static math_function;
+
+public static class aabb
 {
     // Get surface area of an AABB (the perimeter length)
-    static float b2Perimeter(b2AABB a)
+    public static float b2Perimeter(b2AABB a)
     {
         float wx = a.upperBound.x - a.lowerBound.x;
         float wy = a.upperBound.y - a.lowerBound.y;
@@ -19,27 +21,27 @@ public class aabb
     public static bool b2EnlargeAABB(ref b2AABB a, b2AABB b)
     {
         bool changed = false;
-        if (b.lowerBound.x < a->lowerBound.x)
+        if (b.lowerBound.x < a.lowerBound.x)
         {
-            a->lowerBound.x = b.lowerBound.x;
+            a.lowerBound.x = b.lowerBound.x;
             changed = true;
         }
 
-        if (b.lowerBound.y < a->lowerBound.y)
+        if (b.lowerBound.y < a.lowerBound.y)
         {
-            a->lowerBound.y = b.lowerBound.y;
+            a.lowerBound.y = b.lowerBound.y;
             changed = true;
         }
 
-        if (a->upperBound.x < b.upperBound.x)
+        if (a.upperBound.x < b.upperBound.x)
         {
-            a->upperBound.x = b.upperBound.x;
+            a.upperBound.x = b.upperBound.x;
             changed = true;
         }
 
-        if (a->upperBound.y < b.upperBound.y)
+        if (a.upperBound.y < b.upperBound.y)
         {
-            a->upperBound.y = b.upperBound.y;
+            a.upperBound.y = b.upperBound.y;
             changed = true;
         }
 
@@ -47,7 +49,7 @@ public class aabb
     }
 
     /// Do a and b overlap
-    static bool b2AABB_Overlaps(b2AABB a, b2AABB b)
+    public static bool b2AABB_Overlaps(b2AABB a, b2AABB b)
     {
         return !(b.lowerBound.x > a.upperBound.x || b.lowerBound.y > a.upperBound.y || a.lowerBound.x > b.upperBound.x ||
                  a.lowerBound.y > b.upperBound.y);
@@ -55,7 +57,7 @@ public class aabb
 
 
     /// Is this a valid bounding box? Not Nan or infinity. Upper bound greater than or equal to lower bound.
-    bool b2IsValidAABB(b2AABB a)
+    public static bool b2IsValidAABB(b2AABB a)
     {
         b2Vec2 d = b2Sub(a.upperBound, a.lowerBound);
         bool valid = d.x >= 0.0f && d.y >= 0.0f;
@@ -65,10 +67,10 @@ public class aabb
 
     // Ray cast an AABB
     // From Real-time Collision Detection, p179.
-    b2CastOutput b2AABB_RayCast(b2AABB a, b2Vec2 p1, b2Vec2 p2)
+    public static b2CastOutput b2AABB_RayCast(b2AABB a, b2Vec2 p1, b2Vec2 p2)
     {
         // Radius not handled
-        b2CastOutput output = { 0 };
+        b2CastOutput output = new b2CastOutput();
 
         float tmin = -float.MaxValue;
         float tmax = float.MaxValue;

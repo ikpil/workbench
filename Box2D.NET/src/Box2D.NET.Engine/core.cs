@@ -25,9 +25,9 @@ public static class core
         // ..
     }
 
-    public static void memset<T>(T[] array, int index, int count)
+    public static void memset<T>(Span<T> array, T value , int count)
     {
-        Array.Fill(array, default, index, count);
+        array.Slice(0, count).Fill(value);
     }
 
     public static void memcpy<T>(Span<T> dst, Span<T> src, int count)

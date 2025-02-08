@@ -29,10 +29,11 @@ public struct b2RayCastInput
 /// Low level shape cast input in generic form. This allows casting an arbitrary point
 /// cloud wrap with a radius. For example, a circle is a single point with a non-zero radius.
 /// A capsule is two points with a non-zero radius. A box is four points with a zero radius.
-public class b2ShapeCastInput
+public struct b2ShapeCastInput
 {
     /// A point cloud to cast
-    public b2Vec2[] points = new b2Vec2[constants.B2_MAX_POLYGON_VERTICES];
+    //public b2Vec2[] points = new b2Vec2[constants.B2_MAX_POLYGON_VERTICES];
+    public b2Vec2[] points;
 
     /// The number of points
     public int count;

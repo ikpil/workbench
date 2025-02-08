@@ -6,6 +6,7 @@ using System.Diagnostics;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.core;
 using static Box2D.NET.Engine.math_function;
+using static Box2D.NET.Engine.aabb;
 
 namespace Box2D.NET.Engine;
 
@@ -21,11 +22,11 @@ public class b2TreeNode
     // TODO: @ikpil, checking
     // union
     // {
-        /// The node parent index (allocated node)
-        public int parent;
+    /// The node parent index (allocated node)
+    public int parent;
 
-        /// The node freelist next index (free node)
-        public int next;
+    /// The node freelist next index (free node)
+    public int next;
     //}; // 4
 
     /// Child 1 index (internal node)
@@ -34,15 +35,39 @@ public class b2TreeNode
     // TODO: @ikpil, checking
     //union
     //{
-        /// Child 2 index (internal node)
-        public int child2;
+    /// Child 2 index (internal node)
+    public int child2;
 
-        /// User data (leaf node)
-        public int userData;
+    /// User data (leaf node)
+    public int userData;
     //}; // 4
 
     public ushort height; // 2
-    public ushort flags;	 // 2
+    public ushort flags; // 2
+
+    public void Clear()
+    {
+        aabb = new b2AABB(); // 16
+        categoryBits = 0; // 8
+        parent = 0;
+        next = 0;
+        child1 = 0; // 4
+        child2 = 0;
+        userData = 0;
+        height = 0; // 2
+        flags = 0; // 2
+    }
+
+    public void Reset()
+    {
+        aabb = new b2AABB { lowerBound = { x = 0.0f, y = 0.0f }, upperBound = { x = 0.0f, y = 0.0f } };
+        categoryBits = B2_DEFAULT_CATEGORY_BITS;
+        parent = B2_NULL_INDEX;
+        child1 = B2_NULL_INDEX;
+        child2 = B2_NULL_INDEX;
+        height = 0;
+        flags = (ushort)b2TreeNodeFlags.b2_allocatedNode;
+    }
 }
 
 public enum b2RotateType
@@ -54,44 +79,53 @@ public enum b2RotateType
     b2_rotateCE
 };
 
-public class b2TreeBin
+public struct b2TreeBin
 {
     public b2AABB aabb;
     public int count;
 }
 
-public class b2TreePlane
+public struct b2TreePlane
 {
-    b2AABB leftAABB;
-    b2AABB rightAABB;
-    int leftCount;
-    int rightCount;
+    public b2AABB leftAABB;
+    public b2AABB rightAABB;
+    public int leftCount;
+    public int rightCount;
 }
 
+// Temporary data used to track the rebuild of a tree node
+public class b2RebuildItem
+{
+    public int nodeIndex;
+    public int childCount;
 
+    // Leaf indices
+    public int startIndex;
+    public int splitIndex;
+    public int endIndex;
+};
 
 public static class dynamic_tree
 {
-
     public const int B2_TREE_STACK_SIZE = 1024;
 
     /// This function receives proxies found in the AABB query.
     /// @return true if the query should continue
-    public delegate bool b2TreeQueryCallbackFcn( int proxyId, int userData, object context );
-    
+    public delegate bool b2TreeQueryCallbackFcn(int proxyId, int userData, object context);
+
     /// This function receives clipped ray cast input for a proxy. The function
     /// returns the new ray fraction.
     /// - return a value of 0 to terminate the ray cast
     /// - return a value less than input->maxFraction to clip the ray
     /// - return a value of input->maxFraction to continue the ray cast without clipping
-    public delegate float b2TreeRayCastCallbackFcn( b2RayCastInput input, int proxyId, int userData, object context );
-    
+    public delegate float b2TreeRayCastCallbackFcn(b2RayCastInput input, int proxyId, int userData, object context);
+
     /// This function receives clipped ray cast input for a proxy. The function
     /// returns the new ray fraction.
     /// - return a value of 0 to terminate the ray cast
     /// - return a value less than input->maxFraction to clip the ray
     /// - return a value of input->maxFraction to continue the ray cast without clipping
-    public delegate float b2TreeShapeCastCallbackFcn( b2ShapeCastInput input, int proxyId, int userData, object context );
+    public delegate float b2TreeShapeCastCallbackFcn(b2ShapeCastInput input, int proxyId, int userData, object context);
 
 
     public static readonly b2TreeNode b2_defaultTreeNode = new b2TreeNode()
@@ -105,17 +139,17 @@ public static class dynamic_tree
         flags = (ushort)b2TreeNodeFlags.b2_allocatedNode,
     };
 
-    public static bool b2IsLeaf( b2TreeNode node )
+    public static bool b2IsLeaf(b2TreeNode node)
     {
         return 0 != (node.flags & (ushort)b2TreeNodeFlags.b2_leafNode);
     }
 
-    public static bool b2IsAllocated( b2TreeNode node )
+    public static bool b2IsAllocated(b2TreeNode node)
     {
         return 0 != (node.flags & (ushort)b2TreeNodeFlags.b2_allocatedNode);
     }
 
-    public static ushort b2MaxUInt16( ushort a, ushort b )
+    public static ushort b2MaxUInt16(ushort a, ushort b)
     {
         return a > b ? a : b;
     }
@@ -131,7 +165,7 @@ public static class dynamic_tree
         //memset( tree.nodes, 0, tree.nodeCapacity * sizeof( b2TreeNode ) );
 
         // Build a linked list for the free list.
-        for ( int i = 0; i < tree.nodeCapacity - 1; ++i )
+        for (int i = 0; i < tree.nodeCapacity - 1; ++i)
         {
             tree.nodes[i].next = i + 1;
         }
@@ -150,37 +184,41 @@ public static class dynamic_tree
         return tree;
     }
 
-    public static void b2DynamicTree_Destroy( b2DynamicTree tree )
+    public static void b2DynamicTree_Destroy(b2DynamicTree tree)
     {
-        b2Free( tree.nodes, tree.nodeCapacity);
-        b2Free( tree.leafIndices, tree.rebuildCapacity);
-        b2Free( tree.leafBoxes, tree.rebuildCapacity);
-        b2Free( tree.leafCenters, tree.rebuildCapacity);
-        b2Free( tree.binIndices, tree.rebuildCapacity);
+        b2Free(tree.nodes, tree.nodeCapacity);
+        b2Free(tree.leafIndices, tree.rebuildCapacity);
+        b2Free(tree.leafBoxes, tree.rebuildCapacity);
+        b2Free(tree.leafCenters, tree.rebuildCapacity);
+        b2Free(tree.binIndices, tree.rebuildCapacity);
         tree.Clear();
     }
 
     // Allocate a node from the pool. Grow the pool if necessary.
-    public static int b2AllocateNode( b2DynamicTree tree )
+    public static int b2AllocateNode(b2DynamicTree tree)
     {
         // Expand the node pool as needed.
-        if ( tree.freeList == B2_NULL_INDEX )
+        if (tree.freeList == B2_NULL_INDEX)
         {
-            Debug.Assert( tree.nodeCount == tree.nodeCapacity );
+            Debug.Assert(tree.nodeCount == tree.nodeCapacity);
 
             // The free list is empty. Rebuild a bigger pool.
             b2TreeNode[] oldNodes = tree.nodes;
             int oldCapacity = tree.nodeCapacity;
             tree.nodeCapacity += oldCapacity >> 1;
             tree.nodes = b2Alloc<b2TreeNode>(tree.nodeCapacity);
-            Debug.Assert( oldNodes != null);
+            Debug.Assert(oldNodes != null);
             memcpy<b2TreeNode>(tree.nodes, oldNodes, tree.nodeCount);
-            memset( tree.nodes + tree.nodeCount, 0, ( tree.nodeCapacity - tree.nodeCount ) * sizeof( b2TreeNode ) );
+            foreach (var n in tree.nodes.AsSpan(tree.nodeCount, tree.nodeCapacity - tree.nodeCount))
+            {
+                n.Clear();
+            }
+
             b2Free(oldNodes, oldCapacity);
 
             // Build a linked list for the free list. The parent pointer becomes the "next" pointer.
             // todo avoid building freelist?
-            for ( int i = tree.nodeCount; i < tree.nodeCapacity - 1; ++i )
+            for (int i = tree.nodeCount; i < tree.nodeCapacity - 1; ++i)
             {
                 tree.nodes[i].next = i + 1;
             }
@@ -193,16 +231,16 @@ public static class dynamic_tree
         int nodeIndex = tree.freeList;
         b2TreeNode node = tree.nodes[nodeIndex];
         tree.freeList = node.next;
-        *node = b2_defaultTreeNode;
+        node.Reset();
         ++tree.nodeCount;
         return nodeIndex;
     }
 
     // Return a node to the pool.
-    public static void b2FreeNode( b2DynamicTree tree, int nodeId )
+    public static void b2FreeNode(b2DynamicTree tree, int nodeId)
     {
-        Debug.Assert( 0 <= nodeId && nodeId < tree.nodeCapacity );
-        Debug.Assert( 0 < tree.nodeCount );
+        Debug.Assert(0 <= nodeId && nodeId < tree.nodeCapacity);
+        Debug.Assert(0 < tree.nodeCount);
         tree.nodes[nodeId].next = tree.freeList;
         tree.nodes[nodeId].flags = 0;
         tree.freeList = nodeId;
@@ -226,10 +264,10 @@ public static class dynamic_tree
     // Suppose B (or C) is an internal node, then the lowest cost would be one of two cases:
     // case1: D becomes a sibling of B
     // case2: D becomes a descendant of B along with a new internal node of area(D).
-    public static int b2FindBestSibling( b2DynamicTree tree, b2AABB boxD )
+    public static int b2FindBestSibling(b2DynamicTree tree, b2AABB boxD)
     {
-        b2Vec2 centerD = b2AABB_Center( boxD );
-        float areaD = b2Perimeter( boxD );
+        b2Vec2 centerD = b2AABB_Center(boxD);
+        float areaD = b2Perimeter(boxD);
 
         b2TreeNode[] nodes = tree.nodes;
         int rootIndex = tree.root;
@@ -237,10 +275,10 @@ public static class dynamic_tree
         b2AABB rootBox = nodes[rootIndex].aabb;
 
         // Area of current node
-        float areaBase = b2Perimeter( rootBox );
+        float areaBase = b2Perimeter(rootBox);
 
         // Area of inflated node
-        float directCost = b2Perimeter( b2AABB_Union( rootBox, boxD ) );
+        float directCost = b2Perimeter(b2AABB_Union(rootBox, boxD));
         float inheritedCost = 0.0f;
 
         int bestSibling = rootIndex;
@@ -248,7 +286,7 @@ public static class dynamic_tree
 
         // Descend the tree from root, following a single greedy path.
         int index = rootIndex;
-        while ( nodes[index].height > 0 )
+        while (nodes[index].height > 0)
         {
             int child1 = nodes[index].child1;
             int child2 = nodes[index].child2;
@@ -258,7 +296,7 @@ public static class dynamic_tree
 
             // Sometimes there are multiple identical costs within tolerance.
             // This breaks the ties using the centroid distance.
-            if ( cost < bestCost )
+            if (cost < bestCost)
             {
                 bestSibling = index;
                 bestCost = cost;
@@ -273,16 +311,16 @@ public static class dynamic_tree
             // Cost of descending into child 1
             float lowerCost1 = float.MaxValue;
             b2AABB box1 = nodes[child1].aabb;
-            float directCost1 = b2Perimeter( b2AABB_Union( box1, boxD ) );
+            float directCost1 = b2Perimeter(b2AABB_Union(box1, boxD));
             float area1 = 0.0f;
-            if ( leaf1 )
+            if (leaf1)
             {
                 // Child 1 is a leaf
                 // Cost of creating new node and increasing area of node P
                 float cost1 = directCost1 + inheritedCost;
 
                 // Need this here due to while condition above
-                if ( cost1 < bestCost )
+                if (cost1 < bestCost)
                 {
                     bestSibling = child1;
                     bestCost = cost1;
@@ -291,25 +329,25 @@ public static class dynamic_tree
             else
             {
                 // Child 1 is an internal node
-                area1 = b2Perimeter( box1 );
+                area1 = b2Perimeter(box1);
 
                 // Lower bound cost of inserting under child 1.
-                lowerCost1 = inheritedCost + directCost1 + b2MinFloat( areaD - area1, 0.0f );
+                lowerCost1 = inheritedCost + directCost1 + b2MinFloat(areaD - area1, 0.0f);
             }
 
             // Cost of descending into child 2
             float lowerCost2 = float.MaxValue;
             b2AABB box2 = nodes[child2].aabb;
-            float directCost2 = b2Perimeter( b2AABB_Union( box2, boxD ) );
+            float directCost2 = b2Perimeter(b2AABB_Union(box2, boxD));
             float area2 = 0.0f;
-            if ( leaf2 )
+            if (leaf2)
             {
                 // Child 2 is a leaf
                 // Cost of creating new node and increasing area of node P
                 float cost2 = directCost2 + inheritedCost;
 
                 // Need this here due to while condition above
-                if ( cost2 < bestCost )
+                if (cost2 < bestCost)
                 {
                     bestSibling = child2;
                     bestCost = cost2;
@@ -318,39 +356,39 @@ public static class dynamic_tree
             else
             {
                 // Child 2 is an internal node
-                area2 = b2Perimeter( box2 );
+                area2 = b2Perimeter(box2);
 
                 // Lower bound cost of inserting under child 2. This is not the cost
                 // of child 2, it is the best we can hope for under child 2.
-                lowerCost2 = inheritedCost + directCost2 + b2MinFloat( areaD - area2, 0.0f );
+                lowerCost2 = inheritedCost + directCost2 + b2MinFloat(areaD - area2, 0.0f);
             }
 
-            if ( leaf1 && leaf2 )
+            if (leaf1 && leaf2)
             {
                 break;
             }
 
             // Can the cost possibly be decreased?
-            if ( bestCost <= lowerCost1 && bestCost <= lowerCost2 )
+            if (bestCost <= lowerCost1 && bestCost <= lowerCost2)
             {
                 break;
             }
 
-            if ( lowerCost1 == lowerCost2 && leaf1 == false )
+            if (lowerCost1 == lowerCost2 && leaf1 == false)
             {
-                Debug.Assert( lowerCost1 < float.MaxValue );
-                Debug.Assert( lowerCost2 < float.MaxValue );
+                Debug.Assert(lowerCost1 < float.MaxValue);
+                Debug.Assert(lowerCost2 < float.MaxValue);
 
                 // No clear choice based on lower bound surface area. This can happen when both
                 // children fully contain D. Fall back to node distance.
-                b2Vec2 d1 = b2Sub( b2AABB_Center( box1 ), centerD );
-                b2Vec2 d2 = b2Sub( b2AABB_Center( box2 ), centerD );
-                lowerCost1 = b2LengthSquared( d1 );
-                lowerCost2 = b2LengthSquared( d2 );
+                b2Vec2 d1 = b2Sub(b2AABB_Center(box1), centerD);
+                b2Vec2 d2 = b2Sub(b2AABB_Center(box2), centerD);
+                lowerCost1 = b2LengthSquared(d1);
+                lowerCost2 = b2LengthSquared(d2);
             }
 
             // Descend
-            if ( lowerCost1 < lowerCost2 && leaf1 == false )
+            if (lowerCost1 < lowerCost2 && leaf1 == false)
             {
                 index = child1;
                 areaBase = area1;
@@ -363,7 +401,7 @@ public static class dynamic_tree
                 directCost = directCost2;
             }
 
-            Debug.Assert( nodes[index].height > 0 );
+            Debug.Assert(nodes[index].height > 0);
         }
 
         return bestSibling;
@@ -372,56 +410,56 @@ public static class dynamic_tree
 
     // Perform a left or right rotation if node A is imbalanced.
     // Returns the new root index.
-    public static void b2RotateNodes( b2DynamicTree tree, int iA )
+    public static void b2RotateNodes(b2DynamicTree tree, int iA)
     {
-        Debug.Assert( iA != B2_NULL_INDEX );
+        Debug.Assert(iA != B2_NULL_INDEX);
 
         b2TreeNode[] nodes = tree.nodes;
 
         b2TreeNode A = nodes[iA];
-        if ( A.height < 2 )
+        if (A.height < 2)
         {
             return;
         }
 
         int iB = A.child1;
         int iC = A.child2;
-        Debug.Assert( 0 <= iB && iB < tree.nodeCapacity );
-        Debug.Assert( 0 <= iC && iC < tree.nodeCapacity );
+        Debug.Assert(0 <= iB && iB < tree.nodeCapacity);
+        Debug.Assert(0 <= iC && iC < tree.nodeCapacity);
 
         b2TreeNode B = nodes[iB];
         b2TreeNode C = nodes[iC];
 
-        if ( B.height == 0 )
+        if (B.height == 0)
         {
             // B is a leaf and C is internal
-            Debug.Assert( C.height > 0 );
+            Debug.Assert(C.height > 0);
 
             int iF = C.child1;
             int iG = C.child2;
             b2TreeNode F = nodes[iF];
             b2TreeNode G = nodes[iG];
-            Debug.Assert( 0 <= iF && iF < tree.nodeCapacity );
-            Debug.Assert( 0 <= iG && iG < tree.nodeCapacity );
+            Debug.Assert(0 <= iF && iF < tree.nodeCapacity);
+            Debug.Assert(0 <= iG && iG < tree.nodeCapacity);
 
             // Base cost
-            float costBase = b2Perimeter( C.aabb );
+            float costBase = b2Perimeter(C.aabb);
 
             // Cost of swapping B and F
-            b2AABB aabbBG = b2AABB_Union( B.aabb, G.aabb );
-            float costBF = b2Perimeter( aabbBG );
+            b2AABB aabbBG = b2AABB_Union(B.aabb, G.aabb);
+            float costBF = b2Perimeter(aabbBG);
 
             // Cost of swapping B and G
-            b2AABB aabbBF = b2AABB_Union( B.aabb, F.aabb );
-            float costBG = b2Perimeter( aabbBF );
+            b2AABB aabbBF = b2AABB_Union(B.aabb, F.aabb);
+            float costBG = b2Perimeter(aabbBF);
 
-            if ( costBase < costBF && costBase < costBG )
+            if (costBase < costBF && costBase < costBG)
             {
                 // Rotation does not improve cost
                 return;
             }
 
-            if ( costBF < costBG )
+            if (costBF < costBG)
             {
                 // Swap B and F
                 A.child1 = iF;
@@ -432,12 +470,12 @@ public static class dynamic_tree
 
                 C.aabb = aabbBG;
 
-                C.height = (ushort)(1 + b2MaxUInt16( B.height, G.height ));
-                A.height = (ushort)(1 + b2MaxUInt16( C.height, F.height ));
+                C.height = (ushort)(1 + b2MaxUInt16(B.height, G.height));
+                A.height = (ushort)(1 + b2MaxUInt16(C.height, F.height));
                 C.categoryBits = B.categoryBits | G.categoryBits;
                 A.categoryBits = C.categoryBits | F.categoryBits;
-                C.flags |= (ushort)(( B.flags | G.flags ) & (int)b2TreeNodeFlags.b2_enlargedNode);
-                A.flags |= (ushort)(( C.flags | F.flags ) & (int)b2TreeNodeFlags.b2_enlargedNode);
+                C.flags |= (ushort)((B.flags | G.flags) & (int)b2TreeNodeFlags.b2_enlargedNode);
+                A.flags |= (ushort)((C.flags | F.flags) & (int)b2TreeNodeFlags.b2_enlargedNode);
             }
             else
             {
@@ -450,44 +488,44 @@ public static class dynamic_tree
 
                 C.aabb = aabbBF;
 
-                C.height = (ushort)(1 + b2MaxUInt16( B.height, F.height ));
-                A.height = (ushort)(1 + b2MaxUInt16( C.height, G.height ));
+                C.height = (ushort)(1 + b2MaxUInt16(B.height, F.height));
+                A.height = (ushort)(1 + b2MaxUInt16(C.height, G.height));
                 C.categoryBits = B.categoryBits | F.categoryBits;
                 A.categoryBits = C.categoryBits | G.categoryBits;
                 C.flags |= (ushort)((B.flags | F.flags) & (int)b2TreeNodeFlags.b2_enlargedNode);
-                A.flags |= (ushort)(( C.flags | G.flags ) & (int)b2TreeNodeFlags.b2_enlargedNode);
+                A.flags |= (ushort)((C.flags | G.flags) & (int)b2TreeNodeFlags.b2_enlargedNode);
             }
         }
-        else if ( C.height == 0 )
+        else if (C.height == 0)
         {
             // C is a leaf and B is internal
-            Debug.Assert( B.height > 0 );
+            Debug.Assert(B.height > 0);
 
             int iD = B.child1;
             int iE = B.child2;
             b2TreeNode D = nodes[iD];
             b2TreeNode E = nodes[iE];
-            Debug.Assert( 0 <= iD && iD < tree.nodeCapacity );
-            Debug.Assert( 0 <= iE && iE < tree.nodeCapacity );
+            Debug.Assert(0 <= iD && iD < tree.nodeCapacity);
+            Debug.Assert(0 <= iE && iE < tree.nodeCapacity);
 
             // Base cost
-            float costBase = b2Perimeter( B.aabb );
+            float costBase = b2Perimeter(B.aabb);
 
             // Cost of swapping C and D
-            b2AABB aabbCE = b2AABB_Union( C.aabb, E.aabb );
-            float costCD = b2Perimeter( aabbCE );
+            b2AABB aabbCE = b2AABB_Union(C.aabb, E.aabb);
+            float costCD = b2Perimeter(aabbCE);
 
             // Cost of swapping C and E
-            b2AABB aabbCD = b2AABB_Union( C.aabb, D.aabb );
-            float costCE = b2Perimeter( aabbCD );
+            b2AABB aabbCD = b2AABB_Union(C.aabb, D.aabb);
+            float costCE = b2Perimeter(aabbCD);
 
-            if ( costBase < costCD && costBase < costCE )
+            if (costBase < costCD && costBase < costCE)
             {
                 // Rotation does not improve cost
                 return;
             }
 
-            if ( costCD < costCE )
+            if (costCD < costCE)
             {
                 // Swap C and D
                 A.child2 = iD;
@@ -498,12 +536,12 @@ public static class dynamic_tree
 
                 B.aabb = aabbCE;
 
-                B.height = (ushort)(1 + b2MaxUInt16( C.height, E.height ));
-                A.height = (ushort)(1 + b2MaxUInt16( B.height, D.height ));
+                B.height = (ushort)(1 + b2MaxUInt16(C.height, E.height));
+                A.height = (ushort)(1 + b2MaxUInt16(B.height, D.height));
                 B.categoryBits = C.categoryBits | E.categoryBits;
                 A.categoryBits = B.categoryBits | D.categoryBits;
-                B.flags |= (ushort)(( C.flags | E.flags ) & (int)b2TreeNodeFlags.b2_enlargedNode);
-                A.flags |= (ushort)(( B.flags | D.flags ) & (int)b2TreeNodeFlags.b2_enlargedNode);
+                B.flags |= (ushort)((C.flags | E.flags) & (int)b2TreeNodeFlags.b2_enlargedNode);
+                A.flags |= (ushort)((B.flags | D.flags) & (int)b2TreeNodeFlags.b2_enlargedNode);
             }
             else
             {
@@ -515,12 +553,12 @@ public static class dynamic_tree
                 E.parent = iA;
 
                 B.aabb = aabbCD;
-                B.height = (ushort)(1 + b2MaxUInt16( C.height, D.height ));
-                A.height = (ushort)(1 + b2MaxUInt16( B.height, E.height ));
+                B.height = (ushort)(1 + b2MaxUInt16(C.height, D.height));
+                A.height = (ushort)(1 + b2MaxUInt16(B.height, E.height));
                 B.categoryBits = C.categoryBits | D.categoryBits;
                 A.categoryBits = B.categoryBits | E.categoryBits;
-                B.flags |= (ushort)(( C.flags | D.flags ) & (int)b2TreeNodeFlags.b2_enlargedNode);
-                A.flags |= (ushort)(( B.flags | E.flags ) & (int)b2TreeNodeFlags.b2_enlargedNode);
+                B.flags |= (ushort)((C.flags | D.flags) & (int)b2TreeNodeFlags.b2_enlargedNode);
+                A.flags |= (ushort)((B.flags | E.flags) & (int)b2TreeNodeFlags.b2_enlargedNode);
             }
         }
         else
@@ -535,55 +573,55 @@ public static class dynamic_tree
             b2TreeNode F = nodes[iF];
             b2TreeNode G = nodes[iG];
 
-            Debug.Assert( 0 <= iD && iD < tree.nodeCapacity );
-            Debug.Assert( 0 <= iE && iE < tree.nodeCapacity );
-            Debug.Assert( 0 <= iF && iF < tree.nodeCapacity );
-            Debug.Assert( 0 <= iG && iG < tree.nodeCapacity );
+            Debug.Assert(0 <= iD && iD < tree.nodeCapacity);
+            Debug.Assert(0 <= iE && iE < tree.nodeCapacity);
+            Debug.Assert(0 <= iF && iF < tree.nodeCapacity);
+            Debug.Assert(0 <= iG && iG < tree.nodeCapacity);
 
             // Base cost
-            float areaB = b2Perimeter( B.aabb );
-            float areaC = b2Perimeter( C.aabb );
+            float areaB = b2Perimeter(B.aabb);
+            float areaC = b2Perimeter(C.aabb);
             float costBase = areaB + areaC;
             b2RotateType bestRotation = b2RotateType.b2_rotateNone;
             float bestCost = costBase;
 
             // Cost of swapping B and F
-            b2AABB aabbBG = b2AABB_Union( B.aabb, G.aabb );
-            float costBF = areaB + b2Perimeter( aabbBG );
-            if ( costBF < bestCost )
+            b2AABB aabbBG = b2AABB_Union(B.aabb, G.aabb);
+            float costBF = areaB + b2Perimeter(aabbBG);
+            if (costBF < bestCost)
             {
                 bestRotation = b2RotateType.b2_rotateBF;
                 bestCost = costBF;
             }
 
             // Cost of swapping B and G
-            b2AABB aabbBF = b2AABB_Union( B.aabb, F.aabb );
-            float costBG = areaB + b2Perimeter( aabbBF );
-            if ( costBG < bestCost )
+            b2AABB aabbBF = b2AABB_Union(B.aabb, F.aabb);
+            float costBG = areaB + b2Perimeter(aabbBF);
+            if (costBG < bestCost)
             {
                 bestRotation = b2RotateType.b2_rotateBG;
                 bestCost = costBG;
             }
 
             // Cost of swapping C and D
-            b2AABB aabbCE = b2AABB_Union( C.aabb, E.aabb );
-            float costCD = areaC + b2Perimeter( aabbCE );
-            if ( costCD < bestCost )
+            b2AABB aabbCE = b2AABB_Union(C.aabb, E.aabb);
+            float costCD = areaC + b2Perimeter(aabbCE);
+            if (costCD < bestCost)
             {
                 bestRotation = b2RotateType.b2_rotateCD;
                 bestCost = costCD;
             }
 
             // Cost of swapping C and E
-            b2AABB aabbCD = b2AABB_Union( C.aabb, D.aabb );
-            float costCE = areaC + b2Perimeter( aabbCD );
-            if ( costCE < bestCost )
+            b2AABB aabbCD = b2AABB_Union(C.aabb, D.aabb);
+            float costCE = areaC + b2Perimeter(aabbCD);
+            if (costCE < bestCost)
             {
                 bestRotation = b2RotateType.b2_rotateCE;
                 // bestCost = costCE;
             }
 
-            switch ( bestRotation )
+            switch (bestRotation)
             {
                 case b2RotateType.b2_rotateNone:
                     break;
@@ -596,12 +634,12 @@ public static class dynamic_tree
                     F.parent = iA;
 
                     C.aabb = aabbBG;
-                    C.height = (ushort)(1 + b2MaxUInt16( B.height, G.height ));
-                    A.height = (ushort)(1 + b2MaxUInt16( C.height, F.height ));
+                    C.height = (ushort)(1 + b2MaxUInt16(B.height, G.height));
+                    A.height = (ushort)(1 + b2MaxUInt16(C.height, F.height));
                     C.categoryBits = B.categoryBits | G.categoryBits;
                     A.categoryBits = C.categoryBits | F.categoryBits;
-                    C.flags |= (ushort)(( B.flags | G.flags ) & (int)b2TreeNodeFlags.b2_enlargedNode);
-                    A.flags |= (ushort)(( C.flags | F.flags ) & (int)b2TreeNodeFlags.b2_enlargedNode);
+                    C.flags |= (ushort)((B.flags | G.flags) & (int)b2TreeNodeFlags.b2_enlargedNode);
+                    A.flags |= (ushort)((C.flags | F.flags) & (int)b2TreeNodeFlags.b2_enlargedNode);
                     break;
 
                 case b2RotateType.b2_rotateBG:
@@ -612,12 +650,12 @@ public static class dynamic_tree
                     G.parent = iA;
 
                     C.aabb = aabbBF;
-                    C.height = (ushort)(1 + b2MaxUInt16( B.height, F.height ));
-                    A.height = (ushort)(1 + b2MaxUInt16( C.height, G.height ));
+                    C.height = (ushort)(1 + b2MaxUInt16(B.height, F.height));
+                    A.height = (ushort)(1 + b2MaxUInt16(C.height, G.height));
                     C.categoryBits = B.categoryBits | F.categoryBits;
                     A.categoryBits = C.categoryBits | G.categoryBits;
-                    C.flags |= (ushort)(( B.flags | F.flags ) & (int)b2TreeNodeFlags.b2_enlargedNode);
-                    A.flags |= (ushort)(( C.flags | G.flags ) & (int)b2TreeNodeFlags.b2_enlargedNode);
+                    C.flags |= (ushort)((B.flags | F.flags) & (int)b2TreeNodeFlags.b2_enlargedNode);
+                    A.flags |= (ushort)((C.flags | G.flags) & (int)b2TreeNodeFlags.b2_enlargedNode);
                     break;
 
                 case b2RotateType.b2_rotateCD:
@@ -628,12 +666,12 @@ public static class dynamic_tree
                     D.parent = iA;
 
                     B.aabb = aabbCE;
-                    B.height = (ushort)(1 + b2MaxUInt16( C.height, E.height ));
-                    A.height = (ushort)(1 + b2MaxUInt16( B.height, D.height ));
+                    B.height = (ushort)(1 + b2MaxUInt16(C.height, E.height));
+                    A.height = (ushort)(1 + b2MaxUInt16(B.height, D.height));
                     B.categoryBits = C.categoryBits | E.categoryBits;
                     A.categoryBits = B.categoryBits | D.categoryBits;
-                    B.flags |= (ushort)(( C.flags | E.flags ) & (int)b2TreeNodeFlags.b2_enlargedNode);
-                    A.flags |= (ushort)(( B.flags | D.flags ) & (int)b2TreeNodeFlags.b2_enlargedNode);
+                    B.flags |= (ushort)((C.flags | E.flags) & (int)b2TreeNodeFlags.b2_enlargedNode);
+                    A.flags |= (ushort)((B.flags | D.flags) & (int)b2TreeNodeFlags.b2_enlargedNode);
                     break;
 
                 case b2RotateType.b2_rotateCE:
@@ -644,8 +682,8 @@ public static class dynamic_tree
                     E.parent = iA;
 
                     B.aabb = aabbCD;
-                    B.height = (ushort)(1 + b2MaxUInt16( C.height, D.height ));
-                    A.height = (ushort)(1 + b2MaxUInt16( B.height, E.height ));
+                    B.height = (ushort)(1 + b2MaxUInt16(C.height, D.height));
+                    A.height = (ushort)(1 + b2MaxUInt16(B.height, E.height));
                     B.categoryBits = C.categoryBits | D.categoryBits;
                     A.categoryBits = B.categoryBits | E.categoryBits;
                     B.flags |= (ushort)((C.flags | D.flags) & (int)b2TreeNodeFlags.b2_enlargedNode);
@@ -653,15 +691,15 @@ public static class dynamic_tree
                     break;
 
                 default:
-                    Debug.Assert( false );
+                    Debug.Assert(false);
                     break;
             }
         }
     }
 
-    public static void b2InsertLeaf( b2DynamicTree tree, int leaf, bool shouldRotate )
+    public static void b2InsertLeaf(b2DynamicTree tree, int leaf, bool shouldRotate)
     {
-        if ( tree.root == B2_NULL_INDEX )
+        if (tree.root == B2_NULL_INDEX)
         {
             tree.root = leaf;
             tree.nodes[tree.root].parent = B2_NULL_INDEX;
@@ -670,24 +708,24 @@ public static class dynamic_tree
 
         // Stage 1: find the best sibling for this node
         b2AABB leafAABB = tree.nodes[leaf].aabb;
-        int sibling = b2FindBestSibling( tree, leafAABB );
+        int sibling = b2FindBestSibling(tree, leafAABB);
 
         // Stage 2: create a new parent for the leaf and sibling
         int oldParent = tree.nodes[sibling].parent;
-        int newParent = b2AllocateNode( tree );
+        int newParent = b2AllocateNode(tree);
 
         // warning: node pointer can change after allocation
         b2TreeNode[] nodes = tree.nodes;
         nodes[newParent].parent = oldParent;
         nodes[newParent].userData = -1;
-        nodes[newParent].aabb = b2AABB_Union( leafAABB, nodes[sibling].aabb );
+        nodes[newParent].aabb = b2AABB_Union(leafAABB, nodes[sibling].aabb);
         nodes[newParent].categoryBits = nodes[leaf].categoryBits | nodes[sibling].categoryBits;
         nodes[newParent].height = (ushort)(nodes[sibling].height + 1);
 
-        if ( oldParent != B2_NULL_INDEX )
+        if (oldParent != B2_NULL_INDEX)
         {
             // The sibling was not the root.
-            if ( nodes[oldParent].child1 == sibling )
+            if (nodes[oldParent].child1 == sibling)
             {
                 nodes[oldParent].child1 = newParent;
             }
@@ -713,31 +751,31 @@ public static class dynamic_tree
 
         // Stage 3: walk back up the tree fixing heights and AABBs
         int index = nodes[leaf].parent;
-        while ( index != B2_NULL_INDEX )
+        while (index != B2_NULL_INDEX)
         {
             int child1 = nodes[index].child1;
             int child2 = nodes[index].child2;
 
-            Debug.Assert( child1 != B2_NULL_INDEX );
-            Debug.Assert( child2 != B2_NULL_INDEX );
+            Debug.Assert(child1 != B2_NULL_INDEX);
+            Debug.Assert(child2 != B2_NULL_INDEX);
 
-            nodes[index].aabb = b2AABB_Union( nodes[child1].aabb, nodes[child2].aabb );
+            nodes[index].aabb = b2AABB_Union(nodes[child1].aabb, nodes[child2].aabb);
             nodes[index].categoryBits = nodes[child1].categoryBits | nodes[child2].categoryBits;
             nodes[index].height = (ushort)(1 + b2MaxUInt16(nodes[child1].height, nodes[child2].height));
             nodes[index].flags |= (ushort)((nodes[child1].flags | nodes[child2].flags) & (int)b2TreeNodeFlags.b2_enlargedNode);
 
-            if ( shouldRotate )
+            if (shouldRotate)
             {
-                b2RotateNodes( tree, index );
+                b2RotateNodes(tree, index);
             }
 
             index = nodes[index].parent;
         }
     }
 
-    public static void b2RemoveLeaf( b2DynamicTree tree, int leaf )
+    public static void b2RemoveLeaf(b2DynamicTree tree, int leaf)
     {
-        if ( leaf == tree.root )
+        if (leaf == tree.root)
         {
             tree.root = B2_NULL_INDEX;
             return;
@@ -748,7 +786,7 @@ public static class dynamic_tree
         int parent = nodes[leaf].parent;
         int grandParent = nodes[parent].parent;
         int sibling;
-        if ( nodes[parent].child1 == leaf )
+        if (nodes[parent].child1 == leaf)
         {
             sibling = nodes[parent].child2;
         }
@@ -757,10 +795,10 @@ public static class dynamic_tree
             sibling = nodes[parent].child1;
         }
 
-        if ( grandParent != B2_NULL_INDEX )
+        if (grandParent != B2_NULL_INDEX)
         {
             // Destroy parent and connect sibling to grandParent.
-            if ( nodes[grandParent].child1 == parent )
+            if (nodes[grandParent].child1 == parent)
             {
                 nodes[grandParent].child1 = sibling;
             }
@@ -768,12 +806,13 @@ public static class dynamic_tree
             {
                 nodes[grandParent].child2 = sibling;
             }
+
             nodes[sibling].parent = grandParent;
-            b2FreeNode( tree, parent );
+            b2FreeNode(tree, parent);
 
             // Adjust ancestor bounds.
             int index = grandParent;
-            while ( index != B2_NULL_INDEX )
+            while (index != B2_NULL_INDEX)
             {
                 b2TreeNode node = nodes[index];
                 b2TreeNode child1 = nodes[node.child1];
@@ -787,9 +826,9 @@ public static class dynamic_tree
                 //__m128 aabb = _mm_shuffle_ps(lower, upper, _MM_SHUFFLE(3, 2, 1, 0));
                 //_mm_store_ps(&node.aabb.lowerBound.x, aabb);
 
-                node.aabb = b2AABB_Union( child1.aabb, child2.aabb );
+                node.aabb = b2AABB_Union(child1.aabb, child2.aabb);
                 node.categoryBits = child1.categoryBits | child2.categoryBits;
-                node.height = (ushort)(1 + b2MaxUInt16( child1.height, child2.height ));
+                node.height = (ushort)(1 + b2MaxUInt16(child1.height, child2.height));
 
                 index = node.parent;
             }
@@ -798,20 +837,20 @@ public static class dynamic_tree
         {
             tree.root = sibling;
             tree.nodes[sibling].parent = B2_NULL_INDEX;
-            b2FreeNode( tree, parent );
+            b2FreeNode(tree, parent);
         }
     }
 
     // Create a proxy in the tree as a leaf node. We return the index of the node instead of a pointer so that we can grow
     // the node pool.
-    public static int b2DynamicTree_CreateProxy( b2DynamicTree tree, b2AABB aabb, ulong categoryBits, int userData )
+    public static int b2DynamicTree_CreateProxy(b2DynamicTree tree, b2AABB aabb, ulong categoryBits, int userData)
     {
-        Debug.Assert( -B2_HUGE < aabb.lowerBound.x && aabb.lowerBound.x < B2_HUGE );
-        Debug.Assert( -B2_HUGE < aabb.lowerBound.y && aabb.lowerBound.y < B2_HUGE );
-        Debug.Assert( -B2_HUGE < aabb.upperBound.x && aabb.upperBound.x < B2_HUGE );
-        Debug.Assert( -B2_HUGE < aabb.upperBound.y && aabb.upperBound.y < B2_HUGE );
+        Debug.Assert(-B2_HUGE < aabb.lowerBound.x && aabb.lowerBound.x < B2_HUGE);
+        Debug.Assert(-B2_HUGE < aabb.lowerBound.y && aabb.lowerBound.y < B2_HUGE);
+        Debug.Assert(-B2_HUGE < aabb.upperBound.x && aabb.upperBound.x < B2_HUGE);
+        Debug.Assert(-B2_HUGE < aabb.upperBound.y && aabb.upperBound.y < B2_HUGE);
 
-        int proxyId = b2AllocateNode( tree );
+        int proxyId = b2AllocateNode(tree);
         b2TreeNode node = tree.nodes[proxyId];
 
         node.aabb = aabb;
@@ -821,77 +860,77 @@ public static class dynamic_tree
         node.flags = (ushort)(b2TreeNodeFlags.b2_allocatedNode | b2TreeNodeFlags.b2_leafNode);
 
         bool shouldRotate = true;
-        b2InsertLeaf( tree, proxyId, shouldRotate );
+        b2InsertLeaf(tree, proxyId, shouldRotate);
 
         tree.proxyCount += 1;
 
         return proxyId;
     }
 
-    public static void b2DynamicTree_DestroyProxy( b2DynamicTree tree, int proxyId )
+    public static void b2DynamicTree_DestroyProxy(b2DynamicTree tree, int proxyId)
     {
-        Debug.Assert( 0 <= proxyId && proxyId < tree.nodeCapacity );
-        Debug.Assert( b2IsLeaf( tree.nodes[proxyId] ) );
+        Debug.Assert(0 <= proxyId && proxyId < tree.nodeCapacity);
+        Debug.Assert(b2IsLeaf(tree.nodes[proxyId]));
 
-        b2RemoveLeaf( tree, proxyId );
-        b2FreeNode( tree, proxyId );
+        b2RemoveLeaf(tree, proxyId);
+        b2FreeNode(tree, proxyId);
 
-        Debug.Assert( tree.proxyCount > 0 );
+        Debug.Assert(tree.proxyCount > 0);
         tree.proxyCount -= 1;
     }
 
-    public static int b2DynamicTree_GetProxyCount( b2DynamicTree tree )
+    public static int b2DynamicTree_GetProxyCount(b2DynamicTree tree)
     {
         return tree.proxyCount;
     }
 
-    public static void b2DynamicTree_MoveProxy( b2DynamicTree tree, int proxyId, b2AABB aabb )
+    public static void b2DynamicTree_MoveProxy(b2DynamicTree tree, int proxyId, b2AABB aabb)
     {
-        Debug.Assert( b2IsValidAABB( aabb ) );
-        Debug.Assert( aabb.upperBound.x - aabb.lowerBound.x < B2_HUGE );
-        Debug.Assert( aabb.upperBound.y - aabb.lowerBound.y < B2_HUGE );
-        Debug.Assert( 0 <= proxyId && proxyId < tree.nodeCapacity );
-        Debug.Assert( b2IsLeaf( tree.nodes[proxyId] ) );
+        Debug.Assert(b2IsValidAABB(aabb));
+        Debug.Assert(aabb.upperBound.x - aabb.lowerBound.x < B2_HUGE);
+        Debug.Assert(aabb.upperBound.y - aabb.lowerBound.y < B2_HUGE);
+        Debug.Assert(0 <= proxyId && proxyId < tree.nodeCapacity);
+        Debug.Assert(b2IsLeaf(tree.nodes[proxyId]));
 
-        b2RemoveLeaf( tree, proxyId );
+        b2RemoveLeaf(tree, proxyId);
 
         tree.nodes[proxyId].aabb = aabb;
 
         bool shouldRotate = false;
-        b2InsertLeaf( tree, proxyId, shouldRotate );
+        b2InsertLeaf(tree, proxyId, shouldRotate);
     }
 
-    public static void b2DynamicTree_EnlargeProxy( b2DynamicTree tree, int proxyId, b2AABB aabb )
+    public static void b2DynamicTree_EnlargeProxy(b2DynamicTree tree, int proxyId, b2AABB aabb)
     {
         b2TreeNode[] nodes = tree.nodes;
 
-        Debug.Assert( b2IsValidAABB( aabb ) );
-        Debug.Assert( aabb.upperBound.x - aabb.lowerBound.x < B2_HUGE );
-        Debug.Assert( aabb.upperBound.y - aabb.lowerBound.y < B2_HUGE );
-        Debug.Assert( 0 <= proxyId && proxyId < tree.nodeCapacity );
-        Debug.Assert( b2IsLeaf( tree.nodes[proxyId] ) );
+        Debug.Assert(b2IsValidAABB(aabb));
+        Debug.Assert(aabb.upperBound.x - aabb.lowerBound.x < B2_HUGE);
+        Debug.Assert(aabb.upperBound.y - aabb.lowerBound.y < B2_HUGE);
+        Debug.Assert(0 <= proxyId && proxyId < tree.nodeCapacity);
+        Debug.Assert(b2IsLeaf(tree.nodes[proxyId]));
 
         // Caller must ensure this
-        Debug.Assert( b2AABB_Contains( nodes[proxyId].aabb, aabb ) == false );
+        Debug.Assert(b2AABB_Contains(nodes[proxyId].aabb, aabb) == false);
 
         nodes[proxyId].aabb = aabb;
 
         int parentIndex = nodes[proxyId].parent;
-        while ( parentIndex != B2_NULL_INDEX )
+        while (parentIndex != B2_NULL_INDEX)
         {
-            bool changed = b2EnlargeAABB( ref nodes[parentIndex].aabb, aabb );
+            bool changed = b2EnlargeAABB(ref nodes[parentIndex].aabb, aabb);
             nodes[parentIndex].flags |= (int)b2TreeNodeFlags.b2_enlargedNode;
             parentIndex = nodes[parentIndex].parent;
 
-            if ( changed == false )
+            if (changed == false)
             {
                 break;
             }
         }
 
-        while ( parentIndex != B2_NULL_INDEX )
+        while (parentIndex != B2_NULL_INDEX)
         {
-            if (0 != ( nodes[parentIndex].flags & (int)b2TreeNodeFlags.b2_enlargedNode) )
+            if (0 != (nodes[parentIndex].flags & (int)b2TreeNodeFlags.b2_enlargedNode))
             {
                 // early out because this ancestor was previously ascended and marked as enlarged
                 break;
@@ -902,9 +941,9 @@ public static class dynamic_tree
         }
     }
 
-    public static int b2DynamicTree_GetHeight( b2DynamicTree tree )
+    public static int b2DynamicTree_GetHeight(b2DynamicTree tree)
     {
-        if ( tree.root == B2_NULL_INDEX )
+        if (tree.root == B2_NULL_INDEX)
         {
             return 0;
         }
@@ -912,48 +951,48 @@ public static class dynamic_tree
         return tree.nodes[tree.root].height;
     }
 
-    public static float b2DynamicTree_GetAreaRatio( b2DynamicTree tree )
+    public static float b2DynamicTree_GetAreaRatio(b2DynamicTree tree)
     {
-        if ( tree.root == B2_NULL_INDEX )
+        if (tree.root == B2_NULL_INDEX)
         {
             return 0.0f;
         }
 
         b2TreeNode root = tree.nodes[tree.root];
-        float rootArea = b2Perimeter( root.aabb );
+        float rootArea = b2Perimeter(root.aabb);
 
         float totalArea = 0.0f;
-        for ( int i = 0; i < tree.nodeCapacity; ++i )
+        for (int i = 0; i < tree.nodeCapacity; ++i)
         {
             b2TreeNode node = tree.nodes[i];
-            if ( b2IsAllocated(node) == false || b2IsLeaf( node ) || i == tree.root )
+            if (b2IsAllocated(node) == false || b2IsLeaf(node) || i == tree.root)
             {
                 continue;
             }
 
-            totalArea += b2Perimeter( node.aabb );
+            totalArea += b2Perimeter(node.aabb);
         }
 
         return totalArea / rootArea;
     }
 
     // Compute the height of a sub-tree.
-    public static int b2ComputeHeight( b2DynamicTree tree, int nodeId )
+    public static int b2ComputeHeight(b2DynamicTree tree, int nodeId)
     {
-        Debug.Assert( 0 <= nodeId && nodeId < tree.nodeCapacity );
+        Debug.Assert(0 <= nodeId && nodeId < tree.nodeCapacity);
         b2TreeNode node = tree.nodes[nodeId];
 
-        if ( b2IsLeaf( node ) )
+        if (b2IsLeaf(node))
         {
             return 0;
         }
 
-        int height1 = b2ComputeHeight( tree, node.child1 );
-        int height2 = b2ComputeHeight( tree, node.child2 );
-        return 1 + b2MaxInt( height1, height2 );
+        int height1 = b2ComputeHeight(tree, node.child1);
+        int height2 = b2ComputeHeight(tree, node.child2);
+        return 1 + b2MaxInt(height1, height2);
     }
 
-    #if B2_VALIDATE
+#if B2_VALIDATE
     public static void b2ValidateStructure( const b2DynamicTree* tree, int index )
     {
         if ( index == B2_NULL_INDEX )
@@ -1036,11 +1075,11 @@ public static class dynamic_tree
         b2ValidateMetrics( tree, child1 );
         b2ValidateMetrics( tree, child2 );
     }
-    #endif
+#endif
 
-    public static void b2DynamicTree_Validate( b2DynamicTree tree )
+    public static void b2DynamicTree_Validate(b2DynamicTree tree)
     {
-    #if B2_VALIDATE
+#if B2_VALIDATE
         if ( tree.root == B2_NULL_INDEX )
         {
             return;
@@ -1063,14 +1102,14 @@ public static class dynamic_tree
         Debug.Assert( height == computedHeight );
 
         Debug.Assert( tree.nodeCount + freeCount == tree.nodeCapacity );
-    #else
-        B2_UNUSED( tree );
-    #endif
+#else
+        B2_UNUSED(tree);
+#endif
     }
 
     public static void b2DynamicTree_ValidateNoEnlarged(b2DynamicTree tree)
     {
-    #if B2_VALIDATE
+#if B2_VALIDATE
         int capacity = tree.nodeCapacity;
         const b2TreeNode* nodes = tree.nodes;
         for ( int i = 0; i < capacity; ++i )
@@ -1081,12 +1120,12 @@ public static class dynamic_tree
                 Debug.Assert( ( node.flags & b2_enlargedNode ) == 0 );
             }
         }
-    #else
-        B2_UNUSED( tree );
-    #endif
+#else
+        B2_UNUSED(tree);
+#endif
     }
 
-    public static int b2DynamicTree_GetByteCount( b2DynamicTree tree )
+    public static int b2DynamicTree_GetByteCount(b2DynamicTree tree)
     {
         // TODO: @ikpil, check
         // int size = sizeof( b2DynamicTree ) + sizeof( b2TreeNode ) * tree.nodeCapacity +
@@ -1095,22 +1134,22 @@ public static class dynamic_tree
         return -1;
     }
 
-    public static int b2DynamicTree_GetUserData( b2DynamicTree tree, int proxyId )
+    public static int b2DynamicTree_GetUserData(b2DynamicTree tree, int proxyId)
     {
         return tree.nodes[proxyId].userData;
     }
 
-    public static b2AABB b2DynamicTree_GetAABB( b2DynamicTree tree, int proxyId )
+    public static b2AABB b2DynamicTree_GetAABB(b2DynamicTree tree, int proxyId)
     {
         return tree.nodes[proxyId].aabb;
     }
 
-    
-    public static b2TreeStats b2DynamicTree_Query( b2DynamicTree tree, b2AABB aabb, ulong maskBits, b2TreeQueryCallbackFcn callback, object context )
+
+    public static b2TreeStats b2DynamicTree_Query(b2DynamicTree tree, b2AABB aabb, ulong maskBits, b2TreeQueryCallbackFcn callback, object context)
     {
         b2TreeStats result = new b2TreeStats();
 
-        if ( tree.nodeCount == 0 )
+        if (tree.nodeCount == 0)
         {
             return result;
         }
@@ -1119,42 +1158,42 @@ public static class dynamic_tree
         int stackCount = 0;
         stack[stackCount++] = tree.root;
 
-        while ( stackCount > 0 )
+        while (stackCount > 0)
         {
             int nodeId = stack[--stackCount];
-            if ( nodeId == B2_NULL_INDEX )
+            if (nodeId == B2_NULL_INDEX)
             {
                 // todo huh?
-                Debug.Assert( false );
+                Debug.Assert(false);
                 continue;
             }
 
             b2TreeNode node = tree.nodes[nodeId];
             result.nodeVisits += 1;
 
-            if ( b2AABB_Overlaps( node.aabb, aabb ) && ( node.categoryBits & maskBits ) != 0 )
+            if (b2AABB_Overlaps(node.aabb, aabb) && (node.categoryBits & maskBits) != 0)
             {
-                if ( b2IsLeaf( node ) )
+                if (b2IsLeaf(node))
                 {
                     // callback to user code with proxy id
-                    bool proceed = callback( nodeId, node.userData, context );
+                    bool proceed = callback(nodeId, node.userData, context);
                     result.leafVisits += 1;
 
-                    if ( proceed == false )
+                    if (proceed == false)
                     {
                         return result;
                     }
                 }
                 else
                 {
-                    if ( stackCount < B2_TREE_STACK_SIZE - 1 )
+                    if (stackCount < B2_TREE_STACK_SIZE - 1)
                     {
                         stack[stackCount++] = node.child1;
                         stack[stackCount++] = node.child2;
                     }
                     else
                     {
-                        Debug.Assert( stackCount < B2_TREE_STACK_SIZE - 1 );
+                        Debug.Assert(stackCount < B2_TREE_STACK_SIZE - 1);
                     }
                 }
             }
@@ -1163,11 +1202,11 @@ public static class dynamic_tree
         return result;
     }
 
-    public static b2TreeStats b2DynamicTree_RayCast( b2DynamicTree tree, b2RayCastInput input, ulong maskBits, b2TreeRayCastCallbackFcn callback, object context )
+    public static b2TreeStats b2DynamicTree_RayCast(b2DynamicTree tree, b2RayCastInput input, ulong maskBits, b2TreeRayCastCallbackFcn callback, object context)
     {
         b2TreeStats result = new b2TreeStats();
 
-        if ( tree.nodeCount == 0 )
+        if (tree.nodeCount == 0)
         {
             return result;
         }
@@ -1175,21 +1214,21 @@ public static class dynamic_tree
         b2Vec2 p1 = input.origin;
         b2Vec2 d = input.translation;
 
-        b2Vec2 r = b2Normalize( d );
+        b2Vec2 r = b2Normalize(d);
 
         // v is perpendicular to the segment.
-        b2Vec2 v = b2CrossSV( 1.0f, r );
-        b2Vec2 abs_v = b2Abs( v );
+        b2Vec2 v = b2CrossSV(1.0f, r);
+        b2Vec2 abs_v = b2Abs(v);
 
         // Separating axis for segment (Gino, p80).
         // |dot(v, p1 - c)| > dot(|v|, h)
 
         float maxFraction = input.maxFraction;
 
-        b2Vec2 p2 = b2MulAdd( p1, maxFraction, d );
+        b2Vec2 p2 = b2MulAdd(p1, maxFraction, d);
 
         // Build a bounding box for the segment.
-        b2AABB segmentAABB = new b2AABB{ lowerBound = b2Min( p1, p2 ), upperBound = b2Max( p1, p2 ) };
+        b2AABB segmentAABB = new b2AABB { lowerBound = b2Min(p1, p2), upperBound = b2Max(p1, p2) };
 
         int[] stack = new int[B2_TREE_STACK_SIZE];
         int stackCount = 0;
@@ -1199,13 +1238,13 @@ public static class dynamic_tree
 
         b2RayCastInput subInput = input;
 
-        while ( stackCount > 0 )
+        while (stackCount > 0)
         {
             int nodeId = stack[--stackCount];
-            if ( nodeId == B2_NULL_INDEX )
+            if (nodeId == B2_NULL_INDEX)
             {
                 // todo is this possible?
-                Debug.Assert( false );
+                Debug.Assert(false);
                 continue;
             }
 
@@ -1214,7 +1253,7 @@ public static class dynamic_tree
 
             b2AABB nodeAABB = node.aabb;
 
-            if ( ( node.categoryBits & maskBits ) == 0 || b2AABB_Overlaps( nodeAABB, segmentAABB ) == false )
+            if ((node.categoryBits & maskBits) == 0 || b2AABB_Overlaps(nodeAABB, segmentAABB) == false)
             {
                 continue;
             }
@@ -1222,46 +1261,46 @@ public static class dynamic_tree
             // Separating axis for segment (Gino, p80).
             // |dot(v, p1 - c)| > dot(|v|, h)
             // radius extension is added to the node in this case
-            b2Vec2 c = b2AABB_Center( nodeAABB );
-            b2Vec2 h = b2AABB_Extents( nodeAABB );
-            float term1 = b2AbsFloat( b2Dot( v, b2Sub( p1, c ) ) );
-            float term2 = b2Dot( abs_v, h );
-            if ( term2 < term1 )
+            b2Vec2 c = b2AABB_Center(nodeAABB);
+            b2Vec2 h = b2AABB_Extents(nodeAABB);
+            float term1 = b2AbsFloat(b2Dot(v, b2Sub(p1, c)));
+            float term2 = b2Dot(abs_v, h);
+            if (term2 < term1)
             {
                 continue;
             }
 
-            if ( b2IsLeaf( node ) )
+            if (b2IsLeaf(node))
             {
                 subInput.maxFraction = maxFraction;
 
-                float value = callback( &subInput, nodeId, node.userData, context );
+                float value = callback(subInput, nodeId, node.userData, context);
                 result.leafVisits += 1;
 
                 // The user may return -1 to indicate this shape should be skipped
 
-                if ( value == 0.0f )
+                if (value == 0.0f)
                 {
                     // The client has terminated the ray cast.
                     return result;
                 }
 
-                if ( 0.0f < value && value <= maxFraction )
+                if (0.0f < value && value <= maxFraction)
                 {
                     // Update segment bounding box.
                     maxFraction = value;
-                    p2 = b2MulAdd( p1, maxFraction, d );
-                    segmentAABB.lowerBound = b2Min( p1, p2 );
-                    segmentAABB.upperBound = b2Max( p1, p2 );
+                    p2 = b2MulAdd(p1, maxFraction, d);
+                    segmentAABB.lowerBound = b2Min(p1, p2);
+                    segmentAABB.upperBound = b2Max(p1, p2);
                 }
             }
             else
             {
-                if ( stackCount < B2_TREE_STACK_SIZE - 1 )
+                if (stackCount < B2_TREE_STACK_SIZE - 1)
                 {
-                    b2Vec2 c1 = b2AABB_Center( nodes[node.child1].aabb );
-                    b2Vec2 c2 = b2AABB_Center( nodes[node.child2].aabb );
-                    if ( b2DistanceSquared( c1, p1 ) < b2DistanceSquared( c2, p1 ) )
+                    b2Vec2 c1 = b2AABB_Center(nodes[node.child1].aabb);
+                    b2Vec2 c2 = b2AABB_Center(nodes[node.child2].aabb);
+                    if (b2DistanceSquared(c1, p1) < b2DistanceSquared(c2, p1))
                     {
                         stack[stackCount++] = node.child2;
                         stack[stackCount++] = node.child1;
@@ -1274,7 +1313,7 @@ public static class dynamic_tree
                 }
                 else
                 {
-                    Debug.Assert( stackCount < B2_TREE_STACK_SIZE - 1 );
+                    Debug.Assert(stackCount < B2_TREE_STACK_SIZE - 1);
                 }
             }
         }
@@ -1282,34 +1321,34 @@ public static class dynamic_tree
         return result;
     }
 
-    public static b2TreeStats b2DynamicTree_ShapeCast( b2DynamicTree tree, b2ShapeCastInput input, ulong maskBits, b2TreeShapeCastCallbackFcn callback, object context )
+    public static b2TreeStats b2DynamicTree_ShapeCast(b2DynamicTree tree, b2ShapeCastInput input, ulong maskBits, b2TreeShapeCastCallbackFcn callback, object context)
     {
         b2TreeStats stats = new b2TreeStats();
 
-        if ( tree.nodeCount == 0 || input.count == 0 )
+        if (tree.nodeCount == 0 || input.count == 0)
         {
             return stats;
         }
 
-        b2AABB originAABB = new b2AABB{ lowerBound = input.points[0], upperBound = input.points[0] };
-        for ( int i = 1; i < input.count; ++i )
+        b2AABB originAABB = new b2AABB { lowerBound = input.points[0], upperBound = input.points[0] };
+        for (int i = 1; i < input.count; ++i)
         {
-            originAABB.lowerBound = b2Min( originAABB.lowerBound, input.points[i] );
-            originAABB.upperBound = b2Max( originAABB.upperBound, input.points[i] );
+            originAABB.lowerBound = b2Min(originAABB.lowerBound, input.points[i]);
+            originAABB.upperBound = b2Max(originAABB.upperBound, input.points[i]);
         }
 
-        b2Vec2 radius = new b2Vec2{ x =input.radius, y = input.radius };
+        b2Vec2 radius = new b2Vec2 { x = input.radius, y = input.radius };
 
-        originAABB.lowerBound = b2Sub( originAABB.lowerBound, radius );
-        originAABB.upperBound = b2Add( originAABB.upperBound, radius );
+        originAABB.lowerBound = b2Sub(originAABB.lowerBound, radius);
+        originAABB.upperBound = b2Add(originAABB.upperBound, radius);
 
-        b2Vec2 p1 = b2AABB_Center( originAABB );
-        b2Vec2 extension = b2AABB_Extents( originAABB );
+        b2Vec2 p1 = b2AABB_Center(originAABB);
+        b2Vec2 extension = b2AABB_Extents(originAABB);
 
         // v is perpendicular to the segment.
         b2Vec2 r = input.translation;
-        b2Vec2 v = b2CrossSV( 1.0f, r );
-        b2Vec2 abs_v = b2Abs( v );
+        b2Vec2 v = b2CrossSV(1.0f, r);
+        b2Vec2 abs_v = b2Abs(v);
 
         // Separating axis for segment (Gino, p80).
         // |dot(v, p1 - c)| > dot(|v|, h)
@@ -1317,33 +1356,36 @@ public static class dynamic_tree
         float maxFraction = input.maxFraction;
 
         // Build total box for the shape cast
-        b2Vec2 t = b2MulSV( maxFraction, input.translation );
-        b2AABB totalAABB = new b2AABB{
-            lowerBound = b2Min( originAABB.lowerBound, b2Add( originAABB.lowerBound, t ) ),
-            upperBound = b2Max( originAABB.upperBound, b2Add( originAABB.upperBound, t ) ),
+        b2Vec2 t = b2MulSV(maxFraction, input.translation);
+        b2AABB totalAABB = new b2AABB
+        {
+            lowerBound = b2Min(originAABB.lowerBound, b2Add(originAABB.lowerBound, t)),
+            upperBound = b2Max(originAABB.upperBound, b2Add(originAABB.upperBound, t)),
         };
 
-        b2ShapeCastInput subInput = *input;
-        const b2TreeNode* nodes = tree.nodes;
+        b2ShapeCastInput subInput = input;
+        subInput.points = new b2Vec2[input.points.Length];
+        memcpy<b2Vec2>(subInput.points, input.points, input.points.Length);
+        b2TreeNode[] nodes = tree.nodes;
 
-        int stack[B2_TREE_STACK_SIZE];
+        int[] stack = new int[B2_TREE_STACK_SIZE];
         int stackCount = 0;
         stack[stackCount++] = tree.root;
 
-        while ( stackCount > 0 )
+        while (stackCount > 0)
         {
             int nodeId = stack[--stackCount];
-            if ( nodeId == B2_NULL_INDEX )
+            if (nodeId == B2_NULL_INDEX)
             {
                 // todo is this possible?
-                Debug.Assert( false );
+                Debug.Assert(false);
                 continue;
             }
 
-            const b2TreeNode* node = nodes + nodeId;
+            b2TreeNode node = nodes[nodeId];
             stats.nodeVisits += 1;
 
-            if ( ( node.categoryBits & maskBits ) == 0 || b2AABB_Overlaps( node.aabb, totalAABB ) == false )
+            if ((node.categoryBits & maskBits) == 0 || b2AABB_Overlaps(node.aabb, totalAABB) == false)
             {
                 continue;
             }
@@ -1351,44 +1393,44 @@ public static class dynamic_tree
             // Separating axis for segment (Gino, p80).
             // |dot(v, p1 - c)| > dot(|v|, h)
             // radius extension is added to the node in this case
-            b2Vec2 c = b2AABB_Center( node.aabb );
-            b2Vec2 h = b2Add( b2AABB_Extents( node.aabb ), extension );
-            float term1 = b2AbsFloat( b2Dot( v, b2Sub( p1, c ) ) );
-            float term2 = b2Dot( abs_v, h );
-            if ( term2 < term1 )
+            b2Vec2 c = b2AABB_Center(node.aabb);
+            b2Vec2 h = b2Add(b2AABB_Extents(node.aabb), extension);
+            float term1 = b2AbsFloat(b2Dot(v, b2Sub(p1, c)));
+            float term2 = b2Dot(abs_v, h);
+            if (term2 < term1)
             {
                 continue;
             }
 
-            if ( b2IsLeaf( node ) )
+            if (b2IsLeaf(node))
             {
                 subInput.maxFraction = maxFraction;
 
-                float value = callback( &subInput, nodeId, node.userData, context );
+                float value = callback(subInput, nodeId, node.userData, context);
                 stats.leafVisits += 1;
 
-                if ( value == 0.0f )
+                if (value == 0.0f)
                 {
                     // The client has terminated the ray cast.
                     return stats;
                 }
 
-                if ( 0.0f < value && value < maxFraction )
+                if (0.0f < value && value < maxFraction)
                 {
                     // Update segment bounding box.
                     maxFraction = value;
-                    t = b2MulSV( maxFraction, input.translation );
-                    totalAABB.lowerBound = b2Min( originAABB.lowerBound, b2Add( originAABB.lowerBound, t ) );
-                    totalAABB.upperBound = b2Max( originAABB.upperBound, b2Add( originAABB.upperBound, t ) );
+                    t = b2MulSV(maxFraction, input.translation);
+                    totalAABB.lowerBound = b2Min(originAABB.lowerBound, b2Add(originAABB.lowerBound, t));
+                    totalAABB.upperBound = b2Max(originAABB.upperBound, b2Add(originAABB.upperBound, t));
                 }
             }
             else
             {
-                if ( stackCount < B2_TREE_STACK_SIZE - 1 )
+                if (stackCount < B2_TREE_STACK_SIZE - 1)
                 {
-                    b2Vec2 c1 = b2AABB_Center( nodes[node.child1].aabb );
-                    b2Vec2 c2 = b2AABB_Center( nodes[node.child2].aabb );
-                    if ( b2DistanceSquared( c1, p1 ) < b2DistanceSquared( c2, p1 ) )
+                    b2Vec2 c1 = b2AABB_Center(nodes[node.child1].aabb);
+                    b2Vec2 c2 = b2AABB_Center(nodes[node.child2].aabb);
+                    if (b2DistanceSquared(c1, p1) < b2DistanceSquared(c2, p1))
                     {
                         stack[stackCount++] = node.child2;
                         stack[stackCount++] = node.child1;
@@ -1401,7 +1443,7 @@ public static class dynamic_tree
                 }
                 else
                 {
-                    Debug.Assert( stackCount < B2_TREE_STACK_SIZE - 1 );
+                    Debug.Assert(stackCount < B2_TREE_STACK_SIZE - 1);
                 }
             }
         }
@@ -1415,10 +1457,10 @@ public static class dynamic_tree
     // #if B2_TREE_HEURISTIC == 0
 
     // Median split heuristic
-    public static int b2PartitionMid( int* indices, b2Vec2* centers, int count )
+    public static int b2PartitionMid(Span<int> indices, Span<b2Vec2> centers, int count)
     {
         // Handle trivial case
-        if ( count <= 2 )
+        if (count <= 2)
         {
             return count / 2;
         }
@@ -1426,36 +1468,40 @@ public static class dynamic_tree
         b2Vec2 lowerBound = centers[0];
         b2Vec2 upperBound = centers[0];
 
-        for ( int i = 1; i < count; ++i )
+        for (int i = 1; i < count; ++i)
         {
-            lowerBound = b2Min( lowerBound, centers[i] );
-            upperBound = b2Max( upperBound, centers[i] );
+            lowerBound = b2Min(lowerBound, centers[i]);
+            upperBound = b2Max(upperBound, centers[i]);
         }
 
-        b2Vec2 d = b2Sub( upperBound, lowerBound );
-        b2Vec2 c = { 0.5f * ( lowerBound.x + upperBound.x ), 0.5f * ( lowerBound.y + upperBound.y ) };
+        b2Vec2 d = b2Sub(upperBound, lowerBound);
+        b2Vec2 c = new b2Vec2 { x = 0.5f * (lowerBound.x + upperBound.x), y = 0.5f * (lowerBound.y + upperBound.y) };
 
         // Partition longest axis using the Hoare partition scheme
         // https://en.wikipedia.org/wiki/Quicksort
         // https://nicholasvadivelu.com/2021/01/11/array-partition/
         int i1 = 0, i2 = count;
-        if ( d.x > d.y )
+        if (d.x > d.y)
         {
             float pivot = c.x;
 
-            while ( i1 < i2 )
+            while (i1 < i2)
             {
-                while ( i1 < i2 && centers[i1].x < pivot )
+                while (i1 < i2 && centers[i1].x < pivot)
                 {
                     i1 += 1;
-                };
+                }
 
-                while ( i1 < i2 && centers[i2 - 1].x >= pivot )
+                ;
+
+                while (i1 < i2 && centers[i2 - 1].x >= pivot)
                 {
                     i2 -= 1;
-                };
+                }
 
-                if ( i1 < i2 )
+                ;
+
+                if (i1 < i2)
                 {
                     // Swap indices
                     {
@@ -1480,19 +1526,23 @@ public static class dynamic_tree
         {
             float pivot = c.y;
 
-            while ( i1 < i2 )
+            while (i1 < i2)
             {
-                while ( i1 < i2 && centers[i1].y < pivot )
+                while (i1 < i2 && centers[i1].y < pivot)
                 {
                     i1 += 1;
-                };
+                }
 
-                while ( i1 < i2 && centers[i2 - 1].y >= pivot )
+                ;
+
+                while (i1 < i2 && centers[i2 - 1].y >= pivot)
                 {
                     i2 -= 1;
-                };
+                }
 
-                if ( i1 < i2 )
+                ;
+
+                if (i1 < i2)
                 {
                     // Swap indices
                     {
@@ -1513,9 +1563,10 @@ public static class dynamic_tree
                 }
             }
         }
-        Debug.Assert( i1 == i2 );
 
-        if ( i1 > 0 && i1 < count )
+        Debug.Assert(i1 == i2);
+
+        if (i1 > 0 && i1 < count)
         {
             return i1;
         }
@@ -1525,36 +1576,36 @@ public static class dynamic_tree
 
     //#else
 
-    #define B2_BIN_COUNT 64
+    public const int B2_BIN_COUNT = 64;
 
 
     // "On Fast Construction of SAH-based Bounding Volume Hierarchies" by Ingo Wald
     // Returns the left child count
-    static int b2PartitionSAH( int* indices, int* binIndices, b2AABB* boxes, int count )
+    public static int b2PartitionSAH(int[] indices, int[] binIndices, b2AABB[] boxes, int count)
     {
-        Debug.Assert( count > 0 );
+        Debug.Assert(count > 0);
 
-        b2TreeBin bins[B2_BIN_COUNT];
-        b2TreePlane planes[B2_BIN_COUNT - 1];
+        b2TreeBin[] bins = new b2TreeBin[B2_BIN_COUNT];
+        b2TreePlane[] planes = new b2TreePlane[B2_BIN_COUNT - 1];
 
-        b2Vec2 center = b2AABB_Center( boxes[0] );
+        b2Vec2 center = b2AABB_Center(boxes[0]);
         b2AABB centroidAABB;
         centroidAABB.lowerBound = center;
         centroidAABB.upperBound = center;
 
-        for ( int i = 1; i < count; ++i )
+        for (int i = 1; i < count; ++i)
         {
-            center = b2AABB_Center( boxes[i] );
-            centroidAABB.lowerBound = b2Min( centroidAABB.lowerBound, center );
-            centroidAABB.upperBound = b2Max( centroidAABB.upperBound, center );
+            center = b2AABB_Center(boxes[i]);
+            centroidAABB.lowerBound = b2Min(centroidAABB.lowerBound, center);
+            centroidAABB.upperBound = b2Max(centroidAABB.upperBound, center);
         }
 
-        b2Vec2 d = b2Sub( centroidAABB.upperBound, centroidAABB.lowerBound );
+        b2Vec2 d = b2Sub(centroidAABB.upperBound, centroidAABB.lowerBound);
 
         // Find longest axis
         int axisIndex;
         float invD;
-        if ( d.x > d.y )
+        if (d.x > d.y)
         {
             axisIndex = 0;
             invD = d.x;
@@ -1568,27 +1619,27 @@ public static class dynamic_tree
         invD = invD > 0.0f ? 1.0f / invD : 0.0f;
 
         // Initialize bin bounds and count
-        for ( int i = 0; i < B2_BIN_COUNT; ++i )
+        for (int i = 0; i < B2_BIN_COUNT; ++i)
         {
-            bins[i].aabb.lowerBound = ( b2Vec2 ){ float.MaxValue, float.MaxValue };
-            bins[i].aabb.upperBound = ( b2Vec2 ){ -float.MaxValue, -float.MaxValue };
+            bins[i].aabb.lowerBound = new b2Vec2 { x = float.MaxValue, y = float.MaxValue };
+            bins[i].aabb.upperBound = new b2Vec2 { x = -float.MaxValue, y = -float.MaxValue };
             bins[i].count = 0;
         }
 
         // Assign boxes to bins and compute bin boxes
         // TODO_ERIN optimize
         float binCount = B2_BIN_COUNT;
-        float lowerBoundArray[2] = { centroidAABB.lowerBound.x, centroidAABB.lowerBound.y };
+        float[] lowerBoundArray = new float[2] { centroidAABB.lowerBound.x, centroidAABB.lowerBound.y };
         float minC = lowerBoundArray[axisIndex];
-        for ( int i = 0; i < count; ++i )
+        for (int i = 0; i < count; ++i)
         {
-            b2Vec2 c = b2AABB_Center( boxes[i] );
-            float cArray[2] = { c.x, c.y };
-            int binIndex = (int)( binCount * ( cArray[axisIndex] - minC ) * invD );
-            binIndex = b2ClampInt( binIndex, 0, B2_BIN_COUNT - 1 );
+            b2Vec2 c = b2AABB_Center(boxes[i]);
+            float[] cArray = new float[2] { c.x, c.y };
+            int binIndex = (int)(binCount * (cArray[axisIndex] - minC) * invD);
+            binIndex = b2ClampInt(binIndex, 0, B2_BIN_COUNT - 1);
             binIndices[i] = binIndex;
             bins[binIndex].count += 1;
-            bins[binIndex].aabb = b2AABB_Union( bins[binIndex].aabb, boxes[i] );
+            bins[binIndex].aabb = b2AABB_Union(bins[binIndex].aabb, boxes[i]);
         }
 
         int planeCount = B2_BIN_COUNT - 1;
@@ -1596,33 +1647,33 @@ public static class dynamic_tree
         // Prepare all the left planes, candidates for left child
         planes[0].leftCount = bins[0].count;
         planes[0].leftAABB = bins[0].aabb;
-        for ( int i = 1; i < planeCount; ++i )
+        for (int i = 1; i < planeCount; ++i)
         {
             planes[i].leftCount = planes[i - 1].leftCount + bins[i].count;
-            planes[i].leftAABB = b2AABB_Union( planes[i - 1].leftAABB, bins[i].aabb );
+            planes[i].leftAABB = b2AABB_Union(planes[i - 1].leftAABB, bins[i].aabb);
         }
 
         // Prepare all the right planes, candidates for right child
         planes[planeCount - 1].rightCount = bins[planeCount].count;
         planes[planeCount - 1].rightAABB = bins[planeCount].aabb;
-        for ( int i = planeCount - 2; i >= 0; --i )
+        for (int i = planeCount - 2; i >= 0; --i)
         {
             planes[i].rightCount = planes[i + 1].rightCount + bins[i + 1].count;
-            planes[i].rightAABB = b2AABB_Union( planes[i + 1].rightAABB, bins[i + 1].aabb );
+            planes[i].rightAABB = b2AABB_Union(planes[i + 1].rightAABB, bins[i + 1].aabb);
         }
 
         // Find best split to minimize SAH
         float minCost = float.MaxValue;
         int bestPlane = 0;
-        for ( int i = 0; i < planeCount; ++i )
+        for (int i = 0; i < planeCount; ++i)
         {
-            float leftArea = b2Perimeter( planes[i].leftAABB );
-            float rightArea = b2Perimeter( planes[i].rightAABB );
+            float leftArea = b2Perimeter(planes[i].leftAABB);
+            float rightArea = b2Perimeter(planes[i].rightAABB);
             int leftCount = planes[i].leftCount;
             int rightCount = planes[i].rightCount;
 
             float cost = leftCount * leftArea + rightCount * rightArea;
-            if ( cost < minCost )
+            if (cost < minCost)
             {
                 bestPlane = i;
                 minCost = cost;
@@ -1633,19 +1684,23 @@ public static class dynamic_tree
         // https://en.wikipedia.org/wiki/Quicksort
         // https://nicholasvadivelu.com/2021/01/11/array-partition/
         int i1 = 0, i2 = count;
-        while ( i1 < i2 )
+        while (i1 < i2)
         {
-            while ( i1 < i2 && binIndices[i1] < bestPlane )
+            while (i1 < i2 && binIndices[i1] < bestPlane)
             {
                 i1 += 1;
-            };
+            }
 
-            while ( i1 < i2 && binIndices[i2 - 1] >= bestPlane )
+            ;
+
+            while (i1 < i2 && binIndices[i2 - 1] >= bestPlane)
             {
                 i2 -= 1;
-            };
+            }
 
-            if ( i1 < i2 )
+            ;
+
+            if (i1 < i2)
             {
                 // Swap indices
                 {
@@ -1665,9 +1720,10 @@ public static class dynamic_tree
                 i2 -= 1;
             }
         }
-        Debug.Assert( i1 == i2 );
 
-        if ( i1 > 0 && i1 < count )
+        Debug.Assert(i1 == i2);
+
+        if (i1 > 0 && i1 < count)
         {
             return i1;
         }
@@ -1677,97 +1733,84 @@ public static class dynamic_tree
         }
     }
 
-    #endif
-
-    // Temporary data used to track the rebuild of a tree node
-    struct b2RebuildItem
-    {
-        int nodeIndex;
-        int childCount;
-
-        // Leaf indices
-        int startIndex;
-        int splitIndex;
-        int endIndex;
-    };
 
     // Returns root node index
-    static int b2BuildTree( b2DynamicTree* tree, int leafCount )
+    public static int b2BuildTree(b2DynamicTree tree, int leafCount)
     {
-        b2TreeNode* nodes = tree.nodes;
-        int* leafIndices = tree.leafIndices;
+        b2TreeNode[] nodes = tree.nodes;
+        int[] leafIndices = tree.leafIndices;
 
-        if ( leafCount == 1 )
+        if (leafCount == 1)
         {
             nodes[leafIndices[0]].parent = B2_NULL_INDEX;
             return leafIndices[0];
         }
 
-    #if B2_TREE_HEURISTIC == 0
-        b2Vec2* leafCenters = tree.leafCenters;
-    #else
-        b2AABB* leafBoxes = tree.leafBoxes;
-        int* binIndices = tree.binIndices;
-    #endif
+        //#if B2_TREE_HEURISTIC == 0
+        b2Vec2[] leafCenters = tree.leafCenters;
+        // #else
+        //     b2AABB* leafBoxes = tree.leafBoxes;
+        //     int* binIndices = tree.binIndices;
+        // #endif
 
         // todo large stack item
-        struct b2RebuildItem stack[B2_TREE_STACK_SIZE];
+        b2RebuildItem[] stack = b2Alloc<b2RebuildItem>(B2_TREE_STACK_SIZE);
         int top = 0;
 
-        stack[0].nodeIndex = b2AllocateNode( tree );
+        stack[0].nodeIndex = b2AllocateNode(tree);
         stack[0].childCount = -1;
         stack[0].startIndex = 0;
         stack[0].endIndex = leafCount;
-    #if B2_TREE_HEURISTIC == 0
-        stack[0].splitIndex = b2PartitionMid( leafIndices, leafCenters, leafCount );
-    #else
-        stack[0].splitIndex = b2PartitionSAH( leafIndices, binIndices, leafBoxes, leafCount );
-    #endif
+        //#if B2_TREE_HEURISTIC == 0
+        stack[0].splitIndex = b2PartitionMid(leafIndices, leafCenters, leafCount);
+        // #else
+        //     stack[0].splitIndex = b2PartitionSAH( leafIndices, binIndices, leafBoxes, leafCount );
+        // #endif
 
-        while ( true )
+        while (true)
         {
-            struct b2RebuildItem* item = stack + top;
+            b2RebuildItem item = stack[top];
 
             item.childCount += 1;
 
-            if ( item.childCount == 2 )
+            if (item.childCount == 2)
             {
                 // This internal node has both children established
 
-                if ( top == 0 )
+                if (top == 0)
                 {
                     // all done
                     break;
                 }
 
-                struct b2RebuildItem* parentItem = stack + ( top - 1 );
-                b2TreeNode* parentNode = nodes + parentItem.nodeIndex;
+                b2RebuildItem parentItem = stack[(top - 1)];
+                b2TreeNode parentNode = nodes[parentItem.nodeIndex];
 
-                if ( parentItem.childCount == 0 )
+                if (parentItem.childCount == 0)
                 {
-                    Debug.Assert( parentNode.child1 == B2_NULL_INDEX );
+                    Debug.Assert(parentNode.child1 == B2_NULL_INDEX);
                     parentNode.child1 = item.nodeIndex;
                 }
                 else
                 {
-                    Debug.Assert( parentItem.childCount == 1 );
-                    Debug.Assert( parentNode.child2 == B2_NULL_INDEX );
+                    Debug.Assert(parentItem.childCount == 1);
+                    Debug.Assert(parentNode.child2 == B2_NULL_INDEX);
                     parentNode.child2 = item.nodeIndex;
                 }
 
-                b2TreeNode* node = nodes + item.nodeIndex;
+                b2TreeNode node = nodes[item.nodeIndex];
 
-                Debug.Assert( node.parent == B2_NULL_INDEX );
+                Debug.Assert(node.parent == B2_NULL_INDEX);
                 node.parent = parentItem.nodeIndex;
 
-                Debug.Assert( node.child1 != B2_NULL_INDEX );
-                Debug.Assert( node.child2 != B2_NULL_INDEX );
-                b2TreeNode* child1 = nodes + node.child1;
-                b2TreeNode* child2 = nodes + node.child2;
+                Debug.Assert(node.child1 != B2_NULL_INDEX);
+                Debug.Assert(node.child2 != B2_NULL_INDEX);
+                b2TreeNode c1 = nodes[node.child1];
+                b2TreeNode c2 = nodes[node.child2];
 
-                node.aabb = b2AABB_Union( child1.aabb, child2.aabb );
-                node.height = 1 + b2MaxUInt16( child1.height, child2.height );
-                node.categoryBits = child1.categoryBits | child2.categoryBits;
+                node.aabb = b2AABB_Union(c1.aabb, c2.aabb);
+                node.height = (ushort)(1 + b2MaxUInt16(c1.height, c2.height));
+                node.categoryBits = c1.categoryBits | c2.categoryBits;
 
                 // Pop stack
                 top -= 1;
@@ -1775,140 +1818,140 @@ public static class dynamic_tree
             else
             {
                 int startIndex, endIndex;
-                if ( item.childCount == 0 )
+                if (item.childCount == 0)
                 {
                     startIndex = item.startIndex;
                     endIndex = item.splitIndex;
                 }
                 else
                 {
-                    Debug.Assert( item.childCount == 1 );
+                    Debug.Assert(item.childCount == 1);
                     startIndex = item.splitIndex;
                     endIndex = item.endIndex;
                 }
 
                 int count = endIndex - startIndex;
 
-                if ( count == 1 )
+                if (count == 1)
                 {
                     int childIndex = leafIndices[startIndex];
-                    b2TreeNode* node = nodes + item.nodeIndex;
+                    b2TreeNode node = nodes[item.nodeIndex];
 
-                    if ( item.childCount == 0 )
+                    if (item.childCount == 0)
                     {
-                        Debug.Assert( node.child1 == B2_NULL_INDEX );
+                        Debug.Assert(node.child1 == B2_NULL_INDEX);
                         node.child1 = childIndex;
                     }
                     else
                     {
-                        Debug.Assert( item.childCount == 1 );
-                        Debug.Assert( node.child2 == B2_NULL_INDEX );
+                        Debug.Assert(item.childCount == 1);
+                        Debug.Assert(node.child2 == B2_NULL_INDEX);
                         node.child2 = childIndex;
                     }
 
-                    b2TreeNode* childNode = nodes + childIndex;
-                    Debug.Assert( childNode.parent == B2_NULL_INDEX );
+                    b2TreeNode childNode = nodes[childIndex];
+                    Debug.Assert(childNode.parent == B2_NULL_INDEX);
                     childNode.parent = item.nodeIndex;
                 }
                 else
                 {
-                    Debug.Assert( count > 0 );
-                    Debug.Assert( top < B2_TREE_STACK_SIZE );
+                    Debug.Assert(count > 0);
+                    Debug.Assert(top < B2_TREE_STACK_SIZE);
 
                     top += 1;
-                    struct b2RebuildItem* newItem = stack + top;
-                    newItem.nodeIndex = b2AllocateNode( tree );
+                    b2RebuildItem newItem = stack[top];
+                    newItem.nodeIndex = b2AllocateNode(tree);
                     newItem.childCount = -1;
                     newItem.startIndex = startIndex;
                     newItem.endIndex = endIndex;
-    #if B2_TREE_HEURISTIC == 0
-                    newItem.splitIndex = b2PartitionMid( leafIndices + startIndex, leafCenters + startIndex, count );
-    #else
-                    newItem.splitIndex =
-                        b2PartitionSAH( leafIndices + startIndex, binIndices + startIndex, leafBoxes + startIndex, count );
-    #endif
+                    // #if B2_TREE_HEURISTIC == 0
+                    newItem.splitIndex = b2PartitionMid(leafIndices.AsSpan(startIndex), leafCenters.AsSpan(startIndex), count);
+                    // #else
+                    //                 newItem.splitIndex =
+                    //                     b2PartitionSAH( leafIndices + startIndex, binIndices + startIndex, leafBoxes + startIndex, count );
+                    // #endif
                     newItem.splitIndex += startIndex;
                 }
             }
         }
 
-        b2TreeNode* rootNode = nodes + stack[0].nodeIndex;
-        Debug.Assert( rootNode.parent == B2_NULL_INDEX );
-        Debug.Assert( rootNode.child1 != B2_NULL_INDEX );
-        Debug.Assert( rootNode.child2 != B2_NULL_INDEX );
+        b2TreeNode rootNode = nodes[stack[0].nodeIndex];
+        Debug.Assert(rootNode.parent == B2_NULL_INDEX);
+        Debug.Assert(rootNode.child1 != B2_NULL_INDEX);
+        Debug.Assert(rootNode.child2 != B2_NULL_INDEX);
 
-        b2TreeNode* child1 = nodes + rootNode.child1;
-        b2TreeNode* child2 = nodes + rootNode.child2;
+        b2TreeNode child1 = nodes[rootNode.child1];
+        b2TreeNode child2 = nodes[rootNode.child2];
 
-        rootNode.aabb = b2AABB_Union( child1.aabb, child2.aabb );
-        rootNode.height = 1 + b2MaxUInt16( child1.height, child2.height );
+        rootNode.aabb = b2AABB_Union(child1.aabb, child2.aabb);
+        rootNode.height = (ushort)(1 + b2MaxUInt16(child1.height, child2.height));
         rootNode.categoryBits = child1.categoryBits | child2.categoryBits;
 
         return stack[0].nodeIndex;
     }
 
     // Not safe to access tree during this operation because it may grow
-    int b2DynamicTree_Rebuild( b2DynamicTree* tree, bool fullBuild )
+    public static int b2DynamicTree_Rebuild(b2DynamicTree tree, bool fullBuild)
     {
         int proxyCount = tree.proxyCount;
-        if ( proxyCount == 0 )
+        if (proxyCount == 0)
         {
             return 0;
         }
 
         // Ensure capacity for rebuild space
-        if ( proxyCount > tree.rebuildCapacity )
+        if (proxyCount > tree.rebuildCapacity)
         {
             int newCapacity = proxyCount + proxyCount / 2;
 
-            b2Free( tree.leafIndices, tree.rebuildCapacity * sizeof( int ) );
-            tree.leafIndices = b2Alloc( newCapacity * sizeof( int ) );
+            b2Free(tree.leafIndices, tree.rebuildCapacity);
+            tree.leafIndices = b2Alloc<int>(newCapacity);
 
-    #if B2_TREE_HEURISTIC == 0
-            b2Free( tree.leafCenters, tree.rebuildCapacity * sizeof( b2Vec2 ) );
-            tree.leafCenters = b2Alloc( newCapacity * sizeof( b2Vec2 ) );
-    #else
-            b2Free( tree.leafBoxes, tree.rebuildCapacity * sizeof( b2AABB ) );
-            tree.leafBoxes = b2Alloc( newCapacity * sizeof( b2AABB ) );
-            b2Free( tree.binIndices, tree.rebuildCapacity * sizeof( int ) );
-            tree.binIndices = b2Alloc( newCapacity * sizeof( int ) );
-    #endif
+            //#if B2_TREE_HEURISTIC == 0
+            b2Free(tree.leafCenters, tree.rebuildCapacity);
+            tree.leafCenters = b2Alloc<b2Vec2>(newCapacity);
+            // #else
+            //         b2Free( tree.leafBoxes, tree.rebuildCapacity * sizeof( b2AABB ) );
+            //         tree.leafBoxes = b2Alloc( newCapacity * sizeof( b2AABB ) );
+            //         b2Free( tree.binIndices, tree.rebuildCapacity * sizeof( int ) );
+            //         tree.binIndices = b2Alloc( newCapacity * sizeof( int ) );
+            // #endif
             tree.rebuildCapacity = newCapacity;
         }
 
         int leafCount = 0;
-        int stack[B2_TREE_STACK_SIZE];
+        int[] stack = new int[B2_TREE_STACK_SIZE];
         int stackCount = 0;
 
         int nodeIndex = tree.root;
-        b2TreeNode* nodes = tree.nodes;
-        b2TreeNode* node = nodes + nodeIndex;
+        b2TreeNode[] nodes = tree.nodes;
+        b2TreeNode node = nodes[nodeIndex];
 
         // These are the nodes that get sorted to rebuild the tree.
         // I'm using indices because the node pool may grow during the build.
-        int* leafIndices = tree.leafIndices;
+        int[] leafIndices = tree.leafIndices;
 
-    #if B2_TREE_HEURISTIC == 0
-        b2Vec2* leafCenters = tree.leafCenters;
-    #else
-        b2AABB* leafBoxes = tree.leafBoxes;
-    #endif
+        // #if B2_TREE_HEURISTIC == 0
+        b2Vec2[] leafCenters = tree.leafCenters;
+        // #else
+        //     b2AABB* leafBoxes = tree.leafBoxes;
+        // #endif
 
         // Gather all proxy nodes that have grown and all internal nodes that haven't grown. Both are
         // considered leaves in the tree rebuild.
         // Free all internal nodes that have grown.
         // todo use a node growth metric instead of simply enlarged to reduce rebuild size and frequency
         // this should be weighed against B2_AABB_MARGIN
-        while ( true )
+        while (true)
         {
-            if ( node.height == 0 || ( ( node.flags & b2_enlargedNode ) == 0 && fullBuild == false ) )
+            if (node.height == 0 || ((node.flags & (int)b2TreeNodeFlags.b2_enlargedNode) == 0 && fullBuild == false))
             {
                 leafIndices[leafCount] = nodeIndex;
-    #if B2_TREE_HEURISTIC == 0
-                leafCenters[leafCount] = b2AABB_Center( node.aabb );
-    #else
-                leafBoxes[leafCount] = node.aabb;
-    #endif
+                //#if B2_TREE_HEURISTIC == 0
+                leafCenters[leafCount] = b2AABB_Center(node.aabb);
+                // #else
+                //             leafBoxes[leafCount] = node.aabb;
+                // #endif
                 leafCount += 1;
 
                 // Detach
@@ -1921,33 +1964,33 @@ public static class dynamic_tree
                 // Handle children
                 nodeIndex = node.child1;
 
-                if ( stackCount < B2_TREE_STACK_SIZE )
+                if (stackCount < B2_TREE_STACK_SIZE)
                 {
                     stack[stackCount++] = node.child2;
                 }
                 else
                 {
-                    Debug.Assert( stackCount < B2_TREE_STACK_SIZE );
+                    Debug.Assert(stackCount < B2_TREE_STACK_SIZE);
                 }
 
-                node = nodes + nodeIndex;
+                node = nodes[nodeIndex];
 
                 // Remove doomed node
-                b2FreeNode( tree, doomedNodeIndex );
+                b2FreeNode(tree, doomedNodeIndex);
 
                 continue;
             }
 
-            if ( stackCount == 0 )
+            if (stackCount == 0)
             {
                 break;
             }
 
             nodeIndex = stack[--stackCount];
-            node = nodes + nodeIndex;
+            node = nodes[nodeIndex];
         }
 
-    #if B2_VALIDATE == 1
+#if B2_VALIDATE
         int capacity = tree.nodeCapacity;
         for ( int i = 0; i < capacity; ++i )
         {
@@ -1956,280 +1999,14 @@ public static class dynamic_tree
                 Debug.Assert( ( nodes[i].flags & b2_enlargedNode ) == 0 );
             }
         }
-    #endif
+#endif
 
-        Debug.Assert( leafCount <= proxyCount );
+        Debug.Assert(leafCount <= proxyCount);
 
-        tree.root = b2BuildTree( tree, leafCount );
+        tree.root = b2BuildTree(tree, leafCount);
 
-        b2DynamicTree_Validate( tree );
+        b2DynamicTree_Validate(tree);
 
         return leafCount;
     }
-
-    /// Constructing the tree initializes the node pool.
-b2DynamicTree b2DynamicTree_Create();
-
-/// Destroy the tree, freeing the node pool.
-void b2DynamicTree_Destroy( b2DynamicTree* tree );
-
-/// Create a proxy. Provide an AABB and a userData value.
-int b2DynamicTree_CreateProxy( b2DynamicTree* tree, b2AABB aabb, ulong categoryBits, int userData );
-
-/// Destroy a proxy. This asserts if the id is invalid.
-void b2DynamicTree_DestroyProxy( b2DynamicTree* tree, int proxyId );
-
-/// Move a proxy to a new AABB by removing and reinserting into the tree.
-void b2DynamicTree_MoveProxy( b2DynamicTree* tree, int proxyId, b2AABB aabb );
-
-/// Enlarge a proxy and enlarge ancestors as necessary.
-void b2DynamicTree_EnlargeProxy( b2DynamicTree* tree, int proxyId, b2AABB aabb );
-
-/// Query an AABB for overlapping proxies. The callback class is called for each proxy that overlaps the supplied AABB.
-///	@return performance data
-b2TreeStats b2DynamicTree_Query( const b2DynamicTree* tree, b2AABB aabb, ulong maskBits, b2TreeQueryCallbackFcn* callback, void* context );
-
-
-
-/// Ray cast against the proxies in the tree. This relies on the callback
-/// to perform a exact ray cast in the case were the proxy contains a shape.
-/// The callback also performs the any collision filtering. This has performance
-/// roughly equal to k * log(n), where k is the number of collisions and n is the
-/// number of proxies in the tree.
-/// Bit-wise filtering using mask bits can greatly improve performance in some scenarios.
-///	However, this filtering may be approximate, so the user should still apply filtering to results.
-/// @param tree the dynamic tree to ray cast
-/// @param input the ray cast input data. The ray extends from p1 to p1 + maxFraction * (p2 - p1)
-/// @param maskBits mask bit hint: `bool accept = (maskBits & node->categoryBits) != 0;`
-/// @param callback a callback class that is called for each proxy that is hit by the ray
-/// @param context user context that is passed to the callback
-///	@return performance data
-b2TreeStats b2DynamicTree_RayCast( const b2DynamicTree* tree, const b2RayCastInput* input, ulong maskBits, b2TreeRayCastCallbackFcn* callback, void* context );
-
-
-
-/// Ray cast against the proxies in the tree. This relies on the callback
-/// to perform a exact ray cast in the case were the proxy contains a shape.
-/// The callback also performs the any collision filtering. This has performance
-/// roughly equal to k * log(n), where k is the number of collisions and n is the
-/// number of proxies in the tree.
-/// @param tree the dynamic tree to ray cast
-/// @param input the ray cast input data. The ray extends from p1 to p1 + maxFraction * (p2 - p1).
-/// @param maskBits filter bits: `bool accept = (maskBits & node->categoryBits) != 0;`
-/// @param callback a callback class that is called for each proxy that is hit by the shape
-/// @param context user context that is passed to the callback
-///	@return performance data
-b2TreeStats b2DynamicTree_ShapeCast( const b2DynamicTree* tree, const b2ShapeCastInput* input, ulong maskBits, b2TreeShapeCastCallbackFcn* callback, void* context );
-
-/// Get the height of the binary tree.
-int b2DynamicTree_GetHeight( const b2DynamicTree* tree );
-
-/// Get the ratio of the sum of the node areas to the root area.
-float b2DynamicTree_GetAreaRatio( const b2DynamicTree* tree );
-
-/// Get the number of proxies created
-int b2DynamicTree_GetProxyCount( const b2DynamicTree* tree );
-
-/// Rebuild the tree while retaining subtrees that haven't changed. Returns the number of boxes sorted.
-int b2DynamicTree_Rebuild( b2DynamicTree* tree, bool fullBuild );
-
-/// Get the number of bytes used by this tree
-int b2DynamicTree_GetByteCount( const b2DynamicTree* tree );
-
-/// Get proxy user data
-int b2DynamicTree_GetUserData( const b2DynamicTree* tree, int proxyId );
-
-/// Get the AABB of a proxy
-b2AABB b2DynamicTree_GetAABB( const b2DynamicTree* tree, int proxyId );
-
-/// Validate this tree. For testing.
-void b2DynamicTree_Validate( const b2DynamicTree* tree );
-
-/// Validate this tree has no enlarged AABBs. For testing.
-void b2DynamicTree_ValidateNoEnlarged( const b2DynamicTree* tree );
-
-
-/// Validate ray cast input data (NaN, etc)
-bool b2IsValidRay( const b2RayCastInput* input );
-
-/// Make a convex polygon from a convex hull. This will assert if the hull is not valid.
-/// @warning Do not manually fill in the hull data, it must come directly from b2ComputeHull
-b2Polygon b2MakePolygon( const b2Hull* hull, float radius );
-
-/// Make an offset convex polygon from a convex hull. This will assert if the hull is not valid.
-/// @warning Do not manually fill in the hull data, it must come directly from b2ComputeHull
-b2Polygon b2MakeOffsetPolygon( const b2Hull* hull, b2Vec2 position, b2Rot rotation );
-
-/// Make an offset convex polygon from a convex hull. This will assert if the hull is not valid.
-/// @warning Do not manually fill in the hull data, it must come directly from b2ComputeHull
-b2Polygon b2MakeOffsetRoundedPolygon( const b2Hull* hull, b2Vec2 position, b2Rot rotation, float radius );
-
-/// Make a square polygon, bypassing the need for a convex hull.
-/// @param halfWidth the half-width
-b2Polygon b2MakeSquare( float halfWidth );
-
-/// Make a box (rectangle) polygon, bypassing the need for a convex hull.
-/// @param halfWidth the half-width (x-axis)
-/// @param halfHeight the half-height (y-axis)
-b2Polygon b2MakeBox( float halfWidth, float halfHeight );
-
-/// Make a rounded box, bypassing the need for a convex hull.
-/// @param halfWidth the half-width (x-axis)
-/// @param halfHeight the half-height (y-axis)
-/// @param radius the radius of the rounded extension
-b2Polygon b2MakeRoundedBox( float halfWidth, float halfHeight, float radius );
-
-/// Make an offset box, bypassing the need for a convex hull.
-/// @param halfWidth the half-width (x-axis)
-/// @param halfHeight the half-height (y-axis)
-/// @param center the local center of the box
-/// @param rotation the local rotation of the box
-b2Polygon b2MakeOffsetBox( float halfWidth, float halfHeight, b2Vec2 center, b2Rot rotation );
-
-/// Make an offset rounded box, bypassing the need for a convex hull.
-/// @param halfWidth the half-width (x-axis)
-/// @param halfHeight the half-height (y-axis)
-/// @param center the local center of the box
-/// @param rotation the local rotation of the box
-/// @param radius the radius of the rounded extension
-b2Polygon b2MakeOffsetRoundedBox( float halfWidth, float halfHeight, b2Vec2 center, b2Rot rotation, float radius );
-
-/// Transform a polygon. This is useful for transferring a shape from one body to another.
-b2Polygon b2TransformPolygon( b2Transform transform, const b2Polygon* polygon );
-
-/// Compute mass properties of a circle
-b2MassData b2ComputeCircleMass( const b2Circle* shape, float density );
-
-/// Compute mass properties of a capsule
-b2MassData b2ComputeCapsuleMass( const b2Capsule* shape, float density );
-
-/// Compute mass properties of a polygon
-b2MassData b2ComputePolygonMass( const b2Polygon* shape, float density );
-
-/// Compute the bounding box of a transformed circle
-b2AABB b2ComputeCircleAABB( const b2Circle* shape, b2Transform transform );
-
-/// Compute the bounding box of a transformed capsule
-b2AABB b2ComputeCapsuleAABB( const b2Capsule* shape, b2Transform transform );
-
-/// Compute the bounding box of a transformed polygon
-b2AABB b2ComputePolygonAABB( const b2Polygon* shape, b2Transform transform );
-
-/// Compute the bounding box of a transformed line segment
-b2AABB b2ComputeSegmentAABB( const b2Segment* shape, b2Transform transform );
-
-/// Test a point for overlap with a circle in local space
-bool b2PointInCircle( b2Vec2 point, const b2Circle* shape );
-
-/// Test a point for overlap with a capsule in local space
-bool b2PointInCapsule( b2Vec2 point, const b2Capsule* shape );
-
-/// Test a point for overlap with a convex polygon in local space
-bool b2PointInPolygon( b2Vec2 point, const b2Polygon* shape );
-
-/// Ray cast versus circle shape in local space. Initial overlap is treated as a miss.
-b2CastOutput b2RayCastCircle( const b2RayCastInput* input, const b2Circle* shape );
-
-/// Ray cast versus capsule shape in local space. Initial overlap is treated as a miss.
-b2CastOutput b2RayCastCapsule( const b2RayCastInput* input, const b2Capsule* shape );
-
-/// Ray cast versus segment shape in local space. Optionally treat the segment as one-sided with hits from
-/// the left side being treated as a miss.
-b2CastOutput b2RayCastSegment( const b2RayCastInput* input, const b2Segment* shape, bool oneSided );
-
-/// Ray cast versus polygon shape in local space. Initial overlap is treated as a miss.
-b2CastOutput b2RayCastPolygon( const b2RayCastInput* input, const b2Polygon* shape );
-
-/// Shape cast versus a circle. Initial overlap is treated as a miss.
-b2CastOutput b2ShapeCastCircle( const b2ShapeCastInput* input, const b2Circle* shape );
-
-/// Shape cast versus a capsule. Initial overlap is treated as a miss.
-b2CastOutput b2ShapeCastCapsule( const b2ShapeCastInput* input, const b2Capsule* shape );
-
-/// Shape cast versus a line segment. Initial overlap is treated as a miss.
-b2CastOutput b2ShapeCastSegment( const b2ShapeCastInput* input, const b2Segment* shape );
-
-/// Shape cast versus a convex polygon. Initial overlap is treated as a miss.
-b2CastOutput b2ShapeCastPolygon( const b2ShapeCastInput* input, const b2Polygon* shape );
-
-
-/// Compute the convex hull of a set of points. Returns an empty hull if it fails.
-/// Some failure cases:
-/// - all points very close together
-/// - all points on a line
-/// - less than 3 points
-/// - more than B2_MAX_POLYGON_VERTICES points
-/// This welds close points and removes collinear points.
-/// @warning Do not modify a hull once it has been computed
-b2Hull b2ComputeHull( const b2Vec2* points, int count );
-
-/// This determines if a hull is valid. Checks for:
-/// - convexity
-/// - collinear points
-/// This is expensive and should not be called at runtime.
-bool b2ValidateHull( const b2Hull* hull );
-
-/// Compute the distance between two line segments, clamping at the end points if needed.
-b2SegmentDistanceResult b2SegmentDistance( b2Vec2 p1, b2Vec2 q1, b2Vec2 p2, b2Vec2 q2 );
-
-/// Compute the closest points between two shapes represented as point clouds.
-/// b2SimplexCache cache is input/output. On the first call set b2SimplexCache.count to zero.
-/// The underlying GJK algorithm may be debugged by passing in debug simplexes and capacity. You may pass in NULL and 0 for these.
-b2DistanceOutput b2ShapeDistance( b2SimplexCache* cache, const b2DistanceInput* input, b2Simplex* simplexes,int simplexCapacity );
-
-
-/// Perform a linear shape cast of shape B moving and shape A fixed. Determines the hit point, normal, and translation fraction.
-b2CastOutput b2ShapeCast( const b2ShapeCastPairInput* input );
-
-/// Make a proxy for use in GJK and related functions.
-b2ShapeProxy b2MakeProxy( const b2Vec2* vertices, int count, float radius );
-
-/// Evaluate the transform sweep at a specific time.
-b2Transform b2GetSweepTransform( const b2Sweep* sweep, float time );
-
-/// Compute the upper bound on time before two shapes penetrate. Time is represented as
-/// a fraction between [0,tMax]. This uses a swept separating axis and may miss some intermediate,
-/// non-tunneling collisions. If you change the time interval, you should call this function
-/// again.
-b2TOIOutput b2TimeOfImpact( const b2TOIInput* input );
-
-    
-/// Compute the contact manifold between two circles
-b2Manifold b2CollideCircles( const b2Circle* circleA, b2Transform xfA, const b2Circle* circleB, b2Transform xfB );
-
-/// Compute the contact manifold between a capsule and circle
-b2Manifold b2CollideCapsuleAndCircle( const b2Capsule* capsuleA, b2Transform xfA, const b2Circle* circleB, b2Transform xfB );
-
-/// Compute the contact manifold between an segment and a circle
-b2Manifold b2CollideSegmentAndCircle( const b2Segment* segmentA, b2Transform xfA, const b2Circle* circleB, b2Transform xfB );
-
-/// Compute the contact manifold between a polygon and a circle
-b2Manifold b2CollidePolygonAndCircle( const b2Polygon* polygonA, b2Transform xfA, const b2Circle* circleB, b2Transform xfB );
-
-/// Compute the contact manifold between a capsule and circle
-b2Manifold b2CollideCapsules( const b2Capsule* capsuleA, b2Transform xfA, const b2Capsule* capsuleB, b2Transform xfB );
-
-/// Compute the contact manifold between an segment and a capsule
-b2Manifold b2CollideSegmentAndCapsule( const b2Segment* segmentA, b2Transform xfA, const b2Capsule* capsuleB, b2Transform xfB );
-
-/// Compute the contact manifold between a polygon and capsule
-b2Manifold b2CollidePolygonAndCapsule( const b2Polygon* polygonA, b2Transform xfA, const b2Capsule* capsuleB, b2Transform xfB );
-
-/// Compute the contact manifold between two polygons
-b2Manifold b2CollidePolygons( const b2Polygon* polygonA, b2Transform xfA, const b2Polygon* polygonB, b2Transform xfB );
-
-/// Compute the contact manifold between an segment and a polygon
-b2Manifold b2CollideSegmentAndPolygon( const b2Segment* segmentA, b2Transform xfA, const b2Polygon* polygonB, b2Transform xfB );
-
-/// Compute the contact manifold between a chain segment and a circle
-b2Manifold b2CollideChainSegmentAndCircle( const b2ChainSegment* segmentA, b2Transform xfA, const b2Circle* circleB, b2Transform xfB );
-
-/// Compute the contact manifold between a chain segment and a capsule
-b2Manifold b2CollideChainSegmentAndCapsule( const b2ChainSegment* segmentA, b2Transform xfA, const b2Capsule* capsuleB, b2Transform xfB, b2SimplexCache* cache );
-
-/// Compute the contact manifold between a chain segment and a rounded polygon
-b2Manifold b2CollideChainSegmentAndPolygon( const b2ChainSegment* segmentA, b2Transform xfA, const b2Polygon* polygonB, b2Transform xfB, b2SimplexCache* cache );
-
-/**@}*/
-
 }
