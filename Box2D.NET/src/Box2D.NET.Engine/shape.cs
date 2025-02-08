@@ -100,7 +100,7 @@ b2ShapeProxy b2MakeShapeDistanceProxy( const b2Shape* shape );
 b2CastOutput b2RayCastShape( const b2RayCastInput* input, const b2Shape* shape, b2Transform transform );
 b2CastOutput b2ShapeCastShape( const b2ShapeCastInput* input, const b2Shape* shape, b2Transform transform );
 
-static inline float b2GetShapeRadius(const b2Shape* shape)
+static float b2GetShapeRadius(const b2Shape* shape)
 {
 	switch ( shape->type )
 	{

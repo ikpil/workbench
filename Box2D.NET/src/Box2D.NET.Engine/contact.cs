@@ -134,7 +134,7 @@ typedef struct b2ContactSim
 	b2SimplexCache cache;
 } b2ContactSim;
 
-void b2InitializeContactRegisters( void );
+void b2InitializeContactRegisters();
 
 void b2CreateContact( b2World* world, b2Shape* shapeA, b2Shape* shapeB );
 void b2DestroyContact( b2World* world, b2Contact* contact, bool wakeBodies );
@@ -310,7 +310,7 @@ static void b2AddType( b2ManifoldFcn* fcn, b2ShapeType type1, b2ShapeType type2 
 	}
 }
 
-void b2InitializeContactRegisters( void )
+void b2InitializeContactRegisters()
 {
 	if ( s_initialized == false )
 	{

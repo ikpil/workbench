@@ -6,7 +6,7 @@ namespace Box2D.NET.Engine.Test;
 public class test_distance
 {
 
-static int SegmentDistanceTest( void )
+static int SegmentDistanceTest()
 {
 	b2Vec2 p1 = { -1.0f, -1.0f };
 	b2Vec2 q1 = { -1.0f, 1.0f };
@@ -26,7 +26,7 @@ static int SegmentDistanceTest( void )
 	return 0;
 }
 
-static int ShapeDistanceTest( void )
+static int ShapeDistanceTest()
 {
 	b2Vec2 vas[] = { ( b2Vec2 ){ -1.0f, -1.0f }, ( b2Vec2 ){ 1.0f, -1.0f }, ( b2Vec2 ){ 1.0f, 1.0f }, ( b2Vec2 ){ -1.0f, 1.0f } };
 
@@ -50,7 +50,7 @@ static int ShapeDistanceTest( void )
 	return 0;
 }
 
-static int ShapeCastTest( void )
+static int ShapeCastTest()
 {
 	b2Vec2 vas[] = { ( b2Vec2 ){ -1.0f, -1.0f }, ( b2Vec2 ){ 1.0f, -1.0f }, ( b2Vec2 ){ 1.0f, 1.0f }, ( b2Vec2 ){ -1.0f, 1.0f } };
 
@@ -75,7 +75,7 @@ static int ShapeCastTest( void )
 	return 0;
 }
 
-static int TimeOfImpactTest( void )
+static int TimeOfImpactTest()
 {
 	b2Vec2 vas[] = { { -1.0f, -1.0f }, { 1.0f, -1.0f }, { 1.0f, 1.0f }, { -1.0f, 1.0f } };
 
@@ -99,7 +99,7 @@ static int TimeOfImpactTest( void )
 	return 0;
 }
 
-int DistanceTest( void )
+int DistanceTest()
 {
 	RUN_SUBTEST( SegmentDistanceTest );
 	RUN_SUBTEST( ShapeDistanceTest );

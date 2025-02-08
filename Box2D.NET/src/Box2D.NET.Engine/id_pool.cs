@@ -23,17 +23,17 @@ public class id_pool
     void b2FreeId(b2IdPool* pool, int id);
     void b2ValidateFreeId(b2IdPool* pool, int id);
 
-    static inline int b2GetIdCount(b2IdPool* pool)
+    staticint b2GetIdCount(b2IdPool* pool)
     {
         return pool->nextIndex - pool->freeArray.count;
     }
 
-    static inline int b2GetIdCapacity(b2IdPool* pool)
+    staticint b2GetIdCapacity(b2IdPool* pool)
     {
         return pool->nextIndex;
     }
 
-    static inline int b2GetIdBytes(b2IdPool* pool)
+    staticint b2GetIdBytes(b2IdPool* pool)
     {
         return b2IntArray_ByteCount(&pool->freeArray);
     }

@@ -27,12 +27,10 @@ public class base
 // C++ macros
 #ifdef __cplusplus
 #define extern "C" BOX2D_EXPORT
-#define B2_INLINE inline
 #define B2_LITERAL(T) T
 #define B2_ZERO_INIT {}
 #else
 #define BOX2D_EXPORT
-#define B2_INLINE static inline
     /// Used for C literals like (b2Vec2){1.0f, 2.0f} where C++ requires b2Vec2{1.0f, 2.0f}
 #define B2_LITERAL(T) (T)
 #define B2_ZERO_INIT {0}
@@ -64,7 +62,7 @@ public class base
     void b2SetAllocator(b2AllocFcn* allocFcn, b2FreeFcn* freeFcn);
 
     /// @return the total bytes allocated by Box2D
-    int b2GetByteCount( void  );
+    int b2GetByteCount();
 
     /// Override the default assert callback
     /// @param assertFcn a non-null assert callback
@@ -111,14 +109,14 @@ public class base
     b2Version;
 
     /// Get the current version of Box2D
-    b2Version b2GetVersion( void  );
+    b2Version b2GetVersion();
 
     /**@}*/
 
 //! @cond
 
     /// Get the absolute number of system ticks. The value is platform specific.
-    ulong b2GetTicks( void  );
+    ulong b2GetTicks();
 
     /// Get the milliseconds passed from an initial tick value.
     float b2GetMilliseconds(ulong ticks);

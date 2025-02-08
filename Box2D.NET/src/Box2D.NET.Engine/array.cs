@@ -50,19 +50,19 @@ public class array
 // Inline array functions that need the type T to be defined
 #define B2_ARRAY_INLINE( T, PREFIX )                                                                                             \
 	/* Resize */                                                                                                                 \
-	static inline void PREFIX##Array_Resize( PREFIX##Array* a, int count )                                                       \
+	staticvoid PREFIX##Array_Resize( PREFIX##Array* a, int count )                                                       \
 	{                                                                                                                            \
 		PREFIX##Array_Reserve( a, count );                                                                                       \
 		a->count = count;                                                                                                        \
 	}                                                                                                                            \
 	/* Get */                                                                                                                    \
-	static inline T* PREFIX##Array_Get( PREFIX##Array* a, int index )                                                            \
+	staticT* PREFIX##Array_Get( PREFIX##Array* a, int index )                                                            \
 	{                                                                                                                            \
 		B2_ASSERT( 0 <= index && index < a->count );                                                                             \
 		return a->data + index;                                                                                                  \
 	}                                                                                                                            \
 	/* Add */                                                                                                                    \
-	static inline T* PREFIX##Array_Add( PREFIX##Array* a )                                                                       \
+	staticT* PREFIX##Array_Add( PREFIX##Array* a )                                                                       \
 	{                                                                                                                            \
 		if ( a->count == a->capacity )                                                                                           \
 		{                                                                                                                        \
@@ -73,7 +73,7 @@ public class array
 		return a->data + ( a->count - 1 );                                                                                       \
 	}                                                                                                                            \
 	/* Push */                                                                                                                   \
-	static inline void PREFIX##Array_Push( PREFIX##Array* a, T value )                                                           \
+	staticvoid PREFIX##Array_Push( PREFIX##Array* a, T value )                                                           \
 	{                                                                                                                            \
 		if ( a->count == a->capacity )                                                                                           \
 		{                                                                                                                        \
@@ -84,13 +84,13 @@ public class array
 		a->count += 1;                                                                                                           \
 	}                                                                                                                            \
 	/* Set */                                                                                                                    \
-	static inline void PREFIX##Array_Set( PREFIX##Array* a, int index, T value )                                                 \
+	staticvoid PREFIX##Array_Set( PREFIX##Array* a, int index, T value )                                                 \
 	{                                                                                                                            \
 		B2_ASSERT( 0 <= index && index < a->count );                                                                             \
 		a->data[index] = value;                                                                                                  \
 	}                                                                                                                            \
 	/* RemoveSwap */                                                                                                             \
-	static inline int PREFIX##Array_RemoveSwap( PREFIX##Array* a, int index )                                                    \
+	staticint PREFIX##Array_RemoveSwap( PREFIX##Array* a, int index )                                                    \
 	{                                                                                                                            \
 		B2_ASSERT( 0 <= index && index < a->count );                                                                             \
 		int movedIndex = B2_NULL_INDEX;                                                                                          \
@@ -103,7 +103,7 @@ public class array
 		return movedIndex;                                                                                                       \
 	}                                                                                                                            \
 	/* Pop */                                                                                                                    \
-	static inline T PREFIX##Array_Pop( PREFIX##Array* a )                                                                        \
+	staticT PREFIX##Array_Pop( PREFIX##Array* a )                                                                        \
 	{                                                                                                                            \
 		B2_ASSERT( a->count > 0 );                                                                                               \
 		T value = a->data[a->count - 1];                                                                                         \
@@ -111,12 +111,12 @@ public class array
 		return value;                                                                                                            \
 	}                                                                                                                            \
 	/* Clear */                                                                                                                  \
-	static inline void PREFIX##Array_Clear( PREFIX##Array* a )                                                                   \
+	staticvoid PREFIX##Array_Clear( PREFIX##Array* a )                                                                   \
 	{                                                                                                                            \
 		a->count = 0;                                                                                                            \
 	}                                                                                                                            \
 	/* ByteCount */                                                                                                              \
-	static inline int PREFIX##Array_ByteCount( PREFIX##Array* a )                                                                \
+	staticint PREFIX##Array_ByteCount( PREFIX##Array* a )                                                                \
 	{                                                                                                                            \
 		return (int)( a->capacity * sizeof( T ) );                                                                               \
 	}

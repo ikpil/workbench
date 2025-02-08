@@ -75,7 +75,7 @@ static ushort b2MaxUInt16( ushort a, ushort b )
 	return a > b ? a : b;
 }
 
-b2DynamicTree b2DynamicTree_Create( void )
+b2DynamicTree b2DynamicTree_Create()
 {
 	b2DynamicTree tree;
 	tree.root = B2_NULL_INDEX;

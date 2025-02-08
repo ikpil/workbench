@@ -12,7 +12,7 @@ public class test_world
 // box.
 // There are no graphics for this example. Box2D is meant to be used
 // with your rendering engine in your game engine.
-int HelloWorld( void )
+int HelloWorld()
 {
 	// Construct a world object, which will hold and simulate the rigid bodies.
 	b2WorldDef worldDef = b2DefaultWorldDef();
@@ -94,7 +94,7 @@ int HelloWorld( void )
 	return 0;
 }
 
-int EmptyWorld( void )
+int EmptyWorld()
 {
 	b2WorldDef worldDef = b2DefaultWorldDef();
 	b2WorldId worldId = b2CreateWorld( &worldDef );
@@ -116,7 +116,7 @@ int EmptyWorld( void )
 }
 
 #define BODY_COUNT 10
-int DestroyAllBodiesWorld( void )
+int DestroyAllBodiesWorld()
 {
 	b2WorldDef worldDef = b2DefaultWorldDef();
 	b2WorldId worldId = b2CreateWorld( &worldDef );
@@ -167,7 +167,7 @@ int DestroyAllBodiesWorld( void )
 	return 0;
 }
 
-static int TestIsValid( void )
+static int TestIsValid()
 {
 	b2WorldDef worldDef = b2DefaultWorldDef();
 	b2WorldId worldId = b2CreateWorld( &worldDef );
@@ -198,7 +198,7 @@ static int TestIsValid( void )
 
 #define WORLD_COUNT ( B2_MAX_WORLDS / 2 )
 
-int TestWorldRecycle( void )
+int TestWorldRecycle()
 {
 	_Static_assert( WORLD_COUNT > 0, "world count" );
 
@@ -258,7 +258,7 @@ static bool PreSolveStatic( b2ShapeId shapeIdA, b2ShapeId shapeIdB, b2Manifold* 
 }
 
 // This test is here to ensure all API functions link correctly.
-int TestWorldCoverage( void )
+int TestWorldCoverage()
 {
 	b2WorldDef worldDef = b2DefaultWorldDef();
 
@@ -322,7 +322,7 @@ int TestWorldCoverage( void )
 	return 0;
 }
 
-static int TestSensor( void )
+static int TestSensor()
 {
 	b2WorldDef worldDef = b2DefaultWorldDef();
 	b2WorldId worldId = b2CreateWorld( &worldDef );
@@ -388,7 +388,7 @@ static int TestSensor( void )
 	return 0;
 }
 
-int WorldTest( void )
+int WorldTest()
 {
 	RUN_SUBTEST( HelloWorld );
 	RUN_SUBTEST( EmptyWorld );

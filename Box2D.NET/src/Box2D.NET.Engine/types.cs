@@ -142,7 +142,7 @@ typedef struct b2WorldDef
 
 /// Use this to initialize your world definition
 /// @ingroup world
-b2WorldDef b2DefaultWorldDef( void );
+b2WorldDef b2DefaultWorldDef();
 
 /// The body simulation type.
 /// Each body is one of these three types. The type determines how the body behaves in the simulation.
@@ -239,7 +239,7 @@ typedef struct b2BodyDef
 
 /// Use this to initialize your body definition
 /// @ingroup body
-b2BodyDef b2DefaultBodyDef( void );
+b2BodyDef b2DefaultBodyDef();
 
 /// This is used to filter collision on shapes. It affects shape-vs-shape collision
 /// and shape-versus-query collision (such as b2World_CastRay).
@@ -280,7 +280,7 @@ typedef struct b2Filter
 
 /// Use this to initialize your filter
 /// @ingroup shape
-b2Filter b2DefaultFilter( void );
+b2Filter b2DefaultFilter();
 
 /// The query filter is used to filter collisions between queries and shapes. For example,
 /// you may want a ray-cast representing a projectile to hit players and the static environment
@@ -298,7 +298,7 @@ typedef struct b2QueryFilter
 
 /// Use this to initialize your query filter
 /// @ingroup shape
-b2QueryFilter b2DefaultQueryFilter( void );
+b2QueryFilter b2DefaultQueryFilter();
 
 /// Shape type
 /// @ingroup shape
@@ -389,7 +389,7 @@ typedef struct b2ShapeDef
 
 /// Use this to initialize your shape definition
 /// @ingroup shape
-b2ShapeDef b2DefaultShapeDef( void );
+b2ShapeDef b2DefaultShapeDef();
 
 /// Surface materials allow chain shapes to have per segment surface properties.
 /// @ingroup shape
@@ -418,7 +418,7 @@ typedef struct b2SurfaceMaterial
 
 /// Use this to initialize your surface material
 /// @ingroup shape
-b2SurfaceMaterial b2DefaultSurfaceMaterial( void );
+b2SurfaceMaterial b2DefaultSurfaceMaterial();
 
 /// Used to create a chain of line segments. This is designed to eliminate ghost collisions with some limitations.
 /// - chains are one-sided
@@ -465,7 +465,7 @@ typedef struct b2ChainDef
 
 /// Use this to initialize your chain definition
 /// @ingroup shape
-b2ChainDef b2DefaultChainDef( void );
+b2ChainDef b2DefaultChainDef();
 
 //! @cond
 /// Profiling data. Times are in milliseconds.
@@ -593,7 +593,7 @@ typedef struct b2DistanceJointDef
 
 /// Use this to initialize your joint definition
 /// @ingroup distance_joint
-b2DistanceJointDef b2DefaultDistanceJointDef( void );
+b2DistanceJointDef b2DefaultDistanceJointDef();
 
 /// A motor joint is used to control the relative motion between two bodies
 ///
@@ -634,7 +634,7 @@ typedef struct b2MotorJointDef
 
 /// Use this to initialize your joint definition
 /// @ingroup motor_joint
-b2MotorJointDef b2DefaultMotorJointDef( void );
+b2MotorJointDef b2DefaultMotorJointDef();
 
 /// A mouse joint is used to make a point on a body track a specified world point.
 ///
@@ -673,7 +673,7 @@ typedef struct b2MouseJointDef
 
 /// Use this to initialize your joint definition
 /// @ingroup mouse_joint
-b2MouseJointDef b2DefaultMouseJointDef( void );
+b2MouseJointDef b2DefaultMouseJointDef();
 
 /// A null joint is used to disable collision between two specific bodies.
 ///
@@ -695,7 +695,7 @@ typedef struct b2NullJointDef
 
 /// Use this to initialize your joint definition
 /// @ingroup null_joint
-b2NullJointDef b2DefaultNullJointDef( void );
+b2NullJointDef b2DefaultNullJointDef();
 
 /// Prismatic joint definition
 ///
@@ -763,7 +763,7 @@ typedef struct b2PrismaticJointDef
 
 /// Use this to initialize your joint definition
 /// @ingroupd prismatic_joint
-b2PrismaticJointDef b2DefaultPrismaticJointDef( void );
+b2PrismaticJointDef b2DefaultPrismaticJointDef();
 
 /// Revolute joint definition
 ///
@@ -837,7 +837,7 @@ typedef struct b2RevoluteJointDef
 
 /// Use this to initialize your joint definition.
 /// @ingroup revolute_joint
-b2RevoluteJointDef b2DefaultRevoluteJointDef( void );
+b2RevoluteJointDef b2DefaultRevoluteJointDef();
 
 /// Weld joint definition
 ///
@@ -886,7 +886,7 @@ typedef struct b2WeldJointDef
 
 /// Use this to initialize your joint definition
 /// @ingroup weld_joint
-b2WeldJointDef b2DefaultWeldJointDef( void );
+b2WeldJointDef b2DefaultWeldJointDef();
 
 /// Wheel joint definition
 ///
@@ -951,7 +951,7 @@ typedef struct b2WheelJointDef
 
 /// Use this to initialize your joint definition
 /// @ingroup wheel_joint
-b2WheelJointDef b2DefaultWheelJointDef( void );
+b2WheelJointDef b2DefaultWheelJointDef();
 
 /// The explosion definition is used to configure options for explosions. Explosions
 /// consider shape geometry when computing the impulse.
@@ -978,7 +978,7 @@ typedef struct b2ExplosionDef
 
 /// Use this to initialize your explosion definition
 /// @ingroup world
-b2ExplosionDef b2DefaultExplosionDef( void );
+b2ExplosionDef b2DefaultExplosionDef();
 
 /**
  * @defgroup events Events
@@ -1444,13 +1444,13 @@ typedef struct b2DebugDraw
 
 /// Use this to initialize your drawing interface. This allows you to implement a sub-set
 /// of the drawing functions.
-b2DebugDraw b2DefaultDebugDraw( void );
+b2DebugDraw b2DefaultDebugDraw();
 
 
 
 
 
-b2WorldDef b2DefaultWorldDef( void )
+b2WorldDef b2DefaultWorldDef()
 {
 	b2WorldDef def = { 0 };
 	def.gravity.x = 0.0f;
@@ -1470,7 +1470,7 @@ b2WorldDef b2DefaultWorldDef( void )
 	return def;
 }
 
-b2BodyDef b2DefaultBodyDef( void )
+b2BodyDef b2DefaultBodyDef()
 {
 	b2BodyDef def = { 0 };
 	def.type = b2_staticBody;
@@ -1484,19 +1484,19 @@ b2BodyDef b2DefaultBodyDef( void )
 	return def;
 }
 
-b2Filter b2DefaultFilter( void )
+b2Filter b2DefaultFilter()
 {
 	b2Filter filter = { B2_DEFAULT_CATEGORY_BITS, B2_DEFAULT_MASK_BITS, 0 };
 	return filter;
 }
 
-b2QueryFilter b2DefaultQueryFilter( void )
+b2QueryFilter b2DefaultQueryFilter()
 {
 	b2QueryFilter filter = { B2_DEFAULT_CATEGORY_BITS, B2_DEFAULT_MASK_BITS };
 	return filter;
 }
 
-b2ShapeDef b2DefaultShapeDef( void )
+b2ShapeDef b2DefaultShapeDef()
 {
 	b2ShapeDef def = { 0 };
 	def.friction = 0.6f;
@@ -1507,7 +1507,7 @@ b2ShapeDef b2DefaultShapeDef( void )
 	return def;
 }
 
-b2SurfaceMaterial b2DefaultSurfaceMaterial( void )
+b2SurfaceMaterial b2DefaultSurfaceMaterial()
 {
 	b2SurfaceMaterial material = {
 		.friction = 0.6f,
@@ -1516,7 +1516,7 @@ b2SurfaceMaterial b2DefaultSurfaceMaterial( void )
 	return material;
 }
 
-b2ChainDef b2DefaultChainDef( void )
+b2ChainDef b2DefaultChainDef()
 {
 	static b2SurfaceMaterial defaultMaterial = {
 		.friction = 0.6f,
@@ -1576,7 +1576,7 @@ static void b2EmptyDrawString( b2Vec2 p, const char* s, b2HexColor color, void* 
 	B2_UNUSED( p, s, color, context );
 }
 
-b2DebugDraw b2DefaultDebugDraw( void )
+b2DebugDraw b2DefaultDebugDraw()
 {
 	b2DebugDraw draw = { 0 };
 

@@ -26,14 +26,14 @@ public class bitset
     void b2InPlaceUnion(b2BitSet* setA,  const b2BitSet* setB );
     void b2GrowBitSet(b2BitSet* bitSet, uint blockCount);
 
-    static inline void b2SetBit(b2BitSet* bitSet, uint bitIndex)
+    staticvoid b2SetBit(b2BitSet* bitSet, uint bitIndex)
     {
         uint blockIndex = bitIndex / 64;
         B2_ASSERT(blockIndex < bitSet->blockCount);
         bitSet->bits[blockIndex] |= ((ulong)1 << bitIndex % 64);
     }
 
-    static inline void b2SetBitGrow(b2BitSet* bitSet, uint bitIndex)
+    staticvoid b2SetBitGrow(b2BitSet* bitSet, uint bitIndex)
     {
         uint blockIndex = bitIndex / 64;
         if (blockIndex >= bitSet->blockCount)
@@ -44,7 +44,7 @@ public class bitset
         bitSet->bits[blockIndex] |= ((ulong)1 << bitIndex % 64);
     }
 
-    static inline void b2ClearBit(b2BitSet* bitSet, uint bitIndex)
+    staticvoid b2ClearBit(b2BitSet* bitSet, uint bitIndex)
     {
         uint blockIndex = bitIndex / 64;
         if (blockIndex >= bitSet->blockCount)
@@ -55,7 +55,7 @@ public class bitset
         bitSet->bits[blockIndex] &= ~((ulong)1 << bitIndex % 64);
     }
 
-    static inline bool b2GetBit( const b2BitSet* bitSet, uint bitIndex )
+    static bool b2GetBit( const b2BitSet* bitSet, uint bitIndex )
     {
         uint blockIndex = bitIndex / 64;
         if (blockIndex >= bitSet->blockCount)
@@ -66,7 +66,7 @@ public class bitset
         return (bitSet->bits[blockIndex] & ((ulong)1 << bitIndex % 64)) != 0;
     }
 
-    static inline int b2GetBitSetBytes(b2BitSet* bitSet)
+    staticint b2GetBitSetBytes(b2BitSet* bitSet)
     {
         return bitSet->blockCapacity * sizeof(ulong);
     }

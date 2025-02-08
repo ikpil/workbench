@@ -136,7 +136,7 @@ typedef struct b2StepContext
 
 } b2StepContext;
 
-static inline b2Softness b2MakeSoft( float hertz, float zeta, float h )
+staticb2Softness b2MakeSoft( float hertz, float zeta, float h )
 {
 	if ( hertz == 0.0f )
 	{
@@ -154,28 +154,28 @@ void b2Solve( b2World* world, b2StepContext* stepContext );
 
 
 #if ( defined( __GNUC__ ) || defined( __clang__ ) ) && ( defined( __i386__ ) || defined( __x86_64__ ) )
-static inline void b2Pause( void )
+staticvoid b2Pause()
 {
 	__asm__ __volatile__( "pause\n" );
 }
 #elif ( defined( __arm__ ) && defined( __ARM_ARCH ) && __ARM_ARCH >= 7 ) || defined( __aarch64__ )
-static inline void b2Pause( void )
+staticvoid b2Pause()
 {
 	__asm__ __volatile__( "yield" ::: "memory" );
 }
 #elif defined( _MSC_VER ) && ( defined( _M_IX86 ) || defined( _M_X64 ) )
 //
-static inline void b2Pause( void )
+staticvoid b2Pause()
 {
 	_mm_pause();
 }
 #elif defined( _MSC_VER ) && ( defined( _M_ARM ) || defined( _M_ARM64 ) )
-static inline void b2Pause( void )
+staticvoid b2Pause()
 {
 	__yield();
 }
 #else
-static inline void b2Pause( void )
+staticvoid b2Pause()
 {
 }
 #endif
@@ -940,7 +940,7 @@ static void b2ExecuteBlock( b2SolverStage* stage, b2StepContext* context, b2Solv
 	}
 }
 
-static inline int GetWorkerStartIndex( int workerIndex, int blockCount, int workerCount )
+staticint GetWorkerStartIndex( int workerIndex, int blockCount, int workerCount )
 {
 	if ( blockCount <= workerCount )
 	{

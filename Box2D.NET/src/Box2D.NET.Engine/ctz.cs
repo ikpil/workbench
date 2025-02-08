@@ -14,7 +14,7 @@ public class ctz
 
 // https://en.wikipedia.org/wiki/Find_first_set
 
-static inline uint b2CTZ32( uint block )
+staticuint b2CTZ32( uint block )
 {
 	unsigned long index;
 	_BitScanForward( &index, block );
@@ -22,7 +22,7 @@ static inline uint b2CTZ32( uint block )
 }
 
 // This function doesn't need to be fast, so using the Ivy Bridge fallback.
-static inline uint b2CLZ32( uint value )
+staticuint b2CLZ32( uint value )
 {
 	#if 1
 
@@ -48,7 +48,7 @@ static inline uint b2CLZ32( uint value )
 	#endif
 }
 
-static inline uint b2CTZ64( ulong block )
+staticuint b2CTZ64( ulong block )
 {
 	unsigned long index;
 
@@ -72,29 +72,29 @@ static inline uint b2CTZ64( ulong block )
 
 #else
 
-static inline uint b2CTZ32( uint block )
+staticuint b2CTZ32( uint block )
 {
 	return __builtin_ctz( block );
 }
 
-static inline uint b2CLZ32( uint value )
+staticuint b2CLZ32( uint value )
 {
 	return __builtin_clz( value );
 }
 
-static inline uint b2CTZ64( ulong block )
+staticuint b2CTZ64( ulong block )
 {
 	return __builtin_ctzll( block );
 }
 
 #endif
 
-static inline bool b2IsPowerOf2( int x )
+static bool b2IsPowerOf2( int x )
 {
 	return ( x & ( x - 1 ) ) == 0;
 }
 
-static inline int b2BoundingPowerOf2( int x )
+staticint b2BoundingPowerOf2( int x )
 {
 	if ( x <= 1 )
 	{
@@ -104,7 +104,7 @@ static inline int b2BoundingPowerOf2( int x )
 	return 32 - (int)b2CLZ32( (uint)x - 1 );
 }
 
-static inline int b2RoundUpPowerOf2( int x )
+staticint b2RoundUpPowerOf2( int x )
 {
 	if ( x <= 1 )
 	{

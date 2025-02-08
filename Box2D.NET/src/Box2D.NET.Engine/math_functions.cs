@@ -79,49 +79,49 @@ static const b2Transform b2Transform_identity = { { 0.0f, 0.0f }, { 1.0f, 0.0f }
 static const b2Mat22 b2Mat22_zero = { { 0.0f, 0.0f }, { 0.0f, 0.0f } };
 
 /// @return the minimum of two integers
-B2_INLINE int b2MinInt( int a, int b )
+int b2MinInt( int a, int b )
 {
 	return a < b ? a : b;
 }
 
 /// @return the maximum of two integers
-B2_INLINE int b2MaxInt( int a, int b )
+int b2MaxInt( int a, int b )
 {
 	return a > b ? a : b;
 }
 
 /// @return the absolute value of an integer
-B2_INLINE int b2AbsInt( int a )
+int b2AbsInt( int a )
 {
 	return a < 0 ? -a : a;
 }
 
 /// @return an integer clamped between a lower and upper bound
-B2_INLINE int b2ClampInt( int a, int lower, int upper )
+int b2ClampInt( int a, int lower, int upper )
 {
 	return a < lower ? lower : ( a > upper ? upper : a );
 }
 
 /// @return the minimum of two floats
-B2_INLINE float b2MinFloat( float a, float b )
+float b2MinFloat( float a, float b )
 {
 	return a < b ? a : b;
 }
 
 /// @return the maximum of two floats
-B2_INLINE float b2MaxFloat( float a, float b )
+float b2MaxFloat( float a, float b )
 {
 	return a > b ? a : b;
 }
 
 /// @return the absolute value of a float
-B2_INLINE float b2AbsFloat( float a )
+float b2AbsFloat( float a )
 {
 	return a < 0 ? -a : a;
 }
 
 /// @return a float clamped between a lower and upper bound
-B2_INLINE float b2ClampFloat( float a, float lower, float upper )
+float b2ClampFloat( float a, float lower, float upper )
 {
 	return a < lower ? lower : ( a > upper ? upper : a );
 }
@@ -137,92 +137,92 @@ float b2Atan2( float y, float x );
 b2CosSin b2ComputeCosSin( float radians );
 
 /// Vector dot product
-B2_INLINE float b2Dot( b2Vec2 a, b2Vec2 b )
+float b2Dot( b2Vec2 a, b2Vec2 b )
 {
 	return a.x * b.x + a.y * b.y;
 }
 
 /// Vector cross product. In 2D this yields a scalar.
-B2_INLINE float b2Cross( b2Vec2 a, b2Vec2 b )
+float b2Cross( b2Vec2 a, b2Vec2 b )
 {
 	return a.x * b.y - a.y * b.x;
 }
 
 /// Perform the cross product on a vector and a scalar. In 2D this produces a vector.
-B2_INLINE b2Vec2 b2CrossVS( b2Vec2 v, float s )
+b2Vec2 b2CrossVS( b2Vec2 v, float s )
 {
 	return B2_LITERAL( b2Vec2 ){ s * v.y, -s * v.x };
 }
 
 /// Perform the cross product on a scalar and a vector. In 2D this produces a vector.
-B2_INLINE b2Vec2 b2CrossSV( float s, b2Vec2 v )
+b2Vec2 b2CrossSV( float s, b2Vec2 v )
 {
 	return B2_LITERAL( b2Vec2 ){ -s * v.y, s * v.x };
 }
 
 /// Get a left pointing perpendicular vector. Equivalent to b2CrossSV(1.0f, v)
-B2_INLINE b2Vec2 b2LeftPerp( b2Vec2 v )
+b2Vec2 b2LeftPerp( b2Vec2 v )
 {
 	return B2_LITERAL( b2Vec2 ){ -v.y, v.x };
 }
 
 /// Get a right pointing perpendicular vector. Equivalent to b2CrossVS(v, 1.0f)
-B2_INLINE b2Vec2 b2RightPerp( b2Vec2 v )
+b2Vec2 b2RightPerp( b2Vec2 v )
 {
 	return B2_LITERAL( b2Vec2 ){ v.y, -v.x };
 }
 
 /// Vector addition
-B2_INLINE b2Vec2 b2Add( b2Vec2 a, b2Vec2 b )
+b2Vec2 b2Add( b2Vec2 a, b2Vec2 b )
 {
 	return B2_LITERAL( b2Vec2 ){ a.x + b.x, a.y + b.y };
 }
 
 /// Vector subtraction
-B2_INLINE b2Vec2 b2Sub( b2Vec2 a, b2Vec2 b )
+b2Vec2 b2Sub( b2Vec2 a, b2Vec2 b )
 {
 	return B2_LITERAL( b2Vec2 ){ a.x - b.x, a.y - b.y };
 }
 
 /// Vector negation
-B2_INLINE b2Vec2 b2Neg( b2Vec2 a )
+b2Vec2 b2Neg( b2Vec2 a )
 {
 	return B2_LITERAL( b2Vec2 ){ -a.x, -a.y };
 }
 
 /// Vector linear interpolation
 /// https://fgiesen.wordpress.com/2012/08/15/linear-interpolation-past-present-and-future/
-B2_INLINE b2Vec2 b2Lerp( b2Vec2 a, b2Vec2 b, float t )
+b2Vec2 b2Lerp( b2Vec2 a, b2Vec2 b, float t )
 {
 	return B2_LITERAL( b2Vec2 ){ ( 1.0f - t ) * a.x + t * b.x, ( 1.0f - t ) * a.y + t * b.y };
 }
 
 /// Component-wise multiplication
-B2_INLINE b2Vec2 b2Mul( b2Vec2 a, b2Vec2 b )
+b2Vec2 b2Mul( b2Vec2 a, b2Vec2 b )
 {
 	return B2_LITERAL( b2Vec2 ){ a.x * b.x, a.y * b.y };
 }
 
 /// Multiply a scalar and vector
-B2_INLINE b2Vec2 b2MulSV( float s, b2Vec2 v )
+b2Vec2 b2MulSV( float s, b2Vec2 v )
 {
 	return B2_LITERAL( b2Vec2 ){ s * v.x, s * v.y };
 }
 
 /// a + s * b
-B2_INLINE b2Vec2 b2MulAdd( b2Vec2 a, float s, b2Vec2 b )
+b2Vec2 b2MulAdd( b2Vec2 a, float s, b2Vec2 b )
 {
 	return B2_LITERAL( b2Vec2 ){ a.x + s * b.x, a.y + s * b.y };
 }
 
 /// a - s * b
-B2_INLINE b2Vec2 b2MulSub( b2Vec2 a, float s, b2Vec2 b )
+b2Vec2 b2MulSub( b2Vec2 a, float s, b2Vec2 b )
 {
 	return B2_LITERAL( b2Vec2 ){ a.x - s * b.x, a.y - s * b.y };
 }
 
 /// Component-wise absolute vector
-B2_INLINE b2Vec2 b2Abs( b2Vec2 a )
+b2Vec2 b2Abs( b2Vec2 a )
 {
 	b2Vec2 b;
 	b.x = b2AbsFloat( a.x );
@@ -231,7 +231,7 @@ B2_INLINE b2Vec2 b2Abs( b2Vec2 a )
 }
 
 /// Component-wise minimum vector
-B2_INLINE b2Vec2 b2Min( b2Vec2 a, b2Vec2 b )
+b2Vec2 b2Min( b2Vec2 a, b2Vec2 b )
 {
 	b2Vec2 c;
 	c.x = b2MinFloat( a.x, b.x );
@@ -240,7 +240,7 @@ B2_INLINE b2Vec2 b2Min( b2Vec2 a, b2Vec2 b )
 }
 
 /// Component-wise maximum vector
-B2_INLINE b2Vec2 b2Max( b2Vec2 a, b2Vec2 b )
+b2Vec2 b2Max( b2Vec2 a, b2Vec2 b )
 {
 	b2Vec2 c;
 	c.x = b2MaxFloat( a.x, b.x );
@@ -249,7 +249,7 @@ B2_INLINE b2Vec2 b2Max( b2Vec2 a, b2Vec2 b )
 }
 
 /// Component-wise clamp vector v into the range [a, b]
-B2_INLINE b2Vec2 b2Clamp( b2Vec2 v, b2Vec2 a, b2Vec2 b )
+b2Vec2 b2Clamp( b2Vec2 v, b2Vec2 a, b2Vec2 b )
 {
 	b2Vec2 c;
 	c.x = b2ClampFloat( v.x, a.x, b.x );
@@ -258,13 +258,13 @@ B2_INLINE b2Vec2 b2Clamp( b2Vec2 v, b2Vec2 a, b2Vec2 b )
 }
 
 /// Get the length of this vector (the norm)
-B2_INLINE float b2Length( b2Vec2 v )
+float b2Length( b2Vec2 v )
 {
 	return sqrtf( v.x * v.x + v.y * v.y );
 }
 
 /// Get the distance between two points
-B2_INLINE float b2Distance( b2Vec2 a, b2Vec2 b )
+float b2Distance( b2Vec2 a, b2Vec2 b )
 {
 	float dx = b.x - a.x;
 	float dy = b.y - a.y;
@@ -272,7 +272,7 @@ B2_INLINE float b2Distance( b2Vec2 a, b2Vec2 b )
 }
 
 /// Convert a vector into a unit vector if possible, otherwise returns the zero vector.
-B2_INLINE b2Vec2 b2Normalize( b2Vec2 v )
+b2Vec2 b2Normalize( b2Vec2 v )
 {
 	float length = sqrtf( v.x * v.x + v.y * v.y );
 	if ( length < FLT_EPSILON )
@@ -287,7 +287,7 @@ B2_INLINE b2Vec2 b2Normalize( b2Vec2 v )
 
 /// Convert a vector into a unit vector if possible, otherwise returns the zero vector. Also
 /// outputs the length.
-B2_INLINE b2Vec2 b2GetLengthAndNormalize( float* length, b2Vec2 v )
+b2Vec2 b2GetLengthAndNormalize( float* length, b2Vec2 v )
 {
 	*length = b2Length( v );
 	if ( *length < FLT_EPSILON )
@@ -301,7 +301,7 @@ B2_INLINE b2Vec2 b2GetLengthAndNormalize( float* length, b2Vec2 v )
 }
 
 /// Normalize rotation
-B2_INLINE b2Rot b2NormalizeRot( b2Rot q )
+b2Rot b2NormalizeRot( b2Rot q )
 {
 	float mag = sqrtf( q.s * q.s + q.c * q.c );
 	float invMag = mag > 0.0 ? 1.0f / mag : 0.0f;
@@ -312,7 +312,7 @@ B2_INLINE b2Rot b2NormalizeRot( b2Rot q )
 /// Integrate rotation from angular velocity
 /// @param q1 initial rotation
 /// @param deltaAngle the angular displacement in radians
-B2_INLINE b2Rot b2IntegrateRotation( b2Rot q1, float deltaAngle )
+b2Rot b2IntegrateRotation( b2Rot q1, float deltaAngle )
 {
 	// dc/dt = -omega * sin(t)
 	// ds/dt = omega * cos(t)
@@ -326,20 +326,20 @@ B2_INLINE b2Rot b2IntegrateRotation( b2Rot q1, float deltaAngle )
 }
 
 /// Get the length squared of this vector
-B2_INLINE float b2LengthSquared( b2Vec2 v )
+float b2LengthSquared( b2Vec2 v )
 {
 	return v.x * v.x + v.y * v.y;
 }
 
 /// Get the distance squared between points
-B2_INLINE float b2DistanceSquared( b2Vec2 a, b2Vec2 b )
+float b2DistanceSquared( b2Vec2 a, b2Vec2 b )
 {
 	b2Vec2 c = { b.x - a.x, b.y - a.y };
 	return c.x * c.x + c.y * c.y;
 }
 
 /// Make a rotation using an angle in radians
-B2_INLINE b2Rot b2MakeRot( float radians )
+b2Rot b2MakeRot( float radians )
 {
 	b2CosSin cs = b2ComputeCosSin( radians );
 	return B2_LITERAL( b2Rot ){ cs.cosine, cs.sine };
@@ -349,7 +349,7 @@ B2_INLINE b2Rot b2MakeRot( float radians )
 b2Rot b2ComputeRotationBetweenUnitVectors( b2Vec2 v1, b2Vec2 v2 );
 
 /// Is this rotation normalized?
-B2_INLINE bool b2IsNormalized( b2Rot q )
+bool b2IsNormalized( b2Rot q )
 {
 	// larger tolerance due to failure on mingw 32-bit
 	float qq = q.s * q.s + q.c * q.c;
@@ -359,7 +359,7 @@ B2_INLINE bool b2IsNormalized( b2Rot q )
 /// Normalized linear interpolation
 /// https://fgiesen.wordpress.com/2012/08/15/linear-interpolation-past-present-and-future/
 ///	https://web.archive.org/web/20170825184056/http://number-none.com/product/Understanding%20Slerp,%20Then%20Not%20Using%20It/
-B2_INLINE b2Rot b2NLerp( b2Rot q1, b2Rot q2, float t )
+b2Rot b2NLerp( b2Rot q1, b2Rot q2, float t )
 {
 	float omt = 1.0f - t;
 	b2Rot q = {
@@ -374,7 +374,7 @@ B2_INLINE b2Rot b2NLerp( b2Rot q1, b2Rot q2, float t )
 /// @param q1 initial rotation
 /// @param q2 final rotation
 /// @param inv_h inverse time step
-B2_INLINE float b2ComputeAngularVelocity( b2Rot q1, b2Rot q2, float inv_h )
+float b2ComputeAngularVelocity( b2Rot q1, b2Rot q2, float inv_h )
 {
 	// ds/dt = omega * cos(t)
 	// dc/dt = -omega * sin(t)
@@ -391,27 +391,27 @@ B2_INLINE float b2ComputeAngularVelocity( b2Rot q1, b2Rot q2, float inv_h )
 }
 
 /// Get the angle in radians in the range [-pi, pi]
-B2_INLINE float b2Rot_GetAngle( b2Rot q )
+float b2Rot_GetAngle( b2Rot q )
 {
 	return b2Atan2( q.s, q.c );
 }
 
 /// Get the x-axis
-B2_INLINE b2Vec2 b2Rot_GetXAxis( b2Rot q )
+b2Vec2 b2Rot_GetXAxis( b2Rot q )
 {
 	b2Vec2 v = { q.c, q.s };
 	return v;
 }
 
 /// Get the y-axis
-B2_INLINE b2Vec2 b2Rot_GetYAxis( b2Rot q )
+b2Vec2 b2Rot_GetYAxis( b2Rot q )
 {
 	b2Vec2 v = { -q.s, q.c };
 	return v;
 }
 
 /// Multiply two rotations: q * r
-B2_INLINE b2Rot b2MulRot( b2Rot q, b2Rot r )
+b2Rot b2MulRot( b2Rot q, b2Rot r )
 {
 	// [qc -qs] * [rc -rs] = [qc*rc-qs*rs -qc*rs-qs*rc]
 	// [qs  qc]   [rs  rc]   [qs*rc+qc*rs -qs*rs+qc*rc]
@@ -424,7 +424,7 @@ B2_INLINE b2Rot b2MulRot( b2Rot q, b2Rot r )
 }
 
 /// Transpose multiply two rotations: qT * r
-B2_INLINE b2Rot b2InvMulRot( b2Rot q, b2Rot r )
+b2Rot b2InvMulRot( b2Rot q, b2Rot r )
 {
 	// [ qc qs] * [rc -rs] = [qc*rc+qs*rs -qc*rs+qs*rc]
 	// [-qs qc]   [rs  rc]   [-qs*rc+qc*rs qs*rs+qc*rc]
@@ -437,7 +437,7 @@ B2_INLINE b2Rot b2InvMulRot( b2Rot q, b2Rot r )
 }
 
 /// relative angle between b and a (rot_b * inv(rot_a))
-B2_INLINE float b2RelativeAngle( b2Rot b, b2Rot a )
+float b2RelativeAngle( b2Rot b, b2Rot a )
 {
 	// sin(b - a) = bs * ac - bc * as
 	// cos(b - a) = bc * ac + bs * as
@@ -447,7 +447,7 @@ B2_INLINE float b2RelativeAngle( b2Rot b, b2Rot a )
 }
 
 /// Convert an angle in the range [-2*pi, 2*pi] into the range [-pi, pi]
-B2_INLINE float b2UnwindAngle( float radians )
+float b2UnwindAngle( float radians )
 {
 	if ( radians < -B2_PI )
 	{
@@ -462,7 +462,7 @@ B2_INLINE float b2UnwindAngle( float radians )
 }
 
 /// Convert any into the range [-pi, pi] (slow)
-B2_INLINE float b2UnwindLargeAngle( float radians )
+float b2UnwindLargeAngle( float radians )
 {
 	while ( radians > B2_PI )
 	{
@@ -478,19 +478,19 @@ B2_INLINE float b2UnwindLargeAngle( float radians )
 }
 
 /// Rotate a vector
-B2_INLINE b2Vec2 b2RotateVector( b2Rot q, b2Vec2 v )
+b2Vec2 b2RotateVector( b2Rot q, b2Vec2 v )
 {
 	return B2_LITERAL( b2Vec2 ){ q.c * v.x - q.s * v.y, q.s * v.x + q.c * v.y };
 }
 
 /// Inverse rotate a vector
-B2_INLINE b2Vec2 b2InvRotateVector( b2Rot q, b2Vec2 v )
+b2Vec2 b2InvRotateVector( b2Rot q, b2Vec2 v )
 {
 	return B2_LITERAL( b2Vec2 ){ q.c * v.x + q.s * v.y, -q.s * v.x + q.c * v.y };
 }
 
 /// Transform a point (e.g. local space to world space)
-B2_INLINE b2Vec2 b2TransformPoint( b2Transform t, const b2Vec2 p )
+b2Vec2 b2TransformPoint( b2Transform t, const b2Vec2 p )
 {
 	float x = ( t.q.c * p.x - t.q.s * p.y ) + t.p.x;
 	float y = ( t.q.s * p.x + t.q.c * p.y ) + t.p.y;
@@ -499,7 +499,7 @@ B2_INLINE b2Vec2 b2TransformPoint( b2Transform t, const b2Vec2 p )
 }
 
 /// Inverse transform a point (e.g. world space to local space)
-B2_INLINE b2Vec2 b2InvTransformPoint( b2Transform t, const b2Vec2 p )
+b2Vec2 b2InvTransformPoint( b2Transform t, const b2Vec2 p )
 {
 	float vx = p.x - t.p.x;
 	float vy = p.y - t.p.y;
@@ -511,7 +511,7 @@ B2_INLINE b2Vec2 b2InvTransformPoint( b2Transform t, const b2Vec2 p )
 /// in the world frame.
 /// v2 = A.q.Rot(B.q.Rot(v1) + B.p) + A.p
 ///    = (A.q * B.q).Rot(v1) + A.q.Rot(B.p) + A.p
-B2_INLINE b2Transform b2MulTransforms( b2Transform A, b2Transform B )
+b2Transform b2MulTransforms( b2Transform A, b2Transform B )
 {
 	b2Transform C;
 	C.q = b2MulRot( A.q, B.q );
@@ -522,7 +522,7 @@ B2_INLINE b2Transform b2MulTransforms( b2Transform A, b2Transform B )
 /// Creates a transform that converts a local point in frame B to a local point in frame A.
 /// v2 = A.q' * (B.q * v1 + B.p - A.p)
 ///    = A.q' * B.q * v1 + A.q' * (B.p - A.p)
-B2_INLINE b2Transform b2InvMulTransforms( b2Transform A, b2Transform B )
+b2Transform b2InvMulTransforms( b2Transform A, b2Transform B )
 {
 	b2Transform C;
 	C.q = b2InvMulRot( A.q, B.q );
@@ -531,7 +531,7 @@ B2_INLINE b2Transform b2InvMulTransforms( b2Transform A, b2Transform B )
 }
 
 /// Multiply a 2-by-2 matrix times a 2D vector
-B2_INLINE b2Vec2 b2MulMV( b2Mat22 A, b2Vec2 v )
+b2Vec2 b2MulMV( b2Mat22 A, b2Vec2 v )
 {
 	b2Vec2 u = {
 		A.cx.x * v.x + A.cy.x * v.y,
@@ -541,7 +541,7 @@ B2_INLINE b2Vec2 b2MulMV( b2Mat22 A, b2Vec2 v )
 }
 
 /// Get the inverse of a 2-by-2 matrix
-B2_INLINE b2Mat22 b2GetInverse22( b2Mat22 A )
+b2Mat22 b2GetInverse22( b2Mat22 A )
 {
 	float a = A.cx.x, b = A.cy.x, c = A.cx.y, d = A.cy.y;
 	float det = a * d - b * c;
@@ -559,7 +559,7 @@ B2_INLINE b2Mat22 b2GetInverse22( b2Mat22 A )
 
 /// Solve A * x = b, where b is a column vector. This is more efficient
 /// than computing the inverse in one-shot cases.
-B2_INLINE b2Vec2 b2Solve22( b2Mat22 A, b2Vec2 b )
+b2Vec2 b2Solve22( b2Mat22 A, b2Vec2 b )
 {
 	float a11 = A.cx.x, a12 = A.cy.x, a21 = A.cx.y, a22 = A.cy.y;
 	float det = a11 * a22 - a12 * a21;
@@ -572,7 +572,7 @@ B2_INLINE b2Vec2 b2Solve22( b2Mat22 A, b2Vec2 b )
 }
 
 /// Does a fully contain b
-B2_INLINE bool b2AABB_Contains( b2AABB a, b2AABB b )
+bool b2AABB_Contains( b2AABB a, b2AABB b )
 {
 	bool s = true;
 	s = s && a.lowerBound.x <= b.lowerBound.x;
@@ -583,21 +583,21 @@ B2_INLINE bool b2AABB_Contains( b2AABB a, b2AABB b )
 }
 
 /// Get the center of the AABB.
-B2_INLINE b2Vec2 b2AABB_Center( b2AABB a )
+b2Vec2 b2AABB_Center( b2AABB a )
 {
 	b2Vec2 b = { 0.5f * ( a.lowerBound.x + a.upperBound.x ), 0.5f * ( a.lowerBound.y + a.upperBound.y ) };
 	return b;
 }
 
 /// Get the extents of the AABB (half-widths).
-B2_INLINE b2Vec2 b2AABB_Extents( b2AABB a )
+b2Vec2 b2AABB_Extents( b2AABB a )
 {
 	b2Vec2 b = { 0.5f * ( a.upperBound.x - a.lowerBound.x ), 0.5f * ( a.upperBound.y - a.lowerBound.y ) };
 	return b;
 }
 
 /// Union of two AABBs
-B2_INLINE b2AABB b2AABB_Union( b2AABB a, b2AABB b )
+b2AABB b2AABB_Union( b2AABB a, b2AABB b )
 {
 	b2AABB c;
 	c.lowerBound.x = b2MinFloat( a.lowerBound.x, b.lowerBound.x );
@@ -636,7 +636,7 @@ bool b2IsValidAABB( b2AABB aabb );
 void b2SetLengthUnitsPerMeter( float lengthUnits );
 
 /// Get the current length units per meter.
-float b2GetLengthUnitsPerMeter( void );
+float b2GetLengthUnitsPerMeter();
 
 /**@}*/
 

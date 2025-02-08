@@ -160,7 +160,7 @@ bool b2WakeBody( b2World* world, b2Body* body );
 
 void b2UpdateBodyMassData( b2World* world, b2Body* body );
 
-static inline b2Sweep b2MakeSweep( const b2BodySim* bodySim )
+staticb2Sweep b2MakeSweep( const b2BodySim* bodySim )
 {
 	b2Sweep s;
 	s.c1 = bodySim->center0;
@@ -171,7 +171,7 @@ static inline b2Sweep b2MakeSweep( const b2BodySim* bodySim )
 	return s;
 }
 
-// Define inline functions for arrays
+// Definefunctions for arrays
 B2_ARRAY_INLINE( b2Body, b2Body );
 B2_ARRAY_INLINE( b2BodySim, b2BodySim );
 B2_ARRAY_INLINE( b2BodyState, b2BodyState );

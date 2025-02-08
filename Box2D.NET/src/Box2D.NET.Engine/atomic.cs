@@ -13,7 +13,7 @@ public class atomic
 
 #endif
 
-    static inline void b2AtomicStoreInt(b2AtomicInt* a, int value)
+    staticvoid b2AtomicStoreInt(b2AtomicInt* a, int value)
     {
 #if defined( _MSC_VER )
 	(void)_InterlockedExchange( (long*)&a->value, value );
@@ -24,7 +24,7 @@ public class atomic
 #endif
     }
 
-    static inline int b2AtomicLoadInt(b2AtomicInt* a)
+    staticint b2AtomicLoadInt(b2AtomicInt* a)
     {
 #if defined( _MSC_VER )
 	return _InterlockedOr( (long*)&a->value, 0 );
@@ -35,7 +35,7 @@ public class atomic
 #endif
     }
 
-    static inline int b2AtomicFetchAddInt(b2AtomicInt* a, int increment)
+    staticint b2AtomicFetchAddInt(b2AtomicInt* a, int increment)
     {
 #if defined( _MSC_VER )
 	return _InterlockedExchangeAdd( (long*)&a->value, (long)increment );
@@ -46,7 +46,7 @@ public class atomic
 #endif
     }
 
-    static inline bool b2AtomicCompareExchangeInt(b2AtomicInt* a, int expected, int desired)
+    static bool b2AtomicCompareExchangeInt(b2AtomicInt* a, int expected, int desired)
     {
 #if defined( _MSC_VER )
 	return _InterlockedCompareExchange( (long*)&a->value, (long)desired, (long)expected ) == expected;
@@ -58,7 +58,7 @@ public class atomic
 #endif
     }
 
-    static inline void b2AtomicStoreU32(b2AtomicU32* a, uint value)
+    staticvoid b2AtomicStoreU32(b2AtomicU32* a, uint value)
     {
 #if defined( _MSC_VER )
 	(void)_InterlockedExchange( (long*)&a->value, value );
@@ -69,7 +69,7 @@ public class atomic
 #endif
     }
 
-    static inline uint b2AtomicLoadU32(b2AtomicU32* a)
+    staticuint b2AtomicLoadU32(b2AtomicU32* a)
     {
 #if defined( _MSC_VER )
 	return (uint)_InterlockedOr( (long*)&a->value, 0 );

@@ -169,7 +169,7 @@ static void TiltedStacks( int testIndex, int workerCount )
 }
 
 // Test multithreaded determinism.
-static int MultithreadingTest( void )
+static int MultithreadingTest()
 {
 	// Test 1 : 4 threads
 	TiltedStacks( 0, 4 );
@@ -331,7 +331,7 @@ static int CrossPlatformTest(void)
 	return 0;
 }
 
-int DeterminismTest( void )
+int DeterminismTest()
 {
 	RUN_SUBTEST( MultithreadingTest );
 	RUN_SUBTEST( CrossPlatformTest );

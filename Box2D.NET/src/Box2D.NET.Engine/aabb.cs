@@ -10,7 +10,7 @@ public class aabb
     b2CastOutput b2AABB_RayCast(b2AABB a, b2Vec2 p1, b2Vec2 p2);
 
 // Get surface area of an AABB (the perimeter length)
-    static inline float b2Perimeter(b2AABB a)
+    static float b2Perimeter(b2AABB a)
     {
         float wx = a.upperBound.x - a.lowerBound.x;
         float wy = a.upperBound.y - a.lowerBound.y;
@@ -19,7 +19,7 @@ public class aabb
 
     /// Enlarge a to contain b
     /// @return true if the AABB grew
-    static inline bool b2EnlargeAABB(b2AABB* a, b2AABB b)
+    static bool b2EnlargeAABB(b2AABB* a, b2AABB b)
     {
         bool changed = false;
         if (b.lowerBound.x < a->lowerBound.x)
@@ -50,7 +50,7 @@ public class aabb
     }
 
     /// Do a and b overlap
-    static inline bool b2AABB_Overlaps(b2AABB a, b2AABB b)
+    static bool b2AABB_Overlaps(b2AABB a, b2AABB b)
     {
         return !(b.lowerBound.x > a.upperBound.x || b.lowerBound.y > a.upperBound.y || a.lowerBound.x > b.upperBound.x ||
                  a.lowerBound.y > b.upperBound.y);

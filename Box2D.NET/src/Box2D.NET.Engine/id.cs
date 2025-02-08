@@ -103,52 +103,52 @@ public class id
 #define B2_ID_EQUALS( id1, id2 ) ( id1.index1 == id2.index1 && id1.world0 == id2.world0 && id1.generation == id2.generation )
 
     /// Store a body id into a ulong.
-    B2_INLINE ulong b2StoreBodyId(b2BodyId id)
+    ulong b2StoreBodyId(b2BodyId id)
     {
         return ((ulong)id.index1 << 32) | ((ulong)id.world0) << 16 | (ulong)id.generation;
     }
 
     /// Load a ulong into a body id.
-    B2_INLINE b2BodyId b2LoadBodyId(ulong x)
+    b2BodyId b2LoadBodyId(ulong x)
     {
         b2BodyId id = { (int)(x >> 32), (ushort)(x >> 16), (ushort)(x) };
         return id;
     }
 
     /// Store a shape id into a ulong.
-    B2_INLINE ulong b2StoreShapeId(b2ShapeId id)
+    ulong b2StoreShapeId(b2ShapeId id)
     {
         return ((ulong)id.index1 << 32) | ((ulong)id.world0) << 16 | (ulong)id.generation;
     }
 
     /// Load a ulong into a shape id.
-    B2_INLINE b2ShapeId b2LoadShapeId(ulong x)
+    b2ShapeId b2LoadShapeId(ulong x)
     {
         b2ShapeId id = { (int)(x >> 32), (ushort)(x >> 16), (ushort)(x) };
         return id;
     }
 
     /// Store a chain id into a ulong.
-    B2_INLINE ulong b2StoreChainId(b2ChainId id)
+    ulong b2StoreChainId(b2ChainId id)
     {
         return ((ulong)id.index1 << 32) | ((ulong)id.world0) << 16 | (ulong)id.generation;
     }
 
     /// Load a ulong into a chain id.
-    B2_INLINE b2ChainId b2LoadChainId(ulong x)
+    b2ChainId b2LoadChainId(ulong x)
     {
         b2ChainId id = { (int)(x >> 32), (ushort)(x >> 16), (ushort)(x) };
         return id;
     }
 
     /// Store a joint id into a ulong.
-    B2_INLINE ulong b2StoreJointId(b2JointId id)
+    ulong b2StoreJointId(b2JointId id)
     {
         return ((ulong)id.index1 << 32) | ((ulong)id.world0) << 16 | (ulong)id.generation;
     }
 
     /// Load a ulong into a joint id.
-    B2_INLINE b2JointId b2LoadJointId(ulong x)
+    b2JointId b2LoadJointId(ulong x)
     {
         b2JointId id = { (int)(x >> 32), (ushort)(x >> 16), (ushort)(x) };
         return id;
