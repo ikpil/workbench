@@ -70,8 +70,8 @@ public class aabb
         // Radius not handled
         b2CastOutput output = { 0 };
 
-        float tmin = -FLT_MAX;
-        float tmax = FLT_MAX;
+        float tmin = -float.MaxValue;
+        float tmax = float.MaxValue;
 
         b2Vec2 p = p1;
         b2Vec2 d = b2Sub(p2, p1);

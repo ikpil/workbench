@@ -107,7 +107,7 @@ public static class bitset
             ulong[] newBits = b2Alloc<ulong>(bitSet.blockCapacity);
             memset(newBits, 0, bitSet.blockCapacity);
             Debug.Assert(bitSet.bits != null);
-            memcpy(newBits, bitSet.bits, oldCapacity * sizeof(ulong));
+            memcpy<ulong>(newBits, bitSet.bits, oldCapacity);
             b2Free(bitSet.bits, oldCapacity);
             bitSet.bits = newBits;
         }

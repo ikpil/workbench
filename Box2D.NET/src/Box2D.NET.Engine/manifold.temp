@@ -155,7 +155,7 @@ b2Manifold b2CollidePolygonAndCircle( const b2Polygon* polygonA, b2Transform xfA
 
 	// Find the min separating edge.
 	int normalIndex = 0;
-	float separation = -FLT_MAX;
+	float separation = -float.MaxValue;
 	int vertexCount = polygonA->count;
 	const b2Vec2* vertices = polygonA->vertices;
 	const b2Vec2* normals = polygonA->normals;
@@ -689,7 +689,7 @@ static float b2FindMaxSeparation( int* edgeIndex, const b2Polygon* poly1, const 
 	const b2Vec2* v2s = poly2->vertices;
 
 	int bestIndex = 0;
-	float maxSeparation = -FLT_MAX;
+	float maxSeparation = -float.MaxValue;
 	for ( int i = 0; i < count1; ++i )
 	{
 		// Get poly1 normal in frame2.
@@ -697,7 +697,7 @@ static float b2FindMaxSeparation( int* edgeIndex, const b2Polygon* poly1, const 
 		b2Vec2 v1 = v1s[i];
 
 		// Find the deepest point for normal i.
-		float si = FLT_MAX;
+		float si = float.MaxValue;
 		for ( int j = 0; j < count2; ++j )
 		{
 			float sij = b2Dot( n, b2Sub( v2s[j], v1 ) );
@@ -793,7 +793,7 @@ b2Manifold b2CollidePolygons( const b2Polygon* polygonA, b2Transform xfA, const 
 		int count = localPolyB.count;
 		const b2Vec2* normals = localPolyB.normals;
 		edgeB = 0;
-		float minDot = FLT_MAX;
+		float minDot = float.MaxValue;
 		for ( int i = 0; i < count; ++i )
 		{
 			float dot = b2Dot( searchDirection, normals[i] );
@@ -814,7 +814,7 @@ b2Manifold b2CollidePolygons( const b2Polygon* polygonA, b2Transform xfA, const 
 		int count = localPolyA.count;
 		const b2Vec2* normals = localPolyA.normals;
 		edgeA = 0;
-		float minDot = FLT_MAX;
+		float minDot = float.MaxValue;
 		for ( int i = 0; i < count; ++i )
 		{
 			float dot = b2Dot( searchDirection, normals[i] );
@@ -1415,7 +1415,7 @@ b2Manifold b2CollideChainSegmentAndPolygon( const b2ChainSegment* segmentA, b2Tr
 	else
 	{
 		// SAT edge normal
-		float edgeSeparation = FLT_MAX;
+		float edgeSeparation = float.MaxValue;
 
 		for ( int i = 0; i < count; ++i )
 		{
@@ -1430,7 +1430,7 @@ b2Manifold b2CollideChainSegmentAndPolygon( const b2ChainSegment* segmentA, b2Tr
 		// Check convex neighbor for edge separation
 		if ( smoothParams.convex1 )
 		{
-			float s0 = FLT_MAX;
+			float s0 = float.MaxValue;
 
 			for ( int i = 0; i < count; ++i )
 			{
@@ -1453,7 +1453,7 @@ b2Manifold b2CollideChainSegmentAndPolygon( const b2ChainSegment* segmentA, b2Tr
 		// Check convex neighbor for edge separation
 		if ( smoothParams.convex2 )
 		{
-			float s2 = FLT_MAX;
+			float s2 = float.MaxValue;
 
 			for ( int i = 0; i < count; ++i )
 			{
@@ -1474,7 +1474,7 @@ b2Manifold b2CollideChainSegmentAndPolygon( const b2ChainSegment* segmentA, b2Tr
 		}
 
 		// SAT polygon normals
-		float polygonSeparation = -FLT_MAX;
+		float polygonSeparation = -float.MaxValue;
 		int referenceIndex = -1;
 
 		for ( int i = 0; i < count; ++i )

@@ -59,4 +59,11 @@ public static class constants
     /// don't use more vertices.
     public const int B2_MAX_POLYGON_VERTICES = 8;
 
+
+    // types
+    public const ulong B2_DEFAULT_CATEGORY_BITS = 0x0001UL;
+    public const ulong B2_DEFAULT_MASK_BITS = ulong.MaxValue;
+
+    // core
+    public const int B2_NULL_INDEX = -1;
 }

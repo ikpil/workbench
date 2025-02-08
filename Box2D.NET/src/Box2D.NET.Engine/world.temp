@@ -1910,7 +1910,7 @@ void b2World_SetRestitutionThreshold( b2WorldId worldId, float value )
 		return;
 	}
 
-	world->restitutionThreshold = b2ClampFloat( value, 0.0f, FLT_MAX );
+	world->restitutionThreshold = b2ClampFloat( value, 0.0f, float.MaxValue );
 }
 
 float b2World_GetRestitutionThreshold( b2WorldId worldId )
@@ -1928,7 +1928,7 @@ void b2World_SetHitEventThreshold( b2WorldId worldId, float value )
 		return;
 	}
 
-	world->hitEventThreshold = b2ClampFloat( value, 0.0f, FLT_MAX );
+	world->hitEventThreshold = b2ClampFloat( value, 0.0f, float.MaxValue );
 }
 
 float b2World_GetHitEventThreshold( b2WorldId worldId )
@@ -1946,9 +1946,9 @@ void b2World_SetContactTuning( b2WorldId worldId, float hertz, float dampingRati
 		return;
 	}
 
-	world->contactHertz = b2ClampFloat( hertz, 0.0f, FLT_MAX );
-	world->contactDampingRatio = b2ClampFloat( dampingRatio, 0.0f, FLT_MAX );
-	world->contactMaxPushSpeed = b2ClampFloat( pushSpeed, 0.0f, FLT_MAX );
+	world->contactHertz = b2ClampFloat( hertz, 0.0f, float.MaxValue );
+	world->contactDampingRatio = b2ClampFloat( dampingRatio, 0.0f, float.MaxValue );
+	world->contactMaxPushSpeed = b2ClampFloat( pushSpeed, 0.0f, float.MaxValue );
 }
 
 void b2World_SetJointTuning( b2WorldId worldId, float hertz, float dampingRatio )
@@ -1960,8 +1960,8 @@ void b2World_SetJointTuning( b2WorldId worldId, float hertz, float dampingRatio 
 		return;
 	}
 
-	world->jointHertz = b2ClampFloat( hertz, 0.0f, FLT_MAX );
-	world->jointDampingRatio = b2ClampFloat( dampingRatio, 0.0f, FLT_MAX );
+	world->jointHertz = b2ClampFloat( hertz, 0.0f, float.MaxValue );
+	world->jointDampingRatio = b2ClampFloat( dampingRatio, 0.0f, float.MaxValue );
 }
 
 void b2World_SetMaximumLinearSpeed( b2WorldId worldId, float maximumLinearSpeed )

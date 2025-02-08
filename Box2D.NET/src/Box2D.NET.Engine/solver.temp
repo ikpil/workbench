@@ -21,7 +21,7 @@ typedef struct b2Softness
 	float impulseScale;
 } b2Softness;
 
-typedef enum b2SolverStageType
+public enum b2SolverStageType
 {
 	b2_stagePrepareJoints,
 	b2_stagePrepareContacts,
@@ -34,7 +34,7 @@ typedef enum b2SolverStageType
 	b2_stageStoreImpulses
 } b2SolverStageType;
 
-typedef enum b2SolverBlockType
+public enum b2SolverBlockType
 {
 	b2_bodyBlock,
 	b2_jointBlock,
@@ -843,7 +843,7 @@ static void b2FinalizeBodiesTask( int startIndex, int endIndex, uint threadIndex
 }
 
 /*
- typedef enum b2SolverStageType
+ public enum b2SolverStageType
 {
 	b2_stagePrepareJoints,
 	b2_stagePrepareContacts,
@@ -856,7 +856,7 @@ static void b2FinalizeBodiesTask( int startIndex, int endIndex, uint threadIndex
 	b2_stageStoreImpulses
 } b2SolverStageType;
 
-typedef enum b2SolverBlockType
+public enum b2SolverBlockType
 {
 	b2_bodyBlock,
 	b2_jointBlock,

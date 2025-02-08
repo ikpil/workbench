@@ -790,7 +790,7 @@ int b2_toiHitCount;
 int b2_toiSeparatedCount;
 #endif
 
-typedef enum b2SeparationType
+public enum b2SeparationType
 {
 	b2_pointsType,
 	b2_faceAType,

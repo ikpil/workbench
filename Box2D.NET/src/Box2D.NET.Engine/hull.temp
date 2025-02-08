@@ -100,7 +100,7 @@ b2Hull b2ComputeHull( const b2Vec2* points, int count )
 
 	count = b2MinInt( count, B2_MAX_POLYGON_VERTICES );
 
-	b2AABB aabb = { { FLT_MAX, FLT_MAX }, { -FLT_MAX, -FLT_MAX } };
+	b2AABB aabb = { { float.MaxValue, float.MaxValue }, { -float.MaxValue, -float.MaxValue } };
 
 	// Perform aggressive point welding. First point always remains.
 	// Also compute the bounding box for later.

@@ -6,8 +6,6 @@ namespace Box2D.NET.Engine;
 public class types
 {
 
-#define B2_DEFAULT_CATEGORY_BITS 0x0001ULL
-#define B2_DEFAULT_MASK_BITS UINT64_MAX
 
 /// Task interface
 /// This is prototype for a Box2D task. Your task system is expected to invoke the Box2D task with these arguments.
@@ -147,7 +145,7 @@ b2WorldDef b2DefaultWorldDef();
 /// The body simulation type.
 /// Each body is one of these three types. The type determines how the body behaves in the simulation.
 /// @ingroup body
-typedef enum b2BodyType
+public enum b2BodyType
 {
 	/// zero mass, zero velocity, may be manually moved
 	b2_staticBody = 0,
@@ -302,7 +300,7 @@ b2QueryFilter b2DefaultQueryFilter();
 
 /// Shape type
 /// @ingroup shape
-typedef enum b2ShapeType
+public enum b2ShapeType
 {
 	/// A circle with an offset
 	b2_circleShape,
@@ -517,7 +515,7 @@ typedef struct b2Counters
 /// This is useful because all joint types use b2JointId and sometimes you
 /// want to get the type of a joint.
 /// @ingroup joint
-typedef enum b2JointType
+public enum b2JointType
 {
 	b2_distanceJoint,
 	b2_motorJoint,
@@ -1216,7 +1214,7 @@ typedef float b2CastResultFcn( b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, f
 /// See https://www.rapidtables.com/web/color/index.html
 /// https://johndecember.com/html/spec/colorsvg.html
 /// https://upload.wikimedia.org/wikipedia/commons/2/2b/SVG_Recognized_color_keyword_names.svg
-typedef enum b2HexColor
+public enum b2HexColor
 {
 	b2_colorAliceBlue = 0xF0F8FF,
 	b2_colorAntiqueWhite = 0xFAEBD7,
