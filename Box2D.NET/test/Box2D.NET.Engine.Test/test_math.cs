@@ -14,7 +14,7 @@ public class test_math
 // 0.0023 degrees
 #define ATAN_TOL 0.00004f
 
-    int MathTest(void)
+    int MathTest()
     {
         for (float t = -10.0f; t < 10.0f; t += 0.01f)
         {

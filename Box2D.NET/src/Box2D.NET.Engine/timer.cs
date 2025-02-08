@@ -17,7 +17,7 @@ public class timer
 
     static double s_invFrequency = 0.0;
 
-    ulong b2GetTicks(void)
+    ulong b2GetTicks()
     {
         LARGE_INTEGER counter;
         QueryPerformanceCounter(&counter);
@@ -62,7 +62,7 @@ public class timer
         return ms;
     }
 
-    void b2Yield(void)
+    void b2Yield()
     {
         SwitchToThread();
     }
@@ -72,7 +72,7 @@ public class timer
 
 
 
-    ulong b2GetTicks(void)
+    ulong b2GetTicks()
     {
         struct timespec ts;
         clock_gettime(CLOCK_MONOTONIC, &ts);
@@ -93,7 +93,7 @@ public class timer
         return ms;
     }
 
-    void b2Yield(void)
+    void b2Yield()
     {
         sched_yield();
     }
@@ -106,7 +106,7 @@ public class timer
 
     static double s_invFrequency = 0.0;
 
-    ulong b2GetTicks(void)
+    ulong b2GetTicks()
     {
         return mach_absolute_time();
     }
@@ -143,14 +143,14 @@ public class timer
         return ms;
     }
 
-    void b2Yield(void)
+    void b2Yield()
     {
         sched_yield();
     }
 
 #else
 
-    ulong b2GetTicks(void)
+    ulong b2GetTicks()
     {
         return 0;
     }
@@ -167,7 +167,7 @@ public class timer
         return 0.0f;
     }
 
-    void b2Yield(void)
+    void b2Yield()
     {
     }
 

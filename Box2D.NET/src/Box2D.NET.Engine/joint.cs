@@ -415,7 +415,7 @@ b2WheelJointDef b2DefaultWheelJointDef()
 	return def;
 }
 
-b2ExplosionDef b2DefaultExplosionDef(void)
+b2ExplosionDef b2DefaultExplosionDef()
 {
 	b2ExplosionDef def = { 0 };
 	def.maskBits = B2_DEFAULT_MASK_BITS;

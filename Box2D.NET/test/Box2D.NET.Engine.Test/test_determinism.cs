@@ -195,7 +195,7 @@ static int MultithreadingTest()
 }
 
 // Test cross platform determinism based on the FallingHinges sample.
-static int CrossPlatformTest(void)
+static int CrossPlatformTest()
 {
 	b2WorldDef worldDef = b2DefaultWorldDef();
 	b2WorldId worldId = b2CreateWorld( &worldDef );

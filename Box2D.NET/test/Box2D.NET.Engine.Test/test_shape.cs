@@ -18,7 +18,7 @@ public class test_shape
 
 #define N 4
 
-    static int ShapeMassTest(void)
+    static int ShapeMassTest()
     {
         {
             b2MassData md = b2ComputeCircleMass(&circle, 1.0f);
@@ -75,7 +75,7 @@ public class test_shape
         return 0;
     }
 
-    static int ShapeAABBTest(void)
+    static int ShapeAABBTest()
     {
         {
             b2AABB b = b2ComputeCircleAABB(&circle, b2Transform_identity);
@@ -104,7 +104,7 @@ public class test_shape
         return 0;
     }
 
-    static int PointInShapeTest(void)
+    static int PointInShapeTest()
     {
         b2Vec2 p1 = { 0.5f, 0.5f };
         b2Vec2 p2 = { 4.0f, -4.0f };
@@ -128,7 +128,7 @@ public class test_shape
         return 0;
     }
 
-    static int RayCastShapeTest(void)
+    static int RayCastShapeTest()
     {
         b2RayCastInput input = { { -4.0f, 0.0f }, { 8.0f, 0.0f }, 1.0f };
 
@@ -159,7 +159,7 @@ public class test_shape
         return 0;
     }
 
-    int ShapeTest(void)
+    int ShapeTest()
     {
         box = b2MakeBox(1.0f, 1.0f);
 

@@ -196,7 +196,7 @@ public class core
         b2_lengthUnitsPerMeter = lengthUnits;
     }
 
-    float b2GetLengthUnitsPerMeter(void)
+    float b2GetLengthUnitsPerMeter()
     {
         return b2_lengthUnitsPerMeter;
     }
@@ -224,7 +224,7 @@ public class core
     }
 #endif
 
-    b2Version b2GetVersion(void)
+    b2Version b2GetVersion()
     {
         return (b2Version){
             3, 1, 0
@@ -404,7 +404,7 @@ public class core
         return newMem;
     }
 
-    int b2GetByteCount(void)
+    int b2GetByteCount()
     {
         return b2AtomicLoadInt(&b2_byteCount);
     }

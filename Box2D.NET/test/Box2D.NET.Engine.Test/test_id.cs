@@ -8,7 +8,7 @@ public class test_id
 
 
 
-    int IdTest(void)
+    int IdTest()
     {
         ulong x = 0x0123456789ABCDEFull;
 

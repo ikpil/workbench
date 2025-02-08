@@ -9,7 +9,7 @@ public class test_collision
 
 
 
-    static int AABBTest(void)
+    static int AABBTest()
     {
         b2AABB a;
         a.lowerBound = (b2Vec2){
@@ -49,7 +49,7 @@ public class test_collision
         return 0;
     }
 
-    int CollisionTest(void)
+    int CollisionTest()
     {
         RUN_SUBTEST(AABBTest);
 

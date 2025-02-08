@@ -10,7 +10,7 @@ public class test_table
 #define SET_SPAN 317
 #define ITEM_COUNT ( ( SET_SPAN * SET_SPAN - SET_SPAN ) / 2 )
 
-    int TableTest(void)
+    int TableTest()
     {
         int power = b2BoundingPowerOf2(3008);
         ENSURE(power == 12);

@@ -125,7 +125,7 @@ public class base
     float b2GetMillisecondsAndReset(ulong* ticks);
 
     /// Yield to be used in a busy loop.
-    void b2Yield(void);
+    void b2Yield();
 
     /// Simple djb2 hash function for determinism testing
 #define B2_HASH_INIT 5381

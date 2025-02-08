@@ -16,7 +16,7 @@ public class id_pool
 
     b2IdPool;
 
-    b2IdPool b2CreateIdPool(void);
+    b2IdPool b2CreateIdPool();
     void b2DestroyIdPool(b2IdPool* pool);
 
     int b2AllocId(b2IdPool* pool);
@@ -39,7 +39,7 @@ public class id_pool
     }
 
 
-    b2IdPool b2CreateIdPool(void)
+    b2IdPool b2CreateIdPool()
     {
         b2IdPool pool = { 0 };
         pool.freeArray = b2IntArray_Create(32);
