@@ -118,20 +118,20 @@ public class base
 //! @cond
 
     /// Get the absolute number of system ticks. The value is platform specific.
-    B2_API uint64_t b2GetTicks( void  );
+    B2_API ulong b2GetTicks( void  );
 
     /// Get the milliseconds passed from an initial tick value.
-    B2_API float b2GetMilliseconds(uint64_t ticks);
+    B2_API float b2GetMilliseconds(ulong ticks);
 
     /// Get the milliseconds passed from an initial tick value.
-    B2_API float b2GetMillisecondsAndReset(uint64_t* ticks);
+    B2_API float b2GetMillisecondsAndReset(ulong* ticks);
 
     /// Yield to be used in a busy loop.
     B2_API void b2Yield(void);
 
     /// Simple djb2 hash function for determinism testing
 #define B2_HASH_INIT 5381
-    B2_API uint32_t b2Hash(uint32_t hash,  const uint8_t* data,  int count );
+    B2_API uint b2Hash(uint hash,  const byte* data,  int count );
 
 //! @endcond
 

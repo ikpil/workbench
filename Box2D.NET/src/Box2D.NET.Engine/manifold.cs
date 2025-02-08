@@ -13,7 +13,7 @@ public class manifold
 
 
 
-#define B2_MAKE_ID( A, B ) ( (uint8_t)( A ) << 8 | (uint8_t)( B ) )
+#define B2_MAKE_ID( A, B ) ( (byte)( A ) << 8 | (byte)( B ) )
 
 static b2Polygon b2MakeCapsule( b2Vec2 p1, b2Vec2 p2, float radius )
 {
@@ -1075,8 +1075,8 @@ b2Manifold b2CollideChainSegmentAndCapsule( const b2ChainSegment* segmentA, b2Tr
 	return b2CollideChainSegmentAndPolygon( segmentA, xfA, &polyB, xfB, cache );
 }
 
-static b2Manifold b2ClipSegments( b2Vec2 a1, b2Vec2 a2, b2Vec2 b1, b2Vec2 b2, b2Vec2 normal, float ra, float rb, uint16_t id1,
-								  uint16_t id2 )
+static b2Manifold b2ClipSegments( b2Vec2 a1, b2Vec2 a2, b2Vec2 b1, b2Vec2 b2, b2Vec2 normal, float ra, float rb, ushort id1,
+								  ushort id2 )
 {
 	b2Manifold manifold = { 0 };
 

@@ -15,7 +15,7 @@ typedef struct b2World b2World;
 typedef struct b2ShapeRef
 {
     int shapeId;
-    uint16_t generation;
+    ushort generation;
 } b2ShapeRef;
 
 typedef struct b2Sensor
@@ -159,7 +159,7 @@ static int b2CompareShapeRefs( const void* a, const void* b )
 	return 1;
 }
 
-static void b2SensorTask( int startIndex, int endIndex, uint32_t threadIndex, void* context )
+static void b2SensorTask( int startIndex, int endIndex, uint threadIndex, void* context )
 {
 	b2TracyCZoneNC( sensor_task, "Overlap", b2_colorBrown, true );
 
@@ -265,15 +265,15 @@ void b2OverlapSensors( b2World* world )
 
 	// Iterate sensors bits and publish events
 	// Process contact state changes. Iterate over set bits
-	uint64_t* bits = bitSet->bits;
-	uint32_t blockCount = bitSet->blockCount;
+	ulong* bits = bitSet->bits;
+	uint blockCount = bitSet->blockCount;
 
-	for ( uint32_t k = 0; k < blockCount; ++k )
+	for ( uint k = 0; k < blockCount; ++k )
 	{
-		uint64_t word = bits[k];
+		ulong word = bits[k];
 		while ( word != 0 )
 		{
-			uint32_t ctz = b2CTZ64( word );
+			uint ctz = b2CTZ64( word );
 			int sensorIndex = (int)( 64 * k + ctz );
 
 			b2Sensor* sensor = b2SensorArray_Get( &world->sensors, sensorIndex );

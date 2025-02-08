@@ -18,23 +18,23 @@ public class test_table
         int nextPowerOf2 = b2RoundUpPowerOf2(3008);
         ENSURE(nextPowerOf2 == (1 << power));
 
-        const int32_t N = SET_SPAN;
-        const uint32_t itemCount = ITEM_COUNT;
+        const int N = SET_SPAN;
+        const uint itemCount = ITEM_COUNT;
         bool removed[ITEM_COUNT] =  {
             0
         }
         ;
 
-        for (int32_t iter = 0; iter < 1; ++iter)
+        for (int iter = 0; iter < 1; ++iter)
         {
             b2HashSet set = b2CreateSet(16);
 
             // Fill set
-            for (int32_t i = 0; i < N; ++i)
+            for (int i = 0; i < N; ++i)
             {
-                for (int32_t j = i + 1; j < N; ++j)
+                for (int j = i + 1; j < N; ++j)
                 {
-                    uint64_t key = B2_SHAPE_PAIR_KEY(i, j);
+                    ulong key = B2_SHAPE_PAIR_KEY(i, j);
                     b2AddKey(&set, key);
                 }
             }
@@ -42,15 +42,15 @@ public class test_table
             ENSURE(set.count == itemCount);
 
             // Remove a portion of the set
-            int32_t k = 0;
-            uint32_t removeCount = 0;
-            for (int32_t i = 0; i < N; ++i)
+            int k = 0;
+            uint removeCount = 0;
+            for (int i = 0; i < N; ++i)
             {
-                for (int32_t j = i + 1; j < N; ++j)
+                for (int j = i + 1; j < N; ++j)
                 {
                     if (j == i + 1)
                     {
-                        uint64_t key = B2_SHAPE_PAIR_KEY(i, j);
+                        ulong key = B2_SHAPE_PAIR_KEY(i, j);
                         b2RemoveKey(&set, key);
                         removed[k++] = true;
                         removeCount += 1;
@@ -71,20 +71,20 @@ public class test_table
 
             // Test key search
             // ~5ns per search on an AMD 7950x
-            uint64_t ticks = b2GetTicks();
+            ulong ticks = b2GetTicks();
 
             k = 0;
-            for (int32_t i = 0; i < N; ++i)
+            for (int i = 0; i < N; ++i)
             {
-                for (int32_t j = i + 1; j < N; ++j)
+                for (int j = i + 1; j < N; ++j)
                 {
-                    uint64_t key = B2_SHAPE_PAIR_KEY(j, i);
+                    ulong key = B2_SHAPE_PAIR_KEY(j, i);
                     ENSURE(b2ContainsKey(&set, key) || removed[k]);
                     k += 1;
                 }
             }
 
-            // uint64_t ticks = b2GetTicks(&timer);
+            // ulong ticks = b2GetTicks(&timer);
             // printf("set ticks = %llu\n", ticks);
 
             float ms = b2GetMilliseconds(ticks);
@@ -97,11 +97,11 @@ public class test_table
 #endif
 
             // Remove all keys from set
-            for (int32_t i = 0; i < N; ++i)
+            for (int i = 0; i < N; ++i)
             {
-                for (int32_t j = i + 1; j < N; ++j)
+                for (int j = i + 1; j < N; ++j)
                 {
-                    uint64_t key = B2_SHAPE_PAIR_KEY(i, j);
+                    ulong key = B2_SHAPE_PAIR_KEY(i, j);
                     b2RemoveKey(&set, key);
                 }
             }

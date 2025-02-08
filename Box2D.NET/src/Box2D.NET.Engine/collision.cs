@@ -351,13 +351,13 @@ typedef struct b2ShapeProxy
 typedef struct b2SimplexCache
 {
 	/// The number of stored simplex points
-	uint16_t count;
+	ushort count;
 
 	/// The cached simplex indices on shape A
-	uint8_t indexA[3];
+	byte indexA[3];
 
 	/// The cached simplex indices on shape B
-	uint8_t indexB[3];
+	byte indexB[3];
 } b2SimplexCache;
 
 static const b2SimplexCache b2_emptySimplexCache = B2_ZERO_INIT;
@@ -527,7 +527,7 @@ typedef struct b2ManifoldPoint
 	float normalVelocity;
 
 	/// Uniquely identifies a contact point between two shapes
-	uint16_t id;
+	ushort id;
 
 	/// Did this contact point exist the previous step?
 	bool persisted;
@@ -671,7 +671,7 @@ B2_API b2DynamicTree b2DynamicTree_Create( void );
 B2_API void b2DynamicTree_Destroy( b2DynamicTree* tree );
 
 /// Create a proxy. Provide an AABB and a userData value.
-B2_API int b2DynamicTree_CreateProxy( b2DynamicTree* tree, b2AABB aabb, uint64_t categoryBits, int userData );
+B2_API int b2DynamicTree_CreateProxy( b2DynamicTree* tree, b2AABB aabb, ulong categoryBits, int userData );
 
 /// Destroy a proxy. This asserts if the id is invalid.
 B2_API void b2DynamicTree_DestroyProxy( b2DynamicTree* tree, int proxyId );
@@ -688,7 +688,7 @@ typedef bool b2TreeQueryCallbackFcn( int proxyId, int userData, void* context );
 
 /// Query an AABB for overlapping proxies. The callback class is called for each proxy that overlaps the supplied AABB.
 ///	@return performance data
-B2_API b2TreeStats b2DynamicTree_Query( const b2DynamicTree* tree, b2AABB aabb, uint64_t maskBits,
+B2_API b2TreeStats b2DynamicTree_Query( const b2DynamicTree* tree, b2AABB aabb, ulong maskBits,
 										b2TreeQueryCallbackFcn* callback, void* context );
 
 /// This function receives clipped ray cast input for a proxy. The function
@@ -711,7 +711,7 @@ typedef float b2TreeRayCastCallbackFcn( const b2RayCastInput* input, int proxyId
 /// @param callback a callback class that is called for each proxy that is hit by the ray
 /// @param context user context that is passed to the callback
 ///	@return performance data
-B2_API b2TreeStats b2DynamicTree_RayCast( const b2DynamicTree* tree, const b2RayCastInput* input, uint64_t maskBits,
+B2_API b2TreeStats b2DynamicTree_RayCast( const b2DynamicTree* tree, const b2RayCastInput* input, ulong maskBits,
 										  b2TreeRayCastCallbackFcn* callback, void* context );
 
 /// This function receives clipped ray cast input for a proxy. The function
@@ -732,7 +732,7 @@ typedef float b2TreeShapeCastCallbackFcn( const b2ShapeCastInput* input, int pro
 /// @param callback a callback class that is called for each proxy that is hit by the shape
 /// @param context user context that is passed to the callback
 ///	@return performance data
-B2_API b2TreeStats b2DynamicTree_ShapeCast( const b2DynamicTree* tree, const b2ShapeCastInput* input, uint64_t maskBits,
+B2_API b2TreeStats b2DynamicTree_ShapeCast( const b2DynamicTree* tree, const b2ShapeCastInput* input, ulong maskBits,
 											b2TreeShapeCastCallbackFcn* callback, void* context );
 
 /// Get the height of the binary tree.

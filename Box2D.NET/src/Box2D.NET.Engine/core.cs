@@ -145,7 +145,7 @@ public class core
 
     typedef struct b2AtomicU32
     {
-        uint32_t value;
+        uint value;
     }
 
     b2AtomicU32;
@@ -156,8 +156,8 @@ public class core
     int b2AtomicFetchAddInt(b2AtomicInt* a, int increment);
     bool b2AtomicCompareExchangeInt(b2AtomicInt* obj, int expected, int desired);
 
-    void b2AtomicStoreU32(b2AtomicU32* a, uint32_t value);
-    uint32_t b2AtomicLoadU32(b2AtomicU32* a);
+    void b2AtomicStoreU32(b2AtomicU32* a, uint value);
+    uint b2AtomicLoadU32(b2AtomicU32* a);
 #endif
 
 
@@ -282,7 +282,7 @@ public class core
 #endif
     }
 
-    void b2AtomicStoreU32(b2AtomicU32* a, uint32_t value)
+    void b2AtomicStoreU32(b2AtomicU32* a, uint value)
     {
 #if defined( _MSC_VER )
 	(void)_InterlockedExchange( (long*)&a->value, value );
@@ -293,10 +293,10 @@ public class core
 #endif
     }
 
-    uint32_t b2AtomicLoadU32(b2AtomicU32* a)
+    uint b2AtomicLoadU32(b2AtomicU32* a)
     {
 #if defined( _MSC_VER )
-	return (uint32_t)_InterlockedOr( (long*)&a->value, 0 );
+	return (uint)_InterlockedOr( (long*)&a->value, 0 );
 #elif defined( __GNUC__ ) || defined( __clang__ )
 	return __atomic_load_n( &a->value, __ATOMIC_SEQ_CST );
 #else

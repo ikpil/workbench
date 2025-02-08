@@ -110,7 +110,7 @@ typedef struct b2World
 	b2BitSet debugContactSet;
 
 	// Id that is incremented every time step
-	uint64_t stepIndex;
+	ulong stepIndex;
 
 	// Identify islands for splitting as follows:
 	// - I want to split islands so smaller islands can sleep
@@ -134,7 +134,7 @@ typedef struct b2World
 	b2FrictionCallback* frictionCallback;
 	b2RestitutionCallback* restitutionCallback;
 
-	uint16_t generation;
+	ushort generation;
 
 	b2Profile profile;
 
@@ -158,7 +158,7 @@ typedef struct b2World
 	int activeTaskCount;
 	int taskCount;
 
-	uint16_t worldId;
+	ushort worldId;
 
 	bool enableSleep;
 	bool locked;
@@ -304,11 +304,11 @@ b2WorldId b2CreateWorld( const b2WorldDef* def )
 	b2InitializeContactRegisters();
 
 	b2World* world = b2_worlds + worldId;
-	uint16_t generation = world->generation;
+	ushort generation = world->generation;
 
 	*world = ( b2World ){ 0 };
 
-	world->worldId = (uint16_t)worldId;
+	world->worldId = (ushort)worldId;
 	world->generation = generation;
 	world->inUse = true;
 
@@ -442,7 +442,7 @@ b2WorldId b2CreateWorld( const b2WorldDef* def )
 	world->debugContactSet = b2CreateBitSet( 256 );
 
 	// add one to worldId so that 0 represents a null b2WorldId
-	return ( b2WorldId ){ (uint16_t)( worldId + 1 ), world->generation };
+	return ( b2WorldId ){ (ushort)( worldId + 1 ), world->generation };
 }
 
 void b2DestroyWorld( b2WorldId worldId )
@@ -532,13 +532,13 @@ void b2DestroyWorld( b2WorldId worldId )
 	b2DestroyArenaAllocator( &world->stackAllocator );
 
 	// Wipe world but preserve generation
-	uint16_t generation = world->generation;
+	ushort generation = world->generation;
 	*world = ( b2World ){ 0 };
 	world->worldId = 0;
 	world->generation = generation + 1;
 }
 
-static void b2CollideTask( int startIndex, int endIndex, uint32_t threadIndex, void* context )
+static void b2CollideTask( int startIndex, int endIndex, uint threadIndex, void* context )
 {
 	b2TracyCZoneNC( collide_task, "Collide", b2_colorDodgerBlue, true );
 
@@ -615,7 +615,7 @@ static void b2CollideTask( int startIndex, int endIndex, uint32_t threadIndex, v
 	b2TracyCZoneEnd( collide_task );
 }
 
-static void b2UpdateTreesTask( int startIndex, int endIndex, uint32_t threadIndex, void* context )
+static void b2UpdateTreesTask( int startIndex, int endIndex, uint threadIndex, void* context )
 {
 	B2_UNUSED( startIndex );
 	B2_UNUSED( endIndex );
@@ -753,15 +753,15 @@ static void b2Collide( b2StepContext* context )
 	int endEventArrayIndex = world->endEventArrayIndex;
 
 	const b2Shape* shapes = world->shapes.data;
-	uint16_t worldId = world->worldId;
+	ushort worldId = world->worldId;
 
 	// Process contact state changes. Iterate over set bits
-	for ( uint32_t k = 0; k < bitSet->blockCount; ++k )
+	for ( uint k = 0; k < bitSet->blockCount; ++k )
 	{
-		uint64_t bits = bitSet->bits[k];
+		ulong bits = bitSet->bits[k];
 		while ( bits != 0 )
 		{
-			uint32_t ctz = b2CTZ64( bits );
+			uint ctz = b2CTZ64( bits );
 			int contactId = (int)( 64 * k + ctz );
 
 			b2Contact* contact = b2ContactArray_Get( &world->contacts, contactId );
@@ -787,8 +787,8 @@ static void b2Collide( b2StepContext* context )
 			const b2Shape* shapeB = shapes + contact->shapeIdB;
 			b2ShapeId shapeIdA = { shapeA->id + 1, worldId, shapeA->generation };
 			b2ShapeId shapeIdB = { shapeB->id + 1, worldId, shapeB->generation };
-			uint32_t flags = contact->flags;
-			uint32_t simFlags = contactSim->simFlags;
+			uint flags = contact->flags;
+			uint simFlags = contactSim->simFlags;
 
 			if ( simFlags & b2_simDisjoint )
 			{
@@ -901,11 +901,11 @@ void b2World_Step( b2WorldId worldId, float timeStep, int subStepCount )
 	world->activeTaskCount = 0;
 	world->taskCount = 0;
 
-	uint64_t stepTicks = b2GetTicks();
+	ulong stepTicks = b2GetTicks();
 
 	// Update collision pairs and create contacts
 	{
-		uint64_t pairTicks = b2GetTicks();
+		ulong pairTicks = b2GetTicks();
 		b2UpdateBroadPhasePairs( world );
 		world->profile.pairs = b2GetMilliseconds( pairTicks );
 	}
@@ -944,7 +944,7 @@ void b2World_Step( b2WorldId worldId, float timeStep, int subStepCount )
 
 	// Update contacts
 	{
-		uint64_t collideTicks = b2GetTicks();
+		ulong collideTicks = b2GetTicks();
 		b2Collide( &context );
 		world->profile.collide = b2GetMilliseconds( collideTicks );
 	}
@@ -952,14 +952,14 @@ void b2World_Step( b2WorldId worldId, float timeStep, int subStepCount )
 	// Integrate velocities, solve velocity constraints, and integrate positions.
 	if ( context.dt > 0.0f )
 	{
-		uint64_t solveTicks = b2GetTicks();
+		ulong solveTicks = b2GetTicks();
 		b2Solve( world, &context );
 		world->profile.solve = b2GetMilliseconds( solveTicks );
 	}
 
 	// Update sensors
 	{
-		uint64_t sensorTicks = b2GetTicks();
+		ulong sensorTicks = b2GetTicks();
 		b2OverlapSensors( world );
 		world->profile.sensors = b2GetMilliseconds( sensorTicks );
 	}
@@ -1162,15 +1162,15 @@ static void b2DrawWithBounds( b2World* world, b2DebugDraw* draw )
 							 &drawContext );
 	}
 
-	uint32_t wordCount = world->debugBodySet.blockCount;
-	uint64_t* bits = world->debugBodySet.bits;
-	for ( uint32_t k = 0; k < wordCount; ++k )
+	uint wordCount = world->debugBodySet.blockCount;
+	ulong* bits = world->debugBodySet.bits;
+	for ( uint k = 0; k < wordCount; ++k )
 	{
-		uint64_t word = bits[k];
+		ulong word = bits[k];
 		while ( word != 0 )
 		{
-			uint32_t ctz = b2CTZ64( word );
-			uint32_t bodyId = 64 * k + ctz;
+			uint ctz = b2CTZ64( word );
+			uint bodyId = 64 * k + ctz;
 
 			b2Body* body = b2BodyArray_Get( &world->bodies, bodyId );
 
@@ -2875,7 +2875,7 @@ static bool ExplosionCallback( int proxyId, int shapeId, void* context )
 
 void b2World_Explode( b2WorldId worldId, const b2ExplosionDef* explosionDef )
 {
-	uint64_t maskBits = explosionDef->maskBits;
+	ulong maskBits = explosionDef->maskBits;
 	b2Vec2 position = explosionDef->position;
 	float radius = explosionDef->radius;
 	float falloff = explosionDef->falloff;

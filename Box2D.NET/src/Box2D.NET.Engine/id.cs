@@ -38,8 +38,8 @@ public class id
     /// World id references a world instance. This should be treated as an opaque handle.
     typedef struct b2WorldId
     {
-        uint16_t index1;
-        uint16_t generation;
+        ushort index1;
+        ushort generation;
     }
 
     b2WorldId;
@@ -47,9 +47,9 @@ public class id
     /// Body id references a body instance. This should be treated as an opaque handle.
     typedef struct b2BodyId
     {
-        int32_t index1;
-        uint16_t world0;
-        uint16_t generation;
+        int index1;
+        ushort world0;
+        ushort generation;
     }
 
     b2BodyId;
@@ -57,9 +57,9 @@ public class id
     /// Shape id references a shape instance. This should be treated as an opaque handle.
     typedef struct b2ShapeId
     {
-        int32_t index1;
-        uint16_t world0;
-        uint16_t generation;
+        int index1;
+        ushort world0;
+        ushort generation;
     }
 
     b2ShapeId;
@@ -67,9 +67,9 @@ public class id
     /// Chain id references a chain instances. This should be treated as an opaque handle.
     typedef struct b2ChainId
     {
-        int32_t index1;
-        uint16_t world0;
-        uint16_t generation;
+        int index1;
+        ushort world0;
+        ushort generation;
     }
 
     b2ChainId;
@@ -77,9 +77,9 @@ public class id
     /// Joint id references a joint instance. This should be treated as an opaque handle.
     typedef struct b2JointId
     {
-        int32_t index1;
-        uint16_t world0;
-        uint16_t generation;
+        int index1;
+        ushort world0;
+        ushort generation;
     }
 
     b2JointId;
@@ -102,55 +102,55 @@ public class id
     /// Compare two ids for equality. Doesn't work for b2WorldId.
 #define B2_ID_EQUALS( id1, id2 ) ( id1.index1 == id2.index1 && id1.world0 == id2.world0 && id1.generation == id2.generation )
 
-    /// Store a body id into a uint64_t.
-    B2_INLINE uint64_t b2StoreBodyId(b2BodyId id)
+    /// Store a body id into a ulong.
+    B2_INLINE ulong b2StoreBodyId(b2BodyId id)
     {
-        return ((uint64_t)id.index1 << 32) | ((uint64_t)id.world0) << 16 | (uint64_t)id.generation;
+        return ((ulong)id.index1 << 32) | ((ulong)id.world0) << 16 | (ulong)id.generation;
     }
 
-    /// Load a uint64_t into a body id.
-    B2_INLINE b2BodyId b2LoadBodyId(uint64_t x)
+    /// Load a ulong into a body id.
+    B2_INLINE b2BodyId b2LoadBodyId(ulong x)
     {
-        b2BodyId id = { (int32_t)(x >> 32), (uint16_t)(x >> 16), (uint16_t)(x) };
+        b2BodyId id = { (int)(x >> 32), (ushort)(x >> 16), (ushort)(x) };
         return id;
     }
 
-    /// Store a shape id into a uint64_t.
-    B2_INLINE uint64_t b2StoreShapeId(b2ShapeId id)
+    /// Store a shape id into a ulong.
+    B2_INLINE ulong b2StoreShapeId(b2ShapeId id)
     {
-        return ((uint64_t)id.index1 << 32) | ((uint64_t)id.world0) << 16 | (uint64_t)id.generation;
+        return ((ulong)id.index1 << 32) | ((ulong)id.world0) << 16 | (ulong)id.generation;
     }
 
-    /// Load a uint64_t into a shape id.
-    B2_INLINE b2ShapeId b2LoadShapeId(uint64_t x)
+    /// Load a ulong into a shape id.
+    B2_INLINE b2ShapeId b2LoadShapeId(ulong x)
     {
-        b2ShapeId id = { (int32_t)(x >> 32), (uint16_t)(x >> 16), (uint16_t)(x) };
+        b2ShapeId id = { (int)(x >> 32), (ushort)(x >> 16), (ushort)(x) };
         return id;
     }
 
-    /// Store a chain id into a uint64_t.
-    B2_INLINE uint64_t b2StoreChainId(b2ChainId id)
+    /// Store a chain id into a ulong.
+    B2_INLINE ulong b2StoreChainId(b2ChainId id)
     {
-        return ((uint64_t)id.index1 << 32) | ((uint64_t)id.world0) << 16 | (uint64_t)id.generation;
+        return ((ulong)id.index1 << 32) | ((ulong)id.world0) << 16 | (ulong)id.generation;
     }
 
-    /// Load a uint64_t into a chain id.
-    B2_INLINE b2ChainId b2LoadChainId(uint64_t x)
+    /// Load a ulong into a chain id.
+    B2_INLINE b2ChainId b2LoadChainId(ulong x)
     {
-        b2ChainId id = { (int32_t)(x >> 32), (uint16_t)(x >> 16), (uint16_t)(x) };
+        b2ChainId id = { (int)(x >> 32), (ushort)(x >> 16), (ushort)(x) };
         return id;
     }
 
-    /// Store a joint id into a uint64_t.
-    B2_INLINE uint64_t b2StoreJointId(b2JointId id)
+    /// Store a joint id into a ulong.
+    B2_INLINE ulong b2StoreJointId(b2JointId id)
     {
-        return ((uint64_t)id.index1 << 32) | ((uint64_t)id.world0) << 16 | (uint64_t)id.generation;
+        return ((ulong)id.index1 << 32) | ((ulong)id.world0) << 16 | (ulong)id.generation;
     }
 
-    /// Load a uint64_t into a joint id.
-    B2_INLINE b2JointId b2LoadJointId(uint64_t x)
+    /// Load a ulong into a joint id.
+    B2_INLINE b2JointId b2LoadJointId(ulong x)
     {
-        b2JointId id = { (int32_t)(x >> 32), (uint16_t)(x >> 16), (uint16_t)(x) };
+        b2JointId id = { (int)(x >> 32), (ushort)(x >> 16), (ushort)(x) };
         return id;
     }
 

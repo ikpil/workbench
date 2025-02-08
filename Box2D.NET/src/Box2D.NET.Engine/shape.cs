@@ -35,7 +35,7 @@ typedef struct b2Shape
 
 	b2Filter filter;
 	void* userData;
-	uint32_t customColor;
+	uint customColor;
 
 	union
 	{
@@ -46,7 +46,7 @@ typedef struct b2Shape
 		b2ChainSegment chainSegment;
 	};
 
-	uint16_t generation;
+	ushort generation;
 	bool enableContactEvents;
 	bool enableHitEvents;
 	bool enablePreSolveEvents;
@@ -62,7 +62,7 @@ typedef struct b2ChainShape
 	int materialCount;
 	int* shapeIndices;
 	b2SurfaceMaterial* materials;
-	uint16_t generation;
+	ushort generation;
 } b2ChainShape;
 
 typedef struct b2ShapeExtent

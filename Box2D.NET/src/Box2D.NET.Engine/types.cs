@@ -25,7 +25,7 @@ public class types
 /// }
 /// @endcode
 /// @ingroup world
-typedef void b2TaskCallback( int startIndex, int endIndex, uint32_t workerIndex, void* taskContext );
+typedef void b2TaskCallback( int startIndex, int endIndex, uint workerIndex, void* taskContext );
 
 /// These functions can be provided to Box2D to invoke a task system. These are designed to work well with enkiTS.
 /// Returns a pointer to the user's task object. May be nullptr. A nullptr indicates to Box2D that the work was executed
@@ -258,7 +258,7 @@ typedef struct b2Filter
 	///    // etc
 	/// };
 	/// @endcode
-	uint64_t categoryBits;
+	ulong categoryBits;
 
 	/// The collision mask bits. This states the categories that this
 	/// shape would accept for collision.
@@ -267,7 +267,7 @@ typedef struct b2Filter
 	/// @code{.c}
 	/// maskBits = Static | Player;
 	/// @endcode
-	uint64_t maskBits;
+	ulong maskBits;
 
 	/// Collision groups allow a certain group of objects to never collide (negative)
 	/// or always collide (positive). A group index of zero has no effect. Non-zero group filtering
@@ -289,11 +289,11 @@ B2_API b2Filter b2DefaultFilter( void );
 typedef struct b2QueryFilter
 {
 	/// The collision category bits of this query. Normally you would just set one bit.
-	uint64_t categoryBits;
+	ulong categoryBits;
 
 	/// The collision mask bits. This states the shape categories that this
 	/// query would accept for collision.
-	uint64_t maskBits;
+	ulong maskBits;
 } b2QueryFilter;
 
 /// Use this to initialize your query filter
@@ -357,7 +357,7 @@ typedef struct b2ShapeDef
 	b2Filter filter;
 
 	/// Custom debug draw color.
-	uint32_t customColor;
+	uint customColor;
 
 	/// A sensor shape generates overlap events but never generates a collision response.
 	/// Sensors do not collide with other sensors and do not have continuous collision.
@@ -413,7 +413,7 @@ typedef struct b2SurfaceMaterial
 	int material;
 
 	/// Custom debug draw color.
-	uint32_t customColor;
+	uint customColor;
 } b2SurfaceMaterial;
 
 /// Use this to initialize your surface material
@@ -959,7 +959,7 @@ B2_API b2WheelJointDef b2DefaultWheelJointDef( void );
 typedef struct b2ExplosionDef
 {
 	/// Mask bits to filter shapes
-	uint64_t maskBits;
+	ulong maskBits;
 
 	/// The center of the explosion in world space
 	b2Vec2 position;

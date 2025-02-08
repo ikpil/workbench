@@ -8,12 +8,12 @@ public class table
 
 
 
-#define B2_SHAPE_PAIR_KEY( K1, K2 ) K1 < K2 ? (uint64_t)K1 << 32 | (uint64_t)K2 : (uint64_t)K2 << 32 | (uint64_t)K1
+#define B2_SHAPE_PAIR_KEY( K1, K2 ) K1 < K2 ? (ulong)K1 << 32 | (ulong)K2 : (ulong)K2 << 32 | (ulong)K1
 
     typedef struct b2SetItem
     {
-        uint64_t key;
-        uint32_t hash;
+        ulong key;
+        uint hash;
     }
 
     b2SetItem;
@@ -21,8 +21,8 @@ public class table
     typedef struct b2HashSet
     {
         b2SetItem* items;
-        uint32_t capacity;
-        uint32_t count;
+        uint capacity;
+        uint count;
     }
 
     b2HashSet;
@@ -33,12 +33,12 @@ public class table
     void b2ClearSet(b2HashSet* set);
 
 // Returns true if key was already in set
-    bool b2AddKey(b2HashSet* set, uint64_t key);
+    bool b2AddKey(b2HashSet* set, ulong key);
 
 // Returns true if the key was found
-    bool b2RemoveKey(b2HashSet* set, uint64_t key);
+    bool b2RemoveKey(b2HashSet* set, ulong key);
 
-    bool b2ContainsKey( const b2HashSet* set, uint64_t key );
+    bool b2ContainsKey( const b2HashSet* set, ulong key );
 
     int b2GetHashSetBytes(b2HashSet* set);
 
@@ -98,28 +98,28 @@ b2AtomicInt b2_probeCount;
 // https://preshing.com/20130107/this-hash-set-is-faster-than-a-judy-array/
 // todo try: https://www.jandrewrogers.com/2019/02/12/fast-perfect-hashing/
 // todo try: https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/
-    static uint32_t b2KeyHash(uint64_t key)
+    static uint b2KeyHash(ulong key)
     {
-        uint64_t h = key;
+        ulong h = key;
         h ^= h >> 33;
         h *= 0xff51afd7ed558ccdL;
         h ^= h >> 33;
         h *= 0xc4ceb9fe1a85ec53L;
         h ^= h >> 33;
 
-        return (uint32_t)h;
+        return (uint)h;
 
         // todo_erin 
         // return 11400714819323198485ull * key;
     }
 
-    static int b2FindSlot( const b2HashSet* set, uint64_t key, uint32_t hash )
+    static int b2FindSlot( const b2HashSet* set, ulong key, uint hash )
     {
 #if B2_SNOOP_TABLE_COUNTERS
 		b2AtomicFetchAddInt( &b2_findCount, 1 );
 #endif
 
-        uint32_t capacity = set->capacity;
+        uint capacity = set->capacity;
         int index = hash & (capacity - 1);
         const b2SetItem* items = set->items;
         while (items[index].hash != 0 && items[index].key != key)
@@ -133,7 +133,7 @@ b2AtomicInt b2_probeCount;
         return index;
     }
 
-    static void b2AddKeyHaveCapacity(b2HashSet* set, uint64_t key, uint32_t hash)
+    static void b2AddKeyHaveCapacity(b2HashSet* set, ulong key, uint hash)
     {
         int index = b2FindSlot(set, key, hash);
         b2SetItem* items = set->items;
@@ -146,10 +146,10 @@ b2AtomicInt b2_probeCount;
 
     static void b2GrowTable(b2HashSet* set)
     {
-        uint32_t oldCount = set->count;
+        uint oldCount = set->count;
         B2_UNUSED(oldCount);
 
-        uint32_t oldCapacity = set->capacity;
+        uint oldCapacity = set->capacity;
         b2SetItem* oldItems = set->items;
 
         set->count = 0;
@@ -159,7 +159,7 @@ b2AtomicInt b2_probeCount;
         memset(set->items, 0, set->capacity * sizeof(b2SetItem));
 
         // Transfer items into new array
-        for (uint32_t i = 0; i < oldCapacity; ++i)
+        for (uint i = 0; i < oldCapacity; ++i)
         {
             b2SetItem* item = oldItems + i;
             if (item->hash == 0)
@@ -176,11 +176,11 @@ b2AtomicInt b2_probeCount;
         b2Free(oldItems, oldCapacity * sizeof(b2SetItem));
     }
 
-    bool b2ContainsKey( const b2HashSet* set, uint64_t key )
+    bool b2ContainsKey( const b2HashSet* set, ulong key )
     {
         // key of zero is a sentinel
         B2_ASSERT(key != 0);
-        uint32_t hash = b2KeyHash(key);
+        uint hash = b2KeyHash(key);
         int index = b2FindSlot(set, key, hash);
         return set->items[index].key == key;
     }
@@ -190,12 +190,12 @@ b2AtomicInt b2_probeCount;
         return set->capacity * (int)sizeof(b2SetItem);
     }
 
-    bool b2AddKey(b2HashSet* set, uint64_t key)
+    bool b2AddKey(b2HashSet* set, ulong key)
     {
         // key of zero is a sentinel
         B2_ASSERT(key != 0);
 
-        uint32_t hash = b2KeyHash(key);
+        uint hash = b2KeyHash(key);
         B2_ASSERT(hash != 0);
 
         int index = b2FindSlot(set, key, hash);
@@ -216,9 +216,9 @@ b2AtomicInt b2_probeCount;
     }
 
 // See https://en.wikipedia.org/wiki/Open_addressing
-    bool b2RemoveKey(b2HashSet* set, uint64_t key)
+    bool b2RemoveKey(b2HashSet* set, ulong key)
     {
-        uint32_t hash = b2KeyHash(key);
+        uint hash = b2KeyHash(key);
         int i = b2FindSlot(set, key, hash);
         b2SetItem* items = set->items;
         if (items[i].hash == 0)
@@ -236,7 +236,7 @@ b2AtomicInt b2_probeCount;
 
         // Attempt to fill item i
         int j = i;
-        uint32_t capacity = set->capacity;
+        uint capacity = set->capacity;
         for (;;)
         {
             j = (j + 1) & (capacity - 1);

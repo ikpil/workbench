@@ -69,7 +69,7 @@ typedef struct b2Contact
 	int contactId;
 
 	// b2ContactFlags
-	uint32_t flags;
+	uint flags;
 
 	bool isMarked;
 } b2Contact;
@@ -129,7 +129,7 @@ typedef struct b2ContactSim
 	float tangentSpeed;
 
 	// b2ContactSimFlags
-	uint32_t simFlags;
+	uint simFlags;
 
 	b2SimplexCache cache;
 } b2ContactSim;
@@ -437,7 +437,7 @@ void b2CreateContact( b2World* world, b2Shape* shapeA, b2Shape* shapeB )
 	}
 
 	// Add to pair set for fast lookup
-	uint64_t pairKey = B2_SHAPE_PAIR_KEY( shapeIdA, shapeIdB );
+	ulong pairKey = B2_SHAPE_PAIR_KEY( shapeIdA, shapeIdB );
 	b2AddKey( &world->broadPhase.pairSet, pairKey );
 
 	// Contacts are created as non-touching. Later if they are found to be touching
@@ -485,7 +485,7 @@ void b2CreateContact( b2World* world, b2Shape* shapeA, b2Shape* shapeB )
 void b2DestroyContact( b2World* world, b2Contact* contact, bool wakeBodies )
 {
 	// Remove pair from set
-	uint64_t pairKey = B2_SHAPE_PAIR_KEY( contact->shapeIdA, contact->shapeIdB );
+	ulong pairKey = B2_SHAPE_PAIR_KEY( contact->shapeIdA, contact->shapeIdB );
 	b2RemoveKey( &world->broadPhase.pairSet, pairKey );
 
 	b2ContactEdge* edgeA = contact->edges + 0;
@@ -496,12 +496,12 @@ void b2DestroyContact( b2World* world, b2Contact* contact, bool wakeBodies )
 	b2Body* bodyA = b2BodyArray_Get( &world->bodies, bodyIdA );
 	b2Body* bodyB = b2BodyArray_Get( &world->bodies, bodyIdB );
 
-	uint32_t flags = contact->flags;
+	uint flags = contact->flags;
 
 	// End touch event
 	if ( ( flags & b2_contactTouchingFlag ) != 0 && ( flags & b2_contactEnableContactEvents ) != 0 )
 	{
-		uint16_t worldId = world->worldId;
+		ushort worldId = world->worldId;
 		const b2Shape* shapeA = b2ShapeArray_Get( &world->shapes, contact->shapeIdA );
 		const b2Shape* shapeB = b2ShapeArray_Get( &world->shapes, contact->shapeIdB );
 		b2ShapeId shapeIdA = { shapeA->id + 1, worldId, shapeA->generation };
@@ -720,7 +720,7 @@ bool b2UpdateContact( b2World* world, b2ContactSim* contactSim, b2Shape* shapeA,
 		mp2->normalVelocity = 0.0f;
 		mp2->persisted = false;
 
-		uint16_t id2 = mp2->id;
+		ushort id2 = mp2->id;
 
 		for ( int j = 0; j < oldManifold.pointCount; ++j )
 		{

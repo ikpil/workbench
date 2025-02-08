@@ -23,31 +23,31 @@ typedef struct b2TreeNode
 	b2AABB aabb; // 16
 
 	/// Category bits for collision filtering
-	uint64_t categoryBits; // 8
+	ulong categoryBits; // 8
 
 	union
 	{
 		/// The node parent index (allocated node)
-		int32_t parent;
+		int parent;
 
 		/// The node freelist next index (free node)
-		int32_t next;
+		int next;
 	}; // 4
 
 	/// Child 1 index (internal node)
-	int32_t child1; // 4
+	int child1; // 4
 
 	union
 	{
 		/// Child 2 index (internal node)
-		int32_t child2;
+		int child2;
 
 		/// User data (leaf node)
-		int32_t userData;
+		int userData;
 	}; // 4
 
-	uint16_t height; // 2
-	uint16_t flags;	 // 2
+	ushort height; // 2
+	ushort flags;	 // 2
 } b2TreeNode;
 
 static b2TreeNode b2_defaultTreeNode = {
@@ -70,7 +70,7 @@ static bool b2IsAllocated( const b2TreeNode* node )
 	return node->flags & b2_allocatedNode;
 }
 
-static uint16_t b2MaxUInt16( uint16_t a, uint16_t b )
+static ushort b2MaxUInt16( ushort a, ushort b )
 {
 	return a > b ? a : b;
 }
@@ -108,10 +108,10 @@ b2DynamicTree b2DynamicTree_Create( void )
 void b2DynamicTree_Destroy( b2DynamicTree* tree )
 {
 	b2Free( tree->nodes, tree->nodeCapacity * sizeof( b2TreeNode ) );
-	b2Free( tree->leafIndices, tree->rebuildCapacity * sizeof( int32_t ) );
+	b2Free( tree->leafIndices, tree->rebuildCapacity * sizeof( int ) );
 	b2Free( tree->leafBoxes, tree->rebuildCapacity * sizeof( b2AABB ) );
 	b2Free( tree->leafCenters, tree->rebuildCapacity * sizeof( b2Vec2 ) );
-	b2Free( tree->binIndices, tree->rebuildCapacity * sizeof( int32_t ) );
+	b2Free( tree->binIndices, tree->rebuildCapacity * sizeof( int ) );
 
 	memset( tree, 0, sizeof( b2DynamicTree ) );
 }
@@ -768,7 +768,7 @@ static void b2RemoveLeaf( b2DynamicTree* tree, int leaf )
 
 // Create a proxy in the tree as a leaf node. We return the index of the node instead of a pointer so that we can grow
 // the node pool.
-int b2DynamicTree_CreateProxy( b2DynamicTree* tree, b2AABB aabb, uint64_t categoryBits, int userData )
+int b2DynamicTree_CreateProxy( b2DynamicTree* tree, b2AABB aabb, ulong categoryBits, int userData )
 {
 	B2_ASSERT( -B2_HUGE < aabb.lowerBound.x && aabb.lowerBound.x < B2_HUGE );
 	B2_ASSERT( -B2_HUGE < aabb.lowerBound.y && aabb.lowerBound.y < B2_HUGE );
@@ -994,7 +994,7 @@ static void b2ValidateMetrics( const b2DynamicTree* tree, int index )
 	// B2_ASSERT(aabb.upperBound.x == node->aabb.upperBound.x);
 	// B2_ASSERT(aabb.upperBound.y == node->aabb.upperBound.y);
 
-	uint64_t categoryBits = tree->nodes[child1].categoryBits | tree->nodes[child2].categoryBits;
+	ulong categoryBits = tree->nodes[child1].categoryBits | tree->nodes[child2].categoryBits;
 	B2_ASSERT( node->categoryBits == categoryBits );
 
 	b2ValidateMetrics( tree, child1 );
@@ -1068,7 +1068,7 @@ b2AABB b2DynamicTree_GetAABB( const b2DynamicTree* tree, int proxyId )
 	return tree->nodes[proxyId].aabb;
 }
 
-b2TreeStats b2DynamicTree_Query( const b2DynamicTree* tree, b2AABB aabb, uint64_t maskBits, b2TreeQueryCallbackFcn* callback,
+b2TreeStats b2DynamicTree_Query( const b2DynamicTree* tree, b2AABB aabb, ulong maskBits, b2TreeQueryCallbackFcn* callback,
 								 void* context )
 {
 	b2TreeStats result = { 0 };
@@ -1126,7 +1126,7 @@ b2TreeStats b2DynamicTree_Query( const b2DynamicTree* tree, b2AABB aabb, uint64_
 	return result;
 }
 
-b2TreeStats b2DynamicTree_RayCast( const b2DynamicTree* tree, const b2RayCastInput* input, uint64_t maskBits,
+b2TreeStats b2DynamicTree_RayCast( const b2DynamicTree* tree, const b2RayCastInput* input, ulong maskBits,
 								   b2TreeRayCastCallbackFcn* callback, void* context )
 {
 	b2TreeStats result = { 0 };
@@ -1246,7 +1246,7 @@ b2TreeStats b2DynamicTree_RayCast( const b2DynamicTree* tree, const b2RayCastInp
 	return result;
 }
 
-b2TreeStats b2DynamicTree_ShapeCast( const b2DynamicTree* tree, const b2ShapeCastInput* input, uint64_t maskBits,
+b2TreeStats b2DynamicTree_ShapeCast( const b2DynamicTree* tree, const b2ShapeCastInput* input, ulong maskBits,
 									 b2TreeShapeCastCallbackFcn* callback, void* context )
 {
 	b2TreeStats stats = { 0 };

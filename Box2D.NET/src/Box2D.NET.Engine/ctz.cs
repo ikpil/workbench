@@ -14,7 +14,7 @@ public class ctz
 
 // https://en.wikipedia.org/wiki/Find_first_set
 
-static inline uint32_t b2CTZ32( uint32_t block )
+static inline uint b2CTZ32( uint block )
 {
 	unsigned long index;
 	_BitScanForward( &index, block );
@@ -22,7 +22,7 @@ static inline uint32_t b2CTZ32( uint32_t block )
 }
 
 // This function doesn't need to be fast, so using the Ivy Bridge fallback.
-static inline uint32_t b2CLZ32( uint32_t value )
+static inline uint b2CLZ32( uint value )
 {
 	#if 1
 
@@ -48,7 +48,7 @@ static inline uint32_t b2CLZ32( uint32_t value )
 	#endif
 }
 
-static inline uint32_t b2CTZ64( uint64_t block )
+static inline uint b2CTZ64( ulong block )
 {
 	unsigned long index;
 
@@ -56,13 +56,13 @@ static inline uint32_t b2CTZ64( uint64_t block )
 	_BitScanForward64( &index, block );
 	#else
 	// 32-bit fall back
-	if ( (uint32_t)block != 0 )
+	if ( (uint)block != 0 )
 	{
-		_BitScanForward( &index, (uint32_t)block );
+		_BitScanForward( &index, (uint)block );
 	}
 	else
 	{
-		_BitScanForward( &index, (uint32_t)( block >> 32 ) );
+		_BitScanForward( &index, (uint)( block >> 32 ) );
 		index += 32;
 	}
 	#endif
@@ -72,17 +72,17 @@ static inline uint32_t b2CTZ64( uint64_t block )
 
 #else
 
-static inline uint32_t b2CTZ32( uint32_t block )
+static inline uint b2CTZ32( uint block )
 {
 	return __builtin_ctz( block );
 }
 
-static inline uint32_t b2CLZ32( uint32_t value )
+static inline uint b2CLZ32( uint value )
 {
 	return __builtin_clz( value );
 }
 
-static inline uint32_t b2CTZ64( uint64_t block )
+static inline uint b2CTZ64( ulong block )
 {
 	return __builtin_ctzll( block );
 }
@@ -101,7 +101,7 @@ static inline int b2BoundingPowerOf2( int x )
 		return 1;
 	}
 
-	return 32 - (int)b2CLZ32( (uint32_t)x - 1 );
+	return 32 - (int)b2CLZ32( (uint)x - 1 );
 }
 
 static inline int b2RoundUpPowerOf2( int x )
@@ -111,7 +111,7 @@ static inline int b2RoundUpPowerOf2( int x )
 		return 1;
 	}
 
-	return 1 << ( 32 - (int)b2CLZ32( (uint32_t)x - 1 ) );
+	return 1 << ( 32 - (int)b2CLZ32( (uint)x - 1 ) );
 }
 
 }

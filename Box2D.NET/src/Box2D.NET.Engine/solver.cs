@@ -657,7 +657,7 @@ static void b2SolveContinuous( b2World* world, int bodySimIndex )
 	b2TracyCZoneEnd( ccd );
 }
 
-static void b2FinalizeBodiesTask( int startIndex, int endIndex, uint32_t threadIndex, void* context )
+static void b2FinalizeBodiesTask( int startIndex, int endIndex, uint threadIndex, void* context )
 {
 	b2TracyCZoneNC( finalize_transfprms, "Transforms", b2_colorMediumSeaGreen, true );
 
@@ -670,7 +670,7 @@ static void b2FinalizeBodiesTask( int startIndex, int endIndex, uint32_t threadI
 	float timeStep = stepContext->dt;
 	float invTimeStep = stepContext->inv_dt;
 
-	uint16_t worldId = world->worldId;
+	ushort worldId = world->worldId;
 
 	// The body move event array has should already have the correct size
 	B2_ASSERT( endIndex <= world->bodyMoveEvents.count );
@@ -1013,7 +1013,7 @@ static void b2ExecuteStage( b2SolverStage* stage, b2StepContext* context, int pr
 	(void)b2AtomicFetchAddInt( &stage->completionCount, completedCount );
 }
 
-static void b2ExecuteMainStage( b2SolverStage* stage, b2StepContext* context, uint32_t syncBits )
+static void b2ExecuteMainStage( b2SolverStage* stage, b2StepContext* context, uint syncBits )
 {
 	int blockCount = stage->blockCount;
 	if ( blockCount == 0 )
@@ -1046,7 +1046,7 @@ static void b2ExecuteMainStage( b2SolverStage* stage, b2StepContext* context, ui
 }
 
 // This should not use the thread index because thread 0 can be called twice by enkiTS.
-static void b2SolverTask( int startIndex, int endIndex, uint32_t threadIndexIgnore, void* taskContext )
+static void b2SolverTask( int startIndex, int endIndex, uint threadIndexIgnore, void* taskContext )
 {
 	B2_UNUSED( startIndex, endIndex, threadIndexIgnore );
 
@@ -1079,21 +1079,21 @@ static void b2SolverTask( int startIndex, int endIndex, uint32_t threadIndexIgno
 		b2_stageStoreImpulses
 		*/
 
-		uint64_t ticks = b2GetTicks();
+		ulong ticks = b2GetTicks();
 
 		int bodySyncIndex = 1;
 		int stageIndex = 0;
 
 		// This stage loops over all awake joints
-		uint32_t jointSyncIndex = 1;
-		uint32_t syncBits = ( jointSyncIndex << 16 ) | stageIndex;
+		uint jointSyncIndex = 1;
+		uint syncBits = ( jointSyncIndex << 16 ) | stageIndex;
 		B2_ASSERT( stages[stageIndex].type == b2_stagePrepareJoints );
 		b2ExecuteMainStage( stages + stageIndex, context, syncBits );
 		stageIndex += 1;
 		jointSyncIndex += 1;
 
 		// This stage loops over all contact constraints
-		uint32_t contactSyncIndex = 1;
+		uint contactSyncIndex = 1;
 		syncBits = ( contactSyncIndex << 16 ) | stageIndex;
 		B2_ASSERT( stages[stageIndex].type == b2_stagePrepareContacts );
 		b2ExecuteMainStage( stages + stageIndex, context, syncBits );
@@ -1219,13 +1219,13 @@ static void b2SolverTask( int startIndex, int endIndex, uint32_t threadIndexIgno
 	}
 
 	// Worker spins and waits for work
-	uint32_t lastSyncBits = 0;
-	// uint64_t maxSpinTime = 10;
+	uint lastSyncBits = 0;
+	// ulong maxSpinTime = 10;
 	while ( true )
 	{
 		// Spin until main thread bumps changes the sync bits. This can waste significant time overall, but it is necessary for
 		// parallel simulation with graph coloring.
-		uint32_t syncBits;
+		uint syncBits;
 		int spinCount = 0;
 		while ( ( syncBits = b2AtomicLoadU32( &context->atomicSyncBits ) ) == lastSyncBits )
 		{
@@ -1238,7 +1238,7 @@ static void b2SolverTask( int startIndex, int endIndex, uint32_t threadIndexIgno
 			{
 				// Using the cycle counter helps to account for variation in mm_pause timing across different
 				// CPUs. However, this is X64 only.
-				// uint64_t prev = __rdtsc();
+				// ulong prev = __rdtsc();
 				// do
 				//{
 				//	b2Pause();
@@ -1272,7 +1272,7 @@ static void b2SolverTask( int startIndex, int endIndex, uint32_t threadIndexIgno
 	}
 }
 
-static void b2BulletBodyTask( int startIndex, int endIndex, uint32_t threadIndex, void* taskContext )
+static void b2BulletBodyTask( int startIndex, int endIndex, uint threadIndex, void* taskContext )
 {
 	B2_UNUSED( threadIndex );
 
@@ -1307,7 +1307,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 	// Merge islands
 	{
 		b2TracyCZoneNC( merge, "Merge", b2_colorLightGoldenRodYellow, true );
-		uint64_t mergeTicks = b2GetTicks();
+		ulong mergeTicks = b2GetTicks();
 
 		b2MergeAwakeIslands( world );
 
@@ -1339,7 +1339,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 		stepContext->bulletBodies = b2AllocateArenaItem( &world->stackAllocator, awakeBodyCount * sizeof( int ), "bullet bodies" );
 
 		b2TracyCZoneNC( prepare_stages, "Prepare Stages", b2_colorDarkOrange, true );
-		uint64_t prepareTicks = b2GetTicks();
+		ulong prepareTicks = b2GetTicks();
 
 		b2ConstraintGraph* graph = &world->constraintGraph;
 		b2GraphColor* colors = graph->colors;
@@ -1503,7 +1503,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 				else
 				{
 					color->simdConstraints =
-						(b2ContactConstraintSIMD*)( (uint8_t*)simdContactConstraints + contactBase * simdConstraintSize );
+						(b2ContactConstraintSIMD*)( (byte*)simdContactConstraints + contactBase * simdConstraintSize );
 
 					for ( int k = 0; k < colorContactCount; ++k )
 					{
@@ -1792,7 +1792,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 		b2TracyCZoneEnd( prepare_stages );
 
 		b2TracyCZoneNC( solve_constraints, "Solve Constraints", b2_colorIndigo, true );
-		uint64_t constraintTicks = b2GetTicks();
+		ulong constraintTicks = b2GetTicks();
 
 		// Must use worker index because thread 0 can be assigned multiple tasks by enkiTS
 		for ( int i = 0; i < workerCount; ++i )
@@ -1826,7 +1826,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 		b2TracyCZoneEnd( solve_constraints );
 
 		b2TracyCZoneNC( update_transforms, "Update Transforms", b2_colorMediumSeaGreen, true );
-		uint64_t transformTicks = b2GetTicks();
+		ulong transformTicks = b2GetTicks();
 
 		// Prepare contact, enlarged body, and island bit sets used in body finalization.
 		int awakeIslandCount = awakeSet->islandSims.count;
@@ -1867,7 +1867,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 	// todo_erin perhaps do this in parallel with other work below
 	{
 		b2TracyCZoneNC( hit_events, "Hit Events", b2_colorRosyBrown, true );
-		uint64_t hitTicks = b2GetTicks();
+		ulong hitTicks = b2GetTicks();
 
 		B2_ASSERT( world->contactHitEvents.count == 0 );
 
@@ -1926,7 +1926,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 
 	{
 		b2TracyCZoneNC( refit_bvh, "Refit BVH", b2_colorFireBrick, true );
-		uint64_t refitTicks = b2GetTicks();
+		ulong refitTicks = b2GetTicks();
 
 		// Finish the user tree task that was queued earlier in the time step. This must be complete before touching the
 		// broad-phase.
@@ -1952,21 +1952,21 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 		// This has to happen before bullets are processed.
 		{
 			b2BroadPhase* broadPhase = &world->broadPhase;
-			uint32_t wordCount = enlargedBodyBitSet->blockCount;
-			uint64_t* bits = enlargedBodyBitSet->bits;
+			uint wordCount = enlargedBodyBitSet->blockCount;
+			ulong* bits = enlargedBodyBitSet->bits;
 
 			// Fast array access is important here
 			b2Body* bodyArray = world->bodies.data;
 			b2BodySim* bodySimArray = awakeSet->bodySims.data;
 			b2Shape* shapeArray = world->shapes.data;
 
-			for ( uint32_t k = 0; k < wordCount; ++k )
+			for ( uint k = 0; k < wordCount; ++k )
 			{
-				uint64_t word = bits[k];
+				ulong word = bits[k];
 				while ( word != 0 )
 				{
-					uint32_t ctz = b2CTZ64( word );
-					uint32_t bodySimIndex = 64 * k + ctz;
+					uint ctz = b2CTZ64( word );
+					uint bodySimIndex = 64 * k + ctz;
 
 					b2BodySim* bodySim = bodySimArray + bodySimIndex;
 
@@ -2023,7 +2023,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 	if ( bulletBodyCount > 0 )
 	{
 		b2TracyCZoneNC( bullets, "Bullets", b2_colorLightYellow, true );
-		uint64_t bulletTicks = b2GetTicks();
+		ulong bulletTicks = b2GetTicks();
 
 		// Fast bullet bodies
 		// Note: a bullet body may be moving slow
@@ -2105,7 +2105,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 	if ( world->enableSleep == true )
 	{
 		b2TracyCZoneNC( sleep_islands, "Island Sleep", b2_colorLightSlateGray, true );
-		uint64_t sleepTicks = b2GetTicks();
+		ulong sleepTicks = b2GetTicks();
 
 		// Collect split island candidate for the next time step. No need to split if sleeping is disabled.
 		B2_ASSERT( world->splitIslandId == B2_NULL_INDEX );

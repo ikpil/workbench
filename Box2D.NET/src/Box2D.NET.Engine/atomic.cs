@@ -58,7 +58,7 @@ public class atomic
 #endif
     }
 
-    static inline void b2AtomicStoreU32(b2AtomicU32* a, uint32_t value)
+    static inline void b2AtomicStoreU32(b2AtomicU32* a, uint value)
     {
 #if defined( _MSC_VER )
 	(void)_InterlockedExchange( (long*)&a->value, value );
@@ -69,10 +69,10 @@ public class atomic
 #endif
     }
 
-    static inline uint32_t b2AtomicLoadU32(b2AtomicU32* a)
+    static inline uint b2AtomicLoadU32(b2AtomicU32* a)
     {
 #if defined( _MSC_VER )
-	return (uint32_t)_InterlockedOr( (long*)&a->value, 0 );
+	return (uint)_InterlockedOr( (long*)&a->value, 0 );
 #elif defined( __GNUC__ ) || defined( __clang__ )
 	return __atomic_load_n( &a->value, __ATOMIC_SEQ_CST );
 #else

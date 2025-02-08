@@ -195,12 +195,12 @@ static b2Simplex b2MakeSimplexFromCache( const b2SimplexCache* cache, const b2Sh
 
 static void b2MakeSimplexCache( b2SimplexCache* cache, const b2Simplex* simplex )
 {
-	cache->count = (uint16_t)simplex->count;
+	cache->count = (ushort)simplex->count;
 	const b2SimplexVertex* vertices[] = { &simplex->v1, &simplex->v2, &simplex->v3 };
 	for ( int i = 0; i < simplex->count; ++i )
 	{
-		cache->indexA[i] = (uint8_t)vertices[i]->indexA;
-		cache->indexB[i] = (uint8_t)vertices[i]->indexB;
+		cache->indexA[i] = (byte)vertices[i]->indexA;
+		cache->indexB[i] = (byte)vertices[i]->indexB;
 	}
 }
 
@@ -1005,7 +1005,7 @@ static float b2EvaluateSeparation( const b2SeparationFunction* f, int indexA, in
 b2TOIOutput b2TimeOfImpact( const b2TOIInput* input )
 {
 #if B2_SNOOP_TOI_COUNTERS
-	uint64_t ticks = b2GetTicks();
+	ulong ticks = b2GetTicks();
 	++b2_toiCalls;
 #endif
 

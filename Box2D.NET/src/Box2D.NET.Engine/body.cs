@@ -67,7 +67,7 @@ typedef struct b2Body
 
 	// This is monotonically advanced when a body is allocated in this slot
 	// Used to check for invalid b2BodyId
-	uint16_t generation;
+	ushort generation;
 
 	bool enableSleep;
 	bool fixedRotation;

@@ -101,9 +101,9 @@ int EmptyWorld( void )
 	ENSURE( b2World_IsValid( worldId ) == true );
 
 	float timeStep = 1.0f / 60.0f;
-	int32_t subStepCount = 1;
+	int subStepCount = 1;
 
-	for ( int32_t i = 0; i < 60; ++i )
+	for ( int i = 0; i < 60; ++i )
 	{
 		b2World_Step( worldId, timeStep, subStepCount );
 	}
@@ -130,7 +130,7 @@ int DestroyAllBodiesWorld( void )
 	bodyDef.type = b2_dynamicBody;
 	b2Polygon square = b2MakeSquare( 0.5f );
 
-	for ( int32_t i = 0; i < 2 * BODY_COUNT + 10; ++i )
+	for ( int i = 0; i < 2 * BODY_COUNT + 10; ++i )
 	{
 		if ( creating )
 		{

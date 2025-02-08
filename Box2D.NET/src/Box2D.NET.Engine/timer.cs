@@ -17,14 +17,14 @@ public class timer
 
     static double s_invFrequency = 0.0;
 
-    uint64_t b2GetTicks(void)
+    ulong b2GetTicks(void)
     {
         LARGE_INTEGER counter;
         QueryPerformanceCounter(&counter);
-        return (uint64_t)counter.QuadPart;
+        return (ulong)counter.QuadPart;
     }
 
-    float b2GetMilliseconds(uint64_t ticks)
+    float b2GetMilliseconds(ulong ticks)
     {
         if (s_invFrequency == 0.0)
         {
@@ -38,11 +38,11 @@ public class timer
             }
         }
 
-        uint64_t ticksNow = b2GetTicks();
+        ulong ticksNow = b2GetTicks();
         return (float)(s_invFrequency * (ticksNow - ticks));
     }
 
-    float b2GetMillisecondsAndReset(uint64_t* ticks)
+    float b2GetMillisecondsAndReset(ulong* ticks)
     {
         if (s_invFrequency == 0.0)
         {
@@ -56,7 +56,7 @@ public class timer
             }
         }
 
-        uint64_t ticksNow = b2GetTicks();
+        ulong ticksNow = b2GetTicks();
         float ms = (float)(s_invFrequency * (ticksNow - *ticks));
         *ticks = ticksNow;
         return ms;
@@ -72,22 +72,22 @@ public class timer
 
 
 
-    uint64_t b2GetTicks(void)
+    ulong b2GetTicks(void)
     {
         struct timespec ts;
         clock_gettime(CLOCK_MONOTONIC, &ts);
         return ts.tv_sec * 1000000000LL + ts.tv_nsec;
     }
 
-    float b2GetMilliseconds(uint64_t ticks)
+    float b2GetMilliseconds(ulong ticks)
     {
-        uint64_t ticksNow = b2GetTicks();
+        ulong ticksNow = b2GetTicks();
         return (float)((ticksNow - ticks) / 1000000.0);
     }
 
-    float b2GetMillisecondsAndReset(uint64_t* ticks)
+    float b2GetMillisecondsAndReset(ulong* ticks)
     {
-        uint64_t ticksNow = b2GetTicks();
+        ulong ticksNow = b2GetTicks();
         float ms = (float)((ticksNow - *ticks) / 1000000.0);
         *ticks = ticksNow;
         return ms;
@@ -106,12 +106,12 @@ public class timer
 
     static double s_invFrequency = 0.0;
 
-    uint64_t b2GetTicks(void)
+    ulong b2GetTicks(void)
     {
         return mach_absolute_time();
     }
 
-    float b2GetMilliseconds(uint64_t ticks)
+    float b2GetMilliseconds(ulong ticks)
     {
         if (s_invFrequency == 0)
         {
@@ -122,11 +122,11 @@ public class timer
             s_invFrequency = 1e-6 * (double)timebase.numer / (double)timebase.denom;
         }
 
-        uint64_t ticksNow = b2GetTicks();
+        ulong ticksNow = b2GetTicks();
         return (float)(s_invFrequency * (ticksNow - ticks));
     }
 
-    float b2GetMillisecondsAndReset(uint64_t* ticks)
+    float b2GetMillisecondsAndReset(ulong* ticks)
     {
         if (s_invFrequency == 0)
         {
@@ -137,7 +137,7 @@ public class timer
             s_invFrequency = 1e-6 * (double)timebase.numer / (double)timebase.denom;
         }
 
-        uint64_t ticksNow = b2GetTicks();
+        ulong ticksNow = b2GetTicks();
         float ms = (float)(s_invFrequency * (ticksNow - *ticks));
         *ticks = ticksNow;
         return ms;
@@ -150,18 +150,18 @@ public class timer
 
 #else
 
-    uint64_t b2GetTicks(void)
+    ulong b2GetTicks(void)
     {
         return 0;
     }
 
-    float b2GetMilliseconds(uint64_t ticks)
+    float b2GetMilliseconds(ulong ticks)
     {
         ((void)(ticks));
         return 0.0f;
     }
 
-    float b2GetMillisecondsAndReset(uint64_t* ticks)
+    float b2GetMillisecondsAndReset(ulong* ticks)
     {
         ((void)(ticks));
         return 0.0f;
@@ -175,9 +175,9 @@ public class timer
 
 // djb2 hash
 // https://en.wikipedia.org/wiki/List_of_hash_functions
-    uint32_t b2Hash(uint32_t hash,  const uint8_t* data,  int count )
+    uint b2Hash(uint hash,  const byte* data,  int count )
     {
-        uint32_t result = hash;
+        uint result = hash;
         for (int i = 0; i < count; i++)
         {
             result = (result << 5) + result + data[i];

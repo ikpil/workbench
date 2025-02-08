@@ -35,7 +35,7 @@ enkiTaskSet* tasks[e_maxTasks];
 TaskData taskData[e_maxTasks];
 int taskCount;
 
-static void ExecuteRangeTask( uint32_t start, uint32_t end, uint32_t threadIndex, void* context )
+static void ExecuteRangeTask( uint start, uint end, uint threadIndex, void* context )
 {
 	TaskData* data = context;
 	data->box2dTask( start, end, threadIndex, data->box2dContext );
@@ -282,7 +282,7 @@ static int CrossPlatformTest(void)
 
 	assert( bodyIndex == bodyCount );
 
-	uint32_t hash = 0;
+	uint hash = 0;
 	int sleepStep = -1;
 	float timeStep = 1.0f / 60.0f;
 
@@ -307,7 +307,7 @@ static int CrossPlatformTest(void)
 				for ( int i = 0; i < bodyCount; ++i )
 				{
 					b2Transform xf = b2Body_GetTransform( bodies[i] );
-					hash = b2Hash( hash, (uint8_t*)( &xf ), sizeof( b2Transform ) );
+					hash = b2Hash( hash, (byte*)( &xf ), sizeof( b2Transform ) );
 				}
 
 				sleepStep = stepCount;

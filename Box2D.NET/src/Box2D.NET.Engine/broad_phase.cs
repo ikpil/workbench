@@ -55,7 +55,7 @@ typedef struct b2BroadPhase
 void b2CreateBroadPhase( b2BroadPhase* bp );
 void b2DestroyBroadPhase( b2BroadPhase* bp );
 
-int b2BroadPhase_CreateProxy( b2BroadPhase* bp, b2BodyType proxyType, b2AABB aabb, uint64_t categoryBits, int shapeIndex,
+int b2BroadPhase_CreateProxy( b2BroadPhase* bp, b2BodyType proxyType, b2AABB aabb, ulong categoryBits, int shapeIndex,
 							  bool forcePairCreation );
 void b2BroadPhase_DestroyProxy( b2BroadPhase* bp, int proxyKey );
 
@@ -154,7 +154,7 @@ static inline void b2UnBufferMove( b2BroadPhase* bp, int proxyKey )
 	}
 }
 
-int b2BroadPhase_CreateProxy( b2BroadPhase* bp, b2BodyType proxyType, b2AABB aabb, uint64_t categoryBits, int shapeIndex,
+int b2BroadPhase_CreateProxy( b2BroadPhase* bp, b2BodyType proxyType, b2AABB aabb, ulong categoryBits, int shapeIndex,
 							  bool forcePairCreation )
 {
 	B2_ASSERT( 0 <= proxyType && proxyType < b2_bodyTypeCount );
@@ -278,7 +278,7 @@ static bool b2PairQueryCallback( int proxyId, int shapeId, void* context )
 		}
 	}
 
-	uint64_t pairKey = B2_SHAPE_PAIR_KEY( shapeId, queryContext->queryShapeIndex );
+	ulong pairKey = B2_SHAPE_PAIR_KEY( shapeId, queryContext->queryShapeIndex );
 	if ( b2ContainsKey( &broadPhase->pairSet, pairKey ) )
 	{
 		// contact exists
@@ -374,7 +374,7 @@ b2TreeStats b2_kinematicStats;
 b2TreeStats b2_staticStats;
 #endif
 
-static void b2FindPairsTask( int startIndex, int endIndex, uint32_t threadIndex, void* context )
+static void b2FindPairsTask( int startIndex, int endIndex, uint threadIndex, void* context )
 {
 	b2TracyCZoneNC( pair_task, "Pair", b2_colorMediumSlateBlue, true );
 
