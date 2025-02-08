@@ -24,7 +24,7 @@
 
 // This is used for debugging by making all constraints be assigned to overflow.
 
-#pragma once
+namespace Box2D.NET.Engine;
 
 
 

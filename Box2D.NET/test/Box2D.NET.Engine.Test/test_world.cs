@@ -2,14 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 
-
-
-
-
-
-
-
-
+namespace Box2D.NET.Engine.Test;
 
 // This is a simple example of building and running a simulation
 // using Box2D. Here we create a large ground box and a small dynamic

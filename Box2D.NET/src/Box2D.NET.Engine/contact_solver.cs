@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 
-#pragma once
+namespace Box2D.NET.Engine;
 
 
 

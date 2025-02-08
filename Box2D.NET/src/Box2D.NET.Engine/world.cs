@@ -1,16 +1,7 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
-#pragma once
-
-
-
-
-
-
-
-
-
+namespace Box2D.NET.Engine;
 
 enum b2SetType
 {

@@ -24,7 +24,7 @@
 
 // Compare to SDL_CPUPauseInstruction
 
-#pragma once
+namespace Box2D.NET.Engine;
 
 
 
