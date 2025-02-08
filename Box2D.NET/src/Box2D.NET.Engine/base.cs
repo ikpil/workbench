@@ -26,12 +26,12 @@ public class base
 
 // C++ macros
 #ifdef __cplusplus
-#define B2_API extern "C" BOX2D_EXPORT
+#define extern "C" BOX2D_EXPORT
 #define B2_INLINE inline
 #define B2_LITERAL(T) T
 #define B2_ZERO_INIT {}
 #else
-#define B2_API BOX2D_EXPORT
+#define BOX2D_EXPORT
 #define B2_INLINE static inline
     /// Used for C literals like (b2Vec2){1.0f, 2.0f} where C++ requires b2Vec2{1.0f, 2.0f}
 #define B2_LITERAL(T) (T)
@@ -61,14 +61,14 @@ public class base
 
     /// This allows the user to override the allocation functions. These should be
     /// set during application startup.
-    B2_API void b2SetAllocator(b2AllocFcn* allocFcn, b2FreeFcn* freeFcn);
+    void b2SetAllocator(b2AllocFcn* allocFcn, b2FreeFcn* freeFcn);
 
     /// @return the total bytes allocated by Box2D
-    B2_API int b2GetByteCount( void  );
+    int b2GetByteCount( void  );
 
     /// Override the default assert callback
     /// @param assertFcn a non-null assert callback
-    B2_API void b2SetAssertFcn(b2AssertFcn* assertFcn);
+    void b2SetAssertFcn(b2AssertFcn* assertFcn);
 
 // see https://github.com/scottt/debugbreak
 #if defined( _MSC_VER )
@@ -82,7 +82,7 @@ public class base
 #endif
 
 #if !defined( NDEBUG ) || defined( B2_ENABLE_ASSERT )
-    B2_API int b2InternalAssertFcn(
+    int b2InternalAssertFcn(
     const char* condition,  const char* fileName,  int lineNumber );
 #define B2_ASSERT( condition ) \
     do \
@@ -111,27 +111,27 @@ public class base
     b2Version;
 
     /// Get the current version of Box2D
-    B2_API b2Version b2GetVersion( void  );
+    b2Version b2GetVersion( void  );
 
     /**@}*/
 
 //! @cond
 
     /// Get the absolute number of system ticks. The value is platform specific.
-    B2_API ulong b2GetTicks( void  );
+    ulong b2GetTicks( void  );
 
     /// Get the milliseconds passed from an initial tick value.
-    B2_API float b2GetMilliseconds(ulong ticks);
+    float b2GetMilliseconds(ulong ticks);
 
     /// Get the milliseconds passed from an initial tick value.
-    B2_API float b2GetMillisecondsAndReset(ulong* ticks);
+    float b2GetMillisecondsAndReset(ulong* ticks);
 
     /// Yield to be used in a busy loop.
-    B2_API void b2Yield(void);
+    void b2Yield(void);
 
     /// Simple djb2 hash function for determinism testing
 #define B2_HASH_INIT 5381
-    B2_API uint b2Hash(uint hash,  const byte* data,  int count );
+    uint b2Hash(uint hash,  const byte* data,  int count );
 
 //! @endcond
 

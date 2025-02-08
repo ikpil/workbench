@@ -142,7 +142,7 @@ typedef struct b2WorldDef
 
 /// Use this to initialize your world definition
 /// @ingroup world
-B2_API b2WorldDef b2DefaultWorldDef( void );
+b2WorldDef b2DefaultWorldDef( void );
 
 /// The body simulation type.
 /// Each body is one of these three types. The type determines how the body behaves in the simulation.
@@ -239,7 +239,7 @@ typedef struct b2BodyDef
 
 /// Use this to initialize your body definition
 /// @ingroup body
-B2_API b2BodyDef b2DefaultBodyDef( void );
+b2BodyDef b2DefaultBodyDef( void );
 
 /// This is used to filter collision on shapes. It affects shape-vs-shape collision
 /// and shape-versus-query collision (such as b2World_CastRay).
@@ -280,7 +280,7 @@ typedef struct b2Filter
 
 /// Use this to initialize your filter
 /// @ingroup shape
-B2_API b2Filter b2DefaultFilter( void );
+b2Filter b2DefaultFilter( void );
 
 /// The query filter is used to filter collisions between queries and shapes. For example,
 /// you may want a ray-cast representing a projectile to hit players and the static environment
@@ -298,7 +298,7 @@ typedef struct b2QueryFilter
 
 /// Use this to initialize your query filter
 /// @ingroup shape
-B2_API b2QueryFilter b2DefaultQueryFilter( void );
+b2QueryFilter b2DefaultQueryFilter( void );
 
 /// Shape type
 /// @ingroup shape
@@ -389,7 +389,7 @@ typedef struct b2ShapeDef
 
 /// Use this to initialize your shape definition
 /// @ingroup shape
-B2_API b2ShapeDef b2DefaultShapeDef( void );
+b2ShapeDef b2DefaultShapeDef( void );
 
 /// Surface materials allow chain shapes to have per segment surface properties.
 /// @ingroup shape
@@ -418,7 +418,7 @@ typedef struct b2SurfaceMaterial
 
 /// Use this to initialize your surface material
 /// @ingroup shape
-B2_API b2SurfaceMaterial b2DefaultSurfaceMaterial( void );
+b2SurfaceMaterial b2DefaultSurfaceMaterial( void );
 
 /// Used to create a chain of line segments. This is designed to eliminate ghost collisions with some limitations.
 /// - chains are one-sided
@@ -465,7 +465,7 @@ typedef struct b2ChainDef
 
 /// Use this to initialize your chain definition
 /// @ingroup shape
-B2_API b2ChainDef b2DefaultChainDef( void );
+b2ChainDef b2DefaultChainDef( void );
 
 //! @cond
 /// Profiling data. Times are in milliseconds.
@@ -593,7 +593,7 @@ typedef struct b2DistanceJointDef
 
 /// Use this to initialize your joint definition
 /// @ingroup distance_joint
-B2_API b2DistanceJointDef b2DefaultDistanceJointDef( void );
+b2DistanceJointDef b2DefaultDistanceJointDef( void );
 
 /// A motor joint is used to control the relative motion between two bodies
 ///
@@ -634,7 +634,7 @@ typedef struct b2MotorJointDef
 
 /// Use this to initialize your joint definition
 /// @ingroup motor_joint
-B2_API b2MotorJointDef b2DefaultMotorJointDef( void );
+b2MotorJointDef b2DefaultMotorJointDef( void );
 
 /// A mouse joint is used to make a point on a body track a specified world point.
 ///
@@ -673,7 +673,7 @@ typedef struct b2MouseJointDef
 
 /// Use this to initialize your joint definition
 /// @ingroup mouse_joint
-B2_API b2MouseJointDef b2DefaultMouseJointDef( void );
+b2MouseJointDef b2DefaultMouseJointDef( void );
 
 /// A null joint is used to disable collision between two specific bodies.
 ///
@@ -695,7 +695,7 @@ typedef struct b2NullJointDef
 
 /// Use this to initialize your joint definition
 /// @ingroup null_joint
-B2_API b2NullJointDef b2DefaultNullJointDef( void );
+b2NullJointDef b2DefaultNullJointDef( void );
 
 /// Prismatic joint definition
 ///
@@ -763,7 +763,7 @@ typedef struct b2PrismaticJointDef
 
 /// Use this to initialize your joint definition
 /// @ingroupd prismatic_joint
-B2_API b2PrismaticJointDef b2DefaultPrismaticJointDef( void );
+b2PrismaticJointDef b2DefaultPrismaticJointDef( void );
 
 /// Revolute joint definition
 ///
@@ -837,7 +837,7 @@ typedef struct b2RevoluteJointDef
 
 /// Use this to initialize your joint definition.
 /// @ingroup revolute_joint
-B2_API b2RevoluteJointDef b2DefaultRevoluteJointDef( void );
+b2RevoluteJointDef b2DefaultRevoluteJointDef( void );
 
 /// Weld joint definition
 ///
@@ -886,7 +886,7 @@ typedef struct b2WeldJointDef
 
 /// Use this to initialize your joint definition
 /// @ingroup weld_joint
-B2_API b2WeldJointDef b2DefaultWeldJointDef( void );
+b2WeldJointDef b2DefaultWeldJointDef( void );
 
 /// Wheel joint definition
 ///
@@ -951,7 +951,7 @@ typedef struct b2WheelJointDef
 
 /// Use this to initialize your joint definition
 /// @ingroup wheel_joint
-B2_API b2WheelJointDef b2DefaultWheelJointDef( void );
+b2WheelJointDef b2DefaultWheelJointDef( void );
 
 /// The explosion definition is used to configure options for explosions. Explosions
 /// consider shape geometry when computing the impulse.
@@ -978,7 +978,7 @@ typedef struct b2ExplosionDef
 
 /// Use this to initialize your explosion definition
 /// @ingroup world
-B2_API b2ExplosionDef b2DefaultExplosionDef( void );
+b2ExplosionDef b2DefaultExplosionDef( void );
 
 /**
  * @defgroup events Events
@@ -1444,7 +1444,7 @@ typedef struct b2DebugDraw
 
 /// Use this to initialize your drawing interface. This allows you to implement a sub-set
 /// of the drawing functions.
-B2_API b2DebugDraw b2DefaultDebugDraw( void );
+b2DebugDraw b2DefaultDebugDraw( void );
 
 
 

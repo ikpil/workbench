@@ -130,11 +130,11 @@ B2_INLINE float b2ClampFloat( float a, float lower, float upper )
 /// This is hand coded for cross-platform determinism. The atan2f
 /// function in the standard library is not cross-platform deterministic.
 ///	Accurate to around 0.0023 degrees
-B2_API float b2Atan2( float y, float x );
+float b2Atan2( float y, float x );
 
 /// Compute the cosine and sine of an angle in radians. Implemented
 /// for cross-platform determinism.
-B2_API b2CosSin b2ComputeCosSin( float radians );
+b2CosSin b2ComputeCosSin( float radians );
 
 /// Vector dot product
 B2_INLINE float b2Dot( b2Vec2 a, b2Vec2 b )
@@ -346,7 +346,7 @@ B2_INLINE b2Rot b2MakeRot( float radians )
 }
 
 /// Compute the rotation between two unit vectors
-B2_API b2Rot b2ComputeRotationBetweenUnitVectors( b2Vec2 v1, b2Vec2 v2 );
+b2Rot b2ComputeRotationBetweenUnitVectors( b2Vec2 v1, b2Vec2 v2 );
 
 /// Is this rotation normalized?
 B2_INLINE bool b2IsNormalized( b2Rot q )
@@ -608,16 +608,16 @@ B2_INLINE b2AABB b2AABB_Union( b2AABB a, b2AABB b )
 }
 
 /// Is this a valid number? Not NaN or infinity.
-B2_API bool b2IsValidFloat( float a );
+bool b2IsValidFloat( float a );
 
 /// Is this a valid vector? Not NaN or infinity.
-B2_API bool b2IsValidVec2( b2Vec2 v );
+bool b2IsValidVec2( b2Vec2 v );
 
 /// Is this a valid rotation? Not NaN or infinity. Is normalized.
-B2_API bool b2IsValidRotation( b2Rot q );
+bool b2IsValidRotation( b2Rot q );
 
 /// Is this a valid bounding box? Not Nan or infinity. Upper bound greater than or equal to lower bound.
-B2_API bool b2IsValidAABB( b2AABB aabb );
+bool b2IsValidAABB( b2AABB aabb );
 
 /// Box2D bases all length units on meters, but you may need different units for your game.
 /// You can set this value to use different units. This should be done at application startup
@@ -633,10 +633,10 @@ B2_API bool b2IsValidAABB( b2AABB aabb );
 /// However, you are now on the hook for coming up with good values for gravity, density, and
 /// forces.
 /// @warning This must be modified before any calls to Box2D
-B2_API void b2SetLengthUnitsPerMeter( float lengthUnits );
+void b2SetLengthUnitsPerMeter( float lengthUnits );
 
 /// Get the current length units per meter.
-B2_API float b2GetLengthUnitsPerMeter( void );
+float b2GetLengthUnitsPerMeter( void );
 
 /**@}*/
 
