@@ -3,10 +3,10 @@
 
 #pragma once
 
-#include "Base.cs"
-#include "Collision.cs"
-#include "Id.cs"
-#include "MathFunctions.cs"
+#include "base.h"
+#include "collision.h"
+#include "id.h"
+#include "math_functions.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -1221,7 +1221,7 @@ typedef float b2CastResultFcn( b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, f
 /// See https://www.rapidtables.com/web/color/index.html
 /// https://johndecember.com/html/spec/colorsvg.html
 /// https://upload.wikimedia.org/wikipedia/commons/2/2b/SVG_Recognized_color_keyword_names.svg
-public enum b2HexColor
+typedef enum b2HexColor
 {
 	b2_colorAliceBlue = 0xF0F8FF,
 	b2_colorAntiqueWhite = 0xFAEBD7,
@@ -1374,7 +1374,7 @@ public enum b2HexColor
 /// This struct holds callbacks you can implement to draw a Box2D world.
 /// This structure should be zero initialized.
 /// @ingroup world
-public struct b2DebugDraw
+typedef struct b2DebugDraw
 {
 	/// Draw a closed polygon provided in CCW order.
 	void ( *DrawPolygon )( const b2Vec2* vertices, int vertexCount, b2HexColor color, void* context );
@@ -1445,5 +1445,8 @@ public struct b2DebugDraw
 
 	/// User context that is passed as an argument to drawing callback functions
 	void* context;
-};
+} b2DebugDraw;
 
+/// Use this to initialize your drawing interface. This allows you to implement a sub-set
+/// of the drawing functions.
+B2_API b2DebugDraw b2DefaultDebugDraw( void );
