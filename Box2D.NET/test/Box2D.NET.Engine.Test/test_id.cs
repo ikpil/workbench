@@ -5,10 +5,7 @@ namespace Box2D.NET.Engine.Test;
 
 public class test_id
 {
-
-
-
-    int IdTest()
+    public void IdTest()
     {
         ulong x = 0x0123456789ABCDEFull;
 
@@ -35,8 +32,6 @@ public class test_id
             ulong y = b2StoreJointId(id);
             ENSURE(x == y);
         }
-
-        return 0;
     }
 
 }

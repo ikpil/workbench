@@ -7,12 +7,6 @@ namespace Box2D.NET.Engine.Test;
 public class test_determinism
 {
 
-#ifdef BOX2D_PROFILE
-	
-#else
-	#define TracyCFrameMark
-#endif
-
 enum
 {
 	e_columns = 10,

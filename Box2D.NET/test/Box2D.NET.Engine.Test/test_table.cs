@@ -7,10 +7,10 @@ public class test_table
 {
 
 
-#define SET_SPAN 317
+    public const int SET_SPAN = 317;
 #define ITEM_COUNT ( ( SET_SPAN * SET_SPAN - SET_SPAN ) / 2 )
 
-    int TableTest()
+    public void TableTest()
     {
         int power = b2BoundingPowerOf2(3008);
         ENSURE(power == 12);
@@ -111,7 +111,6 @@ public class test_table
             b2DestroySet(&set);
         }
 
-        return 0;
     }
 
 }

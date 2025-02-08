@@ -5,18 +5,12 @@ namespace Box2D.NET.Engine.Test;
 
 public class test_shape
 {
-
-
-
-
-
-
     static b2Capsule capsule = { { -1.0f, 0.0f }, { 1.0f, 0.0f }, 1.0f };
     static b2Circle circle = { { 1.0f, 0.0f }, 1.0f };
     static b2Polygon box;
     static b2Segment segment = { { 0.0f, 1.0f }, { 0.0f, -1.0f } };
 
-#define N 4
+    public const int N = 4;
 
     static int ShapeMassTest()
     {
@@ -159,7 +153,7 @@ public class test_shape
         return 0;
     }
 
-    int ShapeTest()
+    public void ShapeTest()
     {
         box = b2MakeBox(1.0f, 1.0f);
 
@@ -167,8 +161,6 @@ public class test_shape
         RUN_SUBTEST(ShapeAABBTest);
         RUN_SUBTEST(PointInShapeTest);
         RUN_SUBTEST(RayCastShapeTest);
-
-        return 0;
     }
 
 }

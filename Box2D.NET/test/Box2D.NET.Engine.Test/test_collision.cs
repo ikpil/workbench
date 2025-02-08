@@ -5,11 +5,7 @@ namespace Box2D.NET.Engine.Test;
 
 public class test_collision
 {
-
-
-
-
-    static int AABBTest()
+    public void AABBTest()
     {
         b2AABB a;
         a.lowerBound = (b2Vec2){
@@ -45,8 +41,6 @@ public class test_collision
         b2CastOutput output = b2AABB_RayCast(a, p1, p2);
         ENSURE(output.hit == true);
         ENSURE(0.1f < output.fraction && output.fraction < 0.9f);
-
-        return 0;
     }
 
     int CollisionTest()
@@ -55,5 +49,4 @@ public class test_collision
 
         return 0;
     }
-
 }

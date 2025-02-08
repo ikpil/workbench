@@ -4,17 +4,12 @@
 
 namespace Box2D.NET.Engine.Test;
 
-
 public class test_math
 {
-
-
-
-
 // 0.0023 degrees
-#define ATAN_TOL 0.00004f
+    public const float ATAN_TOL = 0.00004f;
 
-    int MathTest()
+    public void MathTest()
     {
         for (float t = -10.0f; t < 10.0f; t += 0.01f)
         {
@@ -150,8 +145,5 @@ public class test_math
                 ENSURE_SMALL(w.y - u.y, 4.0f * FLT_EPSILON);
             }
         }
-
-        return 0;
     }
-
 }

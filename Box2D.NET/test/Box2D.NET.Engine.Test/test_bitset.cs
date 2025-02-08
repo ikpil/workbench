@@ -7,9 +7,9 @@ namespace Box2D.NET.Engine.Test;
 public class test_bitset
 {
 
-#define COUNT 169
+    private const int COUNT = 169;
 
-    int BitSetTest()
+    public void BitSetTest()
     {
         b2BitSet bitSet = b2CreateBitSet(COUNT);
 
@@ -39,8 +39,6 @@ public class test_bitset
         }
 
         b2DestroyBitSet(&bitSet);
-
-        return 0;
     }
 
 }
