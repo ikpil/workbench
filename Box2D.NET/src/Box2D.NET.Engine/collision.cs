@@ -1,17 +1,10 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
+using System;
+using System.Collections.Generic;
+
 namespace Box2D.NET.Engine;
-
-public class collision
-{
-
-
-
-
-
-typedef struct b2SimplexCache b2SimplexCache;
-typedef struct b2Hull b2Hull;
 
 /**
  * @defgroup geometry Geometry
@@ -21,99 +14,94 @@ typedef struct b2Hull b2Hull;
  * @{
  */
 
-/// The maximum number of vertices on a convex polygon. Changing this affects performance even if you
-/// don't use more vertices.
-#define B2_MAX_POLYGON_VERTICES 8
-
 /// Low level ray cast input data
-typedef struct b2RayCastInput
+public class b2RayCastInput
 {
-	/// Start point of the ray cast
-	b2Vec2 origin;
+    /// Start point of the ray cast
+    public b2Vec2 origin;
 
-	/// Translation of the ray cast
-	b2Vec2 translation;
+    /// Translation of the ray cast
+    public b2Vec2 translation;
 
-	/// The maximum fraction of the translation to consider, typically 1
-	float maxFraction;
-} b2RayCastInput;
-
+    /// The maximum fraction of the translation to consider, typically 1
+    public float maxFraction;
+}
 /// Low level shape cast input in generic form. This allows casting an arbitrary point
 /// cloud wrap with a radius. For example, a circle is a single point with a non-zero radius.
 /// A capsule is two points with a non-zero radius. A box is four points with a zero radius.
-typedef struct b2ShapeCastInput
+public class b2ShapeCastInput
 {
-	/// A point cloud to cast
-	b2Vec2 points[B2_MAX_POLYGON_VERTICES];
+    /// A point cloud to cast
+    public b2Vec2[] points = new b2Vec2[constants.B2_MAX_POLYGON_VERTICES];
 
-	/// The number of points
-	int count;
+    /// The number of points
+    public int count;
 
-	/// The radius around the point cloud
-	float radius;
+    /// The radius around the point cloud
+    public float radius;
 
-	/// The translation of the shape cast
-	b2Vec2 translation;
+    /// The translation of the shape cast
+    public b2Vec2 translation;
 
-	/// The maximum fraction of the translation to consider, typically 1
-	float maxFraction;
-} b2ShapeCastInput;
+    /// The maximum fraction of the translation to consider, typically 1
+    public float maxFraction;
+}
 
 /// Low level ray cast or shape-cast output data
-typedef struct b2CastOutput
+public class b2CastOutput
 {
-	/// The surface normal at the hit point
-	b2Vec2 normal;
+    /// The surface normal at the hit point
+    public b2Vec2 normal;
 
-	/// The surface hit point
-	b2Vec2 point;
+    /// The surface hit point
+    public b2Vec2 point;
 
-	/// The fraction of the input translation at collision
-	float fraction;
+    /// The fraction of the input translation at collision
+    public float fraction;
 
-	/// The number of iterations used
-	int iterations;
+    /// The number of iterations used
+    public int iterations;
 
-	/// Did the cast hit?
-	bool hit;
-} b2CastOutput;
+    /// Did the cast hit?
+    public bool hit;
+}
 
 /// This holds the mass data computed for a shape.
-typedef struct b2MassData
+public class b2MassData
 {
-	/// The mass of the shape, usually in kilograms.
-	float mass;
+    /// The mass of the shape, usually in kilograms.
+    public float mass;
 
-	/// The position of the shape's centroid relative to the shape's origin.
-	b2Vec2 center;
+    /// The position of the shape's centroid relative to the shape's origin.
+    public b2Vec2 center;
 
-	/// The rotational inertia of the shape about the local origin.
-	float rotationalInertia;
-} b2MassData;
+    /// The rotational inertia of the shape about the local origin.
+    public float rotationalInertia;
+}
 
 /// A solid circle
-typedef struct b2Circle
+public class b2Circle
 {
-	/// The local center
-	b2Vec2 center;
+    /// The local center
+    public b2Vec2 center;
 
-	/// The radius
-	float radius;
-} b2Circle;
+    /// The radius
+    public float radius;
+}
 
 /// A solid capsule can be viewed as two semicircles connected
 /// by a rectangle.
-typedef struct b2Capsule
+public class b2Capsule
 {
-	/// Local center of the first semicircle
-	b2Vec2 center1;
+    /// Local center of the first semicircle
+    public b2Vec2 center1;
 
-	/// Local center of the second semicircle
-	b2Vec2 center2;
+    /// Local center of the second semicircle
+    public b2Vec2 center2;
 
-	/// The radius of the semicircles
-	float radius;
-} b2Capsule;
+    /// The radius of the semicircles
+    public float radius;
+}
 
 /// A solid convex polygon. It is assumed that the interior of the polygon is to
 /// the left of each edge.
@@ -121,181 +109,63 @@ typedef struct b2Capsule
 /// In most cases you should not need many vertices for a convex polygon.
 /// @warning DO NOT fill this out manually, instead use a helper function like
 /// b2MakePolygon or b2MakeBox.
-typedef struct b2Polygon
+public class b2Polygon
 {
-	/// The polygon vertices
-	b2Vec2 vertices[B2_MAX_POLYGON_VERTICES];
+    /// The polygon vertices
+    public b2Vec2[] vertices = new b2Vec2[constants.B2_MAX_POLYGON_VERTICES];
 
-	/// The outward normal vectors of the polygon sides
-	b2Vec2 normals[B2_MAX_POLYGON_VERTICES];
+    /// The outward normal vectors of the polygon sides
+    public b2Vec2[] normals = new b2Vec2[constants.B2_MAX_POLYGON_VERTICES];
 
-	/// The centroid of the polygon
-	b2Vec2 centroid;
+    /// The centroid of the polygon
+    public b2Vec2 centroid;
 
-	/// The external radius for rounded polygons
-	float radius;
+    /// The external radius for rounded polygons
+    public float radius;
 
-	/// The number of polygon vertices
-	int count;
-} b2Polygon;
+    /// The number of polygon vertices
+    public int count;
+} 
 
 /// A line segment with two-sided collision.
-typedef struct b2Segment
+public class b2Segment
 {
-	/// The first point
-	b2Vec2 point1;
+    /// The first point
+    public b2Vec2 point1;
 
-	/// The second point
-	b2Vec2 point2;
-} b2Segment;
+    /// The second point
+    public b2Vec2 point2;
+}
 
 /// A line segment with one-sided collision. Only collides on the right side.
 /// Several of these are generated for a chain shape.
 /// ghost1 -> point1 -> point2 -> ghost2
-typedef struct b2ChainSegment
+public class b2ChainSegment
 {
-	/// The tail ghost vertex
-	b2Vec2 ghost1;
+    /// The tail ghost vertex
+    public b2Vec2 ghost1;
 
-	/// The line segment
-	b2Segment segment;
+    /// The line segment
+    public b2Segment segment = new b2Segment();
 
-	/// The head ghost vertex
-	b2Vec2 ghost2;
+    /// The head ghost vertex
+    public b2Vec2 ghost2;
 
-	/// The owning chain shape index (internal usage only)
-	int chainId;
-} b2ChainSegment;
+    /// The owning chain shape index (internal usage only)
+    public int chainId;
+}
 
-/// Validate ray cast input data (NaN, etc)
-bool b2IsValidRay( const b2RayCastInput* input );
-
-/// Make a convex polygon from a convex hull. This will assert if the hull is not valid.
-/// @warning Do not manually fill in the hull data, it must come directly from b2ComputeHull
-b2Polygon b2MakePolygon( const b2Hull* hull, float radius );
-
-/// Make an offset convex polygon from a convex hull. This will assert if the hull is not valid.
-/// @warning Do not manually fill in the hull data, it must come directly from b2ComputeHull
-b2Polygon b2MakeOffsetPolygon( const b2Hull* hull, b2Vec2 position, b2Rot rotation );
-
-/// Make an offset convex polygon from a convex hull. This will assert if the hull is not valid.
-/// @warning Do not manually fill in the hull data, it must come directly from b2ComputeHull
-b2Polygon b2MakeOffsetRoundedPolygon( const b2Hull* hull, b2Vec2 position, b2Rot rotation, float radius );
-
-/// Make a square polygon, bypassing the need for a convex hull.
-/// @param halfWidth the half-width
-b2Polygon b2MakeSquare( float halfWidth );
-
-/// Make a box (rectangle) polygon, bypassing the need for a convex hull.
-/// @param halfWidth the half-width (x-axis)
-/// @param halfHeight the half-height (y-axis)
-b2Polygon b2MakeBox( float halfWidth, float halfHeight );
-
-/// Make a rounded box, bypassing the need for a convex hull.
-/// @param halfWidth the half-width (x-axis)
-/// @param halfHeight the half-height (y-axis)
-/// @param radius the radius of the rounded extension
-b2Polygon b2MakeRoundedBox( float halfWidth, float halfHeight, float radius );
-
-/// Make an offset box, bypassing the need for a convex hull.
-/// @param halfWidth the half-width (x-axis)
-/// @param halfHeight the half-height (y-axis)
-/// @param center the local center of the box
-/// @param rotation the local rotation of the box
-b2Polygon b2MakeOffsetBox( float halfWidth, float halfHeight, b2Vec2 center, b2Rot rotation );
-
-/// Make an offset rounded box, bypassing the need for a convex hull.
-/// @param halfWidth the half-width (x-axis)
-/// @param halfHeight the half-height (y-axis)
-/// @param center the local center of the box
-/// @param rotation the local rotation of the box
-/// @param radius the radius of the rounded extension
-b2Polygon b2MakeOffsetRoundedBox( float halfWidth, float halfHeight, b2Vec2 center, b2Rot rotation, float radius );
-
-/// Transform a polygon. This is useful for transferring a shape from one body to another.
-b2Polygon b2TransformPolygon( b2Transform transform, const b2Polygon* polygon );
-
-/// Compute mass properties of a circle
-b2MassData b2ComputeCircleMass( const b2Circle* shape, float density );
-
-/// Compute mass properties of a capsule
-b2MassData b2ComputeCapsuleMass( const b2Capsule* shape, float density );
-
-/// Compute mass properties of a polygon
-b2MassData b2ComputePolygonMass( const b2Polygon* shape, float density );
-
-/// Compute the bounding box of a transformed circle
-b2AABB b2ComputeCircleAABB( const b2Circle* shape, b2Transform transform );
-
-/// Compute the bounding box of a transformed capsule
-b2AABB b2ComputeCapsuleAABB( const b2Capsule* shape, b2Transform transform );
-
-/// Compute the bounding box of a transformed polygon
-b2AABB b2ComputePolygonAABB( const b2Polygon* shape, b2Transform transform );
-
-/// Compute the bounding box of a transformed line segment
-b2AABB b2ComputeSegmentAABB( const b2Segment* shape, b2Transform transform );
-
-/// Test a point for overlap with a circle in local space
-bool b2PointInCircle( b2Vec2 point, const b2Circle* shape );
-
-/// Test a point for overlap with a capsule in local space
-bool b2PointInCapsule( b2Vec2 point, const b2Capsule* shape );
-
-/// Test a point for overlap with a convex polygon in local space
-bool b2PointInPolygon( b2Vec2 point, const b2Polygon* shape );
-
-/// Ray cast versus circle shape in local space. Initial overlap is treated as a miss.
-b2CastOutput b2RayCastCircle( const b2RayCastInput* input, const b2Circle* shape );
-
-/// Ray cast versus capsule shape in local space. Initial overlap is treated as a miss.
-b2CastOutput b2RayCastCapsule( const b2RayCastInput* input, const b2Capsule* shape );
-
-/// Ray cast versus segment shape in local space. Optionally treat the segment as one-sided with hits from
-/// the left side being treated as a miss.
-b2CastOutput b2RayCastSegment( const b2RayCastInput* input, const b2Segment* shape, bool oneSided );
-
-/// Ray cast versus polygon shape in local space. Initial overlap is treated as a miss.
-b2CastOutput b2RayCastPolygon( const b2RayCastInput* input, const b2Polygon* shape );
-
-/// Shape cast versus a circle. Initial overlap is treated as a miss.
-b2CastOutput b2ShapeCastCircle( const b2ShapeCastInput* input, const b2Circle* shape );
-
-/// Shape cast versus a capsule. Initial overlap is treated as a miss.
-b2CastOutput b2ShapeCastCapsule( const b2ShapeCastInput* input, const b2Capsule* shape );
-
-/// Shape cast versus a line segment. Initial overlap is treated as a miss.
-b2CastOutput b2ShapeCastSegment( const b2ShapeCastInput* input, const b2Segment* shape );
-
-/// Shape cast versus a convex polygon. Initial overlap is treated as a miss.
-b2CastOutput b2ShapeCastPolygon( const b2ShapeCastInput* input, const b2Polygon* shape );
 
 /// A convex hull. Used to create convex polygons.
 /// @warning Do not modify these values directly, instead use b2ComputeHull()
-typedef struct b2Hull
+public class b2Hull
 {
-	/// The final points of the hull
-	b2Vec2 points[B2_MAX_POLYGON_VERTICES];
+    /// The final points of the hull
+    public b2Vec2[] points = new b2Vec2[constants.B2_MAX_POLYGON_VERTICES];
 
-	/// The number of points
-	int count;
-} b2Hull;
-
-/// Compute the convex hull of a set of points. Returns an empty hull if it fails.
-/// Some failure cases:
-/// - all points very close together
-/// - all points on a line
-/// - less than 3 points
-/// - more than B2_MAX_POLYGON_VERTICES points
-/// This welds close points and removes collinear points.
-/// @warning Do not modify a hull once it has been computed
-b2Hull b2ComputeHull( const b2Vec2* points, int count );
-
-/// This determines if a hull is valid. Checks for:
-/// - convexity
-/// - collinear points
-/// This is expensive and should not be called at runtime.
-bool b2ValidateHull( const b2Hull* hull );
+    /// The number of points
+    public int count;
+}
 
 /**@}*/
 
@@ -310,106 +180,108 @@ bool b2ValidateHull( const b2Hull* hull );
  */
 
 /// Result of computing the distance between two line segments
-typedef struct b2SegmentDistanceResult
+public class b2SegmentDistanceResult
 {
-	/// The closest point on the first segment
-	b2Vec2 closest1;
+    /// The closest point on the first segment
+    public b2Vec2 closest1;
 
-	/// The closest point on the second segment
-	b2Vec2 closest2;
+    /// The closest point on the second segment
+    public b2Vec2 closest2;
 
-	/// The barycentric coordinate on the first segment
-	float fraction1;
+    /// The barycentric coordinate on the first segment
+    public float fraction1;
 
-	/// The barycentric coordinate on the second segment
-	float fraction2;
+    /// The barycentric coordinate on the second segment
+    public float fraction2;
 
-	/// The squared distance between the closest points
-	float distanceSquared;
-} b2SegmentDistanceResult;
-
-/// Compute the distance between two line segments, clamping at the end points if needed.
-b2SegmentDistanceResult b2SegmentDistance( b2Vec2 p1, b2Vec2 q1, b2Vec2 p2, b2Vec2 q2 );
+    /// The squared distance between the closest points
+    public float distanceSquared;
+}
 
 /// A distance proxy is used by the GJK algorithm. It encapsulates any shape.
-typedef struct b2ShapeProxy
+public class b2ShapeProxy
 {
-	/// The point cloud
-	b2Vec2 points[B2_MAX_POLYGON_VERTICES];
+    /// The point cloud
+    public b2Vec2[] points = new b2Vec2[constants.B2_MAX_POLYGON_VERTICES];
 
-	/// The number of points
-	int count;
+    /// The number of points
+    public int count;
 
-	/// The external radius of the point cloud
-	float radius;
-} b2ShapeProxy;
+    /// The external radius of the point cloud
+    public float radius;
+}
 
 /// Used to warm start the GJK simplex. If you call this function multiple times with nearby
 /// transforms this might improve performance. Otherwise you can zero initialize this.
 /// The distance cache must be initialized to zero on the first call.
 /// Users should generally just zero initialize this structure for each call.
-typedef struct b2SimplexCache
+public class b2SimplexCache
 {
-	/// The number of stored simplex points
-	ushort count;
+    /// The number of stored simplex points
+    public ushort count;
 
-	/// The cached simplex indices on shape A
-	byte indexA[3];
+    /// The cached simplex indices on shape A
+    public byte[] indexA = new byte[3];
 
-	/// The cached simplex indices on shape B
-	byte indexB[3];
-} b2SimplexCache;
-
-static const b2SimplexCache b2_emptySimplexCache = B2_ZERO_INIT;
+    /// The cached simplex indices on shape B
+    public byte[] indexB = new byte[3];
+}
 
 /// Input for b2ShapeDistance
-typedef struct b2DistanceInput
+public class b2DistanceInput
 {
-	/// The proxy for shape A
-	b2ShapeProxy proxyA;
+    /// The proxy for shape A
+    public b2ShapeProxy proxyA;
 
-	/// The proxy for shape B
-	b2ShapeProxy proxyB;
+    /// The proxy for shape B
+    public b2ShapeProxy proxyB;
 
-	/// The world transform for shape A
-	b2Transform transformA;
+    /// The world transform for shape A
+    public b2Transform transformA;
 
-	/// The world transform for shape B
-	b2Transform transformB;
+    /// The world transform for shape B
+    public b2Transform transformB;
 
-	/// Should the proxy radius be considered?
-	bool useRadii;
-} b2DistanceInput;
+    /// Should the proxy radius be considered?
+    public bool useRadii;
+}
 
 /// Output for b2ShapeDistance
-typedef struct b2DistanceOutput
+public class b2DistanceOutput
 {
-	b2Vec2 pointA; ///< Closest point on shapeA
-	b2Vec2 pointB; ///< Closest point on shapeB
-	// todo_erin implement this
-	// b2Vec2 normal;			///< Normal vector that points from A to B
-	float distance;		  ///< The final distance, zero if overlapped
-	int iterations;	  ///< Number of GJK iterations used
-	int simplexCount; ///< The number of simplexes stored in the simplex array
-} b2DistanceOutput;
+    public b2Vec2 pointA; // Closest point on shapeA
+    public b2Vec2 pointB; // Closest point on shapeB
+    // todo_erin implement this
+    // b2Vec2 normal;			// Normal vector that points from A to B
+    public float distance;		  // The final distance, zero if overlapped
+    public int iterations;	  // Number of GJK iterations used
+    public int simplexCount; // The number of simplexes stored in the simplex array
+}
 
 /// Simplex vertex for debugging the GJK algorithm
-typedef struct b2SimplexVertex
+public class b2SimplexVertex
 {
-	b2Vec2 wA;		///< support point in proxyA
-	b2Vec2 wB;		///< support point in proxyB
-	b2Vec2 w;		///< wB - wA
-	float a;		///< barycentric coordinate for closest point
-	int indexA; ///< wA index
-	int indexB; ///< wB index
-} b2SimplexVertex;
+    public b2Vec2 wA;		// support point in proxyA
+    public b2Vec2 wB;		// support point in proxyB
+    public b2Vec2 w;		// wB - wA
+    public float a;		// barycentric coordinate for closest point
+    public int indexA; // wA index
+    public int indexB; // wB index
+}
 
 /// Simplex from the GJK algorithm
-typedef struct b2Simplex
+public class b2Simplex
 {
-	b2SimplexVertex v1, v2, v3; ///< vertices
-	int count;				///< number of valid vertices
-} b2Simplex;
+    b2SimplexVertex v1, v2, v3; // vertices
+    int count;				// number of valid vertices
+}
+
+
+public static class collision
+{
+    public static readonly b2SimplexCache b2_emptySimplexCache = new b2SimplexCache();
+
+
 
 /// Compute the closest points between two shapes represented as point clouds.
 /// b2SimplexCache cache is input/output. On the first call set b2SimplexCache.count to zero.
@@ -420,12 +292,12 @@ b2DistanceOutput b2ShapeDistance( b2SimplexCache* cache, const b2DistanceInput* 
 /// Input parameters for b2ShapeCast
 typedef struct b2ShapeCastPairInput
 {
-	b2ShapeProxy proxyA;	///< The proxy for shape A
-	b2ShapeProxy proxyB;	///< The proxy for shape B
-	b2Transform transformA; ///< The world transform for shape A
-	b2Transform transformB; ///< The world transform for shape B
-	b2Vec2 translationB;	///< The translation of shape B
-	float maxFraction;		///< The fraction of the translation to consider, typically 1
+	b2ShapeProxy proxyA;	// The proxy for shape A
+	b2ShapeProxy proxyB;	// The proxy for shape B
+	b2Transform transformA; // The world transform for shape A
+	b2Transform transformB; // The world transform for shape B
+	b2Vec2 translationB;	// The translation of shape B
+	float maxFraction;		// The fraction of the translation to consider, typically 1
 } b2ShapeCastPairInput;
 
 /// Perform a linear shape cast of shape B moving and shape A fixed. Determines the hit point, normal, and translation fraction.
@@ -439,11 +311,11 @@ b2ShapeProxy b2MakeProxy( const b2Vec2* vertices, int count, float radius );
 /// position.
 typedef struct b2Sweep
 {
-	b2Vec2 localCenter; ///< Local center of mass position
-	b2Vec2 c1;			///< Starting center of mass world position
-	b2Vec2 c2;			///< Ending center of mass world position
-	b2Rot q1;			///< Starting world rotation
-	b2Rot q2;			///< Ending world rotation
+	b2Vec2 localCenter; // Local center of mass position
+	b2Vec2 c1;			// Starting center of mass world position
+	b2Vec2 c2;			// Ending center of mass world position
+	b2Rot q1;			// Starting world rotation
+	b2Rot q2;			// Ending world rotation
 } b2Sweep;
 
 /// Evaluate the transform sweep at a specific time.
@@ -452,11 +324,11 @@ b2Transform b2GetSweepTransform( const b2Sweep* sweep, float time );
 /// Input parameters for b2TimeOfImpact
 typedef struct b2TOIInput
 {
-	b2ShapeProxy proxyA; ///< The proxy for shape A
-	b2ShapeProxy proxyB; ///< The proxy for shape B
-	b2Sweep sweepA;		 ///< The movement of shape A
-	b2Sweep sweepB;		 ///< The movement of shape B
-	float maxFraction;	 ///< Defines the sweep interval [0, maxFraction]
+	b2ShapeProxy proxyA; // The proxy for shape A
+	b2ShapeProxy proxyB; // The proxy for shape B
+	b2Sweep sweepA;		 // The movement of shape A
+	b2Sweep sweepB;		 // The movement of shape B
+	float maxFraction;	 // Defines the sweep interval [0, maxFraction]
 } b2TOIInput;
 
 /// Describes the TOI output
@@ -472,8 +344,8 @@ typedef enum b2TOIState
 /// Output parameters for b2TimeOfImpact.
 typedef struct b2TOIOutput
 {
-	b2TOIState state; ///< The type of result
-	float fraction;	  ///< The sweep time of the collision
+	b2TOIState state; // The type of result
+	float fraction;	  // The sweep time of the collision
 } b2TOIOutput;
 
 /// Compute the upper bound on time before two shapes penetrate. Time is represented as
