@@ -14,7 +14,7 @@ namespace Box2D.NET.Engine;
  * @{
  */
 /// Low level ray cast input data
-public class b2RayCastInput
+public struct b2RayCastInput
 {
     /// Start point of the ray cast
     public b2Vec2 origin;
@@ -463,7 +463,7 @@ public class b2DynamicTree
 }
 
 /// These are performance results returned by dynamic tree queries.
-public struct b2TreeStats
+public class b2TreeStats
 {
     /// Number of internal nodes visited during the query
     public int nodeVisits;

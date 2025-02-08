@@ -1,8 +1,11 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
+using System;
+
 namespace Box2D.NET.Engine;
 
+[Flags]
 public enum b2TreeNodeFlags
 {
     b2_allocatedNode = 0x0001,

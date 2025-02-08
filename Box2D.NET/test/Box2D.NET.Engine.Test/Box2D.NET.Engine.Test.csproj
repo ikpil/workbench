@@ -23,16 +23,4 @@
     <ProjectReference Include="..\..\src\Box2D.NET.Engine\Box2D.NET.Engine.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <ClCompile Include="test_bitset.c" />
-    <ClCompile Include="test_collision.c" />
-    <ClCompile Include="test_determinism.c" />
-    <ClCompile Include="test_distance.c" />
-    <ClCompile Include="test_id.c" />
-    <ClCompile Include="test_math.c" />
-    <ClCompile Include="test_shape.c" />
-    <ClCompile Include="test_table.c" />
-    <ClCompile Include="test_world.c" />
-  </ItemGroup>
-
 </Project>

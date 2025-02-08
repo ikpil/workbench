@@ -16,7 +16,7 @@ public class aabb
 
     /// Enlarge a to contain b
     /// @return true if the AABB grew
-    static bool b2EnlargeAABB(b2AABB* a, b2AABB b)
+    public static bool b2EnlargeAABB(ref b2AABB a, b2AABB b)
     {
         bool changed = false;
         if (b.lowerBound.x < a->lowerBound.x)

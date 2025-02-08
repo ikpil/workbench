@@ -34,4 +34,9 @@ public static class core
     {
         src.Slice(0, count).CopyTo(dst);
     }
+
+    public static void B2_UNUSED<T>(T a)
+    {
+        // ...
+    }
 }
