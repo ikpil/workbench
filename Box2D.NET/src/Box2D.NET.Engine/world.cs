@@ -3,6 +3,9 @@
 
 namespace Box2D.NET.Engine;
 
+public class world
+{
+
 enum b2SetType
 {
 	b2_staticSet = 0,
@@ -3425,3 +3428,5 @@ void b2ValidateContacts( b2World* world )
 }
 
 #endif
+
+}

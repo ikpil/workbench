@@ -3,6 +3,8 @@
 
 namespace Box2D.NET.Engine;
 
+public class wheel_joint
+{
 
 
 
@@ -547,4 +549,6 @@ void b2DrawWheelJoint( b2DebugDraw* draw, b2JointSim* base, b2Transform transfor
 
 	draw->DrawPoint( pA, 5.0f, c1, draw->context );
 	draw->DrawPoint( pB, 5.0f, c4, draw->context );
+}
+
 }

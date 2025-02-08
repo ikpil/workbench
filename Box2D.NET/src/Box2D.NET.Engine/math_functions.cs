@@ -3,6 +3,8 @@
 
 namespace Box2D.NET.Engine;
 
+public class math_function
+{
 
 
 
@@ -864,4 +866,6 @@ b2Rot b2ComputeRotationBetweenUnitVectors(b2Vec2 v1, b2Vec2 v2)
 	rot.c = b2Dot( v1, v2 );
 	rot.s = b2Cross( v1, v2 );
 	return b2NormalizeRot( rot );
+}
+
 }

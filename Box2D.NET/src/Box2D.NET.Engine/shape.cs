@@ -4,6 +4,8 @@
 
 namespace Box2D.NET.Engine;
 
+public class shape
+{
 
 
 
@@ -1792,4 +1794,6 @@ b2Vec2 b2Shape_GetClosestPoint( b2ShapeId shapeId, b2Vec2 target )
 	b2DistanceOutput output = b2ShapeDistance( &cache, &input, NULL, 0 );
 
 	return output.pointA;
+}
+
 }

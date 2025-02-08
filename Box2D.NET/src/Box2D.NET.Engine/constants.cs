@@ -3,7 +3,10 @@
 
 namespace Box2D.NET.Engine;
 
-extern float b2_lengthUnitsPerMeter;
+public class constants
+{
+
+    extern float b2_lengthUnitsPerMeter;
 
 // Used to detect bad values. Positions greater than about 16km will have precision
 // problems, so 100km as a limit should be fine in all cases.
@@ -44,9 +47,11 @@ extern float b2_lengthUnitsPerMeter;
 // The time that a body must be still before it will go to sleep. In seconds.
 #define B2_TIME_TO_SLEEP 0.5f
 
-enum b2TreeNodeFlags
-{
-	b2_allocatedNode = 0x0001,
-	b2_enlargedNode = 0x0002,
-	b2_leafNode = 0x0004,
-};
+    enum b2TreeNodeFlags
+    {
+        b2_allocatedNode = 0x0001,
+        b2_enlargedNode = 0x0002,
+        b2_leafNode = 0x0004,
+    };
+
+}

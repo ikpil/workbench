@@ -3,6 +3,8 @@
 
 namespace Box2D.NET.Engine;
 
+public class solver_set
+{
 
 
 typedef struct b2Body b2Body;
@@ -664,4 +666,6 @@ void b2TransferJoint( b2World* world, b2SolverSet* targetSet, b2SolverSet* sourc
 			movedJoint->localIndex = localIndex;
 		}
 	}
+}
+
 }

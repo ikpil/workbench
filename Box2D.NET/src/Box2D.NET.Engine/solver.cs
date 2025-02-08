@@ -1,37 +1,12 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // Compare to SDL_CPUPauseInstruction
 
 namespace Box2D.NET.Engine;
 
-
-
-
-
-
-
+public class solver
+{
 
 typedef struct b2BodySim b2BodySim;
 typedef struct b2BodyState b2BodyState;
@@ -2181,4 +2156,6 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 		world->profile.sleepIslands = b2GetMilliseconds( sleepTicks );
 		b2TracyCZoneEnd( sleep_islands );
 	}
+}
+
 }

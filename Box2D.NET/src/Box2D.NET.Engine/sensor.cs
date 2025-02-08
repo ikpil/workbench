@@ -4,6 +4,8 @@
 
 namespace Box2D.NET.Engine;
 
+public class sensor
+{
 
 
 
@@ -398,4 +400,6 @@ void b2DestroySensor( b2World* world, b2Shape* sensorShape )
 		b2Shape* otherSensorShape = b2ShapeArray_Get( &world->shapes, movedSensor->shapeId );
 		otherSensorShape->sensorIndex = sensorShape->sensorIndex;
 	}
+}
+
 }

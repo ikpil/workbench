@@ -4,6 +4,9 @@
 
 namespace Box2D.NET.Engine;
 
+public class core
+{
+
 
 
 // clang-format off
@@ -14,15 +17,15 @@ namespace Box2D.NET.Engine;
 #define B2_RESTRICT restrict
 
 #ifdef NDEBUG
-	#define B2_DEBUG 0
+#define B2_DEBUG 0
 #else
-	#define B2_DEBUG 1
+#define B2_DEBUG 1
 #endif
 
 #if defined( BOX2D_VALIDATE ) && !defined( NDEBUG )
 	#define B2_VALIDATE 1
 #else
-	#define B2_VALIDATE 0
+#define B2_VALIDATE 0
 #endif
 
 // Define platform
@@ -33,7 +36,7 @@ namespace Box2D.NET.Engine;
 #elif defined( __linux__ )
 	#define B2_PLATFORM_LINUX
 #elif defined( __APPLE__ )
-	
+
 	#if defined( TARGET_OS_IPHONE ) && !TARGET_OS_IPHONE
 		#define B2_PLATFORM_MACOS
 	#else
@@ -42,7 +45,7 @@ namespace Box2D.NET.Engine;
 #elif defined( __EMSCRIPTEN__ )
 	#define B2_PLATFORM_WASM
 #else
-	#define B2_PLATFORM_UNKNOWN
+#define B2_PLATFORM_UNKNOWN
 #endif
 
 // Define CPU
@@ -53,7 +56,7 @@ namespace Box2D.NET.Engine;
 #elif defined( __EMSCRIPTEN__ )
 	#define B2_CPU_WASM
 #else
-	#define B2_CPU_UNKNOWN
+#define B2_CPU_UNKNOWN
 #endif
 
 // Define SIMD
@@ -78,9 +81,9 @@ namespace Box2D.NET.Engine;
 		#define B2_SIMD_WIDTH 4
 	#endif
 #else
-	#define B2_SIMD_NONE
-	// note: I tried width of 1 and got no performance change
-	#define B2_SIMD_WIDTH 4
+#define B2_SIMD_NONE
+    // note: I tried width of 1 and got no performance change
+#define B2_SIMD_WIDTH 4
 #endif
 
 // Define compiler
@@ -92,17 +95,17 @@ namespace Box2D.NET.Engine;
 	#define B2_COMPILER_MSVC
 #endif
 
-/// Tracy profiler instrumentation
-/// https://github.com/wolfpld/tracy
+    /// Tracy profiler instrumentation
+    /// https://github.com/wolfpld/tracy
 #ifdef BOX2D_PROFILE
-	
-	#define b2TracyCZoneC( ctx, color, active ) TracyCZoneC( ctx, color, active )
-	#define b2TracyCZoneNC( ctx, name, color, active ) TracyCZoneNC( ctx, name, color, active )
-	#define b2TracyCZoneEnd( ctx ) TracyCZoneEnd( ctx )
+
+#define b2TracyCZoneC( ctx, color, active ) TracyCZoneC( ctx, color, active )
+#define b2TracyCZoneNC( ctx, name, color, active ) TracyCZoneNC( ctx, name, color, active )
+#define b2TracyCZoneEnd( ctx ) TracyCZoneEnd( ctx )
 #else
-	#define b2TracyCZoneC( ctx, color, active )
-	#define b2TracyCZoneNC( ctx, name, color, active )
-	#define b2TracyCZoneEnd( ctx )
+#define b2TracyCZoneC( ctx, color, active )
+#define b2TracyCZoneNC( ctx, name, color, active )
+#define b2TracyCZoneEnd( ctx )
 #endif
 
 // clang-format on
@@ -123,34 +126,38 @@ namespace Box2D.NET.Engine;
 
 #define B2_CHECK_DEF( DEF ) B2_ASSERT( DEF->internalValue == B2_SECRET_COOKIE )
 
-void* b2Alloc( int size );
+    void* b2Alloc(int size);
 #define B2_ALLOC_STRUCT( type ) b2Alloc(sizeof(type))
 #define B2_ALLOC_ARRAY( count, type ) b2Alloc(count * sizeof(type))
 
-void b2Free( void* mem, int size );
+    void b2Free(void* mem, int size);
 #define B2_FREE_STRUCT( mem, type ) b2Free( mem, sizeof(type));
 #define B2_FREE_ARRAY( mem, count, type ) b2Free(mem, count * sizeof(type))
 
-void* b2GrowAlloc( void* oldMem, int oldSize, int newSize );
+    void* b2GrowAlloc(void* oldMem, int oldSize, int newSize);
 
-typedef struct b2AtomicInt
-{
-	int value;
-} b2AtomicInt;
+    typedef struct b2AtomicInt
+    {
+        int value;
+    }
 
-typedef struct b2AtomicU32
-{
-	uint32_t value;
-} b2AtomicU32;
+    b2AtomicInt;
+
+    typedef struct b2AtomicU32
+    {
+        uint32_t value;
+    }
+
+    b2AtomicU32;
 
 #if 0
-void b2AtomicStoreInt( b2AtomicInt* a, int value );
-int b2AtomicLoadInt( b2AtomicInt* a );
-int b2AtomicFetchAddInt( b2AtomicInt* a, int increment );
-bool b2AtomicCompareExchangeInt( b2AtomicInt* obj, int expected, int desired );
+    void b2AtomicStoreInt(b2AtomicInt* a, int value);
+    int b2AtomicLoadInt(b2AtomicInt* a);
+    int b2AtomicFetchAddInt(b2AtomicInt* a, int increment);
+    bool b2AtomicCompareExchangeInt(b2AtomicInt* obj, int expected, int desired);
 
-void b2AtomicStoreU32( b2AtomicU32* a, uint32_t value );
-uint32_t b2AtomicLoadU32( b2AtomicU32* a );
+    void b2AtomicStoreU32(b2AtomicU32* a, uint32_t value);
+    uint32_t b2AtomicLoadU32(b2AtomicU32* a);
 #endif
 
 
@@ -181,54 +188,57 @@ uint32_t b2AtomicLoadU32( b2AtomicU32* a );
 
 
 // This allows the user to change the length units at runtime
-float b2_lengthUnitsPerMeter = 1.0f;
+    float b2_lengthUnitsPerMeter = 1.0f;
 
-void b2SetLengthUnitsPerMeter( float lengthUnits )
-{
-	B2_ASSERT( b2IsValidFloat( lengthUnits ) && lengthUnits > 0.0f );
-	b2_lengthUnitsPerMeter = lengthUnits;
-}
+    void b2SetLengthUnitsPerMeter(float lengthUnits)
+    {
+        B2_ASSERT(b2IsValidFloat(lengthUnits) && lengthUnits > 0.0f);
+        b2_lengthUnitsPerMeter = lengthUnits;
+    }
 
-float b2GetLengthUnitsPerMeter( void )
-{
-	return b2_lengthUnitsPerMeter;
-}
+    float b2GetLengthUnitsPerMeter(void)
+    {
+        return b2_lengthUnitsPerMeter;
+    }
 
-static int b2DefaultAssertFcn( const char* condition, const char* fileName, int lineNumber )
-{
-	printf( "BOX2D ASSERTION: %s, %s, line %d\n", condition, fileName, lineNumber );
+    static int b2DefaultAssertFcn( const char* condition,  const char* fileName,  int lineNumber )
+    {
+        printf("BOX2D ASSERTION: %s, %s, line %d\n", condition, fileName, lineNumber);
 
-	// return non-zero to break to debugger
-	return 1;
-}
+        // return non-zero to break to debugger
+        return 1;
+    }
 
-b2AssertFcn* b2AssertHandler = b2DefaultAssertFcn;
+    b2AssertFcn* b2AssertHandler = b2DefaultAssertFcn;
 
-void b2SetAssertFcn( b2AssertFcn* assertFcn )
-{
-	B2_ASSERT( assertFcn != NULL );
-	b2AssertHandler = assertFcn;
-}
+    void b2SetAssertFcn(b2AssertFcn* assertFcn)
+    {
+        B2_ASSERT(assertFcn != NULL);
+        b2AssertHandler = assertFcn;
+    }
 
 #if !defined( NDEBUG ) || defined( B2_ENABLE_ASSERT )
-int b2InternalAssertFcn( const char* condition, const char* fileName, int lineNumber )
-{
-	return b2AssertHandler( condition, fileName, lineNumber );
-}
+    int b2InternalAssertFcn( const char* condition,  const char* fileName,  int lineNumber )
+    {
+        return b2AssertHandler(condition, fileName, lineNumber);
+    }
 #endif
 
-b2Version b2GetVersion( void )
-{
-	return ( b2Version ){ 3, 1, 0 };
-}
+    b2Version b2GetVersion(void)
+    {
+        return (b2Version){
+            3, 1, 0
+        }
+        ;
+    }
 
 #if 0
 #if defined( _MSC_VER )
 
 #endif
 
-void b2AtomicStoreInt( b2AtomicInt* a, int value )
-{
+    void b2AtomicStoreInt(b2AtomicInt* a, int value)
+    {
 #if defined( _MSC_VER )
 	(void)_InterlockedExchange( (long*)&a->value, value );
 #elif defined( __GNUC__ ) || defined( __clang__ )
@@ -236,10 +246,10 @@ void b2AtomicStoreInt( b2AtomicInt* a, int value )
 #else
 #error "Unsupported platform"
 #endif
-}
+    }
 
-int b2AtomicLoadInt( b2AtomicInt* a )
-{
+    int b2AtomicLoadInt(b2AtomicInt* a)
+    {
 #if defined( _MSC_VER )
 	return _InterlockedOr( (long*)&a->value, 0 );
 #elif defined( __GNUC__ ) || defined( __clang__ )
@@ -247,10 +257,10 @@ int b2AtomicLoadInt( b2AtomicInt* a )
 #else
 #error "Unsupported platform"
 #endif
-}
+    }
 
-int b2AtomicFetchAddInt( b2AtomicInt* a, int increment )
-{
+    int b2AtomicFetchAddInt(b2AtomicInt* a, int increment)
+    {
 #if defined( _MSC_VER )
 	return _InterlockedExchangeAdd( (long*)&a->value, (long)increment );
 #elif defined( __GNUC__ ) || defined( __clang__ )
@@ -258,10 +268,10 @@ int b2AtomicFetchAddInt( b2AtomicInt* a, int increment )
 #else
 #error "Unsupported platform"
 #endif
-}
+    }
 
-bool b2AtomicCompareExchangeInt( b2AtomicInt* a, int expected, int desired )
-{
+    bool b2AtomicCompareExchangeInt(b2AtomicInt* a, int expected, int desired)
+    {
 #if defined( _MSC_VER )
 	return _InterlockedCompareExchange( (long*)&a->value, (long)desired, (long)expected ) == expected;
 #elif defined( __GNUC__ ) || defined( __clang__ )
@@ -270,10 +280,10 @@ bool b2AtomicCompareExchangeInt( b2AtomicInt* a, int expected, int desired )
 #else
 #error "Unsupported platform"
 #endif
-}
+    }
 
-void b2AtomicStoreU32( b2AtomicU32* a, uint32_t value )
-{
+    void b2AtomicStoreU32(b2AtomicU32* a, uint32_t value)
+    {
 #if defined( _MSC_VER )
 	(void)_InterlockedExchange( (long*)&a->value, value );
 #elif defined( __GNUC__ ) || defined( __clang__ )
@@ -281,10 +291,10 @@ void b2AtomicStoreU32( b2AtomicU32* a, uint32_t value )
 #else
 #error "Unsupported platform"
 #endif
-}
+    }
 
-uint32_t b2AtomicLoadU32( b2AtomicU32* a )
-{
+    uint32_t b2AtomicLoadU32(b2AtomicU32* a)
+    {
 #if defined( _MSC_VER )
 	return (uint32_t)_InterlockedOr( (long*)&a->value, 0 );
 #elif defined( __GNUC__ ) || defined( __clang__ )
@@ -292,107 +302,111 @@ uint32_t b2AtomicLoadU32( b2AtomicU32* a )
 #else
 #error "Unsupported platform"
 #endif
-}
+    }
 #endif
 
-static b2AllocFcn* b2_allocFcn = NULL;
-static b2FreeFcn* b2_freeFcn = NULL;
+    static b2AllocFcn* b2_allocFcn = NULL;
+    static b2FreeFcn* b2_freeFcn = NULL;
 
-b2AtomicInt b2_byteCount;
+    b2AtomicInt b2_byteCount;
 
-void b2SetAllocator( b2AllocFcn* allocFcn, b2FreeFcn* freeFcn )
-{
-	b2_allocFcn = allocFcn;
-	b2_freeFcn = freeFcn;
-}
+    void b2SetAllocator(b2AllocFcn* allocFcn, b2FreeFcn* freeFcn)
+    {
+        b2_allocFcn = allocFcn;
+        b2_freeFcn = freeFcn;
+    }
 
 // Use 32 byte alignment for everything. Works with 256bit SIMD.
 #define B2_ALIGNMENT 32
 
-void* b2Alloc( int size )
-{
-	if ( size == 0 )
-	{
-		return NULL;
-	}
+    void* b2Alloc(int size)
+    {
+        if (size == 0)
+        {
+            return NULL;
+        }
 
-	// This could cause some sharing issues, however Box2D rarely calls b2Alloc.
-	b2AtomicFetchAddInt( &b2_byteCount, size );
+        // This could cause some sharing issues, however Box2D rarely calls b2Alloc.
+        b2AtomicFetchAddInt(&b2_byteCount, size);
 
-	// Allocation must be a multiple of 32 or risk a seg fault
-	// https://en.cppreference.com/w/c/memory/aligned_alloc
-	int size32 = ( ( size - 1 ) | 0x1F ) + 1;
+        // Allocation must be a multiple of 32 or risk a seg fault
+        // https://en.cppreference.com/w/c/memory/aligned_alloc
+        int size32 = ((size - 1) | 0x1F) + 1;
 
-	if ( b2_allocFcn != NULL )
-	{
-		void* ptr = b2_allocFcn( size32, B2_ALIGNMENT );
-		b2TracyCAlloc( ptr, size );
+        if (b2_allocFcn != NULL)
+        {
+            void* ptr = b2_allocFcn(size32, B2_ALIGNMENT);
+            b2TracyCAlloc(ptr, size);
 
-		B2_ASSERT( ptr != NULL );
-		B2_ASSERT( ( (uintptr_t)ptr & 0x1F ) == 0 );
+            B2_ASSERT(ptr != NULL);
+            B2_ASSERT(((uintptr_t)ptr & 0x1F) == 0);
 
-		return ptr;
-	}
+            return ptr;
+        }
 
 #ifdef B2_PLATFORM_WINDOWS
-	void* ptr = _aligned_malloc( size32, B2_ALIGNMENT );
+        void* ptr = _aligned_malloc(size32, B2_ALIGNMENT);
 #elif defined( B2_PLATFORM_ANDROID )
-	void* ptr = NULL;
-	if ( posix_memalign( &ptr, B2_ALIGNMENT, size32 ) != 0 )
-	{
-		// allocation failed, exit the application
-		exit( EXIT_FAILURE );
-	}
+        void* ptr = NULL;
+        if (posix_memalign(&ptr, B2_ALIGNMENT, size32) != 0)
+        {
+            // allocation failed, exit the application
+            exit(EXIT_FAILURE);
+        }
+
 #else
-	void* ptr = aligned_alloc( B2_ALIGNMENT, size32 );
+        void* ptr = aligned_alloc(B2_ALIGNMENT, size32);
 #endif
 
-	b2TracyCAlloc( ptr, size );
+        b2TracyCAlloc(ptr, size);
 
-	B2_ASSERT( ptr != NULL );
-	B2_ASSERT( ( (uintptr_t)ptr & 0x1F ) == 0 );
+        B2_ASSERT(ptr != NULL);
+        B2_ASSERT(((uintptr_t)ptr & 0x1F) == 0);
 
-	return ptr;
-}
+        return ptr;
+    }
 
-void b2Free( void* mem, int size )
-{
-	if ( mem == NULL )
-	{
-		return;
-	}
+    void b2Free(void* mem, int size)
+    {
+        if (mem == NULL)
+        {
+            return;
+        }
 
-	b2TracyCFree( mem );
+        b2TracyCFree(mem);
 
-	if ( b2_freeFcn != NULL )
-	{
-		b2_freeFcn( mem );
-	}
-	else
-	{
+        if (b2_freeFcn != NULL)
+        {
+            b2_freeFcn(mem);
+        }
+        else
+        {
 #ifdef B2_PLATFORM_WINDOWS
-		_aligned_free( mem );
+            _aligned_free(mem);
 #else
-		free( mem );
+            free(mem);
 #endif
-	}
+        }
 
-	b2AtomicFetchAddInt( &b2_byteCount, -size );
-}
+        b2AtomicFetchAddInt(&b2_byteCount, -size);
+    }
 
-void* b2GrowAlloc( void* oldMem, int oldSize, int newSize )
-{
-	B2_ASSERT( newSize > oldSize );
-	void* newMem = b2Alloc( newSize );
-	if ( oldSize > 0 )
-	{
-		memcpy( newMem, oldMem, oldSize );
-		b2Free( oldMem, oldSize );
-	}
-	return newMem;
-}
+    void* b2GrowAlloc(void* oldMem, int oldSize, int newSize)
+    {
+        B2_ASSERT(newSize > oldSize);
+        void* newMem = b2Alloc(newSize);
+        if (oldSize > 0)
+        {
+            memcpy(newMem, oldMem, oldSize);
+            b2Free(oldMem, oldSize);
+        }
 
-int b2GetByteCount( void )
-{
-	return b2AtomicLoadInt( &b2_byteCount );
+        return newMem;
+    }
+
+    int b2GetByteCount(void)
+    {
+        return b2AtomicLoadInt(&b2_byteCount);
+    }
+
 }

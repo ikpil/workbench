@@ -4,77 +4,84 @@
 
 namespace Box2D.NET.Engine;
 
-
-
-typedef struct b2IdPool
+public class id_pool
 {
-    b2IntArray freeArray;
-    int nextIndex;
-} b2IdPool;
-
-b2IdPool b2CreateIdPool( void );
-void b2DestroyIdPool( b2IdPool* pool );
-
-int b2AllocId( b2IdPool* pool );
-void b2FreeId( b2IdPool* pool, int id );
-void b2ValidateFreeId( b2IdPool* pool, int id );
-
-static inline int b2GetIdCount( b2IdPool* pool )
-{
-    return pool->nextIndex - pool->freeArray.count;
-}
-
-static inline int b2GetIdCapacity( b2IdPool* pool )
-{
-    return pool->nextIndex;
-}
-
-static inline int b2GetIdBytes( b2IdPool* pool )
-{
-    return b2IntArray_ByteCount(&pool->freeArray);
-}
 
 
-b2IdPool b2CreateIdPool( void )
-{
-	b2IdPool pool = { 0 };
-	pool.freeArray = b2IntArray_Create( 32 );
-	return pool;
-}
+    typedef struct b2IdPool
+    {
+        b2IntArray freeArray;
+        int nextIndex;
+    }
 
-void b2DestroyIdPool( b2IdPool* pool )
-{
-	b2IntArray_Destroy( &pool->freeArray );
-	*pool = ( b2IdPool ){ 0 };
-}
+    b2IdPool;
 
-int b2AllocId( b2IdPool* pool )
-{
-	int count = pool->freeArray.count;
-	if ( count > 0 )
-	{
-		int id = b2IntArray_Pop( &pool->freeArray );
-		return id;
-	}
+    b2IdPool b2CreateIdPool(void);
+    void b2DestroyIdPool(b2IdPool* pool);
 
-	int id = pool->nextIndex;
-	pool->nextIndex += 1;
-	return id;
-}
+    int b2AllocId(b2IdPool* pool);
+    void b2FreeId(b2IdPool* pool, int id);
+    void b2ValidateFreeId(b2IdPool* pool, int id);
 
-void b2FreeId( b2IdPool* pool, int id )
-{
-	B2_ASSERT( pool->nextIndex > 0 );
-	B2_ASSERT( 0 <= id && id < pool->nextIndex );
+    static inline int b2GetIdCount(b2IdPool* pool)
+    {
+        return pool->nextIndex - pool->freeArray.count;
+    }
 
-	if ( id == pool->nextIndex )
-	{
-		pool->nextIndex -= 1;
-		return;
-	}
+    static inline int b2GetIdCapacity(b2IdPool* pool)
+    {
+        return pool->nextIndex;
+    }
 
-	b2IntArray_Push( &pool->freeArray, id );
-}
+    static inline int b2GetIdBytes(b2IdPool* pool)
+    {
+        return b2IntArray_ByteCount(&pool->freeArray);
+    }
+
+
+    b2IdPool b2CreateIdPool(void)
+    {
+        b2IdPool pool = { 0 };
+        pool.freeArray = b2IntArray_Create(32);
+        return pool;
+    }
+
+    void b2DestroyIdPool(b2IdPool* pool)
+    {
+        b2IntArray_Destroy(&pool->freeArray);
+        *pool = (b2IdPool){
+            0
+        }
+        ;
+    }
+
+    int b2AllocId(b2IdPool* pool)
+    {
+        int count = pool->freeArray.count;
+        if (count > 0)
+        {
+            int id = b2IntArray_Pop(&pool->freeArray);
+            return id;
+        }
+
+        int id = pool->nextIndex;
+        pool->nextIndex += 1;
+        return id;
+    }
+
+    void b2FreeId(b2IdPool* pool, int id)
+    {
+        B2_ASSERT(pool->nextIndex > 0);
+        B2_ASSERT(0 <= id && id < pool->nextIndex);
+
+        if (id == pool->nextIndex)
+        {
+            pool->nextIndex -= 1;
+            return;
+        }
+
+        b2IntArray_Push(&pool->freeArray, id);
+    }
 
 #if B2_VALIDATE
 
@@ -94,10 +101,12 @@ void b2ValidateFreeId( b2IdPool* pool, int id )
 
 #else
 
-void b2ValidateFreeId( b2IdPool* pool, int id )
-{
-	B2_UNUSED( pool );
-	B2_UNUSED( id );
-}
+    void b2ValidateFreeId(b2IdPool* pool, int id)
+    {
+        B2_UNUSED(pool);
+        B2_UNUSED(id);
+    }
 
 #endif
+
+}

@@ -1,18 +1,6 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
-
-
-
-
-
-
-
-
-
-
-
-
 // Solver using graph coloring. Islands are only used for sleep.
 // High-Performance Physical Simulations on Next-Generation Architecture with Many Cores
 // http://web.eecs.umich.edu/~msmelyan/papers/physsim_onmanycore_itj.pdf
@@ -26,9 +14,8 @@
 
 namespace Box2D.NET.Engine;
 
-
-
-
+public class constraint_graph
+{
 
 typedef struct b2Body b2Body;
 typedef struct b2ContactSim b2ContactSim;
@@ -376,4 +363,5 @@ void b2RemoveJointFromGraph( b2World* world, int bodyIdA, int bodyIdB, int color
 		B2_ASSERT( movedJoint->localIndex == movedIndex );
 		movedJoint->localIndex = localIndex;
 	}
+}
 }

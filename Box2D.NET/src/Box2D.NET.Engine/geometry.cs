@@ -4,6 +4,8 @@
 namespace Box2D.NET.Engine;
 
 
+public class geometry
+{
 
 
 
@@ -917,4 +919,6 @@ b2CastOutput b2ShapeCastPolygon( const b2ShapeCastInput* input, const b2Polygon*
 
 	b2CastOutput output = b2ShapeCast( &pairInput );
 	return output;
+}
+
 }

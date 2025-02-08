@@ -3,6 +3,8 @@
 
 namespace Box2D.NET.Engine;
 
+public class manifold
+{
 
 
 
@@ -1597,4 +1599,6 @@ b2Manifold b2CollideChainSegmentAndPolygon( const b2ChainSegment* segmentA, b2Tr
 	manifold.points[1].point = b2Add( xfA.p, manifold.points[1].anchorA );
 
 	return manifold;
+}
+
 }

@@ -4,6 +4,8 @@
 namespace Box2D.NET.Engine;
 
 
+public class weld_joint
+{
 
 
 
@@ -309,3 +311,5 @@ void b2DumpWeldJoint()
 	b2Dump("  joints[%d] = m_world->CreateJoint(&jd);\n", m_index);
 }
 #endif
+
+}

@@ -4,7 +4,8 @@
 
 namespace Box2D.NET.Engine;
 
-
+public class array
+{
 
 // Macro generated functions for dynamic arrays
 // Pros
@@ -182,3 +183,5 @@ B2_ARRAY_DECLARE( b2TaskContext, b2TaskContext );
 
 
 B2_ARRAY_SOURCE( int, b2Int );
+
+}

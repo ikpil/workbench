@@ -4,6 +4,8 @@
 
 namespace Box2D.NET.Engine;
 
+public class dynamic_tree
+{
 
 
 
@@ -1941,4 +1943,6 @@ int b2DynamicTree_Rebuild( b2DynamicTree* tree, bool fullBuild )
 	b2DynamicTree_Validate( tree );
 
 	return leafCount;
+}
+
 }

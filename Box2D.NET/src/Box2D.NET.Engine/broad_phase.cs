@@ -3,6 +3,8 @@
 
 namespace Box2D.NET.Engine;
 
+public class board_phase
+{
 
 
 
@@ -582,4 +584,6 @@ void b2ValidateNoEnlarged( const b2BroadPhase* bp )
 #else
 	B2_UNUSED( bp );
 #endif
+}
+
 }

@@ -3,13 +3,8 @@
 
 namespace Box2D.NET.Engine;
 
-
-
-
-
-
-
-
+public class types
+{
 
 #define B2_DEFAULT_CATEGORY_BITS 0x0001ULL
 #define B2_DEFAULT_MASK_BITS UINT64_MAX
@@ -1596,4 +1591,6 @@ b2DebugDraw b2DefaultDebugDraw( void )
 	draw.DrawPoint = b2EmptyDrawPoint;
 	draw.DrawString = b2EmptyDrawString;
 	return draw;
+}
+
 }

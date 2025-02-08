@@ -3,6 +3,8 @@
 
 namespace Box2D.NET.Engine;
 
+public class collision
+{
 
 
 
@@ -763,3 +765,5 @@ B2_API void b2DynamicTree_ValidateNoEnlarged( const b2DynamicTree* tree );
 
 
 /**@}*/
+
+}

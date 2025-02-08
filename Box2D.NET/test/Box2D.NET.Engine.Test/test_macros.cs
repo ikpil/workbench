@@ -2,6 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 namespace Box2D.NET.Engine.Test;
+public class test_macros
+{
 
 #define RUN_TEST( T )                                                                                                            \
 	do                                                                                                                           \
@@ -63,3 +65,5 @@ namespace Box2D.NET.Engine.Test;
 
 /// Used to prevent the compiler from warning about unused variables
 #define MAYBE_UNUSED( x ) ( (void)( x ) )
+
+}

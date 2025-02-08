@@ -3,11 +3,8 @@
 
 namespace Box2D.NET.Engine.Test;
 
-
-
-
-
-
+public class test_distance
+{
 
 static int SegmentDistanceTest( void )
 {
@@ -110,4 +107,6 @@ int DistanceTest( void )
 	RUN_SUBTEST( TimeOfImpactTest );
 
 	return 0;
+}
+
 }

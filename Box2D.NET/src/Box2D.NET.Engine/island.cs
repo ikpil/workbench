@@ -5,6 +5,8 @@
 
 namespace Box2D.NET.Engine;
 
+public class island
+{
 
 
 
@@ -1053,3 +1055,5 @@ void b2ValidateIsland( b2World* world, int islandId )
 	B2_UNUSED( islandId );
 }
 #endif
+
+}

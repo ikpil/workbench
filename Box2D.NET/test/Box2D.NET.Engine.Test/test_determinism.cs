@@ -4,14 +4,8 @@
 
 namespace Box2D.NET.Engine.Test;
 
-
-
-
-
-
-
-
-
+public class test_determinism
+{
 
 #ifdef BOX2D_PROFILE
 	
@@ -343,4 +337,6 @@ int DeterminismTest( void )
 	RUN_SUBTEST( CrossPlatformTest );
 
 	return 0;
+}
+
 }

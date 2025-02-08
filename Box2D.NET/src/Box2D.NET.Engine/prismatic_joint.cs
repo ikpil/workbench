@@ -3,6 +3,8 @@
 
 namespace Box2D.NET.Engine;
 
+public class prismatic_joint
+{
 
 
 
@@ -652,4 +654,6 @@ void b2DrawPrismaticJoint( b2DebugDraw* draw, b2JointSim* base, b2Transform tran
 
 	draw->DrawPoint( pA, 5.0f, c1, draw->context );
 	draw->DrawPoint( pB, 5.0f, c4, draw->context );
+}
+
 }

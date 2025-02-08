@@ -3,6 +3,8 @@
 
 namespace Box2D.NET.Engine;
 
+public class hull
+{
 
 
 
@@ -326,4 +328,6 @@ bool b2ValidateHull( const b2Hull* hull )
 	}
 
 	return true;
+}
+
 }

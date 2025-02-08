@@ -3,6 +3,8 @@
 
 namespace Box2D.NET.Engine;
 
+public class distance_joint
+{
 
 // needed for dll export
 
@@ -545,4 +547,6 @@ void b2DrawDistanceJoint( b2DebugDraw* draw, b2JointSim* base, b2Transform trans
 		b2Vec2 pRest = b2MulAdd( pA, joint->length, axis );
 		draw->DrawPoint( pRest, 4.0f, b2_colorBlue, draw->context );
 	}
+}
+
 }

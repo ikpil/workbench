@@ -4,6 +4,9 @@
 
 namespace Box2D.NET.Engine.Test;
 
+public class test_world
+{
+
 // This is a simple example of building and running a simulation
 // using Box2D. Here we create a large ground box and a small dynamic
 // box.
@@ -396,4 +399,6 @@ int WorldTest( void )
 	RUN_SUBTEST( TestSensor );
 
 	return 0;
+}
+
 }

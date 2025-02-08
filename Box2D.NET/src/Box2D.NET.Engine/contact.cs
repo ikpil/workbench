@@ -6,6 +6,8 @@
 namespace Box2D.NET.Engine;
 
 
+public class contract
+{
 
 
 
@@ -792,4 +794,6 @@ b2Manifold b2ComputeManifold( b2Shape* shapeA, b2Transform transformA, b2Shape* 
 	b2ManifoldFcn* fcn = s_registers[shapeA->type][shapeB->type].fcn;
 	b2SimplexCache cache = { 0 };
 	return fcn( shapeA, transformA, shapeB, transformB, &cache );
+}
+
 }

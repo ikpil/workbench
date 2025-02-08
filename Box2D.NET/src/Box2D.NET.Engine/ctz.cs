@@ -3,6 +3,9 @@
 
 namespace Box2D.NET.Engine;
 
+public class ctz
+{
+
 
 
 
@@ -109,4 +112,6 @@ static inline int b2RoundUpPowerOf2( int x )
 	}
 
 	return 1 << ( 32 - (int)b2CLZ32( (uint32_t)x - 1 ) );
+}
+
 }

@@ -4,6 +4,8 @@
 
 namespace Box2D.NET.Engine;
 
+public class contact_solver
+{
 
 
 typedef struct b2ContactSim b2ContactSim;
@@ -2088,4 +2090,6 @@ void b2StoreImpulsesTask( int startIndex, int endIndex, b2StepContext* context )
 	}
 
 	b2TracyCZoneEnd( store_impulses );
+}
+
 }

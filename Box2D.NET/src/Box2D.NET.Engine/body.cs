@@ -6,6 +6,8 @@
 namespace Box2D.NET.Engine;
 
 
+public class body
+{
 
 
 
@@ -2013,4 +2015,5 @@ bool b2ShouldBodiesCollide( b2World* world, b2Body* bodyA, b2Body* bodyB )
 	}
 
 	return true;
+}
 }

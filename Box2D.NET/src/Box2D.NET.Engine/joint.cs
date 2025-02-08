@@ -1,21 +1,12 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
-
-
-
-
-
-
-
-
-
-
-
 // needed for dll export
 
 namespace Box2D.NET.Engine;
 
+public class joint
+{
 
 
 
@@ -1596,4 +1587,6 @@ void b2DrawJoint( b2DebugDraw* draw, b2World* world, b2Joint* joint )
 			draw->DrawPoint( p, 5.0f, colors[colorIndex], draw->context );
 		}
 	}
+}
+
 }

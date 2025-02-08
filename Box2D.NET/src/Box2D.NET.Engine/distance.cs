@@ -4,6 +4,8 @@
 
 namespace Box2D.NET.Engine;
 
+public class distance
+{
 
 
 
@@ -1262,4 +1264,6 @@ b2TOIOutput b2TimeOfImpact( const b2TOIInput* input )
 #endif
 
 	return output;
+}
+
 }
