@@ -6,7 +6,7 @@ using System;
 using NUnit.Framework;
 using static Box2D.NET.Engine.geometry;
 using static Box2D.NET.Engine.math_function;
-using static Box2D.NET.Engine.types;
+using static Box2D.NET.Engine.array;
 
 namespace Box2D.NET.Engine.Test;
 
@@ -38,7 +38,7 @@ public class test_determinism : test_macros
         data->box2dTask( start, end, threadIndex, data->box2dContext );
     }
 
-    static void* EnqueueTask( b2TaskCallback* box2dTask, int itemCount, int minRange, void* box2dContext, void* userContext )
+    static object EnqueueTask( b2TaskCallback* box2dTask, int itemCount, int minRange, void* box2dContext, void* userContext )
     {
         MAYBE_UNUSED( userContext );
 

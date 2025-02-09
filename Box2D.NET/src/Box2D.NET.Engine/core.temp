@@ -133,19 +133,6 @@ public class core
 
     void* b2GrowAlloc(void* oldMem, int oldSize, int newSize);
 
-    typedef struct b2AtomicInt
-    {
-        int value;
-    }
-
-    b2AtomicInt;
-
-    typedef struct b2AtomicU32
-    {
-        uint value;
-    }
-
-    b2AtomicU32;
 
 #if 0
     void b2AtomicStoreInt(b2AtomicInt* a, int value);
@@ -403,18 +390,6 @@ public class core
         b2AtomicFetchAddInt(&b2_byteCount, -size);
     }
 
-    void* b2GrowAlloc(void* oldMem, int oldSize, int newSize)
-    {
-        Debug.Assert(newSize > oldSize);
-        void* newMem = b2Alloc(newSize);
-        if (oldSize > 0)
-        {
-            memcpy(newMem, oldMem, oldSize);
-            b2Free(oldMem, oldSize);
-        }
-
-        return newMem;
-    }
 
     int b2GetByteCount()
     {

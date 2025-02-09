@@ -4,17 +4,16 @@
 
 namespace Box2D.NET.Engine;
 
+public struct b2IdPool
+{
+    b2Array<int> freeArray;
+    int nextIndex;
+}
+
 public class id_pool
 {
 
 
-    typedef struct b2IdPool
-    {
-        b2IntArray freeArray;
-        int nextIndex;
-    }
-
-    b2IdPool;
 
     b2IdPool b2CreateIdPool();
     void b2DestroyIdPool(b2IdPool* pool);

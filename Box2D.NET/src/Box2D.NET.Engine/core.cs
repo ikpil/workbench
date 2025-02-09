@@ -1,6 +1,17 @@
 ﻿using System;
+using System.Diagnostics;
 
 namespace Box2D.NET.Engine;
+
+public class b2AtomicInt
+{
+    public volatile int value;
+}
+
+public class b2AtomicU32
+{
+    public volatile uint value;
+}
 
 public static class core
 {
@@ -24,6 +35,20 @@ public static class core
     {
         // ..
     }
+    
+    public static T[] b2GrowAlloc<T>(T[] oldMem, int oldSize, int newSize) where T : new()
+    {
+        Debug.Assert(newSize > oldSize);
+        T[] newMem = b2Alloc<T>(newSize);
+        if (oldSize > 0)
+        {
+            memcpy<T>(newMem, oldMem, oldSize);
+            b2Free(oldMem, oldSize);
+        }
+
+        return newMem;
+    }
+
 
     public static void memset<T>(Span<T> array, T value , int count)
     {
