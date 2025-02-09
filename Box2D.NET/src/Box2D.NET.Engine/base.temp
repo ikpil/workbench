@@ -74,21 +74,6 @@ public class base
 
 //! @cond
 
-    /// Get the absolute number of system ticks. The value is platform specific.
-    ulong b2GetTicks();
-
-    /// Get the milliseconds passed from an initial tick value.
-    float b2GetMilliseconds(ulong ticks);
-
-    /// Get the milliseconds passed from an initial tick value.
-    float b2GetMillisecondsAndReset(ulong[] ticks);
-
-    /// Yield to be used in a busy loop.
-    void b2Yield();
-
-    /// Simple djb2 hash function for determinism testing
-#define B2_HASH_INIT 5381
-    uint b2Hash(uint hash,  const byte* data,  int count );
 
 //! @endcond
 

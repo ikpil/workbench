@@ -1,95 +1,84 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
+using System.Diagnostics;
+using static Box2D.NET.Engine.array;
+using static Box2D.NET.Engine.core;
 
 namespace Box2D.NET.Engine;
 
-public struct b2IdPool
+public class b2IdPool
 {
-    b2Array<int> freeArray;
-    int nextIndex;
+    public b2Array<int> freeArray;
+    public int nextIndex;
 }
 
 public class id_pool
 {
-
-
-
-    b2IdPool b2CreateIdPool();
-    void b2DestroyIdPool(b2IdPool* pool);
-
-    int b2AllocId(b2IdPool* pool);
-    void b2FreeId(b2IdPool* pool, int id);
-    void b2ValidateFreeId(b2IdPool* pool, int id);
-
-    static int b2GetIdCount(b2IdPool* pool)
+    public static int b2GetIdCount(b2IdPool pool)
     {
-        return pool->nextIndex - pool->freeArray.count;
+        return pool.nextIndex - pool.freeArray.count;
     }
 
-    static int b2GetIdCapacity(b2IdPool* pool)
+    public static int b2GetIdCapacity(b2IdPool pool)
     {
-        return pool->nextIndex;
+        return pool.nextIndex;
     }
 
-    static int b2GetIdBytes(b2IdPool* pool)
+    public static int b2GetIdBytes(b2IdPool pool)
     {
-        return b2IntArray_ByteCount(&pool->freeArray);
+        return Array_ByteCount(pool.freeArray);
     }
 
 
-    b2IdPool b2CreateIdPool()
+    public static b2IdPool b2CreateIdPool()
     {
-        b2IdPool pool = { 0 };
-        pool.freeArray = b2IntArray_Create(32);
+        b2IdPool pool = new b2IdPool();
+        pool.freeArray = Array_Create<int>(32);
         return pool;
     }
 
-    void b2DestroyIdPool(b2IdPool* pool)
+    public static void b2DestroyIdPool(ref b2IdPool pool)
     {
-        b2IntArray_Destroy(&pool->freeArray);
-        *pool = (b2IdPool){
-            0
-        }
-        ;
+        Array_Destroy(pool.freeArray);
+        pool = new b2IdPool();
     }
 
-    int b2AllocId(b2IdPool* pool)
+    public static int b2AllocId(b2IdPool pool)
     {
-        int count = pool->freeArray.count;
+        int count = pool.freeArray.count;
         if (count > 0)
         {
-            int id = b2IntArray_Pop(&pool->freeArray);
+            int id = Array_Pop(pool.freeArray);
             return id;
         }
 
-        int id = pool->nextIndex;
-        pool->nextIndex += 1;
-        return id;
+        int nextId = pool.nextIndex;
+        pool.nextIndex += 1;
+        return nextId;
     }
 
-    void b2FreeId(b2IdPool* pool, int id)
+    public static void b2FreeId(b2IdPool pool, int id)
     {
-        Debug.Assert(pool->nextIndex > 0);
-        Debug.Assert(0 <= id && id < pool->nextIndex);
+        Debug.Assert(pool.nextIndex > 0);
+        Debug.Assert(0 <= id && id < pool.nextIndex);
 
-        if (id == pool->nextIndex)
+        if (id == pool.nextIndex)
         {
-            pool->nextIndex -= 1;
+            pool.nextIndex -= 1;
             return;
         }
 
-        b2IntArray_Push(&pool->freeArray, id);
+        Array_Push(pool.freeArray, id);
     }
 
 #if B2_VALIDATE
-
 void b2ValidateFreeId( b2IdPool* pool, int id )
 {
-	int freeCount = pool->freeArray.count;
+	int freeCount = pool.freeArray.count;
 	for ( int i = 0; i < freeCount; ++i )
 	{
-		if ( pool->freeArray.data[i] == id )
+		if ( pool.freeArray.data[i] == id )
 		{
 			return;
 		}
@@ -100,12 +89,11 @@ void b2ValidateFreeId( b2IdPool* pool, int id )
 
 #else
 
-    void b2ValidateFreeId(b2IdPool* pool, int id)
+    public static void b2ValidateFreeId(b2IdPool pool, int id)
     {
         B2_UNUSED(pool);
         B2_UNUSED(id);
     }
 
 #endif
-
 }

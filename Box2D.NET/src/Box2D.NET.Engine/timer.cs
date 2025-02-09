@@ -8,8 +8,9 @@ namespace Box2D.NET.Engine;
 
 public static class timer
 {
-    public static readonly double s_invFrequency = 1000000000UL / (double)Stopwatch.Frequency; // ticks to nano
+    private static readonly double s_invFrequency = 1000000000UL / (double)Stopwatch.Frequency; // counter to nano
 
+    /// Get the absolute number of system ticks. The value is platform specific.
     // nanoseconds
     public static ulong b2GetTicks()
     {
@@ -17,12 +18,14 @@ public static class timer
         return (ulong)(counter * s_invFrequency);
     }
 
+    /// Get the milliseconds passed from an initial tick value.
     public static float b2GetMilliseconds(ulong ticks)
     {
         ulong ticksNow = b2GetTicks();
         return (ticksNow - ticks) / (float)1000000;
     }
 
+    /// Get the milliseconds passed from an initial tick value.
     public static float b2GetMillisecondsAndReset(ref ulong ticks)
     {
         ulong ticksNow = b2GetTicks();
@@ -31,6 +34,7 @@ public static class timer
         return ms;
     }
 
+    /// Yield to be used in a busy loop.
     public static void b2Yield()
     {
         Thread.Yield();

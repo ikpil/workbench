@@ -69,4 +69,8 @@ public static class constants
 
     // core
     public const int B2_NULL_INDEX = -1;
+    
+    // base
+    /// Simple djb2 hash function for determinism testing
+    public const int B2_HASH_INIT = 5381;
 }
