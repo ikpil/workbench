@@ -1,8 +1,8 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
-using System;
-using System.Collections.Generic;
+using static Box2D.NET.Engine.core;
+using static Box2D.NET.Engine.math_function;
 
 namespace Box2D.NET.Engine;
 
@@ -24,6 +24,13 @@ public struct b2RayCastInput
 
     /// The maximum fraction of the translation to consider, typically 1
     public float maxFraction;
+
+    public b2RayCastInput(b2Vec2 origin, b2Vec2 translation, float maxFraction)
+    {
+        this.origin = origin;
+        this.translation = translation;
+        this.maxFraction = maxFraction;
+    }
 }
 
 /// Low level shape cast input in generic form. This allows casting an arbitrary point
@@ -88,6 +95,12 @@ public class b2Circle
 
     /// The radius
     public float radius;
+
+    public b2Circle(b2Vec2 center, float radius)
+    {
+        this.center = center;
+        this.radius = radius;
+    }
 }
 
 /// A solid capsule can be viewed as two semicircles connected
@@ -102,6 +115,13 @@ public class b2Capsule
 
     /// The radius of the semicircles
     public float radius;
+
+    public b2Capsule(b2Vec2 center1, b2Vec2 center2, float radius)
+    {
+        this.center1 = center1;
+        this.center2 = center2;
+        this.radius = radius;
+    }
 }
 
 /// A solid convex polygon. It is assumed that the interior of the polygon is to
@@ -113,10 +133,10 @@ public class b2Capsule
 public class b2Polygon
 {
     /// The polygon vertices
-    public b2Vec2[] vertices = new b2Vec2[constants.B2_MAX_POLYGON_VERTICES];
+    public readonly b2Vec2[] vertices = new b2Vec2[constants.B2_MAX_POLYGON_VERTICES];
 
     /// The outward normal vectors of the polygon sides
-    public b2Vec2[] normals = new b2Vec2[constants.B2_MAX_POLYGON_VERTICES];
+    public readonly b2Vec2[] normals = new b2Vec2[constants.B2_MAX_POLYGON_VERTICES];
 
     /// The centroid of the polygon
     public b2Vec2 centroid;
@@ -126,6 +146,17 @@ public class b2Polygon
 
     /// The number of polygon vertices
     public int count;
+
+    public b2Polygon Clone()
+    {
+        var p = new b2Polygon();
+        memcpy<b2Vec2>(p.vertices, vertices);
+        memcpy<b2Vec2>(p.normals, normals);
+        p.centroid = centroid;
+        p.radius = radius;
+        p.count = count;
+        return p;
+    }
 }
 
 /// A line segment with two-sided collision.
@@ -136,6 +167,12 @@ public class b2Segment
 
     /// The second point
     public b2Vec2 point2;
+
+    public b2Segment(b2Vec2 point1, b2Vec2 point2)
+    {
+        this.point1 = point1;
+        this.point2 = point2;
+    }
 }
 
 /// A line segment with one-sided collision. Only collides on the right side.
@@ -147,7 +184,7 @@ public class b2ChainSegment
     public b2Vec2 ghost1;
 
     /// The line segment
-    public b2Segment segment = new b2Segment();
+    public b2Segment segment = new b2Segment(b2Vec2_zero, b2Vec2_zero);
 
     /// The head ghost vertex
     public b2Vec2 ghost2;

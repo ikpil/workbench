@@ -4,7 +4,7 @@
 
 namespace Box2D.NET.Engine;
 
-using static math_function;
+using static Box2D.NET.Engine.math_function;
 
 public static class aabb
 {

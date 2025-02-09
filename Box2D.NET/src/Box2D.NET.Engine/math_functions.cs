@@ -128,6 +128,12 @@ public struct b2Transform
 {
     public b2Vec2 p;
     public b2Rot q;
+
+    public b2Transform(b2Vec2 p, b2Rot q)
+    {
+        this.p = p;
+        this.q = q;
+    }
 }
 
 /// A 2-by-2 Matrix
@@ -142,6 +148,12 @@ public struct b2AABB
 {
     public b2Vec2 lowerBound;
     public b2Vec2 upperBound;
+
+    public b2AABB(b2Vec2 lowerBound, b2Vec2 upperBound)
+    {
+        this.lowerBound = lowerBound;
+        this.upperBound = upperBound;
+    }
 }
 
 public static class math_function
