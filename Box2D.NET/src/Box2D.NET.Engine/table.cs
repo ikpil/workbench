@@ -8,7 +8,8 @@ using static Box2D.NET.Engine.core;
 
 namespace Box2D.NET.Engine;
 
-public class b2SetItem
+// @ikpil, must be strcut
+public struct b2SetItem
 {
     public ulong key;
     public uint hash;
@@ -259,7 +260,8 @@ b2AtomicInt b2_probeCount;
             }
 
             // Move j into i
-            items[i] = items[j];
+            items[i].key = items[j].key;
+            items[i].hash = items[j].hash;
 
             // Mark item j as unoccupied
             items[j].key = 0;
