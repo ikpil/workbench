@@ -239,7 +239,7 @@ public class motor_joint
 
             b2Vec2 Cdot = b2Sub(b2Add(vB, b2CrossSV(wB, rB)), b2Add(vA, b2CrossSV(wA, rA)));
             b2Vec2 b = b2MulMV(joint->linearMass, b2Add(Cdot, linearBias));
-            b2Vec2 impulse = { -b.x, -b.y };
+            b2Vec2 impulse = new b2Vec2( -b.x, -b.y );
 
             b2Vec2 oldImpulse = joint->linearImpulse;
             float maxImpulse = context->h * joint->maxForce;

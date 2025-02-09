@@ -24,7 +24,7 @@ bool b2IsValidRay( const b2RayCastInput* input )
 
 static b2Vec2 b2ComputePolygonCentroid( const b2Vec2* vertices, int count )
 {
-	b2Vec2 center = { 0.0f, 0.0f };
+	b2Vec2 center = new b2Vec2( 0.0f, 0.0f );
 	float area = 0.0f;
 
 	// Get a reference point for forming triangles.
@@ -145,14 +145,14 @@ b2Polygon b2MakeBox( float halfWidth, float halfHeight )
 
 	b2Polygon shape = { 0 };
 	shape.count = 4;
-	shape.vertices[0] = ( b2Vec2 ){ -halfWidth, -halfHeight };
-	shape.vertices[1] = ( b2Vec2 ){ halfWidth, -halfHeight };
-	shape.vertices[2] = ( b2Vec2 ){ halfWidth, halfHeight };
-	shape.vertices[3] = ( b2Vec2 ){ -halfWidth, halfHeight };
-	shape.normals[0] = ( b2Vec2 ){ 0.0f, -1.0f };
-	shape.normals[1] = ( b2Vec2 ){ 1.0f, 0.0f };
-	shape.normals[2] = ( b2Vec2 ){ 0.0f, 1.0f };
-	shape.normals[3] = ( b2Vec2 ){ -1.0f, 0.0f };
+	shape.vertices[0] = new b2Vec2( -halfWidth, -halfHeight);
+	shape.vertices[1] = new b2Vec2( halfWidth, -halfHeight);
+	shape.vertices[2] = new b2Vec2( halfWidth, halfHeight);
+	shape.vertices[3] = new b2Vec2( -halfWidth, halfHeight);
+	shape.normals[0] = new b2Vec2( 0.0f, -1.0f);
+	shape.normals[1] = new b2Vec2( 1.0f, 0.0f);
+	shape.normals[2] = new b2Vec2( 0.0f, 1.0f);
+	shape.normals[3] = new b2Vec2( -1.0f, 0.0f);
 	shape.radius = 0.0f;
 	shape.centroid = b2Vec2_zero;
 	return shape;
@@ -172,14 +172,14 @@ b2Polygon b2MakeOffsetBox( float halfWidth, float halfHeight, b2Vec2 center, b2R
 
 	b2Polygon shape = { 0 };
 	shape.count = 4;
-	shape.vertices[0] = b2TransformPoint( xf, ( b2Vec2 ){ -halfWidth, -halfHeight } );
-	shape.vertices[1] = b2TransformPoint( xf, ( b2Vec2 ){ halfWidth, -halfHeight } );
-	shape.vertices[2] = b2TransformPoint( xf, ( b2Vec2 ){ halfWidth, halfHeight } );
-	shape.vertices[3] = b2TransformPoint( xf, ( b2Vec2 ){ -halfWidth, halfHeight } );
-	shape.normals[0] = b2RotateVector( xf.q, ( b2Vec2 ){ 0.0f, -1.0f } );
-	shape.normals[1] = b2RotateVector( xf.q, ( b2Vec2 ){ 1.0f, 0.0f } );
-	shape.normals[2] = b2RotateVector( xf.q, ( b2Vec2 ){ 0.0f, 1.0f } );
-	shape.normals[3] = b2RotateVector( xf.q, ( b2Vec2 ){ -1.0f, 0.0f } );
+	shape.vertices[0] = b2TransformPoint( xf, new b2Vec2( -halfWidth, -halfHeight) );
+	shape.vertices[1] = b2TransformPoint( xf, new b2Vec2( halfWidth, -halfHeight) );
+	shape.vertices[2] = b2TransformPoint( xf, new b2Vec2( halfWidth, halfHeight) );
+	shape.vertices[3] = b2TransformPoint( xf, new b2Vec2( -halfWidth, halfHeight) );
+	shape.normals[0] = b2RotateVector( xf.q, new b2Vec2( 0.0f, -1.0f) );
+	shape.normals[1] = b2RotateVector( xf.q, new b2Vec2( 1.0f, 0.0f) );
+	shape.normals[2] = b2RotateVector( xf.q, new b2Vec2( 0.0f, 1.0f) );
+	shape.normals[3] = b2RotateVector( xf.q, new b2Vec2( -1.0f, 0.0f) );
 	shape.radius = 0.0f;
 	shape.centroid = xf.p;
 	return shape;
@@ -192,14 +192,14 @@ b2Polygon b2MakeOffsetRoundedBox( float halfWidth, float halfHeight, b2Vec2 cent
 
 	b2Polygon shape = { 0 };
 	shape.count = 4;
-	shape.vertices[0] = b2TransformPoint( xf, ( b2Vec2 ){ -halfWidth, -halfHeight } );
-	shape.vertices[1] = b2TransformPoint( xf, ( b2Vec2 ){ halfWidth, -halfHeight } );
-	shape.vertices[2] = b2TransformPoint( xf, ( b2Vec2 ){ halfWidth, halfHeight } );
-	shape.vertices[3] = b2TransformPoint( xf, ( b2Vec2 ){ -halfWidth, halfHeight } );
-	shape.normals[0] = b2RotateVector( xf.q, ( b2Vec2 ){ 0.0f, -1.0f } );
-	shape.normals[1] = b2RotateVector( xf.q, ( b2Vec2 ){ 1.0f, 0.0f } );
-	shape.normals[2] = b2RotateVector( xf.q, ( b2Vec2 ){ 0.0f, 1.0f } );
-	shape.normals[3] = b2RotateVector( xf.q, ( b2Vec2 ){ -1.0f, 0.0f } );
+	shape.vertices[0] = b2TransformPoint( xf, new b2Vec2( -halfWidth, -halfHeight) );
+	shape.vertices[1] = b2TransformPoint( xf, new b2Vec2( halfWidth, -halfHeight) );
+	shape.vertices[2] = b2TransformPoint( xf, new b2Vec2( halfWidth, halfHeight) );
+	shape.vertices[3] = b2TransformPoint( xf, new b2Vec2( -halfWidth, halfHeight) );
+	shape.normals[0] = b2RotateVector( xf.q, new b2Vec2( 0.0f, -1.0f) );
+	shape.normals[1] = b2RotateVector( xf.q, new b2Vec2( 1.0f, 0.0f) );
+	shape.normals[2] = b2RotateVector( xf.q, new b2Vec2( 0.0f, 1.0f) );
+	shape.normals[3] = b2RotateVector( xf.q, new b2Vec2( -1.0f, 0.0f) );
 	shape.radius = radius;
 	shape.centroid = xf.p;
 	return shape;
@@ -347,7 +347,7 @@ b2MassData b2ComputePolygonMass( const b2Polygon* shape, float density )
 		}
 	}
 
-	b2Vec2 center = { 0.0f, 0.0f };
+	b2Vec2 center = new b2Vec2( 0.0f, 0.0f );
 	float area = 0.0f;
 	float rotationalInertia = 0.0f;
 
@@ -415,7 +415,7 @@ b2AABB b2ComputeCapsuleAABB( const b2Capsule* shape, b2Transform xf )
 	b2Vec2 v1 = b2TransformPoint( xf, shape->center1 );
 	b2Vec2 v2 = b2TransformPoint( xf, shape->center2 );
 
-	b2Vec2 r = { shape->radius, shape->radius };
+	b2Vec2 r = new b2Vec2( shape->radius, shape->radius );
 	b2Vec2 lower = b2Sub( b2Min( v1, v2 ), r );
 	b2Vec2 upper = b2Add( b2Max( v1, v2 ), r );
 
@@ -436,7 +436,7 @@ b2AABB b2ComputePolygonAABB( const b2Polygon* shape, b2Transform xf )
 		upper = b2Max( upper, v );
 	}
 
-	b2Vec2 r = { shape->radius, shape->radius };
+	b2Vec2 r = new b2Vec2( shape->radius, shape->radius );
 	lower = b2Sub( lower, r );
 	upper = b2Add( upper, r );
 
@@ -619,7 +619,7 @@ b2CastOutput b2RayCastCapsule( const b2RayCastInput* input, const b2Capsule* sha
 	}
 
 	// Perpendicular to capsule axis, pointing right
-	b2Vec2 n = { a.y, -a.x };
+	b2Vec2 n = new b2Vec2( a.y, -a.x );
 
 	float rayLength;
 	b2Vec2 u = b2GetLengthAndNormalize( &rayLength, d );

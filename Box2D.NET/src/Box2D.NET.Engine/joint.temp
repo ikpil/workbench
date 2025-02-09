@@ -384,7 +384,7 @@ b2NullJointDef b2DefaultNullJointDef()
 b2PrismaticJointDef b2DefaultPrismaticJointDef()
 {
 	b2PrismaticJointDef def = { 0 };
-	def.localAxisA = ( b2Vec2 ){ 1.0f, 0.0f };
+	def.localAxisA = new b2Vec2( 1.0f, 0.0f);
 	def.internalValue = B2_SECRET_COOKIE;
 	return def;
 }
@@ -738,8 +738,8 @@ b2JointId b2CreateMotorJoint( b2WorldId worldId, const b2MotorJointDef* def )
 	b2JointSim* joint = pair.jointSim;
 
 	joint->type = b2_motorJoint;
-	joint->localOriginAnchorA = ( b2Vec2 ){ 0.0f, 0.0f };
-	joint->localOriginAnchorB = ( b2Vec2 ){ 0.0f, 0.0f };
+	joint->localOriginAnchorA = new b2Vec2( 0.0f, 0.0f);
+	joint->localOriginAnchorB = new b2Vec2( 0.0f, 0.0f);
 	joint->motorJoint = ( b2MotorJoint ){ 0 };
 	joint->motorJoint.linearOffset = def->linearOffset;
 	joint->motorJoint.angularOffset = def->angularOffset;

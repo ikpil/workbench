@@ -18,6 +18,12 @@ public struct b2Vec2
 {
     /// coordinates
     public float x, y;
+
+    public b2Vec2(float x, float y)
+    {
+        this.x = x;
+        this.y = y;
+    }
     
     /**
  * @defgroup math_cpp C++ Math
@@ -109,6 +115,12 @@ public struct b2Rot
 {
     /// cosine and sine
     public float c, s;
+
+    public b2Rot(float c, float s)
+    {
+        this.c = c;
+        this.s = s;
+    }
 }
 
 /// A 2D rigid transform

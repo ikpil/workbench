@@ -100,7 +100,7 @@ static void TiltedStacks( int testIndex, int workerCount )
 
 	{
 		b2BodyDef bd = b2DefaultBodyDef();
-		bd.position = ( b2Vec2 ){ 0.0f, -1.0f };
+		bd.position = new b2Vec2( 0.0f, -1.0f);
 		b2BodyId groundId = b2CreateBody( worldId, &bd );
 
 		b2Polygon box = b2MakeBox( 1000.0f, 1.0f );
@@ -128,7 +128,7 @@ static void TiltedStacks( int testIndex, int workerCount )
 
 			int n = j * e_rows + i;
 
-			bd.position = ( b2Vec2 ){ x + offset * i, 0.5f + 1.0f * i };
+			bd.position = new b2Vec2( x + offset * i, 0.5f + 1.0f * i);
 			b2BodyId bodyId = b2CreateBody( worldId, &bd );
 			bodies[n] = bodyId;
 

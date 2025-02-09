@@ -1776,7 +1776,7 @@ b2Vec2 b2Shape_GetClosestPoint( b2ShapeId shapeId, b2Vec2 target )
 	b2World* world = b2GetWorld( shapeId.world0 );
 	if ( world == NULL )
 	{
-		return ( b2Vec2 ){ 0 };
+		return new b2Vec2( 0);
 	}
 
 	b2Shape* shape = b2GetShape( world, shapeId );

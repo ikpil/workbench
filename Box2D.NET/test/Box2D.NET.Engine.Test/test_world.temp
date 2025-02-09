@@ -19,14 +19,14 @@ public class test_world : test_macros
     {
         // Construct a world object, which will hold and simulate the rigid bodies.
         b2WorldDef worldDef = b2DefaultWorldDef();
-        worldDef.gravity = ( b2Vec2 ){ 0.0f, -10.0f };
+        worldDef.gravity = new b2Vec2( 0.0f, -10.0f);
 
         b2WorldId worldId = b2CreateWorld( &worldDef );
         ENSURE( b2World_IsValid( worldId ) );
 
         // Define the ground body.
         b2BodyDef groundBodyDef = b2DefaultBodyDef();
-        groundBodyDef.position = ( b2Vec2 ){ 0.0f, -10.0f };
+        groundBodyDef.position = new b2Vec2( 0.0f, -10.0f);
 
         // Call the body factory which allocates memory for the ground body
         // from a pool and creates the ground box shape (also from a pool).
@@ -44,7 +44,7 @@ public class test_world : test_macros
         // Define the dynamic body. We set its position and call the body factory.
         b2BodyDef bodyDef = b2DefaultBodyDef();
         bodyDef.type = b2_dynamicBody;
-        bodyDef.position = ( b2Vec2 ){ 0.0f, 4.0f };
+        bodyDef.position = new b2Vec2( 0.0f, 4.0f);
 
         b2BodyId bodyId = b2CreateBody( worldId, &bodyDef );
 
@@ -297,7 +297,7 @@ public class test_world : test_macros
         b2World_SetCustomFilterCallback( worldId, CustomFilter, NULL );
         b2World_SetPreSolveCallback( worldId, PreSolveStatic, NULL );
 
-        b2Vec2 g = { 1.0f, 2.0f };
+        b2Vec2 g = new b2Vec2( 1.0f, 2.0f );
         b2World_SetGravity( worldId, g );
         b2Vec2 v = b2World_GetGravity( worldId );
         ENSURE( v.x == g.x );
