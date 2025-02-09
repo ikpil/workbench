@@ -1,0 +1,63 @@
+﻿/// Use this to initialize your world definition
+/// @ingroup world
+b2WorldDef b2DefaultWorldDef();
+
+/// Use this to initialize your body definition
+/// @ingroup body
+b2BodyDef b2DefaultBodyDef();
+
+/// Use this to initialize your filter
+/// @ingroup shape
+b2Filter b2DefaultFilter();
+
+/// Use this to initialize your query filter
+/// @ingroup shape
+b2QueryFilter b2DefaultQueryFilter();
+
+/// Use this to initialize your shape definition
+/// @ingroup shape
+b2ShapeDef b2DefaultShapeDef();
+
+/// Use this to initialize your surface material
+/// @ingroup shape
+b2SurfaceMaterial b2DefaultSurfaceMaterial();
+
+/// Use this to initialize your chain definition
+/// @ingroup shape
+b2ChainDef b2DefaultChainDef();
+
+/// Use this to initialize your joint definition
+/// @ingroup distance_joint
+b2DistanceJointDef b2DefaultDistanceJointDef();
+
+/// Use this to initialize your joint definition
+/// @ingroup distance_joint
+b2DistanceJointDef b2DefaultDistanceJointDef();
+
+/// Use this to initialize your joint definition
+/// @ingroup distance_joint
+b2DistanceJointDef b2DefaultDistanceJointDef();
+
+/// Use this to initialize your joint definition
+/// @ingroup distance_joint
+b2DistanceJointDef b2DefaultDistanceJointDef();
+
+/// Use this to initialize your joint definition
+/// @ingroup distance_joint
+b2DistanceJointDef b2DefaultDistanceJointDef();
+
+/// Use this to initialize your joint definition
+/// @ingroup distance_joint
+b2DistanceJointDef b2DefaultDistanceJointDef();
+
+/// Use this to initialize your joint definition
+/// @ingroup distance_joint
+b2DistanceJointDef b2DefaultDistanceJointDef();
+
+/// Use this to initialize your joint definition
+/// @ingroup distance_joint
+b2DistanceJointDef b2DefaultDistanceJointDef();
+
+/// Use this to initialize your joint definition
+/// @ingroup distance_joint
+b2DistanceJointDef b2DefaultDistanceJointDef();

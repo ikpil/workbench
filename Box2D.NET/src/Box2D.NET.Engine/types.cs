@@ -3,115 +3,165 @@
 
 namespace Box2D.NET.Engine;
 
-public class types
-{
+    /// Task interface
+    /// This is prototype for a Box2D task. Your task system is expected to invoke the Box2D task with these arguments.
+    /// The task spans a range of the parallel-for: [startIndex, endIndex)
+    /// The worker index must correctly identify each worker in the user thread pool, expected in [0, workerCount).
+    /// A worker must only exist on only one thread at a time and is analogous to the thread index.
+    /// The task context is the context pointer sent from Box2D when it is enqueued.
+    /// The startIndex and endIndex are expected in the range [0, itemCount) where itemCount is the argument to b2EnqueueTaskCallback
+    /// below. Box2D expects startIndex < endIndex and will execute a loop like this:
+    ///
+    /// @code{.c}
+    /// for (int i = startIndex; i < endIndex; ++i)
+    /// {
+    /// 	DoWork();
+    /// }
+    /// @endcode
+    /// @ingroup world
+    public delegate void b2TaskCallback( int startIndex, int endIndex, uint workerIndex, object taskContext );
 
+    /// These functions can be provided to Box2D to invoke a task system. These are designed to work well with enkiTS.
+    /// Returns a pointer to the user's task object. May be nullptr. A nullptr indicates to Box2D that the work was executed
+    /// serially within the callback and there is no need to call b2FinishTaskCallback.
+    /// The itemCount is the number of Box2D work items that are to be partitioned among workers by the user's task system.
+    /// This is essentially a parallel-for. The minRange parameter is a suggestion of the minimum number of items to assign
+    /// per worker to reduce overhead. For example, suppose the task is small and that itemCount is 16. A minRange of 8 suggests
+    /// that your task system should split the work items among just two workers, even if you have more available.
+    /// In general the range [startIndex, endIndex) send to b2TaskCallback should obey:
+    /// endIndex - startIndex >= minRange
+    /// The exception of course is when itemCount < minRange.
+    /// @ingroup world
+    public delegate object b2EnqueueTaskCallback( b2TaskCallback task, int itemCount, int minRange, object taskContext, object userContext );
 
-/// Task interface
-/// This is prototype for a Box2D task. Your task system is expected to invoke the Box2D task with these arguments.
-/// The task spans a range of the parallel-for: [startIndex, endIndex)
-/// The worker index must correctly identify each worker in the user thread pool, expected in [0, workerCount).
-/// A worker must only exist on only one thread at a time and is analogous to the thread index.
-/// The task context is the context pointer sent from Box2D when it is enqueued.
-/// The startIndex and endIndex are expected in the range [0, itemCount) where itemCount is the argument to b2EnqueueTaskCallback
-/// below. Box2D expects startIndex < endIndex and will execute a loop like this:
-///
-/// @code{.c}
-/// for (int i = startIndex; i < endIndex; ++i)
-/// {
-/// 	DoWork();
-/// }
-/// @endcode
+    /// Finishes a user task object that wraps a Box2D task.
+    /// @ingroup world
+    public delegate void b2FinishTaskCallback( object userTask, object userContext );
+
+    /// Optional friction mixing callback. This intentionally provides no context objects because this is called
+    /// from a worker thread.
+    /// @warning This function should not attempt to modify Box2D state or user application state.
+    public delegate float b2FrictionCallback( float frictionA, int materialA, float frictionB, int materialB );
+
+    /// Optional restitution mixing callback. This intentionally provides no context objects because this is called
+    /// from a worker thread.
+    /// @warning This function should not attempt to modify Box2D state or user application state.
+    public delegate float b2RestitutionCallback( float restitutionA, int materialA, float restitutionB, int materialB );
+
+/// Prototype for a contact filter callback.
+/// This is called when a contact pair is considered for collision. This allows you to
+/// perform custom logic to prevent collision between shapes. This is only called if
+/// one of the two shapes has custom filtering enabled.
+/// Notes:
+/// - this function must be thread-safe
+/// - this is only called if one of the two shapes has enabled custom filtering
+/// - this is called only for awake dynamic bodies
+/// Return false if you want to disable the collision
+/// @see b2ShapeDef
+/// @warning Do not attempt to modify the world inside this callback
 /// @ingroup world
-typedef void b2TaskCallback( int startIndex, int endIndex, uint workerIndex, void* taskContext );
+public delegate bool b2CustomFilterFcn( b2ShapeId shapeIdA, b2ShapeId shapeIdB, object context );
 
-/// These functions can be provided to Box2D to invoke a task system. These are designed to work well with enkiTS.
-/// Returns a pointer to the user's task object. May be nullptr. A nullptr indicates to Box2D that the work was executed
-/// serially within the callback and there is no need to call b2FinishTaskCallback.
-/// The itemCount is the number of Box2D work items that are to be partitioned among workers by the user's task system.
-/// This is essentially a parallel-for. The minRange parameter is a suggestion of the minimum number of items to assign
-/// per worker to reduce overhead. For example, suppose the task is small and that itemCount is 16. A minRange of 8 suggests
-/// that your task system should split the work items among just two workers, even if you have more available.
-/// In general the range [startIndex, endIndex) send to b2TaskCallback should obey:
-/// endIndex - startIndex >= minRange
-/// The exception of course is when itemCount < minRange.
+/// Prototype for a pre-solve callback.
+/// This is called after a contact is updated. This allows you to inspect a
+/// contact before it goes to the solver. If you are careful, you can modify the
+/// contact manifold (e.g. modify the normal).
+/// Notes:
+/// - this function must be thread-safe
+/// - this is only called if the shape has enabled pre-solve events
+/// - this is called only for awake dynamic bodies
+/// - this is not called for sensors
+/// - the supplied manifold has impulse values from the previous step
+/// Return false if you want to disable the contact this step
+/// @warning Do not attempt to modify the world inside this callback
 /// @ingroup world
-typedef void* b2EnqueueTaskCallback( b2TaskCallback* task, int itemCount, int minRange, void* taskContext, void* userContext );
+public delegate bool b2PreSolveFcn( b2ShapeId shapeIdA, b2ShapeId shapeIdB, b2Manifold manifold, object context );
 
-/// Finishes a user task object that wraps a Box2D task.
+/// Prototype callback for overlap queries.
+/// Called for each shape found in the query.
+/// @see b2World_OverlapABB
+/// @return false to terminate the query.
 /// @ingroup world
-typedef void b2FinishTaskCallback( void* userTask, void* userContext );
+public delegate bool b2OverlapResultFcn( b2ShapeId shapeId, object context );
 
-/// Optional friction mixing callback. This intentionally provides no context objects because this is called
-/// from a worker thread.
-/// @warning This function should not attempt to modify Box2D state or user application state.
-typedef float b2FrictionCallback( float frictionA, int materialA, float frictionB, int materialB );
+/// Prototype callback for ray casts.
+/// Called for each shape found in the query. You control how the ray cast
+/// proceeds by returning a float:
+/// return -1: ignore this shape and continue
+/// return 0: terminate the ray cast
+/// return fraction: clip the ray to this point
+/// return 1: don't clip the ray and continue
+/// @param shapeId the shape hit by the ray
+/// @param point the point of initial intersection
+/// @param normal the normal vector at the point of intersection
+/// @param fraction the fraction along the ray at the point of intersection
+/// @param context the user context
+/// @return -1 to filter, 0 to terminate, fraction to clip the ray for closest hit, 1 to continue
+/// @see b2World_CastRay
+/// @ingroup world
+public delegate float b2CastResultFcn( b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, object context );
 
-/// Optional restitution mixing callback. This intentionally provides no context objects because this is called
-/// from a worker thread.
-/// @warning This function should not attempt to modify Box2D state or user application state.
-typedef float b2RestitutionCallback( float restitutionA, int materialA, float restitutionB, int materialB );
 
 /// Result from b2World_RayCastClosest
 /// @ingroup world
-typedef struct b2RayResult
+public class b2RayResult
 {
-	b2ShapeId shapeId;
-	b2Vec2 point;
-	b2Vec2 normal;
-	float fraction;
-	int nodeVisits;
-	int leafVisits;
-	bool hit;
-} b2RayResult;
+    public b2ShapeId shapeId;
+    public b2Vec2 point;
+    public b2Vec2 normal;
+    public float fraction;
+    public int nodeVisits;
+    public int leafVisits;
+    public bool hit;
+}
 
 /// World definition used to create a simulation world.
 /// Must be initialized using b2DefaultWorldDef().
 /// @ingroup world
-typedef struct b2WorldDef
+public struct b2WorldDef
 {
 	/// Gravity vector. Box2D has no up-vector defined.
-	b2Vec2 gravity;
+	public b2Vec2 gravity;
 
 	/// Restitution speed threshold, usually in m/s. Collisions above this
 	/// speed have restitution applied (will bounce).
-	float restitutionThreshold;
+	public float restitutionThreshold;
 
 	/// Threshold speed for hit events. Usually meters per second.
-	float hitEventThreshold;
+	public float hitEventThreshold;
 
 	/// Contact stiffness. Cycles per second. Increasing this increases the speed of overlap recovery, but can introduce jitter.
-	float contactHertz;
+	public float contactHertz;
 
 	/// Contact bounciness. Non-dimensional. You can speed up overlap recovery by decreasing this with
 	/// the trade-off that overlap resolution becomes more energetic.
-	float contactDampingRatio;
+	public float contactDampingRatio;
 
 	/// This parameter controls how fast overlap is resolved and usually has units of meters per second. This only
 	/// puts a cap on the resolution speed. The resolution speed is increased by increasing the hertz and/or
 	/// decreasing the damping ratio.
-	float contactPushMaxSpeed;
+	public float contactPushMaxSpeed;
 
 	/// Joint stiffness. Cycles per second.
-	float jointHertz;
+	public float jointHertz;
 
 	/// Joint bounciness. Non-dimensional.
-	float jointDampingRatio;
+	public float jointDampingRatio;
 
 	/// Maximum linear speed. Usually meters per second.
-	float maximumLinearSpeed;
+	public float maximumLinearSpeed;
 
 	/// Optional mixing callback for friction. The default uses sqrt(frictionA * frictionB).
-	b2FrictionCallback* frictionCallback;
+	public b2FrictionCallback frictionCallback;
 
 	/// Optional mixing callback for restitution. The default uses max(restitutionA, restitutionB).
-	b2RestitutionCallback* restitutionCallback;
+	public b2RestitutionCallback restitutionCallback;
 
 	/// Can bodies go to sleep to improve performance
-	bool enableSleep;
+	public bool enableSleep;
 
 	/// Enable continuous collision
-	bool enableContinuous;
+	public bool enableContinuous;
 
 	/// Number of workers to use with the provided task system. Box2D performs best when using only
 	/// performance cores and accessing a single L2 cache. Efficiency cores and hyper-threading provide
@@ -120,165 +170,160 @@ typedef struct b2WorldDef
 	/// that you are allocating to b2World_Step.
 	/// @warning Do not modify the default value unless you are also providing a task system and providing
 	/// task callbacks (enqueueTask and finishTask).
-	int workerCount;
+	public int workerCount;
 
 	/// Function to spawn tasks
-	b2EnqueueTaskCallback* enqueueTask;
+	public b2EnqueueTaskCallback enqueueTask;
 
 	/// Function to finish a task
-	b2FinishTaskCallback* finishTask;
+	public b2FinishTaskCallback finishTask;
 
 	/// User context that is provided to enqueueTask and finishTask
-	void* userTaskContext;
+	public object userTaskContext;
 
 	/// User data
-	void* userData;
+	public object userData;
 
 	/// Used internally to detect a valid definition. DO NOT SET.
-	int internalValue;
-} b2WorldDef;
-
-/// Use this to initialize your world definition
-/// @ingroup world
-b2WorldDef b2DefaultWorldDef();
+	public int internalValue;
+}
 
 /// The body simulation type.
 /// Each body is one of these three types. The type determines how the body behaves in the simulation.
 /// @ingroup body
 public enum b2BodyType
 {
-	/// zero mass, zero velocity, may be manually moved
-	b2_staticBody = 0,
+    /// zero mass, zero velocity, may be manually moved
+    b2_staticBody = 0,
 
-	/// zero mass, velocity set by user, moved by solver
-	b2_kinematicBody = 1,
+    /// zero mass, velocity set by user, moved by solver
+    b2_kinematicBody = 1,
 
-	/// positive mass, velocity determined by forces, moved by solver
-	b2_dynamicBody = 2,
+    /// positive mass, velocity determined by forces, moved by solver
+    b2_dynamicBody = 2,
 
-	/// number of body types
-	b2_bodyTypeCount,
-} b2BodyType;
+    /// number of body types
+    b2_bodyTypeCount,
+};
 
 /// A body definition holds all the data needed to construct a rigid body.
 /// You can safely re-use body definitions. Shapes are added to a body after construction.
 /// Body definitions are temporary objects used to bundle creation parameters.
 /// Must be initialized using b2DefaultBodyDef().
 /// @ingroup body
-typedef struct b2BodyDef
+public class b2BodyDef
 {
 	/// The body type: static, kinematic, or dynamic.
-	b2BodyType type;
+	public b2BodyType type;
 
 	/// The initial world position of the body. Bodies should be created with the desired position.
 	/// @note Creating bodies at the origin and then moving them nearly doubles the cost of body creation, especially
 	/// if the body is moved after shapes have been added.
-	b2Vec2 position;
+	public b2Vec2 position;
 
 	/// The initial world rotation of the body. Use b2MakeRot() if you have an angle.
-	b2Rot rotation;
+	public b2Rot rotation;
 
 	/// The initial linear velocity of the body's origin. Usually in meters per second.
-	b2Vec2 linearVelocity;
+	public b2Vec2 linearVelocity;
 
 	/// The initial angular velocity of the body. Radians per second.
-	float angularVelocity;
+	public float angularVelocity;
 
 	/// Linear damping is used to reduce the linear velocity. The damping parameter
 	/// can be larger than 1 but the damping effect becomes sensitive to the
 	/// time step when the damping parameter is large.
 	/// Generally linear damping is undesirable because it makes objects move slowly
 	/// as if they are floating.
-	float linearDamping;
+	public float linearDamping;
 
 	/// Angular damping is used to reduce the angular velocity. The damping parameter
 	/// can be larger than 1.0f but the damping effect becomes sensitive to the
 	/// time step when the damping parameter is large.
 	/// Angular damping can be use slow down rotating bodies.
-	float angularDamping;
+	public float angularDamping;
 
 	/// Scale the gravity applied to this body. Non-dimensional.
-	float gravityScale;
+	public float gravityScale;
 
 	/// Sleep speed threshold, default is 0.05 meters per second
-	float sleepThreshold;
+	public float sleepThreshold;
 
 	/// Optional body name for debugging. Up to 31 characters (excluding null termination)
-	const char* name;
+	public string name;
 
 	/// Use this to store application specific body data.
-	void* userData;
+	public object userData;
 
 	/// Set this flag to false if this body should never fall asleep.
-	bool enableSleep;
+	public bool enableSleep;
 
 	/// Is this body initially awake or sleeping?
-	bool isAwake;
+	public bool isAwake;
 
 	/// Should this body be prevented from rotating? Useful for characters.
-	bool fixedRotation;
+	public bool fixedRotation;
 
 	/// Treat this body as high speed object that performs continuous collision detection
 	/// against dynamic and kinematic bodies, but not other bullet bodies.
 	/// @warning Bullets should be used sparingly. They are not a solution for general dynamic-versus-dynamic
 	/// continuous collision. They may interfere with joint constraints.
-	bool isBullet;
+	public bool isBullet;
 
 	/// Used to disable a body. A disabled body does not move or collide.
-	bool isEnabled;
+	public bool isEnabled;
 
 	/// This allows this body to bypass rotational speed limits. Should only be used
 	/// for circular objects, like wheels.
-	bool allowFastRotation;
+	public bool allowFastRotation;
 
 	/// Used internally to detect a valid definition. DO NOT SET.
-	int internalValue;
-} b2BodyDef;
-
-/// Use this to initialize your body definition
-/// @ingroup body
-b2BodyDef b2DefaultBodyDef();
+	public int internalValue;
+}
 
 /// This is used to filter collision on shapes. It affects shape-vs-shape collision
 /// and shape-versus-query collision (such as b2World_CastRay).
 /// @ingroup shape
-typedef struct b2Filter
+public class b2Filter
 {
-	/// The collision category bits. Normally you would just set one bit. The category bits should
-	/// represent your application object types. For example:
-	/// @code{.cpp}
-	/// enum MyCategories
-	/// {
-	///    Static  = 0x00000001,
-	///    Dynamic = 0x00000002,
-	///    Debris  = 0x00000004,
-	///    Player  = 0x00000008,
-	///    // etc
-	/// };
-	/// @endcode
-	ulong categoryBits;
+    /// The collision category bits. Normally you would just set one bit. The category bits should
+    /// represent your application object types. For example:
+    /// @code{.cpp}
+    /// enum MyCategories
+    /// {
+    ///    Static  = 0x00000001,
+    ///    Dynamic = 0x00000002,
+    ///    Debris  = 0x00000004,
+    ///    Player  = 0x00000008,
+    ///    // etc
+    /// };
+    /// @endcode
+    ulong categoryBits;
 
-	/// The collision mask bits. This states the categories that this
-	/// shape would accept for collision.
-	/// For example, you may want your player to only collide with static objects
-	/// and other players.
-	/// @code{.c}
-	/// maskBits = Static | Player;
-	/// @endcode
-	ulong maskBits;
+    /// The collision mask bits. This states the categories that this
+    /// shape would accept for collision.
+    /// For example, you may want your player to only collide with static objects
+    /// and other players.
+    /// @code{.c}
+    /// maskBits = Static | Player;
+    /// @endcode
+    ulong maskBits;
 
-	/// Collision groups allow a certain group of objects to never collide (negative)
-	/// or always collide (positive). A group index of zero has no effect. Non-zero group filtering
-	/// always wins against the mask bits.
-	/// For example, you may want ragdolls to collide with other ragdolls but you don't want
-	/// ragdoll self-collision. In this case you would give each ragdoll a unique negative group index
-	/// and apply that group index to all shapes on the ragdoll.
-	int groupIndex;
-} b2Filter;
+    /// Collision groups allow a certain group of objects to never collide (negative)
+    /// or always collide (positive). A group index of zero has no effect. Non-zero group filtering
+    /// always wins against the mask bits.
+    /// For example, you may want ragdolls to collide with other ragdolls but you don't want
+    /// ragdoll self-collision. In this case you would give each ragdoll a unique negative group index
+    /// and apply that group index to all shapes on the ragdoll.
+    int groupIndex;
+}
 
-/// Use this to initialize your filter
-/// @ingroup shape
-b2Filter b2DefaultFilter();
+
+public static class types
+{
+
+
+
 
 /// The query filter is used to filter collisions between queries and shapes. For example,
 /// you may want a ray-cast representing a projectile to hit players and the static environment
@@ -294,9 +339,6 @@ typedef struct b2QueryFilter
 	ulong maskBits;
 } b2QueryFilter;
 
-/// Use this to initialize your query filter
-/// @ingroup shape
-b2QueryFilter b2DefaultQueryFilter();
 
 /// Shape type
 /// @ingroup shape
@@ -385,9 +427,6 @@ typedef struct b2ShapeDef
 	int internalValue;
 } b2ShapeDef;
 
-/// Use this to initialize your shape definition
-/// @ingroup shape
-b2ShapeDef b2DefaultShapeDef();
 
 /// Surface materials allow chain shapes to have per segment surface properties.
 /// @ingroup shape
@@ -414,9 +453,6 @@ typedef struct b2SurfaceMaterial
 	uint customColor;
 } b2SurfaceMaterial;
 
-/// Use this to initialize your surface material
-/// @ingroup shape
-b2SurfaceMaterial b2DefaultSurfaceMaterial();
 
 /// Used to create a chain of line segments. This is designed to eliminate ghost collisions with some limitations.
 /// - chains are one-sided
@@ -461,9 +497,6 @@ typedef struct b2ChainDef
 	int internalValue;
 } b2ChainDef;
 
-/// Use this to initialize your chain definition
-/// @ingroup shape
-b2ChainDef b2DefaultChainDef();
 
 //! @cond
 /// Profiling data. Times are in milliseconds.
@@ -589,9 +622,6 @@ typedef struct b2DistanceJointDef
 	int internalValue;
 } b2DistanceJointDef;
 
-/// Use this to initialize your joint definition
-/// @ingroup distance_joint
-b2DistanceJointDef b2DefaultDistanceJointDef();
 
 /// A motor joint is used to control the relative motion between two bodies
 ///
@@ -630,9 +660,6 @@ typedef struct b2MotorJointDef
 	int internalValue;
 } b2MotorJointDef;
 
-/// Use this to initialize your joint definition
-/// @ingroup motor_joint
-b2MotorJointDef b2DefaultMotorJointDef();
 
 /// A mouse joint is used to make a point on a body track a specified world point.
 ///
@@ -669,9 +696,6 @@ typedef struct b2MouseJointDef
 	int internalValue;
 } b2MouseJointDef;
 
-/// Use this to initialize your joint definition
-/// @ingroup mouse_joint
-b2MouseJointDef b2DefaultMouseJointDef();
 
 /// A null joint is used to disable collision between two specific bodies.
 ///
@@ -691,9 +715,6 @@ typedef struct b2NullJointDef
 	int internalValue;
 } b2NullJointDef;
 
-/// Use this to initialize your joint definition
-/// @ingroup null_joint
-b2NullJointDef b2DefaultNullJointDef();
 
 /// Prismatic joint definition
 ///
@@ -759,9 +780,6 @@ typedef struct b2PrismaticJointDef
 	int internalValue;
 } b2PrismaticJointDef;
 
-/// Use this to initialize your joint definition
-/// @ingroupd prismatic_joint
-b2PrismaticJointDef b2DefaultPrismaticJointDef();
 
 /// Revolute joint definition
 ///
@@ -833,9 +851,6 @@ typedef struct b2RevoluteJointDef
 	int internalValue;
 } b2RevoluteJointDef;
 
-/// Use this to initialize your joint definition.
-/// @ingroup revolute_joint
-b2RevoluteJointDef b2DefaultRevoluteJointDef();
 
 /// Weld joint definition
 ///
@@ -882,9 +897,6 @@ typedef struct b2WeldJointDef
 	int internalValue;
 } b2WeldJointDef;
 
-/// Use this to initialize your joint definition
-/// @ingroup weld_joint
-b2WeldJointDef b2DefaultWeldJointDef();
 
 /// Wheel joint definition
 ///
@@ -947,9 +959,6 @@ typedef struct b2WheelJointDef
 	int internalValue;
 } b2WheelJointDef;
 
-/// Use this to initialize your joint definition
-/// @ingroup wheel_joint
-b2WheelJointDef b2DefaultWheelJointDef();
 
 /// The explosion definition is used to configure options for explosions. Explosions
 /// consider shape geometry when computing the impulse.
@@ -974,9 +983,6 @@ typedef struct b2ExplosionDef
 	float impulsePerLength;
 } b2ExplosionDef;
 
-/// Use this to initialize your explosion definition
-/// @ingroup world
-b2ExplosionDef b2DefaultExplosionDef();
 
 /**
  * @defgroup events Events
@@ -1157,58 +1163,6 @@ typedef struct b2ContactData
 
 /**@}*/
 
-/// Prototype for a contact filter callback.
-/// This is called when a contact pair is considered for collision. This allows you to
-/// perform custom logic to prevent collision between shapes. This is only called if
-/// one of the two shapes has custom filtering enabled.
-/// Notes:
-/// - this function must be thread-safe
-/// - this is only called if one of the two shapes has enabled custom filtering
-/// - this is called only for awake dynamic bodies
-/// Return false if you want to disable the collision
-/// @see b2ShapeDef
-/// @warning Do not attempt to modify the world inside this callback
-/// @ingroup world
-typedef bool b2CustomFilterFcn( b2ShapeId shapeIdA, b2ShapeId shapeIdB, void* context );
-
-/// Prototype for a pre-solve callback.
-/// This is called after a contact is updated. This allows you to inspect a
-/// contact before it goes to the solver. If you are careful, you can modify the
-/// contact manifold (e.g. modify the normal).
-/// Notes:
-/// - this function must be thread-safe
-/// - this is only called if the shape has enabled pre-solve events
-/// - this is called only for awake dynamic bodies
-/// - this is not called for sensors
-/// - the supplied manifold has impulse values from the previous step
-/// Return false if you want to disable the contact this step
-/// @warning Do not attempt to modify the world inside this callback
-/// @ingroup world
-typedef bool b2PreSolveFcn( b2ShapeId shapeIdA, b2ShapeId shapeIdB, b2Manifold* manifold, void* context );
-
-/// Prototype callback for overlap queries.
-/// Called for each shape found in the query.
-/// @see b2World_OverlapABB
-/// @return false to terminate the query.
-/// @ingroup world
-typedef bool b2OverlapResultFcn( b2ShapeId shapeId, void* context );
-
-/// Prototype callback for ray casts.
-/// Called for each shape found in the query. You control how the ray cast
-/// proceeds by returning a float:
-/// return -1: ignore this shape and continue
-/// return 0: terminate the ray cast
-/// return fraction: clip the ray to this point
-/// return 1: don't clip the ray and continue
-/// @param shapeId the shape hit by the ray
-/// @param point the point of initial intersection
-/// @param normal the normal vector at the point of intersection
-/// @param fraction the fraction along the ray at the point of intersection
-/// @param context the user context
-/// @return -1 to filter, 0 to terminate, fraction to clip the ray for closest hit, 1 to continue
-/// @see b2World_CastRay
-/// @ingroup world
-typedef float b2CastResultFcn( b2ShapeId shapeId, b2Vec2 point, b2Vec2 normal, float fraction, void* context );
 
 /// These colors are used for debug draw and mostly match the named SVG colors.
 /// See https://www.rapidtables.com/web/color/index.html
