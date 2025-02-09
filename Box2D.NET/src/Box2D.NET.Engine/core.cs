@@ -72,10 +72,37 @@ public static class core
     }
 
     // Used to prevent the compiler from warning about unused variables
-    public static void B2_UNUSED<T>(T a)
+    public static void B2_UNUSED<T1>(T1 a)
     {
         // ...
     }
+    
+    public static void B2_UNUSED<T1, T2>(T1 a, T2 b)
+    {
+        // ...
+    }
+    
+    public static void B2_UNUSED<T1, T2, T3>(T1 a, T2 b, T3 c)
+    {
+        // ...
+    }
+    
+    public static void B2_UNUSED<T1, T2, T3, T4>(T1 a, T2 b, T3 c, T4 d)
+    {
+        // ...
+    }
+    
+    public static void B2_UNUSED<T1, T2, T3, T4, T5>(T1 a, T2 b, T3 c, T4 d, T5 e)
+    {
+        // ...
+    }
+    
+    public static void B2_UNUSED<T1, T2, T3, T4, T5, T6>(T1 a, T2 b, T3 c, T4 d, T5 e, T6 f)
+    {
+        // ...
+    }
+
+
 
     /// Prototype for user allocation function
     /// @param size the allocation size in bytes

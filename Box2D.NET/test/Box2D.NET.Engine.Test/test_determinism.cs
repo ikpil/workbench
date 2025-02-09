@@ -7,6 +7,7 @@ using NUnit.Framework;
 using static Box2D.NET.Engine.geometry;
 using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.array;
+using static Box2D.NET.Engine.types;
 
 namespace Box2D.NET.Engine.Test;
 

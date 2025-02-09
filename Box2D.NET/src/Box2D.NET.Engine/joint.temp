@@ -345,6 +345,8 @@ B2_ARRAY_INLINE( b2JointSim, b2JointSim );
 B2_ARRAY_SOURCE( b2Joint, b2Joint );
 B2_ARRAY_SOURCE( b2JointSim, b2JointSim );
 
+/// Use this to initialize your joint definition
+/// @ingroup distance_joint
 b2DistanceJointDef b2DefaultDistanceJointDef()
 {
 	b2DistanceJointDef def = { 0 };
