@@ -38,7 +38,7 @@ public class test_determinism : test_macros
         data->box2dTask( start, end, threadIndex, data->box2dContext );
     }
 
-    static object EnqueueTask( b2TaskCallback* box2dTask, int itemCount, int minRange, void* box2dContext, void* userContext )
+    static object EnqueueTask( b2TaskCallback box2dTask, int itemCount, int minRange, void* box2dContext, void* userContext )
     {
         MAYBE_UNUSED( userContext );
 
