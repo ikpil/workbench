@@ -27,16 +27,13 @@ public class test_macros
         return 0;
     }
 
-    public static int ENSURE(bool C)
+    public static int ENSURE(bool C, string message = "")
     {
-        do
+        if ((C) == false)
         {
-            if ((C) == false)
-            {
-                Assert.That(false, "condition false: " + nameof(C));
-                return 1;
-            }
-        } while (false);
+            Assert.That(false, string.IsNullOrEmpty(message) ? "condition false: " + nameof(C) : message);
+            return 1;
+        }
 
         return 0;
     }

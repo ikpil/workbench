@@ -180,6 +180,7 @@ b2AtomicInt b2_probeCount;
         return set.capacity * 12;
     }
 
+    // Returns true if key was already in set
     public static bool b2AddKey(b2HashSet set, ulong key)
     {
         // key of zero is a sentinel
@@ -205,6 +206,7 @@ b2AtomicInt b2_probeCount;
         return false;
     }
 
+    // Returns true if the key was found
     // See https://en.wikipedia.org/wiki/Open_addressing
     public static bool b2RemoveKey(b2HashSet set, ulong key)
     {

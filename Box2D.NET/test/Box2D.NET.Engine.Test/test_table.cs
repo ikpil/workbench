@@ -1,15 +1,20 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
+using System;
+using NUnit.Framework;
+using static Box2D.NET.Engine.ctz;
+using static Box2D.NET.Engine.table;
+using static Box2D.NET.Engine.timer;
+
 namespace Box2D.NET.Engine.Test;
 
 public class test_table : test_macros
 {
-
-
     public const int SET_SPAN = 317;
-#define ITEM_COUNT ( ( SET_SPAN * SET_SPAN - SET_SPAN ) / 2 )
+    public const int ITEM_COUNT = ((SET_SPAN * SET_SPAN - SET_SPAN) / 2);
 
+    [Test]
     public void TableTest()
     {
         int power = b2BoundingPowerOf2(3008);
@@ -20,10 +25,7 @@ public class test_table : test_macros
 
         const int N = SET_SPAN;
         const uint itemCount = ITEM_COUNT;
-        bool removed[ITEM_COUNT] =  {
-            0
-        }
-        ;
+        bool[] removed = new bool[ITEM_COUNT];
 
         for (int iter = 0; iter < 1; ++iter)
         {
@@ -35,7 +37,7 @@ public class test_table : test_macros
                 for (int j = i + 1; j < N; ++j)
                 {
                     ulong key = B2_SHAPE_PAIR_KEY(i, j);
-                    b2AddKey(&set, key);
+                    b2AddKey(set, key);
                 }
             }
 
@@ -51,7 +53,7 @@ public class test_table : test_macros
                     if (j == i + 1)
                     {
                         ulong key = B2_SHAPE_PAIR_KEY(i, j);
-                        b2RemoveKey(&set, key);
+                        b2RemoveKey(set, key);
                         removed[k++] = true;
                         removeCount += 1;
                     }
@@ -79,7 +81,7 @@ public class test_table : test_macros
                 for (int j = i + 1; j < N; ++j)
                 {
                     ulong key = B2_SHAPE_PAIR_KEY(j, i);
-                    ENSURE(b2ContainsKey(&set, key) || removed[k]);
+                    ENSURE(b2ContainsKey(set, key) || removed[k], $"b2ContainsKey(set, {key}) = {b2ContainsKey(set, key)} || removed[{k}] = {removed[k]}");
                     k += 1;
                 }
             }
@@ -102,15 +104,13 @@ public class test_table : test_macros
                 for (int j = i + 1; j < N; ++j)
                 {
                     ulong key = B2_SHAPE_PAIR_KEY(i, j);
-                    b2RemoveKey(&set, key);
+                    b2RemoveKey(set, key);
                 }
             }
 
             ENSURE(set.count == 0);
 
-            b2DestroySet(&set);
+            b2DestroySet(set);
         }
-
     }
-
 }
