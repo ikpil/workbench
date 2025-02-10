@@ -9,68 +9,6 @@ public class shape
 
 
 
-
-typedef struct b2BroadPhase b2BroadPhase;
-
-
-typedef struct b2Shape
-{
-	int id;
-	int bodyId;
-	int prevShapeId;
-	int nextShapeId;
-	int sensorIndex;
-	b2ShapeType type;
-	float density;
-	float friction;
-	float restitution;
-	float rollingResistance;
-	float tangentSpeed;
-	int material;
-
-	b2AABB aabb;
-	b2AABB fatAABB;
-	b2Vec2 localCentroid;
-	int proxyKey;
-
-	b2Filter filter;
-	void* userData;
-	uint customColor;
-
-	union
-	{
-		b2Capsule capsule;
-		b2Circle circle;
-		b2Polygon polygon;
-		b2Segment segment;
-		b2ChainSegment chainSegment;
-	};
-
-	ushort generation;
-	bool enableContactEvents;
-	bool enableHitEvents;
-	bool enablePreSolveEvents;
-	bool enlargedAABB;
-} b2Shape;
-
-typedef struct b2ChainShape
-{
-	int id;
-	int bodyId;
-	int nextChainId;
-	int count;
-	int materialCount;
-	int* shapeIndices;
-	b2SurfaceMaterial* materials;
-	ushort generation;
-} b2ChainShape;
-
-typedef struct b2ShapeExtent
-{
-	float minExtent;
-	float maxExtent;
-} b2ShapeExtent;
-
 // Sensors are shapes that live in the broad-phase but never have contacts.
 // At the end of the time step all sensors are queried for overlap with any other shapes.
 // Sensors ignore body type and sleeping.

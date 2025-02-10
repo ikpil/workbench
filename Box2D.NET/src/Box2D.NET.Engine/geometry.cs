@@ -12,7 +12,7 @@ namespace Box2D.NET.Engine;
 
 public static class geometry
 {
-    // _Static_assert( B2_MAX_POLYGON_VERTICES > 2, "must be 3 or more" );
+    // Debug.Assert( B2_MAX_POLYGON_VERTICES > 2, "must be 3 or more" );
 
     public static bool b2IsValidRay(b2RayCastInput input)
     {

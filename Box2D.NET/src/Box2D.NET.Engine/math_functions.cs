@@ -699,7 +699,7 @@ public static class math_function
 
 
 
-    //_Static_assert( sizeof( int32_t ) == sizeof( int ), "Box2D expects int32_t and int to be the same" );
+    //Debug.Assert( sizeof( int32_t ) == sizeof( int ), "Box2D expects int32_t and int to be the same" );
 
     /// Is this a valid number? Not NaN or infinity.
     public static bool b2IsValidFloat( float a )

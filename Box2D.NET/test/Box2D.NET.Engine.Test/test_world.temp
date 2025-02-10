@@ -208,7 +208,7 @@ public class test_world : test_macros
     [Test(ExpectedResult = 0)]
     public int TestWorldRecycle()
     {
-        _Static_assert( WORLD_COUNT > 0, "world count" );
+        Debug.Assert( WORLD_COUNT > 0, "world count" );
 
         int count = 100;
 
