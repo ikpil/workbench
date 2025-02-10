@@ -49,7 +49,7 @@ public static class array
     }
 
     /* Add */
-    public static T Array_Add<T>(b2Array<T> a) where T : new()
+    public static ref T Array_Add<T>(b2Array<T> a) where T : new()
     {
         if (a.count == a.capacity)
         {
@@ -58,7 +58,7 @@ public static class array
         }
 
         a.count += 1;
-        return a.data[a.count - 1];
+        return ref a.data[a.count - 1];
     }
 
     /* Push */

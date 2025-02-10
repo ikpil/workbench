@@ -427,7 +427,7 @@ b2ExplosionDef b2DefaultExplosionDef()
 b2Joint* b2GetJointFullId( b2World* world, b2JointId jointId )
 {
 	int id = jointId.index1 - 1;
-	b2Joint* joint = b2JointArray_Get( &world->joints, id );
+	b2Joint* joint = Array_Get( &world->joints, id );
 	Debug.Assert( joint->jointId == id && joint->generation == jointId.generation );
 	return joint;
 }
@@ -438,11 +438,11 @@ b2JointSim* b2GetJointSim( b2World* world, b2Joint* joint )
 	{
 		Debug.Assert( 0 <= joint->colorIndex && joint->colorIndex < B2_GRAPH_COLOR_COUNT );
 		b2GraphColor* color = world->constraintGraph.colors + joint->colorIndex;
-		return b2JointSimArray_Get( &color->jointSims, joint->localIndex );
+		return Array_Get( &color->jointSims, joint->localIndex );
 	}
 
-	b2SolverSet* set = b2SolverSetArray_Get( &world->solverSets, joint->setIndex );
-	return b2JointSimArray_Get( &set->jointSims, joint->localIndex );
+	b2SolverSet* set = Array_Get( &world->solverSets, joint->setIndex );
+	return Array_Get( &set->jointSims, joint->localIndex );
 }
 
 b2JointSim* b2GetJointSimCheckType( b2JointId jointId, b2JointType type )
@@ -480,10 +480,10 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 	int jointId = b2AllocId( &world->jointIdPool );
 	if ( jointId == world->joints.count )
 	{
-		b2JointArray_Push( &world->joints, ( b2Joint ){ 0 } );
+		Array_Push( &world->joints, ( b2Joint ){ 0 } );
 	}
 
-	b2Joint* joint = b2JointArray_Get( &world->joints, jointId );
+	b2Joint* joint = Array_Get( &world->joints, jointId );
 	joint->jointId = jointId;
 	joint->userData = userData;
 	joint->generation += 1;
@@ -506,7 +506,7 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 	int keyA = ( jointId << 1 ) | 0;
 	if ( bodyA->headJointKey != B2_NULL_INDEX )
 	{
-		b2Joint* jointA = b2JointArray_Get( &world->joints, bodyA->headJointKey >> 1 );
+		b2Joint* jointA = Array_Get( &world->joints, bodyA->headJointKey >> 1 );
 		b2JointEdge* edgeA = jointA->edges + ( bodyA->headJointKey & 1 );
 		edgeA->prevKey = keyA;
 	}
@@ -521,7 +521,7 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 	int keyB = ( jointId << 1 ) | 1;
 	if ( bodyB->headJointKey != B2_NULL_INDEX )
 	{
-		b2Joint* jointB = b2JointArray_Get( &world->joints, bodyB->headJointKey >> 1 );
+		b2Joint* jointB = Array_Get( &world->joints, bodyB->headJointKey >> 1 );
 		b2JointEdge* edgeB = jointB->edges + ( bodyB->headJointKey & 1 );
 		edgeB->prevKey = keyB;
 	}
@@ -533,11 +533,11 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 	if ( bodyA->setIndex == b2_disabledSet || bodyB->setIndex == b2_disabledSet )
 	{
 		// if either body is disabled, create in disabled set
-		b2SolverSet* set = b2SolverSetArray_Get( &world->solverSets, b2_disabledSet );
+		b2SolverSet* set = Array_Get( &world->solverSets, b2_disabledSet );
 		joint->setIndex = b2_disabledSet;
 		joint->localIndex = set->jointSims.count;
 
-		jointSim = b2JointSimArray_Add( &set->jointSims );
+		jointSim = Array_Add( &set->jointSims );
 		memset( jointSim, 0, sizeof( b2JointSim ) );
 
 		jointSim->jointId = jointId;
@@ -547,11 +547,11 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 	else if ( bodyA->setIndex == b2_staticSet && bodyB->setIndex == b2_staticSet )
 	{
 		// joint is connecting static bodies
-		b2SolverSet* set = b2SolverSetArray_Get( &world->solverSets, b2_staticSet );
+		b2SolverSet* set = Array_Get( &world->solverSets, b2_staticSet );
 		joint->setIndex = b2_staticSet;
 		joint->localIndex = set->jointSims.count;
 
-		jointSim = b2JointSimArray_Add( &set->jointSims );
+		jointSim = Array_Add( &set->jointSims );
 		memset( jointSim, 0, sizeof( b2JointSim ) );
 
 		jointSim->jointId = jointId;
@@ -582,11 +582,11 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 		// joint should go into the sleeping set (not static set)
 		int setIndex = maxSetIndex;
 
-		b2SolverSet* set = b2SolverSetArray_Get( &world->solverSets, setIndex );
+		b2SolverSet* set = Array_Get( &world->solverSets, setIndex );
 		joint->setIndex = setIndex;
 		joint->localIndex = set->jointSims.count;
 
-		jointSim = b2JointSimArray_Add( &set->jointSims );
+		jointSim = Array_Add( &set->jointSims );
 		memset( jointSim, 0, sizeof( b2JointSim ) );
 
 		jointSim->jointId = jointId;
@@ -603,10 +603,10 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 			// fix potentially invalid set index
 			setIndex = bodyA->setIndex;
 
-			b2SolverSet* mergedSet = b2SolverSetArray_Get( &world->solverSets, setIndex );
+			b2SolverSet* mergedSet = Array_Get( &world->solverSets, setIndex );
 
 			// Careful! The joint sim pointer was orphaned by the set merge.
-			jointSim = b2JointSimArray_Get( &mergedSet->jointSims, joint->localIndex );
+			jointSim = Array_Get( &mergedSet->jointSims, joint->localIndex );
 		}
 
 		Debug.Assert( joint->setIndex == setIndex );
@@ -654,7 +654,7 @@ static void b2DestroyContactsBetweenBodies( b2World* world, b2Body* bodyA, b2Bod
 		int contactId = contactKey >> 1;
 		int edgeIndex = contactKey & 1;
 
-		b2Contact* contact = b2ContactArray_Get( &world->contacts, contactId );
+		b2Contact* contact = Array_Get( &world->contacts, contactId );
 		contactKey = contact->edges[edgeIndex].nextKey;
 
 		int otherEdgeIndex = edgeIndex ^ 1;
@@ -1030,20 +1030,20 @@ void b2DestroyJointInternal( b2World* world, b2Joint* joint, bool wakeBodies )
 
 	int idA = edgeA->bodyId;
 	int idB = edgeB->bodyId;
-	b2Body* bodyA = b2BodyArray_Get( &world->bodies, idA );
-	b2Body* bodyB = b2BodyArray_Get( &world->bodies, idB );
+	b2Body* bodyA = Array_Get( &world->bodies, idA );
+	b2Body* bodyB = Array_Get( &world->bodies, idB );
 
 	// Remove from body A
 	if ( edgeA->prevKey != B2_NULL_INDEX )
 	{
-		b2Joint* prevJoint = b2JointArray_Get( &world->joints, edgeA->prevKey >> 1 );
+		b2Joint* prevJoint = Array_Get( &world->joints, edgeA->prevKey >> 1 );
 		b2JointEdge* prevEdge = prevJoint->edges + ( edgeA->prevKey & 1 );
 		prevEdge->nextKey = edgeA->nextKey;
 	}
 
 	if ( edgeA->nextKey != B2_NULL_INDEX )
 	{
-		b2Joint* nextJoint = b2JointArray_Get( &world->joints, edgeA->nextKey >> 1 );
+		b2Joint* nextJoint = Array_Get( &world->joints, edgeA->nextKey >> 1 );
 		b2JointEdge* nextEdge = nextJoint->edges + ( edgeA->nextKey & 1 );
 		nextEdge->prevKey = edgeA->prevKey;
 	}
@@ -1059,14 +1059,14 @@ void b2DestroyJointInternal( b2World* world, b2Joint* joint, bool wakeBodies )
 	// Remove from body B
 	if ( edgeB->prevKey != B2_NULL_INDEX )
 	{
-		b2Joint* prevJoint = b2JointArray_Get( &world->joints, edgeB->prevKey >> 1 );
+		b2Joint* prevJoint = Array_Get( &world->joints, edgeB->prevKey >> 1 );
 		b2JointEdge* prevEdge = prevJoint->edges + ( edgeB->prevKey & 1 );
 		prevEdge->nextKey = edgeB->nextKey;
 	}
 
 	if ( edgeB->nextKey != B2_NULL_INDEX )
 	{
-		b2Joint* nextJoint = b2JointArray_Get( &world->joints, edgeB->nextKey >> 1 );
+		b2Joint* nextJoint = Array_Get( &world->joints, edgeB->nextKey >> 1 );
 		b2JointEdge* nextEdge = nextJoint->edges + ( edgeB->nextKey & 1 );
 		nextEdge->prevKey = edgeB->prevKey;
 	}
@@ -1099,14 +1099,14 @@ void b2DestroyJointInternal( b2World* world, b2Joint* joint, bool wakeBodies )
 	}
 	else
 	{
-		b2SolverSet* set = b2SolverSetArray_Get( &world->solverSets, setIndex );
+		b2SolverSet* set = Array_Get( &world->solverSets, setIndex );
 		int movedIndex = b2JointSimArray_RemoveSwap( &set->jointSims, localIndex );
 		if ( movedIndex != B2_NULL_INDEX )
 		{
 			// Fix moved joint
 			b2JointSim* movedJointSim = set->jointSims.data + localIndex;
 			int movedId = movedJointSim->jointId;
-			b2Joint* movedJoint = b2JointArray_Get( &world->joints, movedId );
+			b2Joint* movedJoint = Array_Get( &world->joints, movedId );
 			Debug.Assert( movedJoint->localIndex == movedIndex );
 			movedJoint->localIndex = localIndex;
 		}
@@ -1202,8 +1202,8 @@ void b2Joint_SetCollideConnected( b2JointId jointId, bool shouldCollide )
 
 	joint->collideConnected = shouldCollide;
 
-	b2Body* bodyA = b2BodyArray_Get( &world->bodies, joint->edges[0].bodyId );
-	b2Body* bodyB = b2BodyArray_Get( &world->bodies, joint->edges[1].bodyId );
+	b2Body* bodyA = Array_Get( &world->bodies, joint->edges[0].bodyId );
+	b2Body* bodyB = Array_Get( &world->bodies, joint->edges[1].bodyId );
 
 	if ( shouldCollide )
 	{
@@ -1215,7 +1215,7 @@ void b2Joint_SetCollideConnected( b2JointId jointId, bool shouldCollide )
 		int shapeId = shapeCountA < shapeCountB ? bodyA->headShapeId : bodyB->headShapeId;
 		while ( shapeId != B2_NULL_INDEX )
 		{
-			b2Shape* shape = b2ShapeArray_Get( &world->shapes, shapeId );
+			b2Shape* shape = Array_Get( &world->shapes, shapeId );
 
 			if ( shape->proxyKey != B2_NULL_INDEX )
 			{
@@ -1261,8 +1261,8 @@ void b2Joint_WakeBodies( b2JointId jointId )
 	}
 
 	b2Joint* joint = b2GetJointFullId( world, jointId );
-	b2Body* bodyA = b2BodyArray_Get( &world->bodies, joint->edges[0].bodyId );
-	b2Body* bodyB = b2BodyArray_Get( &world->bodies, joint->edges[1].bodyId );
+	b2Body* bodyA = Array_Get( &world->bodies, joint->edges[0].bodyId );
+	b2Body* bodyB = Array_Get( &world->bodies, joint->edges[1].bodyId );
 
 	b2WakeBody( world, bodyA );
 	b2WakeBody( world, bodyB );
@@ -1517,8 +1517,8 @@ void b2SolveOverflowJoints( b2StepContext* context, bool useBias )
 
 void b2DrawJoint( b2DebugDraw* draw, b2World* world, b2Joint* joint )
 {
-	b2Body* bodyA = b2BodyArray_Get( &world->bodies, joint->edges[0].bodyId );
-	b2Body* bodyB = b2BodyArray_Get( &world->bodies, joint->edges[1].bodyId );
+	b2Body* bodyA = Array_Get( &world->bodies, joint->edges[0].bodyId );
+	b2Body* bodyB = Array_Get( &world->bodies, joint->edges[1].bodyId );
 	if ( bodyA->setIndex == b2_disabledSet || bodyB->setIndex == b2_disabledSet )
 	{
 		return;

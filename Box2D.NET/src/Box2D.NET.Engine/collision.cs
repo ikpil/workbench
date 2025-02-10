@@ -337,6 +337,11 @@ public class b2Sweep
     public b2Rot q1; // Starting world rotation
     public b2Rot q2; // Ending world rotation
 
+    public b2Sweep()
+    {
+        
+    }
+
     public b2Sweep(b2Vec2 localCenter, b2Vec2 c1, b2Vec2 c2, b2Rot q1, b2Rot q2)
     {
         this.localCenter = localCenter;

@@ -20,8 +20,8 @@ typedef struct b2ShapeRef
 
 typedef struct b2Sensor
 {
-    b2ShapeRefArray overlaps1;
-    b2ShapeRefArray overlaps2;
+    b2Array<b2ShapeRef> overlaps1;
+    b2Array<b2ShapeRef> overlaps2;
     int shapeId;
 } b2Sensor;
 
@@ -93,7 +93,7 @@ static bool b2SensorQueryCallback( int proxyId, int shapeId, void* context )
 	}
 
 	b2World* world = queryContext->world;
-	b2Shape* otherShape = b2ShapeArray_Get( &world->shapes, shapeId );
+	b2Shape* otherShape = Array_Get( &world->shapes, shapeId );
 
 	// Sensors don't overlap with other sensors
 	if ( otherShape->sensorIndex != B2_NULL_INDEX )
@@ -126,7 +126,7 @@ static bool b2SensorQueryCallback( int proxyId, int shapeId, void* context )
 
 	// Record the overlap
 	b2Sensor* sensor = queryContext->sensor;
-	b2ShapeRef* shapeRef = b2ShapeRefArray_Add( &sensor->overlaps2 );
+	b2ShapeRef* shapeRef = Array_Add( &sensor->overlaps2 );
 	shapeRef->shapeId = shapeId;
 	shapeRef->generation = otherShape->generation;
 
@@ -172,11 +172,11 @@ static void b2SensorTask( int startIndex, int endIndex, uint threadIndex, void* 
 	b2DynamicTree* trees = world->broadPhase.trees;
 	for ( int sensorIndex = startIndex; sensorIndex < endIndex; ++sensorIndex )
 	{
-		b2Sensor* sensor = b2SensorArray_Get( &world->sensors, sensorIndex );
-		b2Shape* sensorShape = b2ShapeArray_Get( &world->shapes, sensor->shapeId );
+		b2Sensor* sensor = Array_Get( &world->sensors, sensorIndex );
+		b2Shape* sensorShape = Array_Get( &world->shapes, sensor->shapeId );
 
 		// swap overlap arrays
-		b2ShapeRefArray temp = sensor->overlaps1;
+		b2Array<b2ShapeRef> temp = sensor->overlaps1;
 		sensor->overlaps1 = sensor->overlaps2;
 		sensor->overlaps2 = temp;
 		b2ShapeRefArray_Clear( &sensor->overlaps2 );
@@ -276,8 +276,8 @@ void b2OverlapSensors( b2World* world )
 			uint ctz = b2CTZ64( word );
 			int sensorIndex = (int)( 64 * k + ctz );
 
-			b2Sensor* sensor = b2SensorArray_Get( &world->sensors, sensorIndex );
-			b2Shape* sensorShape = b2ShapeArray_Get( &world->shapes, sensor->shapeId );
+			b2Sensor* sensor = Array_Get( &world->sensors, sensorIndex );
+			b2Shape* sensorShape = Array_Get( &world->shapes, sensor->shapeId );
 			b2ShapeId sensorId = { sensor->shapeId + 1, world->worldId, sensorShape->generation };
 
 			int count1 = sensor->overlaps1.count;
@@ -299,7 +299,7 @@ void b2OverlapSensors( b2World* world )
 						// end
 						b2ShapeId visitorId = { r1->shapeId + 1, world->worldId, r1->generation };
 						b2SensorEndTouchEvent event = { sensorId, visitorId };
-						b2SensorEndTouchEventArray_Push( &world->sensorEndEvents[world->endEventArrayIndex], event );
+						Array_Push( &world->sensorEndEvents[world->endEventArrayIndex], event );
 						index1 += 1;
 					}
 					else if ( r1->generation > r2->generation )
@@ -307,7 +307,7 @@ void b2OverlapSensors( b2World* world )
 						// begin
 						b2ShapeId visitorId = { r2->shapeId + 1, world->worldId, r2->generation };
 						b2SensorBeginTouchEvent event = { sensorId, visitorId };
-						b2SensorBeginTouchEventArray_Push( &world->sensorBeginEvents, event );
+						Array_Push( &world->sensorBeginEvents, event );
 						index2 += 1;
 					}
 					else
@@ -322,7 +322,7 @@ void b2OverlapSensors( b2World* world )
 					// end
 					b2ShapeId visitorId = { r1->shapeId + 1, world->worldId, r1->generation };
 					b2SensorEndTouchEvent event = { sensorId, visitorId };
-					b2SensorEndTouchEventArray_Push( &world->sensorEndEvents[world->endEventArrayIndex], event );
+					Array_Push( &world->sensorEndEvents[world->endEventArrayIndex], event );
 					index1 += 1;
 				}
 				else
@@ -330,7 +330,7 @@ void b2OverlapSensors( b2World* world )
 					// begin
 					b2ShapeId visitorId = { r2->shapeId + 1, world->worldId, r2->generation };
 					b2SensorBeginTouchEvent event = { sensorId, visitorId };
-					b2SensorBeginTouchEventArray_Push( &world->sensorBeginEvents, event );
+					Array_Push( &world->sensorBeginEvents, event );
 					index2 += 1;
 				}
 			}
@@ -341,7 +341,7 @@ void b2OverlapSensors( b2World* world )
 				const b2ShapeRef* r1 = refs1 + index1;
 				b2ShapeId visitorId = { r1->shapeId + 1, world->worldId, r1->generation };
 				b2SensorEndTouchEvent event = { sensorId, visitorId };
-				b2SensorEndTouchEventArray_Push( &world->sensorEndEvents[world->endEventArrayIndex], event );
+				Array_Push( &world->sensorEndEvents[world->endEventArrayIndex], event );
 				index1 += 1;
 			}
 
@@ -351,7 +351,7 @@ void b2OverlapSensors( b2World* world )
 				const b2ShapeRef* r2 = refs2 + index2;
 				b2ShapeId visitorId = { r2->shapeId + 1, world->worldId, r2->generation };
 				b2SensorBeginTouchEvent event = { sensorId, visitorId };
-				b2SensorBeginTouchEventArray_Push( &world->sensorBeginEvents, event );
+				Array_Push( &world->sensorBeginEvents, event );
 				index2 += 1;
 			}
 
@@ -366,7 +366,7 @@ void b2OverlapSensors( b2World* world )
 
 void b2DestroySensor( b2World* world, b2Shape* sensorShape )
 {
-	b2Sensor* sensor = b2SensorArray_Get( &world->sensors, sensorShape->sensorIndex );
+	b2Sensor* sensor = Array_Get( &world->sensors, sensorShape->sensorIndex );
 	for ( int i = 0; i < sensor->overlaps2.count; ++i )
 	{
 		b2ShapeRef* ref = sensor->overlaps2.data + i;
@@ -385,7 +385,7 @@ void b2DestroySensor( b2World* world, b2Shape* sensorShape )
 				},
 		};
 
-		b2SensorEndTouchEventArray_Push( world->sensorEndEvents + world->endEventArrayIndex, event );
+		Array_Push( world->sensorEndEvents + world->endEventArrayIndex, event );
 	}
 
 	// Destroy sensor
@@ -396,8 +396,8 @@ void b2DestroySensor( b2World* world, b2Shape* sensorShape )
 	if ( movedIndex != B2_NULL_INDEX )
 	{
 		// Fixup moved sensor
-		b2Sensor* movedSensor = b2SensorArray_Get( &world->sensors, sensorShape->sensorIndex );
-		b2Shape* otherSensorShape = b2ShapeArray_Get( &world->shapes, movedSensor->shapeId );
+		b2Sensor* movedSensor = Array_Get( &world->sensors, sensorShape->sensorIndex );
+		b2Shape* otherSensorShape = Array_Get( &world->shapes, movedSensor->shapeId );
 		otherSensorShape->sensorIndex = sensorShape->sensorIndex;
 	}
 }

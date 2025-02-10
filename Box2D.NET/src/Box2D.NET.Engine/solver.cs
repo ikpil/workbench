@@ -351,7 +351,7 @@ static bool b2ContinuousQueryCallback( int proxyId, int shapeId, void* context )
 
 	b2World* world = continuousContext->world;
 
-	b2Shape* shape = b2ShapeArray_Get( &world->shapes, shapeId );
+	b2Shape* shape = Array_Get( &world->shapes, shapeId );
 
 	// Skip same body
 	if ( shape->bodyId == fastShape->bodyId )
@@ -372,7 +372,7 @@ static bool b2ContinuousQueryCallback( int proxyId, int shapeId, void* context )
 		return true;
 	}
 
-	b2Body* body = b2BodyArray_Get( &world->bodies, shape->bodyId );
+	b2Body* body = Array_Get( &world->bodies, shape->bodyId );
 
 	b2BodySim* bodySim = b2GetBodySim( world, body );
 	Debug.Assert( body->type == b2_staticBody || fastBodySim->isBullet );
@@ -384,7 +384,7 @@ static bool b2ContinuousQueryCallback( int proxyId, int shapeId, void* context )
 	}
 
 	// Skip filtered bodies
-	b2Body* fastBody = b2BodyArray_Get( &world->bodies, fastBodySim->bodyId );
+	b2Body* fastBody = Array_Get( &world->bodies, fastBodySim->bodyId );
 	canCollide = b2ShouldBodiesCollide( world, fastBody, body );
 	if ( canCollide == false )
 	{
@@ -512,8 +512,8 @@ static void b2SolveContinuous( b2World* world, int bodySimIndex )
 {
 	b2TracyCZoneNC( ccd, "CCD", b2_colorDarkGoldenRod, true );
 
-	b2SolverSet* awakeSet = b2SolverSetArray_Get( &world->solverSets, b2_awakeSet );
-	b2BodySim* fastBodySim = b2BodySimArray_Get( &awakeSet->bodySims, bodySimIndex );
+	b2SolverSet* awakeSet = Array_Get( &world->solverSets, b2_awakeSet );
+	b2BodySim* fastBodySim = Array_Get( &awakeSet->bodySims, bodySimIndex );
 	Debug.Assert( fastBodySim->isFast );
 
 	b2Sweep sweep = b2MakeSweep( fastBodySim );
@@ -529,7 +529,7 @@ static void b2SolveContinuous( b2World* world, int bodySimIndex )
 	b2DynamicTree* staticTree = world->broadPhase.trees + b2_staticBody;
 	b2DynamicTree* kinematicTree = world->broadPhase.trees + b2_kinematicBody;
 	b2DynamicTree* dynamicTree = world->broadPhase.trees + b2_dynamicBody;
-	b2Body* fastBody = b2BodyArray_Get( &world->bodies, fastBodySim->bodyId );
+	b2Body* fastBody = Array_Get( &world->bodies, fastBodySim->bodyId );
 
 	struct b2ContinuousContext context;
 	context.world = world;
@@ -542,7 +542,7 @@ static void b2SolveContinuous( b2World* world, int bodySimIndex )
 	int shapeId = fastBody->headShapeId;
 	while ( shapeId != B2_NULL_INDEX )
 	{
-		b2Shape* fastShape = b2ShapeArray_Get( &world->shapes, shapeId );
+		b2Shape* fastShape = Array_Get( &world->shapes, shapeId );
 		shapeId = fastShape->nextShapeId;
 
 		context.fastShape = fastShape;
@@ -595,7 +595,7 @@ static void b2SolveContinuous( b2World* world, int bodySimIndex )
 		shapeId = fastBody->headShapeId;
 		while ( shapeId != B2_NULL_INDEX )
 		{
-			b2Shape* shape = b2ShapeArray_Get( &world->shapes, shapeId );
+			b2Shape* shape = Array_Get( &world->shapes, shapeId );
 
 			// Must recompute aabb at the interpolated transform
 			b2AABB aabb = b2ComputeShapeAABB( shape, transform );
@@ -633,7 +633,7 @@ static void b2SolveContinuous( b2World* world, int bodySimIndex )
 		shapeId = fastBody->headShapeId;
 		while ( shapeId != B2_NULL_INDEX )
 		{
-			b2Shape* shape = b2ShapeArray_Get( &world->shapes, shapeId );
+			b2Shape* shape = Array_Get( &world->shapes, shapeId );
 
 			// shape->aabb is still valid from above
 
@@ -773,7 +773,7 @@ static void b2FinalizeBodiesTask( int startIndex, int endIndex, uint threadIndex
 		}
 
 		// Any single body in an island can keep it awake
-		b2Island* island = b2IslandArray_Get( &world->islands, body->islandId );
+		b2Island* island = Array_Get( &world->islands, body->islandId );
 		if ( body->sleepTime < B2_TIME_TO_SLEEP )
 		{
 			// keep island awake
@@ -797,7 +797,7 @@ static void b2FinalizeBodiesTask( int startIndex, int endIndex, uint threadIndex
 		int shapeId = body->headShapeId;
 		while ( shapeId != B2_NULL_INDEX )
 		{
-			b2Shape* shape = b2ShapeArray_Get( &world->shapes, shapeId );
+			b2Shape* shape = Array_Get( &world->shapes, shapeId );
 
 			if ( isFast )
 			{
@@ -1316,7 +1316,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 	}
 
 	// Are there any awake bodies? This scenario should not be important for profiling.
-	b2SolverSet* awakeSet = b2SolverSetArray_Get( &world->solverSets, b2_awakeSet );
+	b2SolverSet* awakeSet = Array_Get( &world->solverSets, b2_awakeSet );
 	int awakeBodyCount = awakeSet->bodySims.count;
 	if ( awakeBodyCount == 0 )
 	{
@@ -1909,13 +1909,13 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 				{
 					event.normal = contactSim->manifold.normal;
 
-					b2Shape* shapeA = b2ShapeArray_Get( &world->shapes, contactSim->shapeIdA );
-					b2Shape* shapeB = b2ShapeArray_Get( &world->shapes, contactSim->shapeIdB );
+					b2Shape* shapeA = Array_Get( &world->shapes, contactSim->shapeIdA );
+					b2Shape* shapeB = Array_Get( &world->shapes, contactSim->shapeIdB );
 
 					event.shapeIdA = ( b2ShapeId ){ shapeA->id + 1, world->worldId, shapeA->generation };
 					event.shapeIdB = ( b2ShapeId ){ shapeB->id + 1, world->worldId, shapeB->generation };
 
-					b2ContactHitEventArray_Push( &world->contactHitEvents, event );
+					Array_Push( &world->contactHitEvents, event );
 				}
 			}
 		}

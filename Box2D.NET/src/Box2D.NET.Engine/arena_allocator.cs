@@ -32,7 +32,7 @@ public class arena_allocator
         int allocation;
         int maxAllocation;
 
-        b2ArenaEntryArray entries;
+        b2Array<b2ArenaEntry> entries;
     }
 
     b2ArenaAllocator;
@@ -64,7 +64,7 @@ public class arena_allocator
         allocator.allocation = 0;
         allocator.maxAllocation = 0;
         allocator.index = 0;
-        allocator.entries = b2ArenaEntryArray_Create(32);
+        allocator.entries = Array_Create<b2ArenaEntry>(32);
         return allocator;
     }
 
@@ -105,7 +105,7 @@ public class arena_allocator
             alloc->maxAllocation = alloc->allocation;
         }
 
-        b2ArenaEntryArray_Push(&alloc->entries, entry);
+        Array_Push(&alloc->entries, entry);
         return entry.data;
     }
 

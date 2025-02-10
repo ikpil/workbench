@@ -17,7 +17,7 @@ namespace Box2D.NET.Engine;
 public class constraint_graph
 {
 
-typedef struct b2Body b2Body;
+
 typedef struct b2ContactSim b2ContactSim;
 
 typedef struct b2ContactConstraint b2ContactConstraint;
@@ -39,8 +39,8 @@ typedef struct b2GraphColor
     b2BitSet bodySet;
 
     // cache friendly arrays
-    b2ContactSimArray contactSims;
-    b2JointSimArray jointSims;
+    b2Array<b2ContactSim> contactSims;
+    b2Array<b2JointSim> jointSims;
 
     // transient
     union
@@ -120,8 +120,8 @@ void b2AddContactToGraph( b2World* world, b2ContactSim* contactSim, b2Contact* c
 
 	int bodyIdA = contact->edges[0].bodyId;
 	int bodyIdB = contact->edges[1].bodyId;
-	b2Body* bodyA = b2BodyArray_Get( &world->bodies, bodyIdA );
-	b2Body* bodyB = b2BodyArray_Get( &world->bodies, bodyIdB );
+	b2Body* bodyA = Array_Get( &world->bodies, bodyIdA );
+	b2Body* bodyB = Array_Get( &world->bodies, bodyIdB );
 	bool staticA = bodyA->setIndex == b2_staticSet;
 	bool staticB = bodyB->setIndex == b2_staticSet;
 	Debug.Assert( staticA == false || staticB == false );
@@ -181,7 +181,7 @@ void b2AddContactToGraph( b2World* world, b2ContactSim* contactSim, b2Contact* c
 	contact->colorIndex = colorIndex;
 	contact->localIndex = color->contactSims.count;
 
-	b2ContactSim* newContact = b2ContactSimArray_Add( &color->contactSims );
+	b2ContactSim* newContact = Array_Add( &color->contactSims );
 	memcpy( newContact, contactSim, sizeof( b2ContactSim ) );
 
 	// todo perhaps skip this if the contact is already awake
@@ -195,12 +195,12 @@ void b2AddContactToGraph( b2World* world, b2ContactSim* contactSim, b2Contact* c
 	else
 	{
 		Debug.Assert( bodyA->setIndex == b2_awakeSet );
-		b2SolverSet* awakeSet = b2SolverSetArray_Get( &world->solverSets, b2_awakeSet );
+		b2SolverSet* awakeSet = Array_Get( &world->solverSets, b2_awakeSet );
 
 		int localIndex = bodyA->localIndex;
 		newContact->bodySimIndexA = localIndex;
 
-		b2BodySim* bodySimA = b2BodySimArray_Get( &awakeSet->bodySims, localIndex );
+		b2BodySim* bodySimA = Array_Get( &awakeSet->bodySims, localIndex );
 		newContact->invMassA = bodySimA->invMass;
 		newContact->invIA = bodySimA->invInertia;
 	}
@@ -214,12 +214,12 @@ void b2AddContactToGraph( b2World* world, b2ContactSim* contactSim, b2Contact* c
 	else
 	{
 		Debug.Assert( bodyB->setIndex == b2_awakeSet );
-		b2SolverSet* awakeSet = b2SolverSetArray_Get( &world->solverSets, b2_awakeSet );
+		b2SolverSet* awakeSet = Array_Get( &world->solverSets, b2_awakeSet );
 
 		int localIndex = bodyB->localIndex;
 		newContact->bodySimIndexB = localIndex;
 
-		b2BodySim* bodySimB = b2BodySimArray_Get( &awakeSet->bodySims, localIndex );
+		b2BodySim* bodySimB = Array_Get( &awakeSet->bodySims, localIndex );
 		newContact->invMassB = bodySimB->invMass;
 		newContact->invIB = bodySimB->invInertia;
 	}
@@ -247,7 +247,7 @@ void b2RemoveContactFromGraph( b2World* world, int bodyIdA, int bodyIdB, int col
 
 		// Fix moved contact
 		int movedId = movedContactSim->contactId;
-		b2Contact* movedContact = b2ContactArray_Get( &world->contacts, movedId );
+		b2Contact* movedContact = Array_Get( &world->contacts, movedId );
 		Debug.Assert( movedContact->setIndex == b2_awakeSet );
 		Debug.Assert( movedContact->colorIndex == colorIndex );
 		Debug.Assert( movedContact->localIndex == movedIndex );
@@ -316,14 +316,14 @@ b2JointSim* b2CreateJointInGraph( b2World* world, b2Joint* joint )
 
 	int bodyIdA = joint->edges[0].bodyId;
 	int bodyIdB = joint->edges[1].bodyId;
-	b2Body* bodyA = b2BodyArray_Get( &world->bodies, bodyIdA );
-	b2Body* bodyB = b2BodyArray_Get( &world->bodies, bodyIdB );
+	b2Body* bodyA = Array_Get( &world->bodies, bodyIdA );
+	b2Body* bodyB = Array_Get( &world->bodies, bodyIdB );
 	bool staticA = bodyA->setIndex == b2_staticSet;
 	bool staticB = bodyB->setIndex == b2_staticSet;
 
 	int colorIndex = b2AssignJointColor( graph, bodyIdA, bodyIdB, staticA, staticB );
 
-	b2JointSim* jointSim = b2JointSimArray_Add( &graph->colors[colorIndex].jointSims );
+	b2JointSim* jointSim = Array_Add( &graph->colors[colorIndex].jointSims );
 	memset( jointSim, 0, sizeof( b2JointSim ) );
 
 	joint->colorIndex = colorIndex;
@@ -357,7 +357,7 @@ void b2RemoveJointFromGraph( b2World* world, int bodyIdA, int bodyIdB, int color
 		// Fix moved joint
 		b2JointSim* movedJointSim = color->jointSims.data + localIndex;
 		int movedId = movedJointSim->jointId;
-		b2Joint* movedJoint = b2JointArray_Get( &world->joints, movedId );
+		b2Joint* movedJoint = Array_Get( &world->joints, movedId );
 		Debug.Assert( movedJoint->setIndex == b2_awakeSet );
 		Debug.Assert( movedJoint->colorIndex == colorIndex );
 		Debug.Assert( movedJoint->localIndex == movedIndex );

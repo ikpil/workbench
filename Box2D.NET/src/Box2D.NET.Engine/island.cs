@@ -107,16 +107,16 @@ b2Island* b2CreateIsland( b2World* world, int setIndex )
 	if ( islandId == world->islands.count )
 	{
 		b2Island emptyIsland = { 0 };
-		b2IslandArray_Push( &world->islands, emptyIsland );
+		Array_Push( &world->islands, emptyIsland );
 	}
 	else
 	{
 		Debug.Assert( world->islands.data[islandId].setIndex == B2_NULL_INDEX );
 	}
 
-	b2SolverSet* set = b2SolverSetArray_Get( &world->solverSets, setIndex );
+	b2SolverSet* set = Array_Get( &world->solverSets, setIndex );
 
-	b2Island* island = b2IslandArray_Get( &world->islands, islandId );
+	b2Island* island = Array_Get( &world->islands, islandId );
 	island->setIndex = setIndex;
 	island->localIndex = set->islandSims.count;
 	island->islandId = islandId;
@@ -132,7 +132,7 @@ b2Island* b2CreateIsland( b2World* world, int setIndex )
 	island->parentIsland = B2_NULL_INDEX;
 	island->constraintRemoveCount = 0;
 
-	b2IslandSim* islandSim = b2IslandSimArray_Add( &set->islandSims );
+	b2IslandSim* islandSim = Array_Add( &set->islandSims );
 	islandSim->islandId = islandId;
 
 	return island;
@@ -141,15 +141,15 @@ b2Island* b2CreateIsland( b2World* world, int setIndex )
 void b2DestroyIsland( b2World* world, int islandId )
 {
 	// assume island is empty
-	b2Island* island = b2IslandArray_Get( &world->islands, islandId );
-	b2SolverSet* set = b2SolverSetArray_Get( &world->solverSets, island->setIndex );
+	b2Island* island = Array_Get( &world->islands, islandId );
+	b2SolverSet* set = Array_Get( &world->solverSets, island->setIndex );
 	int movedIndex = b2IslandSimArray_RemoveSwap( &set->islandSims, island->localIndex );
 	if ( movedIndex != B2_NULL_INDEX )
 	{
 		// Fix index on moved element
 		b2IslandSim* movedElement = set->islandSims.data + island->localIndex;
 		int movedId = movedElement->islandId;
-		b2Island* movedIsland = b2IslandArray_Get( &world->islands, movedId );
+		b2Island* movedIsland = Array_Get( &world->islands, movedId );
 		Debug.Assert( movedIsland->localIndex == movedIndex );
 		movedIsland->localIndex = island->localIndex;
 	}
@@ -167,12 +167,12 @@ static void b2AddContactToIsland( b2World* world, int islandId, b2Contact* conta
 	Debug.Assert( contact->islandPrev == B2_NULL_INDEX );
 	Debug.Assert( contact->islandNext == B2_NULL_INDEX );
 
-	b2Island* island = b2IslandArray_Get( &world->islands, islandId );
+	b2Island* island = Array_Get( &world->islands, islandId );
 
 	if ( island->headContact != B2_NULL_INDEX )
 	{
 		contact->islandNext = island->headContact;
-		b2Contact* headContact = b2ContactArray_Get( &world->contacts, island->headContact);
+		b2Contact* headContact = Array_Get( &world->contacts, island->headContact);
 		headContact->islandPrev = contact->contactId;
 	}
 
@@ -198,8 +198,8 @@ void b2LinkContact( b2World* world, b2Contact* contact )
 	int bodyIdA = contact->edges[0].bodyId;
 	int bodyIdB = contact->edges[1].bodyId;
 
-	b2Body* bodyA = b2BodyArray_Get( &world->bodies, bodyIdA );
-	b2Body* bodyB = b2BodyArray_Get( &world->bodies, bodyIdB );
+	b2Body* bodyA = Array_Get( &world->bodies, bodyIdA );
+	b2Body* bodyB = Array_Get( &world->bodies, bodyIdB );
 
 	Debug.Assert( bodyA->setIndex != b2_disabledSet && bodyB->setIndex != b2_disabledSet );
 	Debug.Assert( bodyA->setIndex != b2_staticSet || bodyB->setIndex != b2_staticSet );
@@ -235,11 +235,11 @@ void b2LinkContact( b2World* world, b2Contact* contact )
 	b2Island* islandA = NULL;
 	if ( islandIdA != B2_NULL_INDEX )
 	{
-		islandA = b2IslandArray_Get( &world->islands, islandIdA );
+		islandA = Array_Get( &world->islands, islandIdA );
 		int parentId = islandA->parentIsland;
 		while ( parentId != B2_NULL_INDEX )
 		{
-			b2Island* parent = b2IslandArray_Get( &world->islands, parentId );
+			b2Island* parent = Array_Get( &world->islands, parentId );
 			if ( parent->parentIsland != B2_NULL_INDEX )
 			{
 				// path compression
@@ -256,11 +256,11 @@ void b2LinkContact( b2World* world, b2Contact* contact )
 	b2Island* islandB = NULL;
 	if ( islandIdB != B2_NULL_INDEX )
 	{
-		islandB = b2IslandArray_Get( &world->islands, islandIdB );
+		islandB = Array_Get( &world->islands, islandIdB );
 		int parentId = islandB->parentIsland;
 		while ( islandB->parentIsland != B2_NULL_INDEX )
 		{
-			b2Island* parent = b2IslandArray_Get( &world->islands, parentId );
+			b2Island* parent = Array_Get( &world->islands, parentId );
 			if ( parent->parentIsland != B2_NULL_INDEX )
 			{
 				// path compression
@@ -300,18 +300,18 @@ void b2UnlinkContact( b2World* world, b2Contact* contact )
 
 	// remove from island
 	int islandId = contact->islandId;
-	b2Island* island = b2IslandArray_Get( &world->islands, islandId );
+	b2Island* island = Array_Get( &world->islands, islandId );
 
 	if ( contact->islandPrev != B2_NULL_INDEX )
 	{
-		b2Contact* prevContact = b2ContactArray_Get( &world->contacts, contact->islandPrev);
+		b2Contact* prevContact = Array_Get( &world->contacts, contact->islandPrev);
 		Debug.Assert( prevContact->islandNext == contact->contactId );
 		prevContact->islandNext = contact->islandNext;
 	}
 
 	if ( contact->islandNext != B2_NULL_INDEX )
 	{
-		b2Contact* nextContact = b2ContactArray_Get( &world->contacts, contact->islandNext );
+		b2Contact* nextContact = Array_Get( &world->contacts, contact->islandNext );
 		Debug.Assert( nextContact->islandPrev == contact->contactId );
 		nextContact->islandPrev = contact->islandPrev;
 	}
@@ -343,12 +343,12 @@ static void b2AddJointToIsland( b2World* world, int islandId, b2Joint* joint )
 	Debug.Assert( joint->islandPrev == B2_NULL_INDEX );
 	Debug.Assert( joint->islandNext == B2_NULL_INDEX );
 
-	b2Island* island = b2IslandArray_Get( &world->islands, islandId );
+	b2Island* island = Array_Get( &world->islands, islandId );
 
 	if ( island->headJoint != B2_NULL_INDEX )
 	{
 		joint->islandNext = island->headJoint;
-		b2Joint* headJoint = b2JointArray_Get( &world->joints, island->headJoint );
+		b2Joint* headJoint = Array_Get( &world->joints, island->headJoint );
 		headJoint->islandPrev = joint->jointId;
 	}
 
@@ -366,8 +366,8 @@ static void b2AddJointToIsland( b2World* world, int islandId, b2Joint* joint )
 
 void b2LinkJoint( b2World* world, b2Joint* joint, bool mergeIslands )
 {
-	b2Body* bodyA = b2BodyArray_Get( &world->bodies, joint->edges[0].bodyId );
-	b2Body* bodyB = b2BodyArray_Get( &world->bodies, joint->edges[1].bodyId );
+	b2Body* bodyA = Array_Get( &world->bodies, joint->edges[0].bodyId );
+	b2Body* bodyB = Array_Get( &world->bodies, joint->edges[1].bodyId );
 
 	if ( bodyA->setIndex == b2_awakeSet && bodyB->setIndex >= b2_firstSleepingSet )
 	{
@@ -394,10 +394,10 @@ void b2LinkJoint( b2World* world, b2Joint* joint, bool mergeIslands )
 	b2Island* islandA = NULL;
 	if ( islandIdA != B2_NULL_INDEX )
 	{
-		islandA = b2IslandArray_Get( &world->islands, islandIdA );
+		islandA = Array_Get( &world->islands, islandIdA );
 		while ( islandA->parentIsland != B2_NULL_INDEX )
 		{
-			b2Island* parent = b2IslandArray_Get( &world->islands, islandA->parentIsland );
+			b2Island* parent = Array_Get( &world->islands, islandA->parentIsland );
 			if ( parent->parentIsland != B2_NULL_INDEX )
 			{
 				// path compression
@@ -413,10 +413,10 @@ void b2LinkJoint( b2World* world, b2Joint* joint, bool mergeIslands )
 	b2Island* islandB = NULL;
 	if ( islandIdB != B2_NULL_INDEX )
 	{
-		islandB = b2IslandArray_Get( &world->islands, islandIdB );
+		islandB = Array_Get( &world->islands, islandIdB );
 		while ( islandB->parentIsland != B2_NULL_INDEX )
 		{
-			b2Island* parent = b2IslandArray_Get( &world->islands, islandB->parentIsland );
+			b2Island* parent = Array_Get( &world->islands, islandB->parentIsland );
 			if ( parent->parentIsland != B2_NULL_INDEX )
 			{
 				// path compression
@@ -463,18 +463,18 @@ void b2UnlinkJoint( b2World* world, b2Joint* joint )
 
 	// remove from island
 	int islandId = joint->islandId;
-	b2Island* island = b2IslandArray_Get( &world->islands, islandId );
+	b2Island* island = Array_Get( &world->islands, islandId );
 
 	if ( joint->islandPrev != B2_NULL_INDEX )
 	{
-		b2Joint* prevJoint = b2JointArray_Get( &world->joints, joint->islandPrev );
+		b2Joint* prevJoint = Array_Get( &world->joints, joint->islandPrev );
 		Debug.Assert( prevJoint->islandNext == joint->jointId );
 		prevJoint->islandNext = joint->islandNext;
 	}
 
 	if ( joint->islandNext != B2_NULL_INDEX )
 	{
-		b2Joint* nextJoint = b2JointArray_Get( &world->joints, joint->islandNext );
+		b2Joint* nextJoint = Array_Get( &world->joints, joint->islandNext );
 		Debug.Assert( nextJoint->islandPrev == joint->jointId );
 		nextJoint->islandPrev = joint->islandPrev;
 	}
@@ -507,14 +507,14 @@ static void b2MergeIsland( b2World* world, b2Island* island )
 	Debug.Assert( island->parentIsland != B2_NULL_INDEX );
 
 	int rootId = island->parentIsland;
-	b2Island* rootIsland = b2IslandArray_Get( &world->islands, rootId );
+	b2Island* rootIsland = Array_Get( &world->islands, rootId );
 	Debug.Assert( rootIsland->parentIsland == B2_NULL_INDEX );
 
 	// remap island indices
 	int bodyId = island->headBody;
 	while ( bodyId != B2_NULL_INDEX )
 	{
-		b2Body* body = b2BodyArray_Get( &world->bodies, bodyId );
+		b2Body* body = Array_Get( &world->bodies, bodyId );
 		body->islandId = rootId;
 		bodyId = body->islandNext;
 	}
@@ -522,7 +522,7 @@ static void b2MergeIsland( b2World* world, b2Island* island )
 	int contactId = island->headContact;
 	while ( contactId != B2_NULL_INDEX )
 	{
-		b2Contact* contact = b2ContactArray_Get( &world->contacts, contactId );
+		b2Contact* contact = Array_Get( &world->contacts, contactId );
 		contact->islandId = rootId;
 		contactId = contact->islandNext;
 	}
@@ -530,19 +530,19 @@ static void b2MergeIsland( b2World* world, b2Island* island )
 	int jointId = island->headJoint;
 	while ( jointId != B2_NULL_INDEX )
 	{
-		b2Joint* joint = b2JointArray_Get( &world->joints, jointId );
+		b2Joint* joint = Array_Get( &world->joints, jointId );
 		joint->islandId = rootId;
 		jointId = joint->islandNext;
 	}
 
 	// connect body lists
 	Debug.Assert( rootIsland->tailBody != B2_NULL_INDEX );
-	b2Body* tailBody = b2BodyArray_Get( &world->bodies, rootIsland->tailBody );
+	b2Body* tailBody = Array_Get( &world->bodies, rootIsland->tailBody );
 	Debug.Assert( tailBody->islandNext == B2_NULL_INDEX );
 	tailBody->islandNext = island->headBody;
 
 	Debug.Assert( island->headBody != B2_NULL_INDEX );
-	b2Body* headBody = b2BodyArray_Get( &world->bodies, island->headBody );
+	b2Body* headBody = Array_Get( &world->bodies, island->headBody );
 	Debug.Assert( headBody->islandPrev == B2_NULL_INDEX );
 	headBody->islandPrev = rootIsland->tailBody;
 
@@ -564,11 +564,11 @@ static void b2MergeIsland( b2World* world, b2Island* island )
 		Debug.Assert( island->tailContact != B2_NULL_INDEX && island->contactCount > 0 );
 		Debug.Assert( rootIsland->tailContact != B2_NULL_INDEX && rootIsland->contactCount > 0 );
 
-		b2Contact* tailContact = b2ContactArray_Get( &world->contacts, rootIsland->tailContact );
+		b2Contact* tailContact = Array_Get( &world->contacts, rootIsland->tailContact );
 		Debug.Assert( tailContact->islandNext == B2_NULL_INDEX );
 		tailContact->islandNext = island->headContact;
 
-		b2Contact* headContact = b2ContactArray_Get( &world->contacts, island->headContact );
+		b2Contact* headContact = Array_Get( &world->contacts, island->headContact );
 		Debug.Assert( headContact->islandPrev == B2_NULL_INDEX );
 		headContact->islandPrev = rootIsland->tailContact;
 
@@ -590,11 +590,11 @@ static void b2MergeIsland( b2World* world, b2Island* island )
 		Debug.Assert( island->tailJoint != B2_NULL_INDEX && island->jointCount > 0 );
 		Debug.Assert( rootIsland->tailJoint != B2_NULL_INDEX && rootIsland->jointCount > 0 );
 
-		b2Joint* tailJoint = b2JointArray_Get( &world->joints, rootIsland->tailJoint );
+		b2Joint* tailJoint = Array_Get( &world->joints, rootIsland->tailJoint );
 		Debug.Assert( tailJoint->islandNext == B2_NULL_INDEX );
 		tailJoint->islandNext = island->headJoint;
 
-		b2Joint* headJoint = b2JointArray_Get( &world->joints, island->headJoint );
+		b2Joint* headJoint = Array_Get( &world->joints, island->headJoint );
 		Debug.Assert( headJoint->islandPrev == B2_NULL_INDEX );
 		headJoint->islandPrev = rootIsland->tailJoint;
 
@@ -616,7 +616,7 @@ void b2MergeAwakeIslands( b2World* world )
 {
 	b2TracyCZoneNC( merge_islands, "Merge Islands", b2_colorMediumTurquoise, true );
 
-	b2SolverSet* awakeSet = b2SolverSetArray_Get( &world->solverSets, b2_awakeSet );
+	b2SolverSet* awakeSet = Array_Get( &world->solverSets, b2_awakeSet );
 	b2IslandSim* islandSims = awakeSet->islandSims.data;
 	int awakeIslandCount = awakeSet->islandSims.count;
 
@@ -626,14 +626,14 @@ void b2MergeAwakeIslands( b2World* world )
 	{
 		int islandId = islandSims[i].islandId;
 
-		b2Island* island = b2IslandArray_Get( &world->islands, islandId );
+		b2Island* island = Array_Get( &world->islands, islandId );
 
 		// find the root island
 		int rootId = islandId;
 		b2Island* rootIsland = island;
 		while ( rootIsland->parentIsland != B2_NULL_INDEX )
 		{
-			b2Island* parent = b2IslandArray_Get( &world->islands, rootIsland->parentIsland );
+			b2Island* parent = Array_Get( &world->islands, rootIsland->parentIsland );
 			if ( parent->parentIsland != B2_NULL_INDEX )
 			{
 				// path compression
@@ -655,7 +655,7 @@ void b2MergeAwakeIslands( b2World* world )
 	for ( int i = awakeIslandCount - 1; i >= 0; --i )
 	{
 		int islandId = islandSims[i].islandId;
-		b2Island* island = b2IslandArray_Get( &world->islands, islandId );
+		b2Island* island = Array_Get( &world->islands, islandId );
 
 		if ( island->parentIsland == B2_NULL_INDEX )
 		{
@@ -677,7 +677,7 @@ void b2MergeAwakeIslands( b2World* world )
 
 void b2SplitIsland( b2World* world, int baseId )
 {
-	b2Island* baseIsland = b2IslandArray_Get( &world->islands, baseId );
+	b2Island* baseIsland = Array_Get( &world->islands, baseId );
 	int setIndex = baseIsland->setIndex;
 
 	if ( setIndex != b2_awakeSet )
@@ -724,7 +724,7 @@ void b2SplitIsland( b2World* world, int baseId )
 	int nextContactId = baseIsland->headContact;
 	while ( nextContactId != B2_NULL_INDEX )
 	{
-		b2Contact* contact = b2ContactArray_Get( &world->contacts, nextContactId );
+		b2Contact* contact = Array_Get( &world->contacts, nextContactId );
 		contact->isMarked = false;
 		nextContactId = contact->islandNext;
 	}
@@ -733,7 +733,7 @@ void b2SplitIsland( b2World* world, int baseId )
 	int nextJoint = baseIsland->headJoint;
 	while ( nextJoint != B2_NULL_INDEX )
 	{
-		b2Joint* joint = b2JointArray_Get( &world->joints, nextJoint );
+		b2Joint* joint = Array_Get( &world->joints, nextJoint );
 		joint->isMarked = false;
 		nextJoint = joint->islandNext;
 	}
@@ -798,7 +798,7 @@ void b2SplitIsland( b2World* world, int baseId )
 				int contactId = contactKey >> 1;
 				int edgeIndex = contactKey & 1;
 
-				b2Contact* contact = b2ContactArray_Get( &world->contacts, contactId );
+				b2Contact* contact = Array_Get( &world->contacts, contactId );
 				Debug.Assert( contact->contactId == contactId );
 
 				// Next key
@@ -834,7 +834,7 @@ void b2SplitIsland( b2World* world, int baseId )
 				contact->islandId = islandId;
 				if ( island->tailContact != B2_NULL_INDEX )
 				{
-					b2Contact* tailContact = b2ContactArray_Get( &world->contacts, island->tailContact );
+					b2Contact* tailContact = Array_Get( &world->contacts, island->tailContact );
 					tailContact->islandNext = contactId;
 				}
 				contact->islandPrev = island->tailContact;
@@ -856,7 +856,7 @@ void b2SplitIsland( b2World* world, int baseId )
 				int jointId = jointKey >> 1;
 				int edgeIndex = jointKey & 1;
 
-				b2Joint* joint = b2JointArray_Get( &world->joints, jointId );
+				b2Joint* joint = Array_Get( &world->joints, jointId );
 				Debug.Assert( joint->jointId == jointId );
 
 				// Next key
@@ -892,7 +892,7 @@ void b2SplitIsland( b2World* world, int baseId )
 				joint->islandId = islandId;
 				if ( island->tailJoint != B2_NULL_INDEX )
 				{
-					b2Joint* tailJoint = b2JointArray_Get( &world->joints, island->tailJoint );
+					b2Joint* tailJoint = Array_Get( &world->joints, island->tailJoint );
 					tailJoint->islandNext = jointId;
 				}
 				joint->islandPrev = island->tailJoint;
@@ -942,7 +942,7 @@ void b2SplitIslandTask( int startIndex, int endIndex, uint threadIndex, void* co
 #if B2_VALIDATE
 void b2ValidateIsland( b2World* world, int islandId )
 {
-	b2Island* island = b2IslandArray_Get( &world->islands, islandId );
+	b2Island* island = Array_Get( &world->islands, islandId );
 	Debug.Assert( island->islandId == islandId );
 	Debug.Assert( island->setIndex != B2_NULL_INDEX );
 	Debug.Assert( island->headBody != B2_NULL_INDEX );
@@ -960,7 +960,7 @@ void b2ValidateIsland( b2World* world, int islandId )
 		int bodyId = island->headBody;
 		while ( bodyId != B2_NULL_INDEX )
 		{
-			b2Body* body = b2BodyArray_Get(&world->bodies, bodyId);
+			b2Body* body = Array_Get(&world->bodies, bodyId);
 			Debug.Assert( body->islandId == islandId );
 			Debug.Assert( body->setIndex == island->setIndex );
 			count += 1;
@@ -989,7 +989,7 @@ void b2ValidateIsland( b2World* world, int islandId )
 		int contactId = island->headContact;
 		while ( contactId != B2_NULL_INDEX )
 		{
-			b2Contact* contact = b2ContactArray_Get( &world->contacts, contactId );
+			b2Contact* contact = Array_Get( &world->contacts, contactId );
 			Debug.Assert( contact->setIndex == island->setIndex );
 			Debug.Assert( contact->islandId == islandId );
 			count += 1;
@@ -1023,7 +1023,7 @@ void b2ValidateIsland( b2World* world, int islandId )
 		int jointId = island->headJoint;
 		while ( jointId != B2_NULL_INDEX )
 		{
-			b2Joint* joint = b2JointArray_Get( &world->joints, jointId );
+			b2Joint* joint = Array_Get( &world->joints, jointId );
 			Debug.Assert( joint->setIndex == island->setIndex );
 			count += 1;
 

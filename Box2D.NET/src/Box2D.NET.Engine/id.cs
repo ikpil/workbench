@@ -33,6 +33,12 @@ public struct b2WorldId
 {
     public ushort index1;
     public ushort generation;
+    
+    public b2WorldId(ushort index1, ushort generation)
+    {
+        this.index1 = index1;
+        this.generation = generation;
+    }
 }
 
 /// Body id references a body instance. This should be treated as an opaque handle.
@@ -41,6 +47,13 @@ public struct b2BodyId
     public int index1;
     public ushort world0;
     public ushort generation;
+
+    public b2BodyId(int index1, ushort world0, ushort generation)
+    {
+        this.index1 = index1;
+        this.world0 = world0;
+        this.generation = generation;
+    }
 }
 
 /// Shape id references a shape instance. This should be treated as an opaque handle.
@@ -49,6 +62,14 @@ public struct b2ShapeId
     public int index1;
     public ushort world0;
     public ushort generation;
+    
+    public b2ShapeId(int index1, ushort world0, ushort generation)
+    {
+        this.index1 = index1;
+        this.world0 = world0;
+        this.generation = generation;
+    }
+
 }
 
 /// Chain id references a chain instances. This should be treated as an opaque handle.
@@ -57,6 +78,13 @@ public struct b2ChainId
     public int index1;
     public ushort world0;
     public ushort generation;
+    public b2ChainId(int index1, ushort world0, ushort generation)
+    {
+        this.index1 = index1;
+        this.world0 = world0;
+        this.generation = generation;
+    }
+
 }
 
 /// Joint id references a joint instance. This should be treated as an opaque handle.
@@ -65,6 +93,13 @@ public struct b2JointId
     public int index1;
     public ushort world0;
     public ushort generation;
+    public b2JointId(int index1, ushort world0, ushort generation)
+    {
+        this.index1 = index1;
+        this.world0 = world0;
+        this.generation = generation;
+    }
+
 }
 
 public static class id
