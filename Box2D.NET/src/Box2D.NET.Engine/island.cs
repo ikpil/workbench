@@ -5,12 +5,6 @@
 
 namespace Box2D.NET.Engine;
 
-public class island
-{
-
-
-
-
 
 // Deterministic solver
 //
@@ -24,37 +18,46 @@ public class island
 // https://en.wikipedia.org/wiki/Component_(graph_theory)
 // https://en.wikipedia.org/wiki/Dynamic_connectivity
 // map from int to solver set and index
-typedef struct b2Island
+public class b2Island
 {
-	// index of solver set stored in b2World
-	// may be B2_NULL_INDEX
-	int setIndex;
+    // index of solver set stored in b2World
+    // may be B2_NULL_INDEX
+    public int setIndex;
 
-	// island index within set
-	// may be B2_NULL_INDEX
-	int localIndex;
+    // island index within set
+    // may be B2_NULL_INDEX
+    public int localIndex;
 
-	int islandId;
+    public int islandId;
 
-	int headBody;
-	int tailBody;
-	int bodyCount;
+    public int headBody;
+    public int tailBody;
+    public int bodyCount;
 
-	int headContact;
-	int tailContact;
-	int contactCount;
+    public int headContact;
+    public int tailContact;
+    public int contactCount;
 
-	int headJoint;
-	int tailJoint;
-	int jointCount;
+    public int headJoint;
+    public int tailJoint;
+    public int jointCount;
 
-	// Union find
-	int parentIsland;
+    // Union find
+    public int parentIsland;
 
-	// Keeps track of how many contacts have been removed from this island.
-	// This is used to determine if an island is a candidate for splitting.
-	int constraintRemoveCount;
-} b2Island;
+    // Keeps track of how many contacts have been removed from this island.
+    // This is used to determine if an island is a candidate for splitting.
+    public int constraintRemoveCount;
+}
+
+public class island
+{
+
+
+
+
+
+
 
 // This is used to move islands across solver sets
 typedef struct b2IslandSim

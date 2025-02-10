@@ -36,9 +36,9 @@ public class b2TaskContext
 // The world also contains efficient memory management facilities.
 public class b2World
 {
-	//public b2ArenaAllocator stackAllocator;
+	public b2ArenaAllocator stackAllocator;
 	public b2BroadPhase broadPhase;
-	//public b2ConstraintGraph constraintGraph;
+	public b2ConstraintGraph constraintGraph;
 
 	// The body id pool is used to allocate and recycle body ids. Body ids
 	// provide a stable identifier for users, but incur caches misses when used
@@ -63,7 +63,7 @@ public class b2World
 
 	// This is a sparse array that maps joint ids to the joint data stored in the constraint graph
 	// or in the solver sets.
-    //public b2Array<b2Joint> joints;
+    public b2Array<b2Joint> joints;
 
 	// Used to create stable ids for contacts
     public b2IdPool contactIdPool;
@@ -76,7 +76,7 @@ public class b2World
     public b2IdPool islandIdPool;
 
 	// This is a sparse array that maps island ids to the island data stored in the solver sets.
-    //public b2Array<b2Island> islands;
+    public b2Array<b2Island> islands;
 
     public b2IdPool shapeIdPool;
     public b2IdPool chainIdPool;
@@ -86,11 +86,11 @@ public class b2World
     public b2Array<b2ChainShape> chainShapes;
 
 	// This is a dense array of sensor data.
-    //public b2Array<b2Sensor> sensors;
+    public b2Array<b2Sensor> sensors;
 
 	// Per thread storage
 	public b2Array<b2TaskContext> taskContexts;
-	//public b2Array<b2SensorTaskContext> sensorTaskContexts;
+	public b2Array<b2SensorTaskContext> sensorTaskContexts;
 
 	public b2Array<b2BodyMoveEvent> bodyMoveEvents;
 	public b2Array<b2SensorBeginTouchEvent> sensorBeginEvents;
@@ -884,10 +884,10 @@ void b2World_Step( b2WorldId worldId, float timeStep, int subStepCount )
 
 	// Prepare to capture events
 	// Ensure user does not access stale data if there is an early return
-	b2BodyMoveEventArray_Clear( &world->bodyMoveEvents );
-	b2SensorBeginTouchEventArray_Clear( &world->sensorBeginEvents );
-	b2ContactBeginTouchEventArray_Clear( &world->contactBeginEvents );
-	b2ContactHitEventArray_Clear( &world->contactHitEvents );
+	Array_Clear( &world->bodyMoveEvents );
+	Array_Clear( &world->sensorBeginEvents );
+	Array_Clear( &world->contactBeginEvents );
+	Array_Clear( &world->contactHitEvents );
 
 	world->profile = ( b2Profile ){ 0 };
 
@@ -895,8 +895,8 @@ void b2World_Step( b2WorldId worldId, float timeStep, int subStepCount )
 	{
 		// Swap end event array buffers
 		world->endEventArrayIndex = 1 - world->endEventArrayIndex;
-		b2SensorEndTouchEventArray_Clear( world->sensorEndEvents + world->endEventArrayIndex );
-		b2ContactEndTouchEventArray_Clear( world->contactEndEvents + world->endEventArrayIndex );
+		Array_Clear( world->sensorEndEvents + world->endEventArrayIndex );
+		Array_Clear( world->contactEndEvents + world->endEventArrayIndex );
 
 		// todo_erin would be useful to still process collision while paused
 		return;
@@ -985,8 +985,8 @@ void b2World_Step( b2WorldId worldId, float timeStep, int subStepCount )
 
 	// Swap end event array buffers
 	world->endEventArrayIndex = 1 - world->endEventArrayIndex;
-	b2SensorEndTouchEventArray_Clear( world->sensorEndEvents + world->endEventArrayIndex );
-	b2ContactEndTouchEventArray_Clear( world->contactEndEvents + world->endEventArrayIndex );
+	Array_Clear( world->sensorEndEvents + world->endEventArrayIndex );
+	Array_Clear( world->contactEndEvents + world->endEventArrayIndex );
 	world->locked = false;
 }
 

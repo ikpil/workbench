@@ -520,7 +520,7 @@ void b2UpdateBroadPhasePairs( b2World* world )
 	// }
 
 	// Reset move buffer
-	b2IntArray_Clear( &bp.moveArray );
+	Array_Clear( &bp.moveArray );
 	b2ClearSet( &bp.moveSet );
 
 	b2FreeArenaItem( alloc, bp.movePairs );

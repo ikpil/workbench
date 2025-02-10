@@ -4,25 +4,7 @@
 namespace Box2D.NET.Engine;
 
 public class revolute_joint
-
 {
-
-
-#if defined( _MSC_VER ) && !defined( _CRT_SECURE_NO_WARNINGS )
-#define _CRT_SECURE_NO_WARNINGS
-#endif
-
-
-
-
-
-
-
-
-// needed for dll export
-
-
-
 
     void b2RevoluteJoint_EnableSpring(b2JointId jointId, bool enableSpring)
     {

@@ -24,7 +24,7 @@ typedef struct b2ContactConstraint b2ContactConstraint;
 typedef struct b2ContactConstraintSIMD b2ContactConstraintSIMD;
 typedef struct b2JointSim b2JointSim;
 
-typedef struct b2StepContext b2StepContext;
+
 
 
 // This holds constraints that cannot fit the graph color limit. This happens when a single dynamic body
