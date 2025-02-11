@@ -3,9 +3,20 @@
 
 
 using System.Diagnostics;
-using static Box2D.NET.Engine.constants;
-using static Box2D.NET.Engine.math_function;
+using static Box2D.NET.Engine.table;
 using static Box2D.NET.Engine.array;
+using static Box2D.NET.Engine.atomic;
+using static Box2D.NET.Engine.dynamic_tree;
+using static Box2D.NET.Engine.core;
+using static Box2D.NET.Engine.types;
+using static Box2D.NET.Engine.constants;
+using static Box2D.NET.Engine.contact;
+using static Box2D.NET.Engine.math_function;
+using static Box2D.NET.Engine.constants;
+using static Box2D.NET.Engine.array;
+using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.id_pool;
+
 
 namespace Box2D.NET.Engine;
 
@@ -267,6 +278,28 @@ public class b2JointSim
 		public b2WeldJoint weldJoint;
 		public b2WheelJoint wheelJoint;
 	//};
+
+    public void CopyFrom(b2JointSim jointSim)
+    {
+	    this.jointId = jointSim.jointId;
+        this.bodyIdA = jointSim.bodyIdA;
+        this.bodyIdB = jointSim.bodyIdB;
+        this.type = jointSim.type;
+        this.localOriginAnchorA = jointSim.localOriginAnchorA;
+        this.localOriginAnchorB = jointSim.localOriginAnchorB;
+        this.invMassA = jointSim.invMassA;
+        this.invMassB = jointSim.invMassB;
+        this.invIA = jointSim.invIA;
+        this.invIB = jointSim.invIB;
+        this.distanceJoint = jointSim.distanceJoint;
+        this.motorJoint = jointSim.motorJoint;
+        this.mouseJoint = jointSim.mouseJoint;
+        this.revoluteJoint = jointSim.revoluteJoint;
+        this.prismaticJoint = jointSim.prismaticJoint;
+        this.weldJoint = jointSim.weldJoint;
+        this.wheelJoint = jointSim.wheelJoint;
+        
+    }
 }
 
 
@@ -374,7 +407,7 @@ public static b2JointSim b2GetJointSim( b2World world, b2Joint joint )
 	return Array_Get( &set.jointSims, joint.localIndex );
 }
 
-b2JointSim* b2GetJointSimCheckType( b2JointId jointId, b2JointType type )
+public static b2JointSim b2GetJointSimCheckType( b2JointId jointId, b2JointType type )
 {
 	B2_UNUSED( type );
 
@@ -1029,7 +1062,7 @@ void b2DestroyJointInternal( b2World* world, b2Joint* joint, bool wakeBodies )
 	else
 	{
 		b2SolverSet* set = Array_Get( &world.solverSets, setIndex );
-		int movedIndex = b2JointSimArray_RemoveSwap( &set.jointSims, localIndex );
+		int movedIndex = Array_RemoveSwap( &set.jointSims, localIndex );
 		if ( movedIndex != B2_NULL_INDEX )
 		{
 			// Fix moved joint

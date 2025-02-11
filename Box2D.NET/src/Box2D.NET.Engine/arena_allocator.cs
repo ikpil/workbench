@@ -1,6 +1,18 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
+using static Box2D.NET.Engine.table;
+using static Box2D.NET.Engine.array;
+using static Box2D.NET.Engine.atomic;
+using static Box2D.NET.Engine.dynamic_tree;
+using static Box2D.NET.Engine.core;
+using static Box2D.NET.Engine.types;
+using static Box2D.NET.Engine.constants;
+using static Box2D.NET.Engine.contact;
+using static Box2D.NET.Engine.math_function;
+using static Box2D.NET.Engine.constants;
+using static Box2D.NET.Engine.array;
+
 
 namespace Box2D.NET.Engine;
 
@@ -70,7 +82,7 @@ public class arena_allocator
 
     void b2DestroyArenaAllocator(b2ArenaAllocator* allocator)
     {
-        b2ArenaEntryArray_Destroy(&allocator->entries);
+        Array_Destroy(&allocator->entries);
         b2Free(allocator->data, allocator->capacity);
     }
 

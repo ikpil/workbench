@@ -3,11 +3,19 @@
 
 
 using System.Diagnostics;
+using static Box2D.NET.Engine.table;
 using static Box2D.NET.Engine.array;
-using static Box2D.NET.Engine.constants;
+using static Box2D.NET.Engine.atomic;
+using static Box2D.NET.Engine.dynamic_tree;
 using static Box2D.NET.Engine.core;
+using static Box2D.NET.Engine.types;
+using static Box2D.NET.Engine.constants;
+using static Box2D.NET.Engine.contact;
 using static Box2D.NET.Engine.math_function;
+using static Box2D.NET.Engine.constants;
+using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.id_pool;
 
 namespace Box2D.NET.Engine;
 
@@ -535,7 +543,7 @@ public class body
 
         // Remove body sim from solver set that owns it
         b2SolverSet* set = Array_Get( &world.solverSets, body.setIndex );
-        int movedIndex = b2BodySimArray_RemoveSwap( &set.bodySims, body.localIndex );
+        int movedIndex = Array_RemoveSwap( &set.bodySims, body.localIndex );
         if ( movedIndex != B2_NULL_INDEX )
         {
             // Fix moved body index
@@ -549,7 +557,7 @@ public class body
         // Remove body state from awake set
         if ( body.setIndex == b2_awakeSet )
         {
-            int result = b2BodyStateArray_RemoveSwap( &set.bodyStates, body.localIndex );
+            int result = Array_RemoveSwap( &set.bodyStates, body.localIndex );
             B2_UNUSED( result );
             Debug.Assert( result == movedIndex );
         }

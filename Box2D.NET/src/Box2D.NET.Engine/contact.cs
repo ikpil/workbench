@@ -1,6 +1,21 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
+using static Box2D.NET.Engine.table;
+using static Box2D.NET.Engine.array;
+using static Box2D.NET.Engine.atomic;
+using static Box2D.NET.Engine.dynamic_tree;
+using static Box2D.NET.Engine.core;
+using static Box2D.NET.Engine.types;
+using static Box2D.NET.Engine.constants;
+using static Box2D.NET.Engine.contact;
+using static Box2D.NET.Engine.math_function;
+using static Box2D.NET.Engine.constants;
+using static Box2D.NET.Engine.array;
+using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.id_pool;
+
+
 namespace Box2D.NET.Engine;
 
 // A contact edge is used to connect bodies and contacts together
@@ -550,7 +565,7 @@ void b2DestroyContact( b2World* world, b2Contact* contact, bool wakeBodies )
 		// contact is non-touching or is sleeping or is a sensor
 		Debug.Assert( contact->setIndex != b2_awakeSet || ( contact->flags & b2_contactTouchingFlag ) == 0 );
 		b2SolverSet* set = Array_Get( &world->solverSets, contact->setIndex );
-		int movedIndex = b2ContactSimArray_RemoveSwap( &set->contactSims, contact->localIndex );
+		int movedIndex = Array_RemoveSwap( &set->contactSims, contact->localIndex );
 		if ( movedIndex != B2_NULL_INDEX )
 		{
 			b2ContactSim* movedContactSim = set->contactSims.data + contact->localIndex;

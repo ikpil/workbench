@@ -1,17 +1,28 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
+
+using static Box2D.NET.Engine.table;
+using static Box2D.NET.Engine.array;
+using static Box2D.NET.Engine.atomic;
+using static Box2D.NET.Engine.dynamic_tree;
+using static Box2D.NET.Engine.core;
+using static Box2D.NET.Engine.types;
+using static Box2D.NET.Engine.constants;
+using static Box2D.NET.Engine.contact;
+using static Box2D.NET.Engine.math_function;
+using static Box2D.NET.Engine.constants;
+using static Box2D.NET.Engine.array;
+using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.id_pool;
+
+
 namespace Box2D.NET.Engine;
+
 
 public class motor_joint
 {
 
-
-
-
-
-
-// needed for dll export
 
 
     void b2MotorJoint_SetLinearOffset(b2JointId jointId, b2Vec2 linearOffset)

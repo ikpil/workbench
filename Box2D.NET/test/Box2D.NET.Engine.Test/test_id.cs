@@ -3,6 +3,7 @@
 
 using NUnit.Framework;
 using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.id_pool;
 
 namespace Box2D.NET.Engine.Test;
 

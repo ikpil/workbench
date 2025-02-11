@@ -1,6 +1,19 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
+using static Box2D.NET.Engine.table;
+using static Box2D.NET.Engine.array;
+using static Box2D.NET.Engine.atomic;
+using static Box2D.NET.Engine.dynamic_tree;
+using static Box2D.NET.Engine.core;
+using static Box2D.NET.Engine.types;
+using static Box2D.NET.Engine.constants;
+using static Box2D.NET.Engine.contact;
+using static Box2D.NET.Engine.math_function;
+using static Box2D.NET.Engine.constants;
+using static Box2D.NET.Engine.array;
+using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.id_pool;
 
 namespace Box2D.NET.Engine;
 
@@ -409,10 +422,10 @@ static void b2DestroyShapeInternal( b2World* world, b2Shape* shape, b2Body* body
 		}
 
 		// Destroy sensor
-		b2ShapeRefArray_Destroy( &sensor->overlaps1 );
-		b2ShapeRefArray_Destroy( &sensor->overlaps2 );
+		Array_Destroy( &sensor->overlaps1 );
+		Array_Destroy( &sensor->overlaps2 );
 
-		int movedIndex = b2SensorArray_RemoveSwap( &world->sensors, shape->sensorIndex );
+		int movedIndex = Array_RemoveSwap( &world->sensors, shape->sensorIndex );
 		if ( movedIndex != B2_NULL_INDEX )
 		{
 			// Fixup moved sensor

@@ -10,6 +10,12 @@ using static Box2D.NET.Engine.core;
 using static Box2D.NET.Engine.types;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.contact;
+using static Box2D.NET.Engine.math_function;
+using static Box2D.NET.Engine.constants;
+using static Box2D.NET.Engine.array;
+using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.id_pool;
+
 
 namespace Box2D.NET.Engine;
 

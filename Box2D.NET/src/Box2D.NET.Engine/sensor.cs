@@ -2,10 +2,20 @@
 // SPDX-License-Identifier: MIT
 
 using System.Diagnostics;
-using static Box2D.NET.Engine.core;
-using static Box2D.NET.Engine.math_function;
+using static Box2D.NET.Engine.table;
 using static Box2D.NET.Engine.array;
+using static Box2D.NET.Engine.atomic;
+using static Box2D.NET.Engine.dynamic_tree;
+using static Box2D.NET.Engine.core;
+using static Box2D.NET.Engine.types;
 using static Box2D.NET.Engine.constants;
+using static Box2D.NET.Engine.contact;
+using static Box2D.NET.Engine.math_function;
+using static Box2D.NET.Engine.constants;
+using static Box2D.NET.Engine.array;
+using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.id_pool;
+
 
 namespace Box2D.NET.Engine;
 
@@ -206,7 +216,7 @@ public static void b2SensorTask( int startIndex, int endIndex, uint threadIndex,
 	b2TracyCZoneEnd( sensor_task );
 }
 
-void b2OverlapSensors( b2World* world )
+public static void b2OverlapSensors( b2World world )
 {
 	int sensorCount = world.sensors.count;
 	if ( sensorCount == 0 )
@@ -366,10 +376,10 @@ void b2DestroySensor( b2World* world, b2Shape* sensorShape )
 	}
 
 	// Destroy sensor
-	b2ShapeRefArray_Destroy( &sensor.overlaps1 );
-	b2ShapeRefArray_Destroy( &sensor.overlaps2 );
+	Array_Destroy( &sensor.overlaps1 );
+	Array_Destroy( &sensor.overlaps2 );
 
-	int movedIndex = b2SensorArray_RemoveSwap( &world.sensors, sensorShape.sensorIndex );
+	int movedIndex = Array_RemoveSwap( &world.sensors, sensorShape.sensorIndex );
 	if ( movedIndex != B2_NULL_INDEX )
 	{
 		// Fixup moved sensor
