@@ -211,7 +211,7 @@ public class body
         Debug.Assert( body.islandNext == B2_NULL_INDEX );
         Debug.Assert( setIndex != (int)b2SetType.b2_disabledSet );
 
-        b2Island* island = b2CreateIsland( world, setIndex );
+        b2Island island = b2CreateIsland( world, setIndex );
 
         body.islandId = island.islandId;
         island.headBody = body.id;
@@ -229,18 +229,18 @@ public class body
         }
 
         int islandId = body.islandId;
-        b2Island* island = Array_Get( &world.islands, islandId );
+        b2Island island = Array_Get( world.islands, islandId );
 
         // Fix the island's linked list of sims
         if ( body.islandPrev != B2_NULL_INDEX )
         {
-            b2Body* prevBody = Array_Get( &world.bodies, body.islandPrev );
+            b2Body prevBody = Array_Get( world.bodies, body.islandPrev );
             prevBody.islandNext = body.islandNext;
         }
 
         if ( body.islandNext != B2_NULL_INDEX )
         {
-            b2Body* nextBody = Array_Get( &world.bodies, body.islandNext );
+            b2Body nextBody = Array_Get( world.bodies, body.islandNext );
             nextBody.islandPrev = body.islandPrev;
         }
 
@@ -486,7 +486,7 @@ public class body
             int jointId = edgeKey >> 1;
             int edgeIndex = edgeKey & 1;
 
-            b2Joint* joint = Array_Get( &world.joints, jointId );
+            b2Joint joint = Array_Get( &world.joints, jointId );
             edgeKey = joint.edges[edgeIndex].nextKey;
 
             // Careful because this modifies the list being traversed

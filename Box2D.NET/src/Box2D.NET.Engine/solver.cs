@@ -10,8 +10,8 @@ public class solver
 
 typedef struct b2BodySim b2BodySim;
 typedef struct b2BodyState b2BodyState;
-typedef struct b2ContactSim b2ContactSim;
-typedef struct b2JointSim b2JointSim;
+
+
 
 
 typedef struct b2Softness

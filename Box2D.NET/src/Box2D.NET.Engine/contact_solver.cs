@@ -8,7 +8,7 @@ public class contact_solver
 {
 
 
-typedef struct b2ContactSim b2ContactSim;
+
 
 typedef struct b2ContactConstraintPoint
 {

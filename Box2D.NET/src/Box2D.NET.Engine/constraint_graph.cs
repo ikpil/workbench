@@ -12,21 +12,13 @@
 
 // This is used for debugging by making all constraints be assigned to overflow.
 
+using static
+
 namespace Box2D.NET.Engine;
+
 
 public class constraint_graph
 {
-
-
-typedef struct b2ContactSim b2ContactSim;
-
-typedef struct b2ContactConstraint b2ContactConstraint;
-typedef struct b2ContactConstraintSIMD b2ContactConstraintSIMD;
-typedef struct b2JointSim b2JointSim;
-
-
-
-
 // This holds constraints that cannot fit the graph color limit. This happens when a single dynamic body
 // is touching many other bodies.
 #define B2_OVERFLOW_INDEX (B2_GRAPH_COLOR_COUNT - 1)

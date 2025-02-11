@@ -1,356 +1,293 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
-// needed for dll export
+
+using System.Diagnostics;
+using static Box2D.NET.Engine.constants;
+using static Box2D.NET.Engine.math_function;
+using static Box2D.NET.Engine.array;
 
 namespace Box2D.NET.Engine;
-
-public class joint
-{
 
 /// A joint edge is used to connect bodies and joints together
 /// in a joint graph where each body is a node and each joint
 /// is an edge. A joint edge belongs to a doubly linked list
 /// maintained in each attached body. Each joint has two joint
 /// nodes, one for each attached body.
-typedef struct b2JointEdge
+public class b2JointEdge
 {
-	int bodyId;
-	int prevKey;
-	int nextKey;
-} b2JointEdge;
+    public int bodyId;
+    public int prevKey;
+    public int nextKey;
+}
 
 // Map from b2JointId to b2Joint in the solver sets
-typedef struct b2Joint
+public class b2Joint
 {
-	void* userData;
+    public object userData;
 
-	// index of simulation set stored in b2World
-	// B2_NULL_INDEX when slot is free
-	int setIndex;
+    // index of simulation set stored in b2World
+    // B2_NULL_INDEX when slot is free
+    public int setIndex;
 
-	// index into the constraint graph color array, may be B2_NULL_INDEX for sleeping/disabled joints
-	// B2_NULL_INDEX when slot is free
-	int colorIndex;
+    // index into the constraint graph color array, may be B2_NULL_INDEX for sleeping/disabled joints
+    // B2_NULL_INDEX when slot is free
+    public int colorIndex;
 
-	// joint index within set or graph color
-	// B2_NULL_INDEX when slot is free
-	int localIndex;
+    // joint index within set or graph color
+    // B2_NULL_INDEX when slot is free
+    public int localIndex;
 
-	b2JointEdge edges[2];
+    public b2JointEdge[] edges;
 
-	int jointId;
-	int islandId;
-	int islandPrev;
-	int islandNext;
+    public int jointId;
+    public int islandId;
+    public int islandPrev;
+    public int islandNext;
 
-	float drawSize;
+    public float drawSize;
 
-	b2JointType type;
+    public b2JointType type;
 
-	// This is monotonically advanced when a body is allocated in this slot
-	// Used to check for invalid b2JointId
-	ushort generation;
+    // This is monotonically advanced when a body is allocated in this slot
+    // Used to check for invalid b2JointId
+    public ushort generation;
 
-	bool isMarked;
-	bool collideConnected;
+    public bool isMarked;
+    public bool collideConnected;
 
-} b2Joint;
+}
 
-typedef struct b2DistanceJoint
+public class b2DistanceJoint
 {
-	float length;
-	float hertz;
-	float dampingRatio;
-	float minLength;
-	float maxLength;
+	public float length;
+	public float hertz;
+	public float dampingRatio;
+	public float minLength;
+	public float maxLength;
 
-	float maxMotorForce;
-	float motorSpeed;
+	public float maxMotorForce;
+	public float motorSpeed;
 
-	float impulse;
-	float lowerImpulse;
-	float upperImpulse;
-	float motorImpulse;
+	public float impulse;
+	public float lowerImpulse;
+	public float upperImpulse;
+	public float motorImpulse;
 
-	int indexA;
-	int indexB;
-	b2Vec2 anchorA;
-	b2Vec2 anchorB;
-	b2Vec2 deltaCenter;
-	b2Softness distanceSoftness;
-	float axialMass;
+	public int indexA;
+	public int indexB;
+	public b2Vec2 anchorA;
+	public b2Vec2 anchorB;
+	public b2Vec2 deltaCenter;
+	public b2Softness distanceSoftness;
+	public float axialMass;
 
-	bool enableSpring;
-	bool enableLimit;
-	bool enableMotor;
-} b2DistanceJoint;
+	public bool enableSpring;
+	public bool enableLimit;
+	public bool enableMotor;
+}
 
-typedef struct b2MotorJoint
+public class b2MotorJoint
 {
-	b2Vec2 linearOffset;
-	float angularOffset;
-	b2Vec2 linearImpulse;
-	float angularImpulse;
-	float maxForce;
-	float maxTorque;
-	float correctionFactor;
+	public b2Vec2 linearOffset;
+	public float angularOffset;
+	public b2Vec2 linearImpulse;
+	public float angularImpulse;
+	public float maxForce;
+	public float maxTorque;
+	public float correctionFactor;
 
-	int indexA;
-	int indexB;
-	b2Vec2 anchorA;
-	b2Vec2 anchorB;
-	b2Vec2 deltaCenter;
-	float deltaAngle;
-	b2Mat22 linearMass;
-	float angularMass;
-} b2MotorJoint;
+	public int indexA;
+	public int indexB;
+	public b2Vec2 anchorA;
+	public b2Vec2 anchorB;
+	public b2Vec2 deltaCenter;
+	public float deltaAngle;
+	public b2Mat22 linearMass;
+	public float angularMass;
+}
 
-typedef struct b2MouseJoint
+public class b2MouseJoint
 {
-	b2Vec2 targetA;
-	float hertz;
-	float dampingRatio;
-	float maxForce;
+	public b2Vec2 targetA;
+	public float hertz;
+	public float dampingRatio;
+	public float maxForce;
 
-	b2Vec2 linearImpulse;
-	float angularImpulse;
+	public b2Vec2 linearImpulse;
+	public float angularImpulse;
 
-	b2Softness linearSoftness;
-	b2Softness angularSoftness;
-	int indexB;
-	b2Vec2 anchorB;
-	b2Vec2 deltaCenter;
-	b2Mat22 linearMass;
-} b2MouseJoint;
+	public b2Softness linearSoftness;
+	public b2Softness angularSoftness;
+	public int indexB;
+	public b2Vec2 anchorB;
+	public b2Vec2 deltaCenter;
+	public b2Mat22 linearMass;
+}
 
-typedef struct b2PrismaticJoint
+public class b2PrismaticJoint
 {
-	b2Vec2 localAxisA;
-	b2Vec2 impulse;
-	float springImpulse;
-	float motorImpulse;
-	float lowerImpulse;
-	float upperImpulse;
-	float hertz;
-	float dampingRatio;
-	float maxMotorForce;
-	float motorSpeed;
-	float referenceAngle;
-	float lowerTranslation;
-	float upperTranslation;
+	public b2Vec2 localAxisA;
+	public b2Vec2 impulse;
+	public float springImpulse;
+	public float motorImpulse;
+	public float lowerImpulse;
+	public float upperImpulse;
+	public float hertz;
+	public float dampingRatio;
+	public float maxMotorForce;
+	public float motorSpeed;
+	public float referenceAngle;
+	public float lowerTranslation;
+	public float upperTranslation;
 
-	int indexA;
-	int indexB;
-	b2Vec2 anchorA;
-	b2Vec2 anchorB;
-	b2Vec2 axisA;
-	b2Vec2 deltaCenter;
-	float deltaAngle;
-	float axialMass;
-	b2Softness springSoftness;
+	public int indexA;
+	public int indexB;
+	public b2Vec2 anchorA;
+	public b2Vec2 anchorB;
+	public b2Vec2 axisA;
+	public b2Vec2 deltaCenter;
+	public float deltaAngle;
+	public float axialMass;
+	public b2Softness springSoftness;
 
-	bool enableSpring;
-	bool enableLimit;
-	bool enableMotor;
-} b2PrismaticJoint;
+	public bool enableSpring;
+	public bool enableLimit;
+	public bool enableMotor;
+}
 
-typedef struct b2RevoluteJoint
+public class b2RevoluteJoint
 {
-	b2Vec2 linearImpulse;
-	float springImpulse;
-	float motorImpulse;
-	float lowerImpulse;
-	float upperImpulse;
-	float hertz;
-	float dampingRatio;
-	float maxMotorTorque;
-	float motorSpeed;
-	float referenceAngle;
-	float lowerAngle;
-	float upperAngle;
+	public b2Vec2 linearImpulse;
+	public float springImpulse;
+	public float motorImpulse;
+	public float lowerImpulse;
+	public float upperImpulse;
+	public float hertz;
+	public float dampingRatio;
+	public float maxMotorTorque;
+	public float motorSpeed;
+	public float referenceAngle;
+	public float lowerAngle;
+	public float upperAngle;
 
-	int indexA;
-	int indexB;
-	b2Vec2 anchorA;
-	b2Vec2 anchorB;
-	b2Vec2 deltaCenter;
-	float deltaAngle;
-	float axialMass;
-	b2Softness springSoftness;
+	public int indexA;
+	public int indexB;
+	public b2Vec2 anchorA;
+	public b2Vec2 anchorB;
+	public b2Vec2 deltaCenter;
+	public float deltaAngle;
+	public float axialMass;
+	public b2Softness springSoftness;
 
-	bool enableSpring;
-	bool enableMotor;
-	bool enableLimit;
-} b2RevoluteJoint;
+	public bool enableSpring;
+	public bool enableMotor;
+	public bool enableLimit;
+}
 
-typedef struct b2WeldJoint
+public class b2WeldJoint
 {
-	float referenceAngle;
-	float linearHertz;
-	float linearDampingRatio;
-	float angularHertz;
-	float angularDampingRatio;
+	public float referenceAngle;
+	public float linearHertz;
+	public float linearDampingRatio;
+	public float angularHertz;
+	public float angularDampingRatio;
 
-	b2Softness linearSoftness;
-	b2Softness angularSoftness;
-	b2Vec2 linearImpulse;
-	float angularImpulse;
+	public b2Softness linearSoftness;
+	public b2Softness angularSoftness;
+	public b2Vec2 linearImpulse;
+	public float angularImpulse;
 
-	int indexA;
-	int indexB;
-	b2Vec2 anchorA;
-	b2Vec2 anchorB;
-	b2Vec2 deltaCenter;
-	float deltaAngle;
-	float axialMass;
-} b2WeldJoint;
+	public int indexA;
+	public int indexB;
+	public b2Vec2 anchorA;
+	public b2Vec2 anchorB;
+	public b2Vec2 deltaCenter;
+	public float deltaAngle;
+	public float axialMass;
+}
 
-typedef struct b2WheelJoint
+public class b2WheelJoint
 {
-	b2Vec2 localAxisA;
-	float perpImpulse;
-	float motorImpulse;
-	float springImpulse;
-	float lowerImpulse;
-	float upperImpulse;
-	float maxMotorTorque;
-	float motorSpeed;
-	float lowerTranslation;
-	float upperTranslation;
-	float hertz;
-	float dampingRatio;
+	public b2Vec2 localAxisA;
+	public float perpImpulse;
+	public float motorImpulse;
+	public float springImpulse;
+	public float lowerImpulse;
+	public float upperImpulse;
+	public float maxMotorTorque;
+	public float motorSpeed;
+	public float lowerTranslation;
+	public float upperTranslation;
+	public float hertz;
+	public float dampingRatio;
 
-	int indexA;
-	int indexB;
-	b2Vec2 anchorA;
-	b2Vec2 anchorB;
-	b2Vec2 axisA;
-	b2Vec2 deltaCenter;
-	float perpMass;
-	float motorMass;
-	float axialMass;
-	b2Softness springSoftness;
+	public int indexA;
+	public int indexB;
+	public b2Vec2 anchorA;
+	public b2Vec2 anchorB;
+	public b2Vec2 axisA;
+	public b2Vec2 deltaCenter;
+	public float perpMass;
+	public float motorMass;
+	public float axialMass;
+	public b2Softness springSoftness;
 
-	bool enableSpring;
-	bool enableMotor;
-	bool enableLimit;
-} b2WheelJoint;
+	public bool enableSpring;
+	public bool enableMotor;
+	public bool enableLimit;
+}
 
 /// The base joint class. Joints are used to constraint two bodies together in
 /// various fashions. Some joints also feature limits and motors.
-typedef struct b2JointSim
+public class b2JointSim
 {
-	int jointId;
+	public int jointId;
 
-	int bodyIdA;
-	int bodyIdB;
+    public int bodyIdA;
+    public int bodyIdB;
 
-	b2JointType type;
+    public b2JointType type;
 
 	// Anchors relative to body origin
-	b2Vec2 localOriginAnchorA;
-	b2Vec2 localOriginAnchorB;
+    public b2Vec2 localOriginAnchorA;
+    public b2Vec2 localOriginAnchorB;
 
-	float invMassA, invMassB;
-	float invIA, invIB;
+    public float invMassA, invMassB;
+    public float invIA, invIB;
 
-	union
-	{
-		b2DistanceJoint distanceJoint;
-		b2MotorJoint motorJoint;
-		b2MouseJoint mouseJoint;
-		b2RevoluteJoint revoluteJoint;
-		b2PrismaticJoint prismaticJoint;
-		b2WeldJoint weldJoint;
-		b2WheelJoint wheelJoint;
-	};
-} b2JointSim;
-
-void b2DestroyJointInternal( b2World* world, b2Joint* joint, bool wakeBodies );
-
-b2Joint* b2GetJointFullId( b2World* world, b2JointId jointId );
-b2JointSim* b2GetJointSim( b2World* world, b2Joint* joint );
-b2JointSim* b2GetJointSimCheckType( b2JointId jointId, b2JointType type );
-
-void b2PrepareJoint( b2JointSim* joint, b2StepContext* context );
-void b2WarmStartJoint( b2JointSim* joint, b2StepContext* context );
-void b2SolveJoint( b2JointSim* joint, b2StepContext* context, bool useBias );
-
-void b2PrepareOverflowJoints( b2StepContext* context );
-void b2WarmStartOverflowJoints( b2StepContext* context );
-void b2SolveOverflowJoints( b2StepContext* context, bool useBias );
-
-void b2DrawJoint( b2DebugDraw* draw, b2World* world, b2Joint* joint );
-
-b2Vec2 b2GetDistanceJointForce( b2World* world, b2JointSim* base );
-b2Vec2 b2GetMotorJointForce( b2World* world, b2JointSim* base );
-b2Vec2 b2GetMouseJointForce( b2World* world, b2JointSim* base );
-b2Vec2 b2GetPrismaticJointForce( b2World* world, b2JointSim* base );
-b2Vec2 b2GetRevoluteJointForce( b2World* world, b2JointSim* base );
-b2Vec2 b2GetWeldJointForce( b2World* world, b2JointSim* base );
-b2Vec2 b2GetWheelJointForce( b2World* world, b2JointSim* base );
-
-float b2GetMotorJointTorque( b2World* world, b2JointSim* base );
-float b2GetMouseJointTorque( b2World* world, b2JointSim* base );
-float b2GetPrismaticJointTorque( b2World* world, b2JointSim* base );
-float b2GetRevoluteJointTorque( b2World* world, b2JointSim* base );
-float b2GetWeldJointTorque( b2World* world, b2JointSim* base );
-float b2GetWheelJointTorque( b2World* world, b2JointSim* base );
-
-void b2PrepareDistanceJoint( b2JointSim* base, b2StepContext* context );
-void b2PrepareMotorJoint( b2JointSim* base, b2StepContext* context );
-void b2PrepareMouseJoint( b2JointSim* base, b2StepContext* context );
-void b2PreparePrismaticJoint( b2JointSim* base, b2StepContext* context );
-void b2PrepareRevoluteJoint( b2JointSim* base, b2StepContext* context );
-void b2PrepareWeldJoint( b2JointSim* base, b2StepContext* context );
-void b2PrepareWheelJoint( b2JointSim* base, b2StepContext* context );
-
-void b2WarmStartDistanceJoint( b2JointSim* base, b2StepContext* context );
-void b2WarmStartMotorJoint( b2JointSim* base, b2StepContext* context );
-void b2WarmStartMouseJoint( b2JointSim* base, b2StepContext* context );
-void b2WarmStartPrismaticJoint( b2JointSim* base, b2StepContext* context );
-void b2WarmStartRevoluteJoint( b2JointSim* base, b2StepContext* context );
-void b2WarmStartWeldJoint( b2JointSim* base, b2StepContext* context );
-void b2WarmStartWheelJoint( b2JointSim* base, b2StepContext* context );
-
-void b2SolveDistanceJoint( b2JointSim* base, b2StepContext* context, bool useBias );
-void b2SolveMotorJoint( b2JointSim* base, b2StepContext* context, bool useBias );
-void b2SolveMouseJoint( b2JointSim* base, b2StepContext* context );
-void b2SolvePrismaticJoint( b2JointSim* base, b2StepContext* context, bool useBias );
-void b2SolveRevoluteJoint( b2JointSim* base, b2StepContext* context, bool useBias );
-void b2SolveWeldJoint( b2JointSim* base, b2StepContext* context, bool useBias );
-void b2SolveWheelJoint( b2JointSim* base, b2StepContext* context, bool useBias );
-
-void b2DrawDistanceJoint( b2DebugDraw* draw, b2JointSim* base, b2Transform transformA, b2Transform transformB );
-void b2DrawPrismaticJoint( b2DebugDraw* draw, b2JointSim* base, b2Transform transformA, b2Transform transformB );
-void b2DrawRevoluteJoint( b2DebugDraw* draw, b2JointSim* base, b2Transform transformA, b2Transform transformB, float drawSize );
-void b2DrawWheelJoint( b2DebugDraw* draw, b2JointSim* base, b2Transform transformA, b2Transform transformB );
-
-// Definefunctions for arrays
-B2_ARRAY_INLINE( b2Joint, b2Joint );
-B2_ARRAY_INLINE( b2JointSim, b2JointSim );
+    // TODO: @ikpil, check
+	// union
+	// {
+		public b2DistanceJoint distanceJoint;
+		public b2MotorJoint motorJoint;
+		public b2MouseJoint mouseJoint;
+		public b2RevoluteJoint revoluteJoint;
+		public b2PrismaticJoint prismaticJoint;
+		public b2WeldJoint weldJoint;
+		public b2WheelJoint wheelJoint;
+	//};
+}
 
 
 
-
-B2_ARRAY_SOURCE( b2Joint, b2Joint );
-B2_ARRAY_SOURCE( b2JointSim, b2JointSim );
+public class joint
+{
 
 /// Use this to initialize your joint definition
 /// @ingroup distance_joint
-b2DistanceJointDef b2DefaultDistanceJointDef()
+public static b2DistanceJointDef b2DefaultDistanceJointDef()
 {
-	b2DistanceJointDef def = { 0 };
+	b2DistanceJointDef def = new b2DistanceJointDef();
 	def.length = 1.0f;
 	def.maxLength = B2_HUGE;
 	def.internalValue = B2_SECRET_COOKIE;
 	return def;
 }
 
-b2MotorJointDef b2DefaultMotorJointDef()
+public static b2MotorJointDef b2DefaultMotorJointDef()
 {
-	b2MotorJointDef def = { 0 };
+    b2MotorJointDef def = new b2MotorJointDef();
 	def.maxForce = 1.0f;
 	def.maxTorque = 1.0f;
 	def.correctionFactor = 0.3f;
@@ -358,9 +295,9 @@ b2MotorJointDef b2DefaultMotorJointDef()
 	return def;
 }
 
-b2MouseJointDef b2DefaultMouseJointDef()
+public static b2MouseJointDef b2DefaultMouseJointDef()
 {
-	b2MouseJointDef def = { 0 };
+    b2MouseJointDef def = new b2MouseJointDef();
 	def.hertz = 4.0f;
 	def.dampingRatio = 1.0f;
 	def.maxForce = 1.0f;
@@ -368,39 +305,39 @@ b2MouseJointDef b2DefaultMouseJointDef()
 	return def;
 }
 
-b2NullJointDef b2DefaultNullJointDef()
+public static b2NullJointDef b2DefaultNullJointDef()
 {
-	b2NullJointDef def = { 0 };
+    b2NullJointDef def = new b2NullJointDef();
 	def.internalValue = B2_SECRET_COOKIE;
 	return def;
 }
 
-b2PrismaticJointDef b2DefaultPrismaticJointDef()
+public static b2PrismaticJointDef b2DefaultPrismaticJointDef()
 {
-	b2PrismaticJointDef def = { 0 };
+    b2PrismaticJointDef def = new b2PrismaticJointDef();
 	def.localAxisA = new b2Vec2( 1.0f, 0.0f);
 	def.internalValue = B2_SECRET_COOKIE;
 	return def;
 }
 
-b2RevoluteJointDef b2DefaultRevoluteJointDef()
+public static b2RevoluteJointDef b2DefaultRevoluteJointDef()
 {
-	b2RevoluteJointDef def = { 0 };
+    b2RevoluteJointDef def = new b2RevoluteJointDef();
 	def.drawSize = 0.25f;
 	def.internalValue = B2_SECRET_COOKIE;
 	return def;
 }
 
-b2WeldJointDef b2DefaultWeldJointDef()
+public static b2WeldJointDef b2DefaultWeldJointDef()
 {
-	b2WeldJointDef def = { 0 };
+    b2WeldJointDef def = new b2WeldJointDef();
 	def.internalValue = B2_SECRET_COOKIE;
 	return def;
 }
 
-b2WheelJointDef b2DefaultWheelJointDef()
+public static b2WheelJointDef b2DefaultWheelJointDef()
 {
-	b2WheelJointDef def = { 0 };
+    b2WheelJointDef def = new b2WheelJointDef();
 	def.localAxisA.y = 1.0f;
 	def.enableSpring = true;
 	def.hertz = 1.0f;
@@ -409,32 +346,32 @@ b2WheelJointDef b2DefaultWheelJointDef()
 	return def;
 }
 
-b2ExplosionDef b2DefaultExplosionDef()
+public static b2ExplosionDef b2DefaultExplosionDef()
 {
-	b2ExplosionDef def = { 0 };
+    b2ExplosionDef def = new b2ExplosionDef();
 	def.maskBits = B2_DEFAULT_MASK_BITS;
 	return def;
 }
 
-b2Joint* b2GetJointFullId( b2World* world, b2JointId jointId )
+public static b2Joint b2GetJointFullId( b2World world, b2JointId jointId )
 {
 	int id = jointId.index1 - 1;
-	b2Joint* joint = Array_Get( &world->joints, id );
-	Debug.Assert( joint->jointId == id && joint->generation == jointId.generation );
+	b2Joint joint = Array_Get( world.joints, id );
+	Debug.Assert( joint.jointId == id && joint.generation == jointId.generation );
 	return joint;
 }
 
-b2JointSim* b2GetJointSim( b2World* world, b2Joint* joint )
+public static b2JointSim b2GetJointSim( b2World world, b2Joint joint )
 {
-	if ( joint->setIndex == b2_awakeSet )
+	if ( joint.setIndex == (int)b2SetType.b2_awakeSet )
 	{
-		Debug.Assert( 0 <= joint->colorIndex && joint->colorIndex < B2_GRAPH_COLOR_COUNT );
-		b2GraphColor* color = world->constraintGraph.colors + joint->colorIndex;
-		return Array_Get( &color->jointSims, joint->localIndex );
+		Debug.Assert( 0 <= joint.colorIndex && joint.colorIndex < B2_GRAPH_COLOR_COUNT );
+		b2GraphColor* color = world.constraintGraph.colors + joint.colorIndex;
+		return Array_Get( &color.jointSims, joint.localIndex );
 	}
 
-	b2SolverSet* set = Array_Get( &world->solverSets, joint->setIndex );
-	return Array_Get( &set->jointSims, joint->localIndex );
+	b2SolverSet* set = Array_Get( &world.solverSets, joint.setIndex );
+	return Array_Get( &set.jointSims, joint.localIndex );
 }
 
 b2JointSim* b2GetJointSimCheckType( b2JointId jointId, b2JointType type )
@@ -442,16 +379,16 @@ b2JointSim* b2GetJointSimCheckType( b2JointId jointId, b2JointType type )
 	B2_UNUSED( type );
 
 	b2World* world = b2GetWorld( jointId.world0 );
-	Debug.Assert( world->locked == false );
-	if ( world->locked )
+	Debug.Assert( world.locked == false );
+	if ( world.locked )
 	{
 		return NULL;
 	}
 
 	b2Joint* joint = b2GetJointFullId( world, jointId );
-	Debug.Assert( joint->type == type );
+	Debug.Assert( joint.type == type );
 	b2JointSim* jointSim = b2GetJointSim( world, joint );
-	Debug.Assert( jointSim->type == type );
+	Debug.Assert( jointSim.type == type );
 	return jointSim;
 }
 
@@ -464,93 +401,93 @@ typedef struct b2JointPair
 static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, void* userData, float drawSize, b2JointType type,
 								  bool collideConnected )
 {
-	int bodyIdA = bodyA->id;
-	int bodyIdB = bodyB->id;
-	int maxSetIndex = b2MaxInt( bodyA->setIndex, bodyB->setIndex );
+	int bodyIdA = bodyA.id;
+	int bodyIdB = bodyB.id;
+	int maxSetIndex = b2MaxInt( bodyA.setIndex, bodyB.setIndex );
 
 	// Create joint id and joint
-	int jointId = b2AllocId( &world->jointIdPool );
-	if ( jointId == world->joints.count )
+	int jointId = b2AllocId( &world.jointIdPool );
+	if ( jointId == world.joints.count )
 	{
-		Array_Push( &world->joints, ( b2Joint ){ 0 } );
+		Array_Push( &world.joints, ( b2Joint ){ 0 } );
 	}
 
-	b2Joint* joint = Array_Get( &world->joints, jointId );
-	joint->jointId = jointId;
-	joint->userData = userData;
-	joint->generation += 1;
-	joint->setIndex = B2_NULL_INDEX;
-	joint->colorIndex = B2_NULL_INDEX;
-	joint->localIndex = B2_NULL_INDEX;
-	joint->islandId = B2_NULL_INDEX;
-	joint->islandPrev = B2_NULL_INDEX;
-	joint->islandNext = B2_NULL_INDEX;
-	joint->drawSize = drawSize;
-	joint->type = type;
-	joint->collideConnected = collideConnected;
-	joint->isMarked = false;
+	b2Joint* joint = Array_Get( &world.joints, jointId );
+	joint.jointId = jointId;
+	joint.userData = userData;
+	joint.generation += 1;
+	joint.setIndex = B2_NULL_INDEX;
+	joint.colorIndex = B2_NULL_INDEX;
+	joint.localIndex = B2_NULL_INDEX;
+	joint.islandId = B2_NULL_INDEX;
+	joint.islandPrev = B2_NULL_INDEX;
+	joint.islandNext = B2_NULL_INDEX;
+	joint.drawSize = drawSize;
+	joint.type = type;
+	joint.collideConnected = collideConnected;
+	joint.isMarked = false;
 
 	// Doubly linked list on bodyA
-	joint->edges[0].bodyId = bodyIdA;
-	joint->edges[0].prevKey = B2_NULL_INDEX;
-	joint->edges[0].nextKey = bodyA->headJointKey;
+	joint.edges[0].bodyId = bodyIdA;
+	joint.edges[0].prevKey = B2_NULL_INDEX;
+	joint.edges[0].nextKey = bodyA.headJointKey;
 
 	int keyA = ( jointId << 1 ) | 0;
-	if ( bodyA->headJointKey != B2_NULL_INDEX )
+	if ( bodyA.headJointKey != B2_NULL_INDEX )
 	{
-		b2Joint* jointA = Array_Get( &world->joints, bodyA->headJointKey >> 1 );
-		b2JointEdge* edgeA = jointA->edges + ( bodyA->headJointKey & 1 );
-		edgeA->prevKey = keyA;
+		b2Joint* jointA = Array_Get( &world.joints, bodyA.headJointKey >> 1 );
+		b2JointEdge* edgeA = jointA.edges + ( bodyA.headJointKey & 1 );
+		edgeA.prevKey = keyA;
 	}
-	bodyA->headJointKey = keyA;
-	bodyA->jointCount += 1;
+	bodyA.headJointKey = keyA;
+	bodyA.jointCount += 1;
 
 	// Doubly linked list on bodyB
-	joint->edges[1].bodyId = bodyIdB;
-	joint->edges[1].prevKey = B2_NULL_INDEX;
-	joint->edges[1].nextKey = bodyB->headJointKey;
+	joint.edges[1].bodyId = bodyIdB;
+	joint.edges[1].prevKey = B2_NULL_INDEX;
+	joint.edges[1].nextKey = bodyB.headJointKey;
 
 	int keyB = ( jointId << 1 ) | 1;
-	if ( bodyB->headJointKey != B2_NULL_INDEX )
+	if ( bodyB.headJointKey != B2_NULL_INDEX )
 	{
-		b2Joint* jointB = Array_Get( &world->joints, bodyB->headJointKey >> 1 );
-		b2JointEdge* edgeB = jointB->edges + ( bodyB->headJointKey & 1 );
-		edgeB->prevKey = keyB;
+		b2Joint* jointB = Array_Get( &world.joints, bodyB.headJointKey >> 1 );
+		b2JointEdge* edgeB = jointB.edges + ( bodyB.headJointKey & 1 );
+		edgeB.prevKey = keyB;
 	}
-	bodyB->headJointKey = keyB;
-	bodyB->jointCount += 1;
+	bodyB.headJointKey = keyB;
+	bodyB.jointCount += 1;
 
 	b2JointSim* jointSim;
 
-	if ( bodyA->setIndex == b2_disabledSet || bodyB->setIndex == b2_disabledSet )
+	if ( bodyA.setIndex == b2_disabledSet || bodyB.setIndex == b2_disabledSet )
 	{
 		// if either body is disabled, create in disabled set
-		b2SolverSet* set = Array_Get( &world->solverSets, b2_disabledSet );
-		joint->setIndex = b2_disabledSet;
-		joint->localIndex = set->jointSims.count;
+		b2SolverSet* set = Array_Get( &world.solverSets, b2_disabledSet );
+		joint.setIndex = b2_disabledSet;
+		joint.localIndex = set.jointSims.count;
 
-		jointSim = Array_Add( &set->jointSims );
+		jointSim = Array_Add( &set.jointSims );
 		memset( jointSim, 0, sizeof( b2JointSim ) );
 
-		jointSim->jointId = jointId;
-		jointSim->bodyIdA = bodyIdA;
-		jointSim->bodyIdB = bodyIdB;
+		jointSim.jointId = jointId;
+		jointSim.bodyIdA = bodyIdA;
+		jointSim.bodyIdB = bodyIdB;
 	}
-	else if ( bodyA->setIndex == b2_staticSet && bodyB->setIndex == b2_staticSet )
+	else if ( bodyA.setIndex == b2_staticSet && bodyB.setIndex == b2_staticSet )
 	{
 		// joint is connecting static bodies
-		b2SolverSet* set = Array_Get( &world->solverSets, b2_staticSet );
-		joint->setIndex = b2_staticSet;
-		joint->localIndex = set->jointSims.count;
+		b2SolverSet* set = Array_Get( &world.solverSets, b2_staticSet );
+		joint.setIndex = b2_staticSet;
+		joint.localIndex = set.jointSims.count;
 
-		jointSim = Array_Add( &set->jointSims );
+		jointSim = Array_Add( &set.jointSims );
 		memset( jointSim, 0, sizeof( b2JointSim ) );
 
-		jointSim->jointId = jointId;
-		jointSim->bodyIdA = bodyIdA;
-		jointSim->bodyIdB = bodyIdB;
+		jointSim.jointId = jointId;
+		jointSim.bodyIdA = bodyIdA;
+		jointSim.bodyIdB = bodyIdB;
 	}
-	else if ( bodyA->setIndex == b2_awakeSet || bodyB->setIndex == b2_awakeSet )
+	else if ( bodyA.setIndex == b2_awakeSet || bodyB.setIndex == b2_awakeSet )
 	{
 		// if either body is sleeping, wake it
 		if ( maxSetIndex >= b2_firstSleepingSet )
@@ -558,57 +495,57 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 			b2WakeSolverSet( world, maxSetIndex );
 		}
 
-		joint->setIndex = b2_awakeSet;
+		joint.setIndex = b2_awakeSet;
 
 		jointSim = b2CreateJointInGraph( world, joint );
-		jointSim->jointId = jointId;
-		jointSim->bodyIdA = bodyIdA;
-		jointSim->bodyIdB = bodyIdB;
+		jointSim.jointId = jointId;
+		jointSim.bodyIdA = bodyIdA;
+		jointSim.bodyIdB = bodyIdB;
 	}
 	else
 	{
 		// joint connected between sleeping and/or static bodies
-		Debug.Assert( bodyA->setIndex >= b2_firstSleepingSet || bodyB->setIndex >= b2_firstSleepingSet );
-		Debug.Assert( bodyA->setIndex != b2_staticSet || bodyB->setIndex != b2_staticSet );
+		Debug.Assert( bodyA.setIndex >= b2_firstSleepingSet || bodyB.setIndex >= b2_firstSleepingSet );
+		Debug.Assert( bodyA.setIndex != b2_staticSet || bodyB.setIndex != b2_staticSet );
 
 		// joint should go into the sleeping set (not static set)
 		int setIndex = maxSetIndex;
 
-		b2SolverSet* set = Array_Get( &world->solverSets, setIndex );
-		joint->setIndex = setIndex;
-		joint->localIndex = set->jointSims.count;
+		b2SolverSet* set = Array_Get( &world.solverSets, setIndex );
+		joint.setIndex = setIndex;
+		joint.localIndex = set.jointSims.count;
 
-		jointSim = Array_Add( &set->jointSims );
+		jointSim = Array_Add( &set.jointSims );
 		memset( jointSim, 0, sizeof( b2JointSim ) );
 
-		jointSim->jointId = jointId;
-		jointSim->bodyIdA = bodyIdA;
-		jointSim->bodyIdB = bodyIdB;
+		jointSim.jointId = jointId;
+		jointSim.bodyIdA = bodyIdA;
+		jointSim.bodyIdB = bodyIdB;
 
-		if ( bodyA->setIndex != bodyB->setIndex && bodyA->setIndex >= b2_firstSleepingSet &&
-			 bodyB->setIndex >= b2_firstSleepingSet )
+		if ( bodyA.setIndex != bodyB.setIndex && bodyA.setIndex >= b2_firstSleepingSet &&
+			 bodyB.setIndex >= b2_firstSleepingSet )
 		{
 			// merge sleeping sets
-			b2MergeSolverSets( world, bodyA->setIndex, bodyB->setIndex );
-			Debug.Assert( bodyA->setIndex == bodyB->setIndex );
+			b2MergeSolverSets( world, bodyA.setIndex, bodyB.setIndex );
+			Debug.Assert( bodyA.setIndex == bodyB.setIndex );
 
 			// fix potentially invalid set index
-			setIndex = bodyA->setIndex;
+			setIndex = bodyA.setIndex;
 
-			b2SolverSet* mergedSet = Array_Get( &world->solverSets, setIndex );
+			b2SolverSet* mergedSet = Array_Get( &world.solverSets, setIndex );
 
 			// Careful! The joint sim pointer was orphaned by the set merge.
-			jointSim = Array_Get( &mergedSet->jointSims, joint->localIndex );
+			jointSim = Array_Get( &mergedSet.jointSims, joint.localIndex );
 		}
 
-		Debug.Assert( joint->setIndex == setIndex );
+		Debug.Assert( joint.setIndex == setIndex );
 	}
 
-	Debug.Assert( jointSim->jointId == jointId );
-	Debug.Assert( jointSim->bodyIdA == bodyIdA );
-	Debug.Assert( jointSim->bodyIdB == bodyIdB );
+	Debug.Assert( jointSim.jointId == jointId );
+	Debug.Assert( jointSim.bodyIdA == bodyIdA );
+	Debug.Assert( jointSim.bodyIdB == bodyIdB );
 
-	if ( joint->setIndex > b2_disabledSet )
+	if ( joint.setIndex > b2_disabledSet )
 	{
 		// Add edge to island graph
 		bool mergeIslands = true;
@@ -626,15 +563,15 @@ static void b2DestroyContactsBetweenBodies( b2World* world, b2Body* bodyA, b2Bod
 	int otherBodyId;
 
 	// use the smaller of the two contact lists
-	if ( bodyA->contactCount < bodyB->contactCount )
+	if ( bodyA.contactCount < bodyB.contactCount )
 	{
-		contactKey = bodyA->headContactKey;
-		otherBodyId = bodyB->id;
+		contactKey = bodyA.headContactKey;
+		otherBodyId = bodyB.id;
 	}
 	else
 	{
-		contactKey = bodyB->headContactKey;
-		otherBodyId = bodyA->id;
+		contactKey = bodyB.headContactKey;
+		otherBodyId = bodyA.id;
 	}
 
 	// no need to wake bodies when a joint removes collision between them
@@ -646,11 +583,11 @@ static void b2DestroyContactsBetweenBodies( b2World* world, b2Body* bodyA, b2Bod
 		int contactId = contactKey >> 1;
 		int edgeIndex = contactKey & 1;
 
-		b2Contact* contact = Array_Get( &world->contacts, contactId );
-		contactKey = contact->edges[edgeIndex].nextKey;
+		b2Contact* contact = Array_Get( &world.contacts, contactId );
+		contactKey = contact.edges[edgeIndex].nextKey;
 
 		int otherEdgeIndex = edgeIndex ^ 1;
-		if ( contact->edges[otherEdgeIndex].bodyId == otherBodyId )
+		if ( contact.edges[otherEdgeIndex].bodyId == otherBodyId )
 		{
 			// Careful, this removes the contact from the current doubly linked list
 			b2DestroyContact( world, contact, wakeBodies );
@@ -665,51 +602,51 @@ b2JointId b2CreateDistanceJoint( b2WorldId worldId, const b2DistanceJointDef* de
 	B2_CHECK_DEF( def );
 	b2World* world = b2GetWorldFromId( worldId );
 
-	Debug.Assert( world->locked == false );
+	Debug.Assert( world.locked == false );
 
-	if ( world->locked )
+	if ( world.locked )
 	{
 		return ( b2JointId ){ 0 };
 	}
 
-	Debug.Assert( b2Body_IsValid( def->bodyIdA ) );
-	Debug.Assert( b2Body_IsValid( def->bodyIdB ) );
-	Debug.Assert( b2IsValidFloat( def->length ) && def->length > 0.0f );
+	Debug.Assert( b2Body_IsValid( def.bodyIdA ) );
+	Debug.Assert( b2Body_IsValid( def.bodyIdB ) );
+	Debug.Assert( b2IsValidFloat( def.length ) && def.length > 0.0f );
 
-	b2Body* bodyA = b2GetBodyFullId( world, def->bodyIdA );
-	b2Body* bodyB = b2GetBodyFullId( world, def->bodyIdB );
+	b2Body* bodyA = b2GetBodyFullId( world, def.bodyIdA );
+	b2Body* bodyB = b2GetBodyFullId( world, def.bodyIdB );
 
-	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def->userData, 1.0f, b2_distanceJoint, def->collideConnected );
+	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def.userData, 1.0f, b2_distanceJoint, def.collideConnected );
 
 	b2JointSim* joint = pair.jointSim;
-	joint->type = b2_distanceJoint;
-	joint->localOriginAnchorA = def->localAnchorA;
-	joint->localOriginAnchorB = def->localAnchorB;
+	joint.type = b2_distanceJoint;
+	joint.localOriginAnchorA = def.localAnchorA;
+	joint.localOriginAnchorB = def.localAnchorB;
 
 	b2DistanceJoint empty = { 0 };
-	joint->distanceJoint = empty;
-	joint->distanceJoint.length = b2MaxFloat( def->length, B2_LINEAR_SLOP );
-	joint->distanceJoint.hertz = def->hertz;
-	joint->distanceJoint.dampingRatio = def->dampingRatio;
-	joint->distanceJoint.minLength = b2MaxFloat( def->minLength, B2_LINEAR_SLOP );
-	joint->distanceJoint.maxLength = b2MaxFloat( def->minLength, def->maxLength );
-	joint->distanceJoint.maxMotorForce = def->maxMotorForce;
-	joint->distanceJoint.motorSpeed = def->motorSpeed;
-	joint->distanceJoint.enableSpring = def->enableSpring;
-	joint->distanceJoint.enableLimit = def->enableLimit;
-	joint->distanceJoint.enableMotor = def->enableMotor;
-	joint->distanceJoint.impulse = 0.0f;
-	joint->distanceJoint.lowerImpulse = 0.0f;
-	joint->distanceJoint.upperImpulse = 0.0f;
-	joint->distanceJoint.motorImpulse = 0.0f;
+	joint.distanceJoint = empty;
+	joint.distanceJoint.length = b2MaxFloat( def.length, B2_LINEAR_SLOP );
+	joint.distanceJoint.hertz = def.hertz;
+	joint.distanceJoint.dampingRatio = def.dampingRatio;
+	joint.distanceJoint.minLength = b2MaxFloat( def.minLength, B2_LINEAR_SLOP );
+	joint.distanceJoint.maxLength = b2MaxFloat( def.minLength, def.maxLength );
+	joint.distanceJoint.maxMotorForce = def.maxMotorForce;
+	joint.distanceJoint.motorSpeed = def.motorSpeed;
+	joint.distanceJoint.enableSpring = def.enableSpring;
+	joint.distanceJoint.enableLimit = def.enableLimit;
+	joint.distanceJoint.enableMotor = def.enableMotor;
+	joint.distanceJoint.impulse = 0.0f;
+	joint.distanceJoint.lowerImpulse = 0.0f;
+	joint.distanceJoint.upperImpulse = 0.0f;
+	joint.distanceJoint.motorImpulse = 0.0f;
 
 	// If the joint prevents collisions, then destroy all contacts between attached bodies
-	if ( def->collideConnected == false )
+	if ( def.collideConnected == false )
 	{
 		b2DestroyContactsBetweenBodies( world, bodyA, bodyB );
 	}
 
-	b2JointId jointId = { joint->jointId + 1, world->worldId, pair.joint->generation };
+	b2JointId jointId = { joint.jointId + 1, world.worldId, pair.joint.generation };
 	return jointId;
 }
 
@@ -718,36 +655,36 @@ b2JointId b2CreateMotorJoint( b2WorldId worldId, const b2MotorJointDef* def )
 	B2_CHECK_DEF( def );
 	b2World* world = b2GetWorldFromId( worldId );
 
-	Debug.Assert( world->locked == false );
+	Debug.Assert( world.locked == false );
 
-	if ( world->locked )
+	if ( world.locked )
 	{
 		return ( b2JointId ){ 0 };
 	}
 
-	b2Body* bodyA = b2GetBodyFullId( world, def->bodyIdA );
-	b2Body* bodyB = b2GetBodyFullId( world, def->bodyIdB );
+	b2Body* bodyA = b2GetBodyFullId( world, def.bodyIdA );
+	b2Body* bodyB = b2GetBodyFullId( world, def.bodyIdB );
 
-	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def->userData, 1.0f, b2_motorJoint, def->collideConnected );
+	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def.userData, 1.0f, b2_motorJoint, def.collideConnected );
 	b2JointSim* joint = pair.jointSim;
 
-	joint->type = b2_motorJoint;
-	joint->localOriginAnchorA = new b2Vec2( 0.0f, 0.0f);
-	joint->localOriginAnchorB = new b2Vec2( 0.0f, 0.0f);
-	joint->motorJoint = ( b2MotorJoint ){ 0 };
-	joint->motorJoint.linearOffset = def->linearOffset;
-	joint->motorJoint.angularOffset = def->angularOffset;
-	joint->motorJoint.maxForce = def->maxForce;
-	joint->motorJoint.maxTorque = def->maxTorque;
-	joint->motorJoint.correctionFactor = b2ClampFloat( def->correctionFactor, 0.0f, 1.0f );
+	joint.type = b2_motorJoint;
+	joint.localOriginAnchorA = new b2Vec2( 0.0f, 0.0f);
+	joint.localOriginAnchorB = new b2Vec2( 0.0f, 0.0f);
+	joint.motorJoint = ( b2MotorJoint ){ 0 };
+	joint.motorJoint.linearOffset = def.linearOffset;
+	joint.motorJoint.angularOffset = def.angularOffset;
+	joint.motorJoint.maxForce = def.maxForce;
+	joint.motorJoint.maxTorque = def.maxTorque;
+	joint.motorJoint.correctionFactor = b2ClampFloat( def.correctionFactor, 0.0f, 1.0f );
 
 	// If the joint prevents collisions, then destroy all contacts between attached bodies
-	if ( def->collideConnected == false )
+	if ( def.collideConnected == false )
 	{
 		b2DestroyContactsBetweenBodies( world, bodyA, bodyB );
 	}
 
-	b2JointId jointId = { joint->jointId + 1, world->worldId, pair.joint->generation };
+	b2JointId jointId = { joint.jointId + 1, world.worldId, pair.joint.generation };
 	return jointId;
 }
 
@@ -756,34 +693,34 @@ b2JointId b2CreateMouseJoint( b2WorldId worldId, const b2MouseJointDef* def )
 	B2_CHECK_DEF( def );
 	b2World* world = b2GetWorldFromId( worldId );
 
-	Debug.Assert( world->locked == false );
+	Debug.Assert( world.locked == false );
 
-	if ( world->locked )
+	if ( world.locked )
 	{
 		return ( b2JointId ){ 0 };
 	}
 
-	b2Body* bodyA = b2GetBodyFullId( world, def->bodyIdA );
-	b2Body* bodyB = b2GetBodyFullId( world, def->bodyIdB );
+	b2Body* bodyA = b2GetBodyFullId( world, def.bodyIdA );
+	b2Body* bodyB = b2GetBodyFullId( world, def.bodyIdB );
 
 	b2Transform transformA = b2GetBodyTransformQuick( world, bodyA );
 	b2Transform transformB = b2GetBodyTransformQuick( world, bodyB );
 
-	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def->userData, 1.0f, b2_mouseJoint, def->collideConnected );
+	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def.userData, 1.0f, b2_mouseJoint, def.collideConnected );
 
 	b2JointSim* joint = pair.jointSim;
-	joint->type = b2_mouseJoint;
-	joint->localOriginAnchorA = b2InvTransformPoint( transformA, def->target );
-	joint->localOriginAnchorB = b2InvTransformPoint( transformB, def->target );
+	joint.type = b2_mouseJoint;
+	joint.localOriginAnchorA = b2InvTransformPoint( transformA, def.target );
+	joint.localOriginAnchorB = b2InvTransformPoint( transformB, def.target );
 
 	b2MouseJoint empty = { 0 };
-	joint->mouseJoint = empty;
-	joint->mouseJoint.targetA = def->target;
-	joint->mouseJoint.hertz = def->hertz;
-	joint->mouseJoint.dampingRatio = def->dampingRatio;
-	joint->mouseJoint.maxForce = def->maxForce;
+	joint.mouseJoint = empty;
+	joint.mouseJoint.targetA = def.target;
+	joint.mouseJoint.hertz = def.hertz;
+	joint.mouseJoint.dampingRatio = def.dampingRatio;
+	joint.mouseJoint.maxForce = def.maxForce;
 
-	b2JointId jointId = { joint->jointId + 1, world->worldId, pair.joint->generation };
+	b2JointId jointId = { joint.jointId + 1, world.worldId, pair.joint.generation };
 	return jointId;
 }
 
@@ -792,25 +729,25 @@ b2JointId b2CreateNullJoint( b2WorldId worldId, const b2NullJointDef* def )
 	B2_CHECK_DEF( def );
 	b2World* world = b2GetWorldFromId( worldId );
 
-	Debug.Assert( world->locked == false );
+	Debug.Assert( world.locked == false );
 
-	if ( world->locked )
+	if ( world.locked )
 	{
 		return ( b2JointId ){ 0 };
 	}
 
-	b2Body* bodyA = b2GetBodyFullId( world, def->bodyIdA );
-	b2Body* bodyB = b2GetBodyFullId( world, def->bodyIdB );
+	b2Body* bodyA = b2GetBodyFullId( world, def.bodyIdA );
+	b2Body* bodyB = b2GetBodyFullId( world, def.bodyIdB );
 
 	bool collideConnected = false;
-	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def->userData, 1.0f, b2_nullJoint, collideConnected);
+	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def.userData, 1.0f, b2_nullJoint, collideConnected);
 
 	b2JointSim* joint = pair.jointSim;
-	joint->type = b2_nullJoint;
-	joint->localOriginAnchorA = b2Vec2_zero;
-	joint->localOriginAnchorB = b2Vec2_zero;
+	joint.type = b2_nullJoint;
+	joint.localOriginAnchorA = b2Vec2_zero;
+	joint.localOriginAnchorB = b2Vec2_zero;
 
-	b2JointId jointId = { joint->jointId + 1, world->worldId, pair.joint->generation };
+	b2JointId jointId = { joint.jointId + 1, world.worldId, pair.joint.generation };
 	return jointId;
 }
 
@@ -819,53 +756,53 @@ b2JointId b2CreateRevoluteJoint( b2WorldId worldId, const b2RevoluteJointDef* de
 	B2_CHECK_DEF( def );
 	b2World* world = b2GetWorldFromId( worldId );
 
-	Debug.Assert( world->locked == false );
+	Debug.Assert( world.locked == false );
 
-	if ( world->locked )
+	if ( world.locked )
 	{
 		return ( b2JointId ){ 0 };
 	}
 
-	b2Body* bodyA = b2GetBodyFullId( world, def->bodyIdA );
-	b2Body* bodyB = b2GetBodyFullId( world, def->bodyIdB );
+	b2Body* bodyA = b2GetBodyFullId( world, def.bodyIdA );
+	b2Body* bodyB = b2GetBodyFullId( world, def.bodyIdB );
 
 	b2JointPair pair =
-		b2CreateJoint( world, bodyA, bodyB, def->userData, def->drawSize, b2_revoluteJoint, def->collideConnected );
+		b2CreateJoint( world, bodyA, bodyB, def.userData, def.drawSize, b2_revoluteJoint, def.collideConnected );
 
 	b2JointSim* joint = pair.jointSim;
-	joint->type = b2_revoluteJoint;
-	joint->localOriginAnchorA = def->localAnchorA;
-	joint->localOriginAnchorB = def->localAnchorB;
+	joint.type = b2_revoluteJoint;
+	joint.localOriginAnchorA = def.localAnchorA;
+	joint.localOriginAnchorB = def.localAnchorB;
 
 	b2RevoluteJoint empty = { 0 };
-	joint->revoluteJoint = empty;
+	joint.revoluteJoint = empty;
 
-	joint->revoluteJoint.referenceAngle = b2ClampFloat( def->referenceAngle, -B2_PI, B2_PI );
-	joint->revoluteJoint.linearImpulse = b2Vec2_zero;
-	joint->revoluteJoint.axialMass = 0.0f;
-	joint->revoluteJoint.springImpulse = 0.0f;
-	joint->revoluteJoint.motorImpulse = 0.0f;
-	joint->revoluteJoint.lowerImpulse = 0.0f;
-	joint->revoluteJoint.upperImpulse = 0.0f;
-	joint->revoluteJoint.hertz = def->hertz;
-	joint->revoluteJoint.dampingRatio = def->dampingRatio;
-	joint->revoluteJoint.lowerAngle = b2MinFloat( def->lowerAngle, def->upperAngle );
-	joint->revoluteJoint.upperAngle = b2MaxFloat( def->lowerAngle, def->upperAngle );
-	joint->revoluteJoint.lowerAngle = b2ClampFloat( joint->revoluteJoint.lowerAngle, -B2_PI, B2_PI );
-	joint->revoluteJoint.upperAngle = b2ClampFloat( joint->revoluteJoint.upperAngle, -B2_PI, B2_PI );
-	joint->revoluteJoint.maxMotorTorque = def->maxMotorTorque;
-	joint->revoluteJoint.motorSpeed = def->motorSpeed;
-	joint->revoluteJoint.enableSpring = def->enableSpring;
-	joint->revoluteJoint.enableLimit = def->enableLimit;
-	joint->revoluteJoint.enableMotor = def->enableMotor;
+	joint.revoluteJoint.referenceAngle = b2ClampFloat( def.referenceAngle, -B2_PI, B2_PI );
+	joint.revoluteJoint.linearImpulse = b2Vec2_zero;
+	joint.revoluteJoint.axialMass = 0.0f;
+	joint.revoluteJoint.springImpulse = 0.0f;
+	joint.revoluteJoint.motorImpulse = 0.0f;
+	joint.revoluteJoint.lowerImpulse = 0.0f;
+	joint.revoluteJoint.upperImpulse = 0.0f;
+	joint.revoluteJoint.hertz = def.hertz;
+	joint.revoluteJoint.dampingRatio = def.dampingRatio;
+	joint.revoluteJoint.lowerAngle = b2MinFloat( def.lowerAngle, def.upperAngle );
+	joint.revoluteJoint.upperAngle = b2MaxFloat( def.lowerAngle, def.upperAngle );
+	joint.revoluteJoint.lowerAngle = b2ClampFloat( joint.revoluteJoint.lowerAngle, -B2_PI, B2_PI );
+	joint.revoluteJoint.upperAngle = b2ClampFloat( joint.revoluteJoint.upperAngle, -B2_PI, B2_PI );
+	joint.revoluteJoint.maxMotorTorque = def.maxMotorTorque;
+	joint.revoluteJoint.motorSpeed = def.motorSpeed;
+	joint.revoluteJoint.enableSpring = def.enableSpring;
+	joint.revoluteJoint.enableLimit = def.enableLimit;
+	joint.revoluteJoint.enableMotor = def.enableMotor;
 
 	// If the joint prevents collisions, then destroy all contacts between attached bodies
-	if ( def->collideConnected == false )
+	if ( def.collideConnected == false )
 	{
 		b2DestroyContactsBetweenBodies( world, bodyA, bodyB );
 	}
 
-	b2JointId jointId = { joint->jointId + 1, world->worldId, pair.joint->generation };
+	b2JointId jointId = { joint.jointId + 1, world.worldId, pair.joint.generation };
 	return jointId;
 }
 
@@ -874,51 +811,51 @@ b2JointId b2CreatePrismaticJoint( b2WorldId worldId, const b2PrismaticJointDef* 
 	B2_CHECK_DEF( def );
 	b2World* world = b2GetWorldFromId( worldId );
 
-	Debug.Assert( world->locked == false );
+	Debug.Assert( world.locked == false );
 
-	if ( world->locked )
+	if ( world.locked )
 	{
 		return ( b2JointId ){ 0 };
 	}
 
-	b2Body* bodyA = b2GetBodyFullId( world, def->bodyIdA );
-	b2Body* bodyB = b2GetBodyFullId( world, def->bodyIdB );
+	b2Body* bodyA = b2GetBodyFullId( world, def.bodyIdA );
+	b2Body* bodyB = b2GetBodyFullId( world, def.bodyIdB );
 
-	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def->userData, 1.0f, b2_prismaticJoint, def->collideConnected );
+	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def.userData, 1.0f, b2_prismaticJoint, def.collideConnected );
 
 	b2JointSim* joint = pair.jointSim;
-	joint->type = b2_prismaticJoint;
-	joint->localOriginAnchorA = def->localAnchorA;
-	joint->localOriginAnchorB = def->localAnchorB;
+	joint.type = b2_prismaticJoint;
+	joint.localOriginAnchorA = def.localAnchorA;
+	joint.localOriginAnchorB = def.localAnchorB;
 
 	b2PrismaticJoint empty = { 0 };
-	joint->prismaticJoint = empty;
+	joint.prismaticJoint = empty;
 
-	joint->prismaticJoint.localAxisA = b2Normalize( def->localAxisA );
-	joint->prismaticJoint.referenceAngle = def->referenceAngle;
-	joint->prismaticJoint.impulse = b2Vec2_zero;
-	joint->prismaticJoint.axialMass = 0.0f;
-	joint->prismaticJoint.springImpulse = 0.0f;
-	joint->prismaticJoint.motorImpulse = 0.0f;
-	joint->prismaticJoint.lowerImpulse = 0.0f;
-	joint->prismaticJoint.upperImpulse = 0.0f;
-	joint->prismaticJoint.hertz = def->hertz;
-	joint->prismaticJoint.dampingRatio = def->dampingRatio;
-	joint->prismaticJoint.lowerTranslation = def->lowerTranslation;
-	joint->prismaticJoint.upperTranslation = def->upperTranslation;
-	joint->prismaticJoint.maxMotorForce = def->maxMotorForce;
-	joint->prismaticJoint.motorSpeed = def->motorSpeed;
-	joint->prismaticJoint.enableSpring = def->enableSpring;
-	joint->prismaticJoint.enableLimit = def->enableLimit;
-	joint->prismaticJoint.enableMotor = def->enableMotor;
+	joint.prismaticJoint.localAxisA = b2Normalize( def.localAxisA );
+	joint.prismaticJoint.referenceAngle = def.referenceAngle;
+	joint.prismaticJoint.impulse = b2Vec2_zero;
+	joint.prismaticJoint.axialMass = 0.0f;
+	joint.prismaticJoint.springImpulse = 0.0f;
+	joint.prismaticJoint.motorImpulse = 0.0f;
+	joint.prismaticJoint.lowerImpulse = 0.0f;
+	joint.prismaticJoint.upperImpulse = 0.0f;
+	joint.prismaticJoint.hertz = def.hertz;
+	joint.prismaticJoint.dampingRatio = def.dampingRatio;
+	joint.prismaticJoint.lowerTranslation = def.lowerTranslation;
+	joint.prismaticJoint.upperTranslation = def.upperTranslation;
+	joint.prismaticJoint.maxMotorForce = def.maxMotorForce;
+	joint.prismaticJoint.motorSpeed = def.motorSpeed;
+	joint.prismaticJoint.enableSpring = def.enableSpring;
+	joint.prismaticJoint.enableLimit = def.enableLimit;
+	joint.prismaticJoint.enableMotor = def.enableMotor;
 
 	// If the joint prevents collisions, then destroy all contacts between attached bodies
-	if ( def->collideConnected == false )
+	if ( def.collideConnected == false )
 	{
 		b2DestroyContactsBetweenBodies( world, bodyA, bodyB );
 	}
 
-	b2JointId jointId = { joint->jointId + 1, world->worldId, pair.joint->generation };
+	b2JointId jointId = { joint.jointId + 1, world.worldId, pair.joint.generation };
 	return jointId;
 }
 
@@ -927,40 +864,40 @@ b2JointId b2CreateWeldJoint( b2WorldId worldId, const b2WeldJointDef* def )
 	B2_CHECK_DEF( def );
 	b2World* world = b2GetWorldFromId( worldId );
 
-	Debug.Assert( world->locked == false );
+	Debug.Assert( world.locked == false );
 
-	if ( world->locked )
+	if ( world.locked )
 	{
 		return ( b2JointId ){ 0 };
 	}
 
-	b2Body* bodyA = b2GetBodyFullId( world, def->bodyIdA );
-	b2Body* bodyB = b2GetBodyFullId( world, def->bodyIdB );
+	b2Body* bodyA = b2GetBodyFullId( world, def.bodyIdA );
+	b2Body* bodyB = b2GetBodyFullId( world, def.bodyIdB );
 
-	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def->userData, 1.0f, b2_weldJoint, def->collideConnected );
+	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def.userData, 1.0f, b2_weldJoint, def.collideConnected );
 
 	b2JointSim* joint = pair.jointSim;
-	joint->type = b2_weldJoint;
-	joint->localOriginAnchorA = def->localAnchorA;
-	joint->localOriginAnchorB = def->localAnchorB;
+	joint.type = b2_weldJoint;
+	joint.localOriginAnchorA = def.localAnchorA;
+	joint.localOriginAnchorB = def.localAnchorB;
 
 	b2WeldJoint empty = { 0 };
-	joint->weldJoint = empty;
-	joint->weldJoint.referenceAngle = def->referenceAngle;
-	joint->weldJoint.linearHertz = def->linearHertz;
-	joint->weldJoint.linearDampingRatio = def->linearDampingRatio;
-	joint->weldJoint.angularHertz = def->angularHertz;
-	joint->weldJoint.angularDampingRatio = def->angularDampingRatio;
-	joint->weldJoint.linearImpulse = b2Vec2_zero;
-	joint->weldJoint.angularImpulse = 0.0f;
+	joint.weldJoint = empty;
+	joint.weldJoint.referenceAngle = def.referenceAngle;
+	joint.weldJoint.linearHertz = def.linearHertz;
+	joint.weldJoint.linearDampingRatio = def.linearDampingRatio;
+	joint.weldJoint.angularHertz = def.angularHertz;
+	joint.weldJoint.angularDampingRatio = def.angularDampingRatio;
+	joint.weldJoint.linearImpulse = b2Vec2_zero;
+	joint.weldJoint.angularImpulse = 0.0f;
 
 	// If the joint prevents collisions, then destroy all contacts between attached bodies
-	if ( def->collideConnected == false )
+	if ( def.collideConnected == false )
 	{
 		b2DestroyContactsBetweenBodies( world, bodyA, bodyB );
 	}
 
-	b2JointId jointId = { joint->jointId + 1, world->worldId, pair.joint->generation };
+	b2JointId jointId = { joint.jointId + 1, world.worldId, pair.joint.generation };
 	return jointId;
 }
 
@@ -969,147 +906,147 @@ b2JointId b2CreateWheelJoint( b2WorldId worldId, const b2WheelJointDef* def )
 	B2_CHECK_DEF( def );
 	b2World* world = b2GetWorldFromId( worldId );
 
-	Debug.Assert( world->locked == false );
+	Debug.Assert( world.locked == false );
 
-	if ( world->locked )
+	if ( world.locked )
 	{
 		return ( b2JointId ){ 0 };
 	}
 
-	b2Body* bodyA = b2GetBodyFullId( world, def->bodyIdA );
-	b2Body* bodyB = b2GetBodyFullId( world, def->bodyIdB );
+	b2Body* bodyA = b2GetBodyFullId( world, def.bodyIdA );
+	b2Body* bodyB = b2GetBodyFullId( world, def.bodyIdB );
 
-	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def->userData, 1.0f, b2_wheelJoint, def->collideConnected );
+	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def.userData, 1.0f, b2_wheelJoint, def.collideConnected );
 
 	b2JointSim* joint = pair.jointSim;
-	joint->type = b2_wheelJoint;
-	joint->localOriginAnchorA = def->localAnchorA;
-	joint->localOriginAnchorB = def->localAnchorB;
+	joint.type = b2_wheelJoint;
+	joint.localOriginAnchorA = def.localAnchorA;
+	joint.localOriginAnchorB = def.localAnchorB;
 
-	joint->wheelJoint = ( b2WheelJoint ){ 0 };
-	joint->wheelJoint.localAxisA = b2Normalize( def->localAxisA );
-	joint->wheelJoint.perpMass = 0.0f;
-	joint->wheelJoint.axialMass = 0.0f;
-	joint->wheelJoint.motorImpulse = 0.0f;
-	joint->wheelJoint.lowerImpulse = 0.0f;
-	joint->wheelJoint.upperImpulse = 0.0f;
-	joint->wheelJoint.lowerTranslation = def->lowerTranslation;
-	joint->wheelJoint.upperTranslation = def->upperTranslation;
-	joint->wheelJoint.maxMotorTorque = def->maxMotorTorque;
-	joint->wheelJoint.motorSpeed = def->motorSpeed;
-	joint->wheelJoint.hertz = def->hertz;
-	joint->wheelJoint.dampingRatio = def->dampingRatio;
-	joint->wheelJoint.enableSpring = def->enableSpring;
-	joint->wheelJoint.enableLimit = def->enableLimit;
-	joint->wheelJoint.enableMotor = def->enableMotor;
+	joint.wheelJoint = ( b2WheelJoint ){ 0 };
+	joint.wheelJoint.localAxisA = b2Normalize( def.localAxisA );
+	joint.wheelJoint.perpMass = 0.0f;
+	joint.wheelJoint.axialMass = 0.0f;
+	joint.wheelJoint.motorImpulse = 0.0f;
+	joint.wheelJoint.lowerImpulse = 0.0f;
+	joint.wheelJoint.upperImpulse = 0.0f;
+	joint.wheelJoint.lowerTranslation = def.lowerTranslation;
+	joint.wheelJoint.upperTranslation = def.upperTranslation;
+	joint.wheelJoint.maxMotorTorque = def.maxMotorTorque;
+	joint.wheelJoint.motorSpeed = def.motorSpeed;
+	joint.wheelJoint.hertz = def.hertz;
+	joint.wheelJoint.dampingRatio = def.dampingRatio;
+	joint.wheelJoint.enableSpring = def.enableSpring;
+	joint.wheelJoint.enableLimit = def.enableLimit;
+	joint.wheelJoint.enableMotor = def.enableMotor;
 
 	// If the joint prevents collisions, then destroy all contacts between attached bodies
-	if ( def->collideConnected == false )
+	if ( def.collideConnected == false )
 	{
 		b2DestroyContactsBetweenBodies( world, bodyA, bodyB );
 	}
 
-	b2JointId jointId = { joint->jointId + 1, world->worldId, pair.joint->generation };
+	b2JointId jointId = { joint.jointId + 1, world.worldId, pair.joint.generation };
 	return jointId;
 }
 
 void b2DestroyJointInternal( b2World* world, b2Joint* joint, bool wakeBodies )
 {
-	int jointId = joint->jointId;
+	int jointId = joint.jointId;
 
-	b2JointEdge* edgeA = joint->edges + 0;
-	b2JointEdge* edgeB = joint->edges + 1;
+	b2JointEdge* edgeA = joint.edges + 0;
+	b2JointEdge* edgeB = joint.edges + 1;
 
-	int idA = edgeA->bodyId;
-	int idB = edgeB->bodyId;
-	b2Body* bodyA = Array_Get( &world->bodies, idA );
-	b2Body* bodyB = Array_Get( &world->bodies, idB );
+	int idA = edgeA.bodyId;
+	int idB = edgeB.bodyId;
+	b2Body* bodyA = Array_Get( &world.bodies, idA );
+	b2Body* bodyB = Array_Get( &world.bodies, idB );
 
 	// Remove from body A
-	if ( edgeA->prevKey != B2_NULL_INDEX )
+	if ( edgeA.prevKey != B2_NULL_INDEX )
 	{
-		b2Joint* prevJoint = Array_Get( &world->joints, edgeA->prevKey >> 1 );
-		b2JointEdge* prevEdge = prevJoint->edges + ( edgeA->prevKey & 1 );
-		prevEdge->nextKey = edgeA->nextKey;
+		b2Joint* prevJoint = Array_Get( &world.joints, edgeA.prevKey >> 1 );
+		b2JointEdge* prevEdge = prevJoint.edges + ( edgeA.prevKey & 1 );
+		prevEdge.nextKey = edgeA.nextKey;
 	}
 
-	if ( edgeA->nextKey != B2_NULL_INDEX )
+	if ( edgeA.nextKey != B2_NULL_INDEX )
 	{
-		b2Joint* nextJoint = Array_Get( &world->joints, edgeA->nextKey >> 1 );
-		b2JointEdge* nextEdge = nextJoint->edges + ( edgeA->nextKey & 1 );
-		nextEdge->prevKey = edgeA->prevKey;
+		b2Joint* nextJoint = Array_Get( &world.joints, edgeA.nextKey >> 1 );
+		b2JointEdge* nextEdge = nextJoint.edges + ( edgeA.nextKey & 1 );
+		nextEdge.prevKey = edgeA.prevKey;
 	}
 
 	int edgeKeyA = ( jointId << 1 ) | 0;
-	if ( bodyA->headJointKey == edgeKeyA )
+	if ( bodyA.headJointKey == edgeKeyA )
 	{
-		bodyA->headJointKey = edgeA->nextKey;
+		bodyA.headJointKey = edgeA.nextKey;
 	}
 
-	bodyA->jointCount -= 1;
+	bodyA.jointCount -= 1;
 
 	// Remove from body B
-	if ( edgeB->prevKey != B2_NULL_INDEX )
+	if ( edgeB.prevKey != B2_NULL_INDEX )
 	{
-		b2Joint* prevJoint = Array_Get( &world->joints, edgeB->prevKey >> 1 );
-		b2JointEdge* prevEdge = prevJoint->edges + ( edgeB->prevKey & 1 );
-		prevEdge->nextKey = edgeB->nextKey;
+		b2Joint* prevJoint = Array_Get( &world.joints, edgeB.prevKey >> 1 );
+		b2JointEdge* prevEdge = prevJoint.edges + ( edgeB.prevKey & 1 );
+		prevEdge.nextKey = edgeB.nextKey;
 	}
 
-	if ( edgeB->nextKey != B2_NULL_INDEX )
+	if ( edgeB.nextKey != B2_NULL_INDEX )
 	{
-		b2Joint* nextJoint = Array_Get( &world->joints, edgeB->nextKey >> 1 );
-		b2JointEdge* nextEdge = nextJoint->edges + ( edgeB->nextKey & 1 );
-		nextEdge->prevKey = edgeB->prevKey;
+		b2Joint* nextJoint = Array_Get( &world.joints, edgeB.nextKey >> 1 );
+		b2JointEdge* nextEdge = nextJoint.edges + ( edgeB.nextKey & 1 );
+		nextEdge.prevKey = edgeB.prevKey;
 	}
 
 	int edgeKeyB = ( jointId << 1 ) | 1;
-	if ( bodyB->headJointKey == edgeKeyB )
+	if ( bodyB.headJointKey == edgeKeyB )
 	{
-		bodyB->headJointKey = edgeB->nextKey;
+		bodyB.headJointKey = edgeB.nextKey;
 	}
 
-	bodyB->jointCount -= 1;
+	bodyB.jointCount -= 1;
 
-	if ( joint->islandId != B2_NULL_INDEX )
+	if ( joint.islandId != B2_NULL_INDEX )
 	{
-		Debug.Assert( joint->setIndex > b2_disabledSet );
+		Debug.Assert( joint.setIndex > b2_disabledSet );
 		b2UnlinkJoint( world, joint );
 	}
 	else
 	{
-		Debug.Assert( joint->setIndex <= b2_disabledSet );
+		Debug.Assert( joint.setIndex <= b2_disabledSet );
 	}
 
 	// Remove joint from solver set that owns it
-	int setIndex = joint->setIndex;
-	int localIndex = joint->localIndex;
+	int setIndex = joint.setIndex;
+	int localIndex = joint.localIndex;
 
 	if ( setIndex == b2_awakeSet )
 	{
-		b2RemoveJointFromGraph( world, joint->edges[0].bodyId, joint->edges[1].bodyId, joint->colorIndex, localIndex );
+		b2RemoveJointFromGraph( world, joint.edges[0].bodyId, joint.edges[1].bodyId, joint.colorIndex, localIndex );
 	}
 	else
 	{
-		b2SolverSet* set = Array_Get( &world->solverSets, setIndex );
-		int movedIndex = b2JointSimArray_RemoveSwap( &set->jointSims, localIndex );
+		b2SolverSet* set = Array_Get( &world.solverSets, setIndex );
+		int movedIndex = b2JointSimArray_RemoveSwap( &set.jointSims, localIndex );
 		if ( movedIndex != B2_NULL_INDEX )
 		{
 			// Fix moved joint
-			b2JointSim* movedJointSim = set->jointSims.data + localIndex;
-			int movedId = movedJointSim->jointId;
-			b2Joint* movedJoint = Array_Get( &world->joints, movedId );
-			Debug.Assert( movedJoint->localIndex == movedIndex );
-			movedJoint->localIndex = localIndex;
+			b2JointSim* movedJointSim = set.jointSims.data + localIndex;
+			int movedId = movedJointSim.jointId;
+			b2Joint* movedJoint = Array_Get( &world.joints, movedId );
+			Debug.Assert( movedJoint.localIndex == movedIndex );
+			movedJoint.localIndex = localIndex;
 		}
 	}
 
 	// Free joint and id (preserve joint generation)
-	joint->setIndex = B2_NULL_INDEX;
-	joint->localIndex = B2_NULL_INDEX;
-	joint->colorIndex = B2_NULL_INDEX;
-	joint->jointId = B2_NULL_INDEX;
-	b2FreeId( &world->jointIdPool, jointId );
+	joint.setIndex = B2_NULL_INDEX;
+	joint.localIndex = B2_NULL_INDEX;
+	joint.colorIndex = B2_NULL_INDEX;
+	joint.jointId = B2_NULL_INDEX;
+	b2FreeId( &world.jointIdPool, jointId );
 
 	if ( wakeBodies )
 	{
@@ -1123,9 +1060,9 @@ void b2DestroyJointInternal( b2World* world, b2Joint* joint, bool wakeBodies )
 void b2DestroyJoint( b2JointId jointId )
 {
 	b2World* world = b2GetWorld( jointId.world0 );
-	Debug.Assert( world->locked == false );
+	Debug.Assert( world.locked == false );
 
-	if ( world->locked )
+	if ( world.locked )
 	{
 		return;
 	}
@@ -1139,27 +1076,27 @@ b2JointType b2Joint_GetType( b2JointId jointId )
 {
 	b2World* world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
-	return joint->type;
+	return joint.type;
 }
 
 b2BodyId b2Joint_GetBodyA( b2JointId jointId )
 {
 	b2World* world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
-	return b2MakeBodyId( world, joint->edges[0].bodyId );
+	return b2MakeBodyId( world, joint.edges[0].bodyId );
 }
 
 b2BodyId b2Joint_GetBodyB( b2JointId jointId )
 {
 	b2World* world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
-	return b2MakeBodyId( world, joint->edges[1].bodyId );
+	return b2MakeBodyId( world, joint.edges[1].bodyId );
 }
 
 b2WorldId b2Joint_GetWorld( b2JointId jointId )
 {
 	b2World* world = b2GetWorld( jointId.world0 );
-	return ( b2WorldId ){ jointId.world0 + 1, world->generation };
+	return ( b2WorldId ){ jointId.world0 + 1, world.generation };
 }
 
 b2Vec2 b2Joint_GetLocalAnchorA( b2JointId jointId )
@@ -1167,7 +1104,7 @@ b2Vec2 b2Joint_GetLocalAnchorA( b2JointId jointId )
 	b2World* world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
 	b2JointSim* jointSim = b2GetJointSim( world, joint );
-	return jointSim->localOriginAnchorA;
+	return jointSim.localOriginAnchorA;
 }
 
 b2Vec2 b2Joint_GetLocalAnchorB( b2JointId jointId )
@@ -1175,7 +1112,7 @@ b2Vec2 b2Joint_GetLocalAnchorB( b2JointId jointId )
 	b2World* world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
 	b2JointSim* jointSim = b2GetJointSim( world, joint );
-	return jointSim->localOriginAnchorB;
+	return jointSim.localOriginAnchorB;
 }
 
 void b2Joint_SetCollideConnected( b2JointId jointId, bool shouldCollide )
@@ -1187,34 +1124,34 @@ void b2Joint_SetCollideConnected( b2JointId jointId, bool shouldCollide )
 	}
 
 	b2Joint* joint = b2GetJointFullId( world, jointId );
-	if ( joint->collideConnected == shouldCollide )
+	if ( joint.collideConnected == shouldCollide )
 	{
 		return;
 	}
 
-	joint->collideConnected = shouldCollide;
+	joint.collideConnected = shouldCollide;
 
-	b2Body* bodyA = Array_Get( &world->bodies, joint->edges[0].bodyId );
-	b2Body* bodyB = Array_Get( &world->bodies, joint->edges[1].bodyId );
+	b2Body* bodyA = Array_Get( &world.bodies, joint.edges[0].bodyId );
+	b2Body* bodyB = Array_Get( &world.bodies, joint.edges[1].bodyId );
 
 	if ( shouldCollide )
 	{
 		// need to tell the broad-phase to look for new pairs for one of the
 		// two bodies. Pick the one with the fewest shapes.
-		int shapeCountA = bodyA->shapeCount;
-		int shapeCountB = bodyB->shapeCount;
+		int shapeCountA = bodyA.shapeCount;
+		int shapeCountB = bodyB.shapeCount;
 
-		int shapeId = shapeCountA < shapeCountB ? bodyA->headShapeId : bodyB->headShapeId;
+		int shapeId = shapeCountA < shapeCountB ? bodyA.headShapeId : bodyB.headShapeId;
 		while ( shapeId != B2_NULL_INDEX )
 		{
-			b2Shape* shape = Array_Get( &world->shapes, shapeId );
+			b2Shape* shape = Array_Get( &world.shapes, shapeId );
 
-			if ( shape->proxyKey != B2_NULL_INDEX )
+			if ( shape.proxyKey != B2_NULL_INDEX )
 			{
-				b2BufferMove( &world->broadPhase, shape->proxyKey );
+				b2BufferMove( &world.broadPhase, shape.proxyKey );
 			}
 
-			shapeId = shape->nextShapeId;
+			shapeId = shape.nextShapeId;
 		}
 	}
 	else
@@ -1227,21 +1164,21 @@ bool b2Joint_GetCollideConnected( b2JointId jointId )
 {
 	b2World* world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
-	return joint->collideConnected;
+	return joint.collideConnected;
 }
 
 void b2Joint_SetUserData( b2JointId jointId, void* userData )
 {
 	b2World* world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
-	joint->userData = userData;
+	joint.userData = userData;
 }
 
 void* b2Joint_GetUserData( b2JointId jointId )
 {
 	b2World* world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
-	return joint->userData;
+	return joint.userData;
 }
 
 void b2Joint_WakeBodies( b2JointId jointId )
@@ -1253,8 +1190,8 @@ void b2Joint_WakeBodies( b2JointId jointId )
 	}
 
 	b2Joint* joint = b2GetJointFullId( world, jointId );
-	b2Body* bodyA = Array_Get( &world->bodies, joint->edges[0].bodyId );
-	b2Body* bodyB = Array_Get( &world->bodies, joint->edges[1].bodyId );
+	b2Body* bodyA = Array_Get( &world.bodies, joint.edges[0].bodyId );
+	b2Body* bodyB = Array_Get( &world.bodies, joint.edges[1].bodyId );
 
 	b2WakeBody( world, bodyA );
 	b2WakeBody( world, bodyB );
@@ -1266,7 +1203,7 @@ b2Vec2 b2Joint_GetConstraintForce( b2JointId jointId )
 	b2Joint* joint = b2GetJointFullId( world, jointId );
 	b2JointSim* base = b2GetJointSim( world, joint );
 
-	switch ( joint->type )
+	switch ( joint.type )
 	{
 		case b2_distanceJoint:
 			return b2GetDistanceJointForce( world, base );
@@ -1304,7 +1241,7 @@ float b2Joint_GetConstraintTorque( b2JointId jointId )
 	b2Joint* joint = b2GetJointFullId( world, jointId );
 	b2JointSim* base = b2GetJointSim( world, joint );
 
-	switch ( joint->type )
+	switch ( joint.type )
 	{
 		case b2_distanceJoint:
 			return 0.0f;
@@ -1338,7 +1275,7 @@ float b2Joint_GetConstraintTorque( b2JointId jointId )
 
 void b2PrepareJoint( b2JointSim* joint, b2StepContext* context )
 {
-	switch ( joint->type )
+	switch ( joint.type )
 	{
 		case b2_distanceJoint:
 			b2PrepareDistanceJoint( joint, context );
@@ -1378,7 +1315,7 @@ void b2PrepareJoint( b2JointSim* joint, b2StepContext* context )
 
 void b2WarmStartJoint( b2JointSim* joint, b2StepContext* context )
 {
-	switch ( joint->type )
+	switch ( joint.type )
 	{
 		case b2_distanceJoint:
 			b2WarmStartDistanceJoint( joint, context );
@@ -1418,7 +1355,7 @@ void b2WarmStartJoint( b2JointSim* joint, b2StepContext* context )
 
 void b2SolveJoint( b2JointSim* joint, b2StepContext* context, bool useBias )
 {
-	switch ( joint->type )
+	switch ( joint.type )
 	{
 		case b2_distanceJoint:
 			b2SolveDistanceJoint( joint, context, useBias );
@@ -1460,9 +1397,9 @@ void b2PrepareOverflowJoints( b2StepContext* context )
 {
 	b2TracyCZoneNC( prepare_joints, "PrepJoints", b2_colorOldLace, true );
 
-	b2ConstraintGraph* graph = context->graph;
-	b2JointSim* joints = graph->colors[B2_OVERFLOW_INDEX].jointSims.data;
-	int jointCount = graph->colors[B2_OVERFLOW_INDEX].jointSims.count;
+	b2ConstraintGraph* graph = context.graph;
+	b2JointSim* joints = graph.colors[B2_OVERFLOW_INDEX].jointSims.data;
+	int jointCount = graph.colors[B2_OVERFLOW_INDEX].jointSims.count;
 
 	for ( int i = 0; i < jointCount; ++i )
 	{
@@ -1477,9 +1414,9 @@ void b2WarmStartOverflowJoints( b2StepContext* context )
 {
 	b2TracyCZoneNC( prepare_joints, "PrepJoints", b2_colorOldLace, true );
 
-	b2ConstraintGraph* graph = context->graph;
-	b2JointSim* joints = graph->colors[B2_OVERFLOW_INDEX].jointSims.data;
-	int jointCount = graph->colors[B2_OVERFLOW_INDEX].jointSims.count;
+	b2ConstraintGraph* graph = context.graph;
+	b2JointSim* joints = graph.colors[B2_OVERFLOW_INDEX].jointSims.data;
+	int jointCount = graph.colors[B2_OVERFLOW_INDEX].jointSims.count;
 
 	for ( int i = 0; i < jointCount; ++i )
 	{
@@ -1494,9 +1431,9 @@ void b2SolveOverflowJoints( b2StepContext* context, bool useBias )
 {
 	b2TracyCZoneNC( solve_joints, "SolveJoints", b2_colorLemonChiffon, true );
 
-	b2ConstraintGraph* graph = context->graph;
-	b2JointSim* joints = graph->colors[B2_OVERFLOW_INDEX].jointSims.data;
-	int jointCount = graph->colors[B2_OVERFLOW_INDEX].jointSims.count;
+	b2ConstraintGraph* graph = context.graph;
+	b2JointSim* joints = graph.colors[B2_OVERFLOW_INDEX].jointSims.data;
+	int jointCount = graph.colors[B2_OVERFLOW_INDEX].jointSims.count;
 
 	for ( int i = 0; i < jointCount; ++i )
 	{
@@ -1509,9 +1446,9 @@ void b2SolveOverflowJoints( b2StepContext* context, bool useBias )
 
 void b2DrawJoint( b2DebugDraw* draw, b2World* world, b2Joint* joint )
 {
-	b2Body* bodyA = Array_Get( &world->bodies, joint->edges[0].bodyId );
-	b2Body* bodyB = Array_Get( &world->bodies, joint->edges[1].bodyId );
-	if ( bodyA->setIndex == b2_disabledSet || bodyB->setIndex == b2_disabledSet )
+	b2Body* bodyA = Array_Get( &world.bodies, joint.edges[0].bodyId );
+	b2Body* bodyB = Array_Get( &world.bodies, joint.edges[1].bodyId );
+	if ( bodyA.setIndex == b2_disabledSet || bodyB.setIndex == b2_disabledSet )
 	{
 		return;
 	}
@@ -1520,12 +1457,12 @@ void b2DrawJoint( b2DebugDraw* draw, b2World* world, b2Joint* joint )
 
 	b2Transform transformA = b2GetBodyTransformQuick( world, bodyA );
 	b2Transform transformB = b2GetBodyTransformQuick( world, bodyB );
-	b2Vec2 pA = b2TransformPoint( transformA, jointSim->localOriginAnchorA );
-	b2Vec2 pB = b2TransformPoint( transformB, jointSim->localOriginAnchorB );
+	b2Vec2 pA = b2TransformPoint( transformA, jointSim.localOriginAnchorA );
+	b2Vec2 pB = b2TransformPoint( transformB, jointSim.localOriginAnchorB );
 
 	b2HexColor color = b2_colorDarkSeaGreen;
 
-	switch ( joint->type )
+	switch ( joint.type )
 	{
 		case b2_distanceJoint:
 			b2DrawDistanceJoint( draw, jointSim, transformA, transformB );
@@ -1533,20 +1470,20 @@ void b2DrawJoint( b2DebugDraw* draw, b2World* world, b2Joint* joint )
 
 		case b2_mouseJoint:
 		{
-			b2Vec2 target = jointSim->mouseJoint.targetA;
+			b2Vec2 target = jointSim.mouseJoint.targetA;
 
 			b2HexColor c1 = b2_colorGreen;
-			draw->DrawPoint( target, 4.0f, c1, draw->context );
-			draw->DrawPoint( pB, 4.0f, c1, draw->context );
+			draw.DrawPoint( target, 4.0f, c1, draw.context );
+			draw.DrawPoint( pB, 4.0f, c1, draw.context );
 
 			b2HexColor c2 = b2_colorLightGray;
-			draw->DrawSegment( target, pB, c2, draw->context );
+			draw.DrawSegment( target, pB, c2, draw.context );
 		}
 		break;
 
 		case b2_nullJoint:
 		{
-			draw->DrawSegment( pA, pB, b2_colorGold, draw->context );
+			draw.DrawSegment( pA, pB, b2_colorGold, draw.context );
 		}
 		break;
 
@@ -1555,7 +1492,7 @@ void b2DrawJoint( b2DebugDraw* draw, b2World* world, b2Joint* joint )
 			break;
 
 		case b2_revoluteJoint:
-			b2DrawRevoluteJoint( draw, jointSim, transformA, transformB, joint->drawSize );
+			b2DrawRevoluteJoint( draw, jointSim, transformA, transformB, joint.drawSize );
 			break;
 
 		case b2_wheelJoint:
@@ -1563,22 +1500,22 @@ void b2DrawJoint( b2DebugDraw* draw, b2World* world, b2Joint* joint )
 			break;
 
 		default:
-			draw->DrawSegment( transformA.p, pA, color, draw->context );
-			draw->DrawSegment( pA, pB, color, draw->context );
-			draw->DrawSegment( transformB.p, pB, color, draw->context );
+			draw.DrawSegment( transformA.p, pA, color, draw.context );
+			draw.DrawSegment( pA, pB, color, draw.context );
+			draw.DrawSegment( transformB.p, pB, color, draw.context );
 	}
 
-	if ( draw->drawGraphColors )
+	if ( draw.drawGraphColors )
 	{
 		b2HexColor colors[B2_GRAPH_COLOR_COUNT] = { b2_colorRed,		 b2_colorOrange,	b2_colorYellow, b2_colorGreen,
 												  b2_colorCyan,		 b2_colorBlue,		b2_colorViolet, b2_colorPink,
 												  b2_colorChocolate, b2_colorGoldenRod, b2_colorCoral,	b2_colorBlack };
 
-		int colorIndex = joint->colorIndex;
+		int colorIndex = joint.colorIndex;
 		if ( colorIndex != B2_NULL_INDEX )
 		{
 			b2Vec2 p = b2Lerp( pA, pB, 0.5f );
-			draw->DrawPoint( p, 5.0f, colors[colorIndex], draw->context );
+			draw.DrawPoint( p, 5.0f, colors[colorIndex], draw.context );
 		}
 	}
 }
