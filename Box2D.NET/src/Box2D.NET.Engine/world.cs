@@ -667,19 +667,19 @@ static void b2Collide( b2StepContext* context )
 	{
 		b2GraphColor* color = graphColors + i;
 		int count = color.contactSims.count;
-		b2ContactSim* base = color.contactSims.data;
+		b2ContactSim* @base = color.contactSims.data;
 		for ( int j = 0; j < count; ++j )
 		{
-			contactSims[contactIndex] = base + j;
+			contactSims[contactIndex] = @base + j;
 			contactIndex += 1;
 		}
 	}
 
 	{
-		b2ContactSim* base = world.solverSets.data[b2_awakeSet].contactSims.data;
+		b2ContactSim* @base = world.solverSets.data[b2_awakeSet].contactSims.data;
 		for ( int i = 0; i < nonTouchingCount; ++i )
 		{
-			contactSims[contactIndex] = base + i;
+			contactSims[contactIndex] = @base + i;
 			contactIndex += 1;
 		}
 	}

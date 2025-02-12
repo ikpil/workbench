@@ -40,72 +40,72 @@ public class mouse_joint
     void b2MouseJoint_SetTarget(b2JointId jointId, b2Vec2 target)
     {
         Debug.Assert(b2IsValidVec2(target));
-        b2JointSim * base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
-        base->mouseJoint.targetA = target;
+        b2JointSim * @base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
+        @base->mouseJoint.targetA = target;
     }
 
     b2Vec2 b2MouseJoint_GetTarget(b2JointId jointId)
     {
-        b2JointSim * base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
-        return base->mouseJoint.targetA;
+        b2JointSim * @base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
+        return @base->mouseJoint.targetA;
     }
 
     void b2MouseJoint_SetSpringHertz(b2JointId jointId, float hertz)
     {
         Debug.Assert(b2IsValidFloat(hertz) && hertz >= 0.0f);
-        b2JointSim * base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
-        base->mouseJoint.hertz = hertz;
+        b2JointSim * @base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
+        @base->mouseJoint.hertz = hertz;
     }
 
     float b2MouseJoint_GetSpringHertz(b2JointId jointId)
     {
-        b2JointSim * base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
-        return base->mouseJoint.hertz;
+        b2JointSim * @base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
+        return @base->mouseJoint.hertz;
     }
 
     void b2MouseJoint_SetSpringDampingRatio(b2JointId jointId, float dampingRatio)
     {
         Debug.Assert(b2IsValidFloat(dampingRatio) && dampingRatio >= 0.0f);
-        b2JointSim * base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
-        base->mouseJoint.dampingRatio = dampingRatio;
+        b2JointSim * @base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
+        @base->mouseJoint.dampingRatio = dampingRatio;
     }
 
     float b2MouseJoint_GetSpringDampingRatio(b2JointId jointId)
     {
-        b2JointSim * base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
-        return base->mouseJoint.dampingRatio;
+        b2JointSim * @base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
+        return @base->mouseJoint.dampingRatio;
     }
 
     void b2MouseJoint_SetMaxForce(b2JointId jointId, float maxForce)
     {
         Debug.Assert(b2IsValidFloat(maxForce) && maxForce >= 0.0f);
-        b2JointSim * base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
-        base->mouseJoint.maxForce = maxForce;
+        b2JointSim * @base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
+        @base->mouseJoint.maxForce = maxForce;
     }
 
     float b2MouseJoint_GetMaxForce(b2JointId jointId)
     {
-        b2JointSim * base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
-        return base->mouseJoint.maxForce;
+        b2JointSim * @base = b2GetJointSimCheckType(jointId, b2_mouseJoint);
+        return @base->mouseJoint.maxForce;
     }
 
-    b2Vec2 b2GetMouseJointForce(b2World* world, b2JointSim* base)
+    b2Vec2 b2GetMouseJointForce(b2World* world, b2JointSim @base)
     {
-        b2Vec2 force = b2MulSV(world->inv_h, base->mouseJoint.linearImpulse);
+        b2Vec2 force = b2MulSV(world->inv_h, @base->mouseJoint.linearImpulse);
         return force;
     }
 
-    float b2GetMouseJointTorque(b2World* world, b2JointSim* base)
+    float b2GetMouseJointTorque(b2World* world, b2JointSim @base)
     {
-        return world->inv_h * base->mouseJoint.angularImpulse;
+        return world->inv_h * @base->mouseJoint.angularImpulse;
     }
 
-    void b2PrepareMouseJoint(b2JointSim* base, b2StepContext* context)
+    void b2PrepareMouseJoint(b2JointSim @base, b2StepContext* context)
     {
-        Debug.Assert(base->type == b2_mouseJoint);
+        Debug.Assert(@base->type == b2_mouseJoint);
 
         // chase body id to the solver set where the body lives
-        int idB = base->bodyIdB;
+        int idB = @base->bodyIdB;
 
         b2World* world = context->world;
 
@@ -117,12 +117,12 @@ public class mouse_joint
         int localIndexB = bodyB->localIndex;
         b2BodySim* bodySimB = Array_Get(&setB->bodySims, localIndexB);
 
-        base->invMassB = bodySimB->invMass;
-        base->invIB = bodySimB->invInertia;
+        @base->invMassB = bodySimB->invMass;
+        @base->invIB = bodySimB->invInertia;
 
-        b2MouseJoint* joint = &base->mouseJoint;
+        b2MouseJoint* joint = &@base->mouseJoint;
         joint->indexB = bodyB->setIndex == (int)b2SetType.b2_awakeSet ? localIndexB : B2_NULL_INDEX;
-        joint->anchorB = b2RotateVector(bodySimB->transform.q, b2Sub(base->localOriginAnchorB, bodySimB->localCenter));
+        joint->anchorB = b2RotateVector(bodySimB->transform.q, b2Sub(@base->localOriginAnchorB, bodySimB->localCenter));
 
         joint->linearSoftness = b2MakeSoft(joint->hertz, joint->dampingRatio, context->h);
 
@@ -153,14 +153,14 @@ public class mouse_joint
         }
     }
 
-    void b2WarmStartMouseJoint(b2JointSim* base, b2StepContext* context)
+    void b2WarmStartMouseJoint(b2JointSim @base, b2StepContext* context)
     {
-        Debug.Assert(base->type == b2_mouseJoint);
+        Debug.Assert(@base->type == b2_mouseJoint);
 
-        float mB = base->invMassB;
-        float iB = base->invIB;
+        float mB = @base->invMassB;
+        float iB = @base->invIB;
 
-        b2MouseJoint* joint = &base->mouseJoint;
+        b2MouseJoint* joint = &@base->mouseJoint;
 
         b2BodyState* stateB = context->states + joint->indexB;
         b2Vec2 vB = stateB->linearVelocity;
@@ -176,12 +176,12 @@ public class mouse_joint
         stateB->angularVelocity = wB;
     }
 
-    void b2SolveMouseJoint(b2JointSim* base, b2StepContext* context)
+    void b2SolveMouseJoint(b2JointSim @base, b2StepContext* context)
     {
-        float mB = base->invMassB;
-        float iB = base->invIB;
+        float mB = @base->invMassB;
+        float iB = @base->invIB;
 
-        b2MouseJoint* joint = &base->mouseJoint;
+        b2MouseJoint* joint = &@base->mouseJoint;
         b2BodyState* stateB = context->states + joint->indexB;
 
         b2Vec2 vB = stateB->linearVelocity;

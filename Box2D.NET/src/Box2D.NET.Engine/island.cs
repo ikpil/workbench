@@ -691,7 +691,7 @@ void b2SplitIsland( b2World* world, int baseId )
 	int* stack = b2AllocateArenaItem( alloc, bodyCount * sizeof( int ), "island stack" );
 	int* bodyIds = b2AllocateArenaItem( alloc, bodyCount * sizeof( int ), "body ids" );
 
-	// Build array containing all body indices from base island. These
+	// Build array containing all body indices from @base island. These
 	// serve as seed bodies for the depth first search (DFS).
 	int index = 0;
 	int nextBody = baseIsland.headBody;
@@ -708,7 +708,7 @@ void b2SplitIsland( b2World* world, int baseId )
 	Debug.Assert( index == bodyCount );
 
 	// Clear contact island flags. Only need to consider contacts
-	// already in the base island.
+	// already in the @base island.
 	int nextContactId = baseIsland.headContact;
 	while ( nextContactId != B2_NULL_INDEX )
 	{
@@ -726,7 +726,7 @@ void b2SplitIsland( b2World* world, int baseId )
 		nextJoint = joint.islandNext;
 	}
 
-	// Done with the base split island.
+	// Done with the @base split island.
 	b2DestroyIsland( world, baseId );
 
 	// Each island is found as a depth first search starting from a seed body

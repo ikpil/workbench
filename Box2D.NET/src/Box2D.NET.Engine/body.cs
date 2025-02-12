@@ -115,7 +115,7 @@ public class b2BodyState
 // Transform data used for collision and solver preparation.
 public class b2BodySim
 {
-    // todo better to have transform in sim or in base body? Try both!
+    // todo better to have transform in sim or in @base body? Try both!
     // transform for body origin
     public b2Transform transform;
 
@@ -779,7 +779,7 @@ public class body
 
     b2Vec2 b2Body_GetPosition( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         b2Transform transform = b2GetBodyTransformQuick( world, body );
         return transform.p;
@@ -787,7 +787,7 @@ public class body
 
     b2Rot b2Body_GetRotation( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         b2Transform transform = b2GetBodyTransformQuick( world, body );
         return transform.q;
@@ -795,14 +795,14 @@ public class body
 
     b2Transform b2Body_GetTransform( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         return b2GetBodyTransformQuick( world, body );
     }
 
     b2Vec2 b2Body_GetLocalPoint( b2BodyId bodyId, b2Vec2 worldPoint )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         b2Transform transform = b2GetBodyTransformQuick( world, body );
         return b2InvTransformPoint( transform, worldPoint );
@@ -810,7 +810,7 @@ public class body
 
     b2Vec2 b2Body_GetWorldPoint( b2BodyId bodyId, b2Vec2 localPoint )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         b2Transform transform = b2GetBodyTransformQuick( world, body );
         return b2TransformPoint( transform, localPoint );
@@ -818,7 +818,7 @@ public class body
 
     b2Vec2 b2Body_GetLocalVector( b2BodyId bodyId, b2Vec2 worldVector )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         b2Transform transform = b2GetBodyTransformQuick( world, body );
         return b2InvRotateVector( transform.q, worldVector );
@@ -826,7 +826,7 @@ public class body
 
     b2Vec2 b2Body_GetWorldVector( b2BodyId bodyId, b2Vec2 localVector )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         b2Transform transform = b2GetBodyTransformQuick( world, body );
         return b2RotateVector( transform.q, localVector );
@@ -837,7 +837,7 @@ public class body
         Debug.Assert( b2IsValidVec2( position ) );
         Debug.Assert( b2IsValidRotation( rotation ) );
         Debug.Assert( b2Body_IsValid( bodyId ) );
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         Debug.Assert( world.locked == false );
 
         b2Body* body = b2GetBodyFullId( world, bodyId );
@@ -889,7 +889,7 @@ public class body
 
     b2Vec2 b2Body_GetLinearVelocity( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         b2BodyState* state = b2GetBodyState( world, body );
         if ( state != NULL )
@@ -901,7 +901,7 @@ public class body
 
     float b2Body_GetAngularVelocity( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         b2BodyState* state = b2GetBodyState( world, body );
         if ( state != NULL )
@@ -913,7 +913,7 @@ public class body
 
     void b2Body_SetLinearVelocity( b2BodyId bodyId, b2Vec2 linearVelocity )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
 
         if ( body.type == b2_staticBody )
@@ -937,7 +937,7 @@ public class body
 
     void b2Body_SetAngularVelocity( b2BodyId bodyId, float angularVelocity )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
 
         if ( body.type == b2_staticBody || body.fixedRotation )
@@ -961,7 +961,7 @@ public class body
 
     b2Vec2 b2Body_GetLocalPointVelocity(b2BodyId bodyId, b2Vec2 localPoint)
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         b2BodyState* state = b2GetBodyState( world, body );
         if ( state == NULL )
@@ -979,7 +979,7 @@ public class body
 
     b2Vec2 b2Body_GetWorldPointVelocity(b2BodyId bodyId, b2Vec2 worldPoint)
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         b2BodyState* state = b2GetBodyState( world, body );
         if ( state == NULL )
@@ -997,7 +997,7 @@ public class body
 
     void b2Body_ApplyForce( b2BodyId bodyId, b2Vec2 force, b2Vec2 point, bool wake )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
 
         if ( wake && body.setIndex >= (int)b2SetType.b2_firstSleepingSet )
@@ -1015,7 +1015,7 @@ public class body
 
     void b2Body_ApplyForceToCenter( b2BodyId bodyId, b2Vec2 force, bool wake )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
 
         if ( wake && body.setIndex >= (int)b2SetType.b2_firstSleepingSet )
@@ -1032,7 +1032,7 @@ public class body
 
     void b2Body_ApplyTorque( b2BodyId bodyId, float torque, bool wake )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
 
         if ( wake && body.setIndex >= (int)b2SetType.b2_firstSleepingSet )
@@ -1049,7 +1049,7 @@ public class body
 
     void b2Body_ApplyLinearImpulse( b2BodyId bodyId, b2Vec2 impulse, b2Vec2 point, bool wake )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
 
         if ( wake && body.setIndex >= (int)b2SetType.b2_firstSleepingSet )
@@ -1070,7 +1070,7 @@ public class body
 
     void b2Body_ApplyLinearImpulseToCenter( b2BodyId bodyId, b2Vec2 impulse, bool wake )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
 
         if ( wake && body.setIndex >= (int)b2SetType.b2_firstSleepingSet )
@@ -1091,7 +1091,7 @@ public class body
     void b2Body_ApplyAngularImpulse( b2BodyId bodyId, float impulse, bool wake )
     {
         Debug.Assert( b2Body_IsValid( bodyId ) );
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
 
         int id = bodyId.index1 - 1;
         b2Body* body = Array_Get( &world.bodies, id );
@@ -1115,7 +1115,7 @@ public class body
 
     b2BodyType b2Body_GetType( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         return body.type;
     }
@@ -1129,7 +1129,7 @@ public class body
     // - joints between static bodies must go into the static set
     void b2Body_SetType( b2BodyId bodyId, b2BodyType type )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
 
         b2BodyType originalType = body.type;
@@ -1379,7 +1379,7 @@ public class body
 
     void b2Body_SetName(b2BodyId bodyId, const char* name)
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
 
         if ( name != NULL )
@@ -1399,42 +1399,42 @@ public class body
 
     const char* b2Body_GetName(b2BodyId bodyId)
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         return body.name;
     }
 
     void b2Body_SetUserData( b2BodyId bodyId, void* userData )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         body.userData = userData;
     }
 
     void* b2Body_GetUserData( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         return body.userData;
     }
 
     float b2Body_GetMass( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         return body.mass;
     }
 
     float b2Body_GetRotationalInertia( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         return body.inertia;
     }
 
     b2Vec2 b2Body_GetLocalCenterOfMass( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         b2BodySim* bodySim = b2GetBodySim( world, body );
         return bodySim.localCenter;
@@ -1442,7 +1442,7 @@ public class body
 
     b2Vec2 b2Body_GetWorldCenterOfMass( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         b2BodySim* bodySim = b2GetBodySim( world, body );
         return bodySim.center;
@@ -1477,7 +1477,7 @@ public class body
 
     b2MassData b2Body_GetMassData( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         b2BodySim* bodySim = b2GetBodySim( world, body );
         b2MassData massData = { body.mass, bodySim.localCenter, body.inertia };
@@ -1513,7 +1513,7 @@ public class body
 
     float b2Body_GetLinearDamping( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         b2BodySim* bodySim = b2GetBodySim( world, body );
         return bodySim.linearDamping;
@@ -1536,7 +1536,7 @@ public class body
 
     float b2Body_GetAngularDamping( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         b2BodySim* bodySim = b2GetBodySim( world, body );
         return bodySim.angularDamping;
@@ -1561,7 +1561,7 @@ public class body
     float b2Body_GetGravityScale( b2BodyId bodyId )
     {
         Debug.Assert( b2Body_IsValid( bodyId ) );
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         b2BodySim* bodySim = b2GetBodySim( world, body );
         return bodySim.gravityScale;
@@ -1569,7 +1569,7 @@ public class body
 
     bool b2Body_IsAwake( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         return body.setIndex == (int)b2SetType.b2_awakeSet;
     }
@@ -1603,28 +1603,28 @@ public class body
 
     bool b2Body_IsEnabled( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         return body.setIndex != (int)b2SetType.b2_disabledSet;
     }
 
     bool b2Body_IsSleepEnabled( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         return body.enableSleep;
     }
 
     void b2Body_SetSleepThreshold( b2BodyId bodyId, float sleepThreshold )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         body.sleepThreshold = sleepThreshold;
     }
 
     float b2Body_GetSleepThreshold( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         return body.sleepThreshold;
     }
@@ -1837,7 +1837,7 @@ public class body
 
     bool b2Body_IsFixedRotation( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         return body.fixedRotation;
     }
@@ -1857,7 +1857,7 @@ public class body
 
     bool b2Body_IsBullet( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         b2BodySim* bodySim = b2GetBodySim( world, body );
         return bodySim.isBullet;
@@ -1865,7 +1865,7 @@ public class body
 
     void b2Body_EnableContactEvents( b2BodyId bodyId, bool flag )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         int shapeId = body.headShapeId;
         while ( shapeId != B2_NULL_INDEX )
@@ -1878,7 +1878,7 @@ public class body
 
     void b2Body_EnableHitEvents( b2BodyId bodyId, bool flag )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         int shapeId = body.headShapeId;
         while ( shapeId != B2_NULL_INDEX )
@@ -1891,20 +1891,20 @@ public class body
 
     b2WorldId b2Body_GetWorld( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         return ( b2WorldId ){ bodyId.world0 + 1, world.generation };
     }
 
     int b2Body_GetShapeCount( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         return body.shapeCount;
     }
 
     int b2Body_GetShapes( b2BodyId bodyId, b2ShapeId* shapeArray, int capacity )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         int shapeId = body.headShapeId;
         int shapeCount = 0;
@@ -1923,14 +1923,14 @@ public class body
 
     int b2Body_GetJointCount( b2BodyId bodyId )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         return body.jointCount;
     }
 
     int b2Body_GetJoints( b2BodyId bodyId, b2JointId* jointArray, int capacity )
     {
-        b2World* world = b2GetWorld( bodyId.world0 );
+        b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
         int jointKey = body.headJointKey;
 

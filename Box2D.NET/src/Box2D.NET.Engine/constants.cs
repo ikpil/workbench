@@ -74,7 +74,7 @@ public static class constants
     public const int B2_SECRET_COOKIE = 1152023;
 
     
-    // base
+    // @base
     /// Simple djb2 hash function for determinism testing
     public const int B2_HASH_INIT = 5381;
 }

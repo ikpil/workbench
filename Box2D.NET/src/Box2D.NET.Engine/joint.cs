@@ -255,7 +255,7 @@ public class b2WheelJoint
 	public bool enableLimit;
 }
 
-/// The base joint class. Joints are used to constraint two bodies together in
+/// The @base joint class. Joints are used to constraint two bodies together in
 /// various fashions. Some joints also feature limits and motors.
 public class b2JointSim
 {
@@ -961,7 +961,7 @@ b2JointId b2CreateWheelJoint( b2WorldId worldId, const b2WheelJointDef* def )
 	b2Body* bodyA = b2GetBodyFullId( world, def.bodyIdA );
 	b2Body* bodyB = b2GetBodyFullId( world, def.bodyIdB );
 
-	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def.userData, 1.0f, b2_wheelJoint, def.collideConnected );
+	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def.userData, 1.0f, b2JointType.b2_wheelJoint, def.collideConnected );
 
 	b2JointSim* joint = pair.jointSim;
 	joint.type = b2_wheelJoint;
@@ -1104,7 +1104,7 @@ void b2DestroyJointInternal( b2World* world, b2Joint* joint, bool wakeBodies )
 
 void b2DestroyJoint( b2JointId jointId )
 {
-	b2World* world = b2GetWorld( jointId.world0 );
+	b2World world = b2GetWorld( jointId.world0 );
 	Debug.Assert( world.locked == false );
 
 	if ( world.locked )
@@ -1119,34 +1119,34 @@ void b2DestroyJoint( b2JointId jointId )
 
 b2JointType b2Joint_GetType( b2JointId jointId )
 {
-	b2World* world = b2GetWorld( jointId.world0 );
+	b2World world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
 	return joint.type;
 }
 
 b2BodyId b2Joint_GetBodyA( b2JointId jointId )
 {
-	b2World* world = b2GetWorld( jointId.world0 );
+	b2World world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
 	return b2MakeBodyId( world, joint.edges[0].bodyId );
 }
 
 b2BodyId b2Joint_GetBodyB( b2JointId jointId )
 {
-	b2World* world = b2GetWorld( jointId.world0 );
+	b2World world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
 	return b2MakeBodyId( world, joint.edges[1].bodyId );
 }
 
 b2WorldId b2Joint_GetWorld( b2JointId jointId )
 {
-	b2World* world = b2GetWorld( jointId.world0 );
+	b2World world = b2GetWorld( jointId.world0 );
 	return ( b2WorldId ){ jointId.world0 + 1, world.generation };
 }
 
 b2Vec2 b2Joint_GetLocalAnchorA( b2JointId jointId )
 {
-	b2World* world = b2GetWorld( jointId.world0 );
+	b2World world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
 	b2JointSim* jointSim = b2GetJointSim( world, joint );
 	return jointSim.localOriginAnchorA;
@@ -1154,7 +1154,7 @@ b2Vec2 b2Joint_GetLocalAnchorA( b2JointId jointId )
 
 b2Vec2 b2Joint_GetLocalAnchorB( b2JointId jointId )
 {
-	b2World* world = b2GetWorld( jointId.world0 );
+	b2World world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
 	b2JointSim* jointSim = b2GetJointSim( world, joint );
 	return jointSim.localOriginAnchorB;
@@ -1207,21 +1207,21 @@ void b2Joint_SetCollideConnected( b2JointId jointId, bool shouldCollide )
 
 bool b2Joint_GetCollideConnected( b2JointId jointId )
 {
-	b2World* world = b2GetWorld( jointId.world0 );
+	b2World world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
 	return joint.collideConnected;
 }
 
 void b2Joint_SetUserData( b2JointId jointId, void* userData )
 {
-	b2World* world = b2GetWorld( jointId.world0 );
+	b2World world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
 	joint.userData = userData;
 }
 
 void* b2Joint_GetUserData( b2JointId jointId )
 {
-	b2World* world = b2GetWorld( jointId.world0 );
+	b2World world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
 	return joint.userData;
 }
@@ -1244,35 +1244,35 @@ void b2Joint_WakeBodies( b2JointId jointId )
 
 b2Vec2 b2Joint_GetConstraintForce( b2JointId jointId )
 {
-	b2World* world = b2GetWorld( jointId.world0 );
+	b2World world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
-	b2JointSim* base = b2GetJointSim( world, joint );
+	b2JointSim @base = b2GetJointSim( world, joint );
 
 	switch ( joint.type )
 	{
 		case b2_distanceJoint:
-			return b2GetDistanceJointForce( world, base );
+			return b2GetDistanceJointForce( world, @base );
 
 		case b2_motorJoint:
-			return b2GetMotorJointForce( world, base );
+			return b2GetMotorJointForce( world, @base );
 
 		case b2_mouseJoint:
-			return b2GetMouseJointForce( world, base );
+			return b2GetMouseJointForce( world, @base );
 
 		case b2_nullJoint:
 			return b2Vec2_zero;
 
 		case b2_prismaticJoint:
-			return b2GetPrismaticJointForce( world, base );
+			return b2GetPrismaticJointForce( world, @base );
 
 		case b2_revoluteJoint:
-			return b2GetRevoluteJointForce( world, base );
+			return b2GetRevoluteJointForce( world, @base );
 
 		case b2_weldJoint:
-			return b2GetWeldJointForce( world, base );
+			return b2GetWeldJointForce( world, @base );
 
 		case b2_wheelJoint:
-			return b2GetWheelJointForce( world, base );
+			return b2GetWheelJointForce( world, @base );
 
 		default:
 			Debug.Assert( false );
@@ -1282,9 +1282,9 @@ b2Vec2 b2Joint_GetConstraintForce( b2JointId jointId )
 
 float b2Joint_GetConstraintTorque( b2JointId jointId )
 {
-	b2World* world = b2GetWorld( jointId.world0 );
+	b2World world = b2GetWorld( jointId.world0 );
 	b2Joint* joint = b2GetJointFullId( world, jointId );
-	b2JointSim* base = b2GetJointSim( world, joint );
+	b2JointSim @base = b2GetJointSim( world, joint );
 
 	switch ( joint.type )
 	{
@@ -1292,25 +1292,25 @@ float b2Joint_GetConstraintTorque( b2JointId jointId )
 			return 0.0f;
 
 		case b2_motorJoint:
-			return b2GetMotorJointTorque( world, base );
+			return b2GetMotorJointTorque( world, @base );
 
 		case b2_mouseJoint:
-			return b2GetMouseJointTorque( world, base );
+			return b2GetMouseJointTorque( world, @base );
 
 		case b2_nullJoint:
 			return 0.0f;
 
 		case b2_prismaticJoint:
-			return b2GetPrismaticJointTorque( world, base );
+			return b2GetPrismaticJointTorque( world, @base );
 
 		case b2_revoluteJoint:
-			return b2GetRevoluteJointTorque( world, base );
+			return b2GetRevoluteJointTorque( world, @base );
 
 		case b2_weldJoint:
-			return b2GetWeldJointTorque( world, base );
+			return b2GetWeldJointTorque( world, @base );
 
 		case b2_wheelJoint:
-			return b2GetWheelJointTorque( world, base );
+			return b2GetWheelJointTorque( world, @base );
 
 		default:
 			Debug.Assert( false );
