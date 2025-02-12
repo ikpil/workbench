@@ -13,6 +13,10 @@ using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.solver;
+using static Box2D.NET.Engine.body;
+using static Box2D.NET.Engine.world;
+using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.id_pool;
 
 namespace Box2D.NET.Engine;
@@ -251,7 +255,7 @@ static b2Shape* b2CreateShapeInternal( b2World* world, b2Body* body, b2Transform
 	shape->fatAABB = ( b2AABB ){ b2Vec2_zero, b2Vec2_zero };
 	shape->generation += 1;
 
-	if ( body->setIndex != b2_disabledSet )
+	if ( body->setIndex != (int)b2SetType.b2_disabledSet )
 	{
 		b2BodyType proxyType = body->type;
 		b2CreateShapeProxy( shape, &world->broadPhase, proxyType, transform, def->invokeContactCreation || def->isSensor );

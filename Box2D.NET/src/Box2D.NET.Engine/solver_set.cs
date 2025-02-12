@@ -13,6 +13,10 @@ using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.solver;
+using static Box2D.NET.Engine.body;
+using static Box2D.NET.Engine.world;
+using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.id_pool;
 
 
@@ -102,7 +106,7 @@ void b2DestroySolverSet( b2World* world, int setIndex )
 // This handles contact types 1 and 3. Type 2 doesn't need any action.
 void b2WakeSolverSet( b2World* world, int setIndex )
 {
-	Debug.Assert( setIndex >= b2_firstSleepingSet );
+	Debug.Assert( setIndex >= (int)b2SetType.b2_firstSleepingSet );
 	b2SolverSet* set = Array_Get( &world->solverSets, setIndex );
 	b2SolverSet* awakeSet = Array_Get( &world->solverSets, b2_awakeSet );
 	b2SolverSet* disabledSet = Array_Get( &world->solverSets, b2_disabledSet );
@@ -139,9 +143,9 @@ void b2WakeSolverSet( b2World* world, int setIndex )
 
 			contactKey = contact->edges[edgeIndex].nextKey;
 
-			if ( contact->setIndex != b2_disabledSet )
+			if ( contact->setIndex != (int)b2SetType.b2_disabledSet )
 			{
-				Debug.Assert( contact->setIndex == b2_awakeSet || contact->setIndex == setIndex );
+				Debug.Assert( contact->setIndex == (int)b2SetType.b2_awakeSet || contact->setIndex == setIndex );
 				continue;
 			}
 
@@ -222,7 +226,7 @@ void b2WakeSolverSet( b2World* world, int setIndex )
 void b2TrySleepIsland( b2World* world, int islandId )
 {
 	b2Island* island = Array_Get( &world->islands, islandId );
-	Debug.Assert( island->setIndex == b2_awakeSet );
+	Debug.Assert( island->setIndex == (int)b2SetType.b2_awakeSet );
 
 	// cannot put an island to sleep while it has a pending split
 	if ( island->constraintRemoveCount > 0 )
@@ -264,7 +268,7 @@ void b2TrySleepIsland( b2World* world, int islandId )
 		while ( bodyId != B2_NULL_INDEX )
 		{
 			b2Body* body = Array_Get( &world->bodies, bodyId );
-			Debug.Assert( body->setIndex == b2_awakeSet );
+			Debug.Assert( body->setIndex == (int)b2SetType.b2_awakeSet );
 			Debug.Assert( body->islandId == islandId );
 
 			// Update the body move event to indicate this body fell asleep
@@ -313,10 +317,10 @@ void b2TrySleepIsland( b2World* world, int islandId )
 
 				b2Contact* contact = Array_Get( &world->contacts, contactId );
 
-				Debug.Assert( contact->setIndex == b2_awakeSet || contact->setIndex == b2_disabledSet );
+				Debug.Assert( contact->setIndex == (int)b2SetType.b2_awakeSet || contact->setIndex == (int)b2SetType.b2_disabledSet );
 				contactKey = contact->edges[edgeIndex].nextKey;
 
-				if ( contact->setIndex == b2_disabledSet )
+				if ( contact->setIndex == (int)b2SetType.b2_disabledSet )
 				{
 					// already moved to disabled set by another body in the island
 					continue;
@@ -334,7 +338,7 @@ void b2TrySleepIsland( b2World* world, int islandId )
 				int otherEdgeIndex = edgeIndex ^ 1;
 				int otherBodyId = contact->edges[otherEdgeIndex].bodyId;
 				b2Body* otherBody = Array_Get( &world->bodies, otherBodyId );
-				if ( otherBody->setIndex == b2_awakeSet )
+				if ( otherBody->setIndex == (int)b2SetType.b2_awakeSet )
 				{
 					continue;
 				}
@@ -373,7 +377,7 @@ void b2TrySleepIsland( b2World* world, int islandId )
 		while ( contactId != B2_NULL_INDEX )
 		{
 			b2Contact* contact = Array_Get( &world->contacts, contactId );
-			Debug.Assert( contact->setIndex == b2_awakeSet );
+			Debug.Assert( contact->setIndex == (int)b2SetType.b2_awakeSet );
 			Debug.Assert( contact->islandId == islandId );
 			int colorIndex = contact->colorIndex;
 			Debug.Assert( 0 <= colorIndex && colorIndex < B2_GRAPH_COLOR_COUNT );
@@ -420,7 +424,7 @@ void b2TrySleepIsland( b2World* world, int islandId )
 		while ( jointId != B2_NULL_INDEX )
 		{
 			b2Joint* joint = Array_Get( &world->joints, jointId );
-			Debug.Assert( joint->setIndex == b2_awakeSet );
+			Debug.Assert( joint->setIndex == (int)b2SetType.b2_awakeSet );
 			Debug.Assert( joint->islandId == islandId );
 			int colorIndex = joint->colorIndex;
 			int localIndex = joint->localIndex;
@@ -463,7 +467,7 @@ void b2TrySleepIsland( b2World* world, int islandId )
 
 	// move island struct
 	{
-		Debug.Assert( island->setIndex == b2_awakeSet );
+		Debug.Assert( island->setIndex == (int)b2SetType.b2_awakeSet );
 
 		int islandIndex = island->localIndex;
 		b2IslandSim* sleepIsland = Array_Add( &sleepSet->islandSims );
@@ -492,8 +496,8 @@ void b2TrySleepIsland( b2World* world, int islandId )
 // Islands will get merge when the set is waked.
 void b2MergeSolverSets( b2World* world, int setId1, int setId2 )
 {
-	Debug.Assert( setId1 >= b2_firstSleepingSet );
-	Debug.Assert( setId2 >= b2_firstSleepingSet );
+	Debug.Assert( setId1 >= (int)b2SetType.b2_firstSleepingSet );
+	Debug.Assert( setId2 >= (int)b2SetType.b2_firstSleepingSet );
 	b2SolverSet* set1 = Array_Get( &world->solverSets, setId1 );
 	b2SolverSet* set2 = Array_Get( &world->solverSets, setId2 );
 
@@ -607,11 +611,11 @@ void b2TransferBody( b2World* world, b2SolverSet* targetSet, b2SolverSet* source
 		movedBody->localIndex = sourceIndex;
 	}
 
-	if ( sourceSet->setIndex == b2_awakeSet )
+	if ( sourceSet->setIndex == (int)b2SetType.b2_awakeSet )
 	{
 		Array_RemoveSwap( &sourceSet->bodyStates, sourceIndex );
 	}
-	else if ( targetSet->setIndex == b2_awakeSet )
+	else if ( targetSet->setIndex == (int)b2SetType.b2_awakeSet )
 	{
 		b2BodyState* state = Array_Add( &targetSet->bodyStates );
 		*state = b2_identityBodyState;
@@ -630,7 +634,7 @@ void b2TransferJoint( b2World* world, b2SolverSet* targetSet, b2SolverSet* sourc
 
 	// Retrieve source.
 	b2JointSim* sourceSim;
-	if ( sourceSet->setIndex == b2_awakeSet )
+	if ( sourceSet->setIndex == (int)b2SetType.b2_awakeSet )
 	{
 		Debug.Assert( 0 <= colorIndex && colorIndex < B2_GRAPH_COLOR_COUNT );
 		b2GraphColor* color = world->constraintGraph.colors + colorIndex;
@@ -644,7 +648,7 @@ void b2TransferJoint( b2World* world, b2SolverSet* targetSet, b2SolverSet* sourc
 	}
 
 	// Create target and copy. Fix joint.
-	if ( targetSet->setIndex == b2_awakeSet )
+	if ( targetSet->setIndex == (int)b2SetType.b2_awakeSet )
 	{
 		b2AddJointToGraph( world, sourceSim, joint );
 		joint->setIndex = b2_awakeSet;
@@ -660,7 +664,7 @@ void b2TransferJoint( b2World* world, b2SolverSet* targetSet, b2SolverSet* sourc
 	}
 
 	// Destroy source.
-	if ( sourceSet->setIndex == b2_awakeSet )
+	if ( sourceSet->setIndex == (int)b2SetType.b2_awakeSet )
 	{
 		b2RemoveJointFromGraph( world, joint->edges[0].bodyId, joint->edges[1].bodyId, colorIndex, localIndex );
 	}

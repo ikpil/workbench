@@ -13,6 +13,10 @@ using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.solver;
+using static Box2D.NET.Engine.body;
+using static Box2D.NET.Engine.world;
+using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.id_pool;
 
 
@@ -343,11 +347,11 @@ void b2CreateContact( b2World* world, b2Shape* shapeA, b2Shape* shapeB )
 	b2Body* bodyA = Array_Get( &world->bodies, shapeA->bodyId );
 	b2Body* bodyB = Array_Get( &world->bodies, shapeB->bodyId );
 
-	Debug.Assert( bodyA->setIndex != b2_disabledSet && bodyB->setIndex != b2_disabledSet );
-	Debug.Assert( bodyA->setIndex != b2_staticSet || bodyB->setIndex != b2_staticSet );
+	Debug.Assert( bodyA->setIndex != (int)b2SetType.b2_disabledSet && bodyB->setIndex != (int)b2SetType.b2_disabledSet );
+	Debug.Assert( bodyA->setIndex != (int)b2SetType.b2_staticSet || bodyB->setIndex != (int)b2SetType.b2_staticSet );
 
 	int setIndex;
-	if ( bodyA->setIndex == b2_awakeSet || bodyB->setIndex == b2_awakeSet )
+	if ( bodyA->setIndex == (int)b2SetType.b2_awakeSet || bodyB->setIndex == (int)b2SetType.b2_awakeSet )
 	{
 		setIndex = b2_awakeSet;
 	}
@@ -557,7 +561,7 @@ void b2DestroyContact( b2World* world, b2Contact* contact, bool wakeBodies )
 	if ( contact->colorIndex != B2_NULL_INDEX )
 	{
 		// contact is an active constraint
-		Debug.Assert( contact->setIndex == b2_awakeSet );
+		Debug.Assert( contact->setIndex == (int)b2SetType.b2_awakeSet );
 		b2RemoveContactFromGraph( world, bodyIdA, bodyIdB, contact->colorIndex, contact->localIndex );
 	}
 	else
@@ -590,7 +594,7 @@ void b2DestroyContact( b2World* world, b2Contact* contact, bool wakeBodies )
 
 b2ContactSim* b2GetContactSim( b2World* world, b2Contact* contact )
 {
-	if ( contact->setIndex == b2_awakeSet && contact->colorIndex != B2_NULL_INDEX )
+	if ( contact->setIndex == (int)b2SetType.b2_awakeSet && contact->colorIndex != B2_NULL_INDEX )
 	{
 		// contact lives in constraint graph
 		Debug.Assert( 0 <= contact->colorIndex && contact->colorIndex < B2_GRAPH_COLOR_COUNT );

@@ -15,6 +15,10 @@ using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.solver;
+using static Box2D.NET.Engine.body;
+using static Box2D.NET.Engine.world;
+using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.id_pool;
 
 namespace Box2D.NET.Engine;
@@ -561,13 +565,13 @@ public class body
         }
 
         // Remove body state from awake set
-        if ( body.setIndex == b2_awakeSet )
+        if ( body.setIndex == (int)b2SetType.b2_awakeSet )
         {
             int result = Array_RemoveSwap( &set.bodyStates, body.localIndex );
             B2_UNUSED( result );
             Debug.Assert( result == movedIndex );
         }
-        else if ( set.setIndex >= b2_firstSleepingSet && set.bodySims.count == 0 )
+        else if ( set.setIndex >= (int)b2SetType.b2_firstSleepingSet && set.bodySims.count == 0 )
         {
             // Remove solver set if it's now an orphan.
             b2DestroySolverSet( world, set.setIndex );
@@ -994,12 +998,12 @@ public class body
         b2World* world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
 
-        if ( wake && body.setIndex >= b2_firstSleepingSet )
+        if ( wake && body.setIndex >= (int)b2SetType.b2_firstSleepingSet )
         {
             b2WakeBody( world, body );
         }
 
-        if ( body.setIndex == b2_awakeSet )
+        if ( body.setIndex == (int)b2SetType.b2_awakeSet )
         {
             b2BodySim* bodySim = b2GetBodySim( world, body );
             bodySim.force = b2Add( bodySim.force, force );
@@ -1012,12 +1016,12 @@ public class body
         b2World* world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
 
-        if ( wake && body.setIndex >= b2_firstSleepingSet )
+        if ( wake && body.setIndex >= (int)b2SetType.b2_firstSleepingSet )
         {
             b2WakeBody( world, body );
         }
 
-        if ( body.setIndex == b2_awakeSet )
+        if ( body.setIndex == (int)b2SetType.b2_awakeSet )
         {
             b2BodySim* bodySim = b2GetBodySim( world, body );
             bodySim.force = b2Add( bodySim.force, force );
@@ -1029,12 +1033,12 @@ public class body
         b2World* world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
 
-        if ( wake && body.setIndex >= b2_firstSleepingSet )
+        if ( wake && body.setIndex >= (int)b2SetType.b2_firstSleepingSet )
         {
             b2WakeBody( world, body );
         }
 
-        if ( body.setIndex == b2_awakeSet )
+        if ( body.setIndex == (int)b2SetType.b2_awakeSet )
         {
             b2BodySim* bodySim = b2GetBodySim( world, body );
             bodySim.torque += torque;
@@ -1046,12 +1050,12 @@ public class body
         b2World* world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
 
-        if ( wake && body.setIndex >= b2_firstSleepingSet )
+        if ( wake && body.setIndex >= (int)b2SetType.b2_firstSleepingSet )
         {
             b2WakeBody( world, body );
         }
 
-        if ( body.setIndex == b2_awakeSet )
+        if ( body.setIndex == (int)b2SetType.b2_awakeSet )
         {
             int localIndex = body.localIndex;
             b2SolverSet* set = Array_Get( &world.solverSets, b2_awakeSet );
@@ -1067,12 +1071,12 @@ public class body
         b2World* world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
 
-        if ( wake && body.setIndex >= b2_firstSleepingSet )
+        if ( wake && body.setIndex >= (int)b2SetType.b2_firstSleepingSet )
         {
             b2WakeBody( world, body );
         }
 
-        if ( body.setIndex == b2_awakeSet )
+        if ( body.setIndex == (int)b2SetType.b2_awakeSet )
         {
             int localIndex = body.localIndex;
             b2SolverSet* set = Array_Get( &world.solverSets, b2_awakeSet );
@@ -1091,13 +1095,13 @@ public class body
         b2Body* body = Array_Get( &world.bodies, id );
         Debug.Assert( body.generation == bodyId.generation );
 
-        if ( wake && body.setIndex >= b2_firstSleepingSet )
+        if ( wake && body.setIndex >= (int)b2SetType.b2_firstSleepingSet )
         {
             // this will not invalidate body pointer
             b2WakeBody( world, body );
         }
 
-        if ( body.setIndex == b2_awakeSet )
+        if ( body.setIndex == (int)b2SetType.b2_awakeSet )
         {
             int localIndex = body.localIndex;
             b2SolverSet* set = Array_Get( &world.solverSets, b2_awakeSet );
@@ -1132,7 +1136,7 @@ public class body
             return;
         }
 
-        if ( body.setIndex == b2_disabledSet )
+        if ( body.setIndex == (int)b2SetType.b2_disabledSet )
         {
             // Disabled bodies don't change solver sets or islands when they change type.
             body.type = type;
@@ -1180,7 +1184,7 @@ public class body
         if ( originalType == b2_staticBody )
         {
             // Body is going from static to dynamic or kinematic. It only makes sense to move it to the awake set.
-            Debug.Assert( body.setIndex == b2_staticSet );
+            Debug.Assert( body.setIndex == (int)b2SetType.b2_staticSet );
 
             b2SolverSet* staticSet = Array_Get( &world.solverSets, b2_staticSet );
             b2SolverSet* awakeSet = Array_Get( &world.solverSets, b2_awakeSet );
@@ -1201,11 +1205,11 @@ public class body
                 b2Joint* joint = Array_Get( &world.joints, jointId );
 
                 // Transfer the joint if it is in the static set
-                if ( joint.setIndex == b2_staticSet )
+                if ( joint.setIndex == (int)b2SetType.b2_staticSet )
                 {
                     b2TransferJoint( world, awakeSet, staticSet, joint );
                 }
-                else if ( joint.setIndex == b2_awakeSet )
+                else if ( joint.setIndex == (int)b2SetType.b2_awakeSet )
                 {
                     // In this case the joint must be re-inserted into the constraint graph to ensure the correct
                     // graph color.
@@ -1219,7 +1223,7 @@ public class body
                 else
                 {
                     // Otherwise the joint must be disabled.
-                    Debug.Assert( joint.setIndex == b2_disabledSet );
+                    Debug.Assert( joint.setIndex == (int)b2SetType.b2_disabledSet );
                 }
 
                 jointKey = joint.edges[edgeIndex].nextKey;
@@ -1241,7 +1245,7 @@ public class body
         else if ( type == b2_staticBody )
         {
             // The body is going from dynamic/kinematic to static. It should be awake.
-            Debug.Assert( body.setIndex == b2_awakeSet );
+            Debug.Assert( body.setIndex == (int)b2SetType.b2_awakeSet );
 
             b2SolverSet* staticSet = Array_Get( &world.solverSets, b2_staticSet );
             b2SolverSet* awakeSet = Array_Get( &world.solverSets, b2_awakeSet );
@@ -1269,25 +1273,25 @@ public class body
                 b2Body* otherBody = Array_Get( &world.bodies, joint.edges[otherEdgeIndex].bodyId );
 
                 // Skip disabled joint
-                if ( joint.setIndex == b2_disabledSet )
+                if ( joint.setIndex == (int)b2SetType.b2_disabledSet )
                 {
                     // Joint is disable, should be connected to a disabled body
-                    Debug.Assert( otherBody.setIndex == b2_disabledSet );
+                    Debug.Assert( otherBody.setIndex == (int)b2SetType.b2_disabledSet );
                     continue;
                 }
 
                 // Since the body was not static, the joint must be awake.
-                Debug.Assert( joint.setIndex == b2_awakeSet );
+                Debug.Assert( joint.setIndex == (int)b2SetType.b2_awakeSet );
 
                 // Only transfer joint to static set if both bodies are static.
-                if ( otherBody.setIndex == b2_staticSet )
+                if ( otherBody.setIndex == (int)b2SetType.b2_staticSet )
                 {
                     b2TransferJoint( world, staticSet, awakeSet, joint );
                 }
                 else
                 {
                     // The other body must be awake.
-                    Debug.Assert( otherBody.setIndex == b2_awakeSet );
+                    Debug.Assert( otherBody.setIndex == (int)b2SetType.b2_awakeSet );
 
                     // The joint must live in a graph color.
                     Debug.Assert( 0 <= joint.colorIndex && joint.colorIndex < B2_GRAPH_COLOR_COUNT );
@@ -1349,7 +1353,7 @@ public class body
                 int otherBodyId = joint.edges[otherEdgeIndex].bodyId;
                 b2Body* otherBody = Array_Get( &world.bodies, otherBodyId );
 
-                if ( otherBody.setIndex == b2_disabledSet )
+                if ( otherBody.setIndex == (int)b2SetType.b2_disabledSet )
                 {
                     continue;
                 }
@@ -1565,7 +1569,7 @@ public class body
     {
         b2World* world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
-        return body.setIndex == b2_awakeSet;
+        return body.setIndex == (int)b2SetType.b2_awakeSet;
     }
 
     void b2Body_SetAwake( b2BodyId bodyId, bool awake )
@@ -1578,11 +1582,11 @@ public class body
 
         b2Body* body = b2GetBodyFullId( world, bodyId );
 
-        if ( awake && body.setIndex >= b2_firstSleepingSet )
+        if ( awake && body.setIndex >= (int)b2SetType.b2_firstSleepingSet )
         {
             b2WakeBody( world, body );
         }
-        else if ( awake == false && body.setIndex == b2_awakeSet )
+        else if ( awake == false && body.setIndex == (int)b2SetType.b2_awakeSet )
         {
             b2Island* island = Array_Get( &world.islands, body.islandId );
             if ( island.constraintRemoveCount > 0 )
@@ -1599,7 +1603,7 @@ public class body
     {
         b2World* world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
-        return body.setIndex != b2_disabledSet;
+        return body.setIndex != (int)b2SetType.b2_disabledSet;
     }
 
     bool b2Body_IsSleepEnabled( b2BodyId bodyId )
@@ -1651,7 +1655,7 @@ public class body
         }
 
         b2Body* body = b2GetBodyFullId( world, bodyId );
-        if ( body.setIndex == b2_disabledSet )
+        if ( body.setIndex == (int)b2SetType.b2_disabledSet )
         {
             return;
         }
@@ -1691,12 +1695,12 @@ public class body
             jointKey = joint.edges[edgeIndex].nextKey;
 
             // joint may already be disabled by other body
-            if ( joint.setIndex == b2_disabledSet )
+            if ( joint.setIndex == (int)b2SetType.b2_disabledSet )
             {
                 continue;
             }
 
-            Debug.Assert( joint.setIndex == set.setIndex || set.setIndex == b2_staticSet );
+            Debug.Assert( joint.setIndex == set.setIndex || set.setIndex == (int)b2SetType.b2_staticSet );
 
             // Remove joint from island
             if ( joint.islandId != B2_NULL_INDEX )
@@ -1722,7 +1726,7 @@ public class body
         }
 
         b2Body* body = b2GetBodyFullId( world, bodyId );
-        if ( body.setIndex != b2_disabledSet )
+        if ( body.setIndex != (int)b2SetType.b2_disabledSet )
         {
             return;
         }
@@ -1747,7 +1751,7 @@ public class body
             b2CreateShapeProxy( shape, &world.broadPhase, proxyType, transform, forcePairCreation );
         }
 
-        if ( setId != b2_staticSet )
+        if ( setId != (int)b2SetType.b2_staticSet )
         {
             b2CreateIslandForBody( world, setId, body );
         }
@@ -1762,7 +1766,7 @@ public class body
             int edgeIndex = jointKey & 1;
 
             b2Joint* joint = Array_Get( &world.joints, jointId );
-            Debug.Assert( joint.setIndex == b2_disabledSet );
+            Debug.Assert( joint.setIndex == (int)b2SetType.b2_disabledSet );
             Debug.Assert( joint.islandId == B2_NULL_INDEX );
 
             jointKey = joint.edges[edgeIndex].nextKey;
@@ -1770,7 +1774,7 @@ public class body
             b2Body* bodyA = Array_Get( &world.bodies, joint.edges[0].bodyId );
             b2Body* bodyB = Array_Get( &world.bodies, joint.edges[1].bodyId );
 
-            if ( bodyA.setIndex == b2_disabledSet || bodyB.setIndex == b2_disabledSet )
+            if ( bodyA.setIndex == (int)b2SetType.b2_disabledSet || bodyB.setIndex == (int)b2SetType.b2_disabledSet )
             {
                 // one body is still disabled
                 continue;
@@ -1778,11 +1782,11 @@ public class body
 
             // Transfer joint first
             int jointSetId;
-            if ( bodyA.setIndex == b2_staticSet && bodyB.setIndex == b2_staticSet )
+            if ( bodyA.setIndex == (int)b2SetType.b2_staticSet && bodyB.setIndex == (int)b2SetType.b2_staticSet )
             {
                 jointSetId = b2_staticSet;
             }
-            else if ( bodyA.setIndex == b2_staticSet )
+            else if ( bodyA.setIndex == (int)b2SetType.b2_staticSet )
             {
                 jointSetId = bodyB.setIndex;
             }
@@ -1795,7 +1799,7 @@ public class body
             b2TransferJoint( world, jointSet, disabledSet, joint );
 
             // Now that the joint is in the correct set, I can link the joint in the island.
-            if ( jointSetId != b2_staticSet )
+            if ( jointSetId != (int)b2SetType.b2_staticSet )
             {
                 b2LinkJoint( world, joint, mergeIslands );
             }
@@ -1987,7 +1991,6 @@ public class body
     b2Body* b2GetBodyFullId( b2World* world, b2BodyId bodyId );
 
     b2Transform b2GetBodyTransformQuick( b2World* world, b2Body* body );
-    b2Transform b2GetBodyTransform( b2World* world, int bodyId );
 
     // Create a b2BodyId from a raw id.
     b2BodyId b2MakeBodyId( b2World* world, int bodyId );

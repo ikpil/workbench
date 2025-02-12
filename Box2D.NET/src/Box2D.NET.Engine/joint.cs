@@ -15,6 +15,10 @@ using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.solver;
+using static Box2D.NET.Engine.body;
+using static Box2D.NET.Engine.world;
+using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.id_pool;
 
 
@@ -492,7 +496,7 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 
 	b2JointSim* jointSim;
 
-	if ( bodyA.setIndex == b2_disabledSet || bodyB.setIndex == b2_disabledSet )
+	if ( bodyA.setIndex == (int)b2SetType.b2_disabledSet || bodyB.setIndex == (int)b2SetType.b2_disabledSet )
 	{
 		// if either body is disabled, create in disabled set
 		b2SolverSet* set = Array_Get( &world.solverSets, b2_disabledSet );
@@ -506,7 +510,7 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 		jointSim.bodyIdA = bodyIdA;
 		jointSim.bodyIdB = bodyIdB;
 	}
-	else if ( bodyA.setIndex == b2_staticSet && bodyB.setIndex == b2_staticSet )
+	else if ( bodyA.setIndex == (int)b2SetType.b2_staticSet && bodyB.setIndex == (int)b2SetType.b2_staticSet )
 	{
 		// joint is connecting static bodies
 		b2SolverSet* set = Array_Get( &world.solverSets, b2_staticSet );
@@ -520,10 +524,10 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 		jointSim.bodyIdA = bodyIdA;
 		jointSim.bodyIdB = bodyIdB;
 	}
-	else if ( bodyA.setIndex == b2_awakeSet || bodyB.setIndex == b2_awakeSet )
+	else if ( bodyA.setIndex == (int)b2SetType.b2_awakeSet || bodyB.setIndex == (int)b2SetType.b2_awakeSet )
 	{
 		// if either body is sleeping, wake it
-		if ( maxSetIndex >= b2_firstSleepingSet )
+		if ( maxSetIndex >= (int)b2SetType.b2_firstSleepingSet )
 		{
 			b2WakeSolverSet( world, maxSetIndex );
 		}
@@ -538,8 +542,8 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 	else
 	{
 		// joint connected between sleeping and/or static bodies
-		Debug.Assert( bodyA.setIndex >= b2_firstSleepingSet || bodyB.setIndex >= b2_firstSleepingSet );
-		Debug.Assert( bodyA.setIndex != b2_staticSet || bodyB.setIndex != b2_staticSet );
+		Debug.Assert( bodyA.setIndex >= (int)b2SetType.b2_firstSleepingSet || bodyB.setIndex >= (int)b2SetType.b2_firstSleepingSet );
+		Debug.Assert( bodyA.setIndex != (int)b2SetType.b2_staticSet || bodyB.setIndex != (int)b2SetType.b2_staticSet );
 
 		// joint should go into the sleeping set (not static set)
 		int setIndex = maxSetIndex;
@@ -555,8 +559,8 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 		jointSim.bodyIdA = bodyIdA;
 		jointSim.bodyIdB = bodyIdB;
 
-		if ( bodyA.setIndex != bodyB.setIndex && bodyA.setIndex >= b2_firstSleepingSet &&
-			 bodyB.setIndex >= b2_firstSleepingSet )
+		if ( bodyA.setIndex != bodyB.setIndex && bodyA.setIndex >= (int)b2SetType.b2_firstSleepingSet &&
+			 bodyB.setIndex >= (int)b2SetType.b2_firstSleepingSet )
 		{
 			// merge sleeping sets
 			b2MergeSolverSets( world, bodyA.setIndex, bodyB.setIndex );
@@ -1055,7 +1059,7 @@ void b2DestroyJointInternal( b2World* world, b2Joint* joint, bool wakeBodies )
 	int setIndex = joint.setIndex;
 	int localIndex = joint.localIndex;
 
-	if ( setIndex == b2_awakeSet )
+	if ( setIndex == (int)b2SetType.b2_awakeSet )
 	{
 		b2RemoveJointFromGraph( world, joint.edges[0].bodyId, joint.edges[1].bodyId, joint.colorIndex, localIndex );
 	}
@@ -1481,7 +1485,7 @@ void b2DrawJoint( b2DebugDraw* draw, b2World* world, b2Joint* joint )
 {
 	b2Body* bodyA = Array_Get( &world.bodies, joint.edges[0].bodyId );
 	b2Body* bodyB = Array_Get( &world.bodies, joint.edges[1].bodyId );
-	if ( bodyA.setIndex == b2_disabledSet || bodyB.setIndex == b2_disabledSet )
+	if ( bodyA.setIndex == (int)b2SetType.b2_disabledSet || bodyB.setIndex == (int)b2SetType.b2_disabledSet )
 	{
 		return;
 	}

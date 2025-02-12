@@ -14,6 +14,10 @@ using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.solver;
+using static Box2D.NET.Engine.body;
+using static Box2D.NET.Engine.world;
+using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.id_pool;
 
 
@@ -123,7 +127,7 @@ public class motor_joint
         b2Body* bodyA = Array_Get(&world->bodies, idA);
         b2Body* bodyB = Array_Get(&world->bodies, idB);
 
-        Debug.Assert(bodyA->setIndex == b2_awakeSet || bodyB->setIndex == b2_awakeSet);
+        Debug.Assert(bodyA->setIndex == (int)b2SetType.b2_awakeSet || bodyB->setIndex == (int)b2SetType.b2_awakeSet);
 
         b2SolverSet* setA = Array_Get(&world->solverSets, bodyA->setIndex);
         b2SolverSet* setB = Array_Get(&world->solverSets, bodyB->setIndex);
@@ -145,8 +149,8 @@ public class motor_joint
         base->invIB = iB;
 
         b2MotorJoint* joint = &base->motorJoint;
-        joint->indexA = bodyA->setIndex == b2_awakeSet ? localIndexA : B2_NULL_INDEX;
-        joint->indexB = bodyB->setIndex == b2_awakeSet ? localIndexB : B2_NULL_INDEX;
+        joint->indexA = bodyA->setIndex == (int)b2SetType.b2_awakeSet ? localIndexA : B2_NULL_INDEX;
+        joint->indexB = bodyB->setIndex == (int)b2SetType.b2_awakeSet ? localIndexB : B2_NULL_INDEX;
 
         joint->anchorA = b2RotateVector(bodySimA->transform.q, b2Sub(base->localOriginAnchorA, bodySimA->localCenter));
         joint->anchorB = b2RotateVector(bodySimB->transform.q, b2Sub(base->localOriginAnchorB, bodySimB->localCenter));

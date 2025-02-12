@@ -15,6 +15,10 @@ using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.solver;
+using static Box2D.NET.Engine.body;
+using static Box2D.NET.Engine.world;
+using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.id_pool;
 
 
@@ -105,7 +109,7 @@ public class mouse_joint
 
         b2Body* bodyB = Array_Get(&world->bodies, idB);
 
-        Debug.Assert(bodyB->setIndex == b2_awakeSet);
+        Debug.Assert(bodyB->setIndex == (int)b2SetType.b2_awakeSet);
         b2SolverSet* setB = Array_Get(&world->solverSets, bodyB->setIndex);
 
         int localIndexB = bodyB->localIndex;
@@ -115,7 +119,7 @@ public class mouse_joint
         base->invIB = bodySimB->invInertia;
 
         b2MouseJoint* joint = &base->mouseJoint;
-        joint->indexB = bodyB->setIndex == b2_awakeSet ? localIndexB : B2_NULL_INDEX;
+        joint->indexB = bodyB->setIndex == (int)b2SetType.b2_awakeSet ? localIndexB : B2_NULL_INDEX;
         joint->anchorB = b2RotateVector(bodySimB->transform.q, b2Sub(base->localOriginAnchorB, bodySimB->localCenter));
 
         joint->linearSoftness = b2MakeSoft(joint->hertz, joint->dampingRatio, context->h);

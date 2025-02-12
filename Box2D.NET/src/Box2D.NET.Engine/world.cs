@@ -15,6 +15,10 @@ using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.solver;
+using static Box2D.NET.Engine.body;
+using static Box2D.NET.Engine.world;
+using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.id_pool;
 
 
@@ -293,17 +297,17 @@ public static b2WorldId b2CreateWorld( b2WorldDef def )
 	// static set
 	set.setIndex = b2AllocId( &world.solverSetIdPool );
 	Array_Push( &world.solverSets, set );
-	Debug.Assert( world.solverSets.data[b2_staticSet].setIndex == b2_staticSet );
+	Debug.Assert( world.solverSets.data[b2_staticSet].setIndex == (int)b2SetType.b2_staticSet );
 
 	// disabled set
 	set.setIndex = b2AllocId( &world.solverSetIdPool );
 	Array_Push( &world.solverSets, set );
-	Debug.Assert( world.solverSets.data[b2_disabledSet].setIndex == b2_disabledSet );
+	Debug.Assert( world.solverSets.data[b2_disabledSet].setIndex == (int)b2SetType.b2_disabledSet );
 
 	// awake set
 	set.setIndex = b2AllocId( &world.solverSetIdPool );
 	Array_Push( &world.solverSets, set );
-	Debug.Assert( world.solverSets.data[b2_awakeSet].setIndex == b2_awakeSet );
+	Debug.Assert( world.solverSets.data[b2_awakeSet].setIndex == (int)b2SetType.b2_awakeSet );
 
 	world.shapeIdPool = b2CreateIdPool();
 	world.shapes = Array_Create<b2Shape>( 16 );
@@ -545,11 +549,11 @@ static void b2CollideTask( int startIndex, int endIndex, uint threadIndex, void*
 			b2BodySim* bodySimB = b2GetBodySim( world, bodyB );
 
 			// avoid cache misses in b2PrepareContactsTask
-			contactSim.bodySimIndexA = bodyA.setIndex == b2_awakeSet ? bodyA.localIndex : B2_NULL_INDEX;
+			contactSim.bodySimIndexA = bodyA.setIndex == (int)b2SetType.b2_awakeSet ? bodyA.localIndex : B2_NULL_INDEX;
 			contactSim.invMassA = bodySimA.invMass;
 			contactSim.invIA = bodySimA.invInertia;
 
-			contactSim.bodySimIndexB = bodyB.setIndex == b2_awakeSet ? bodyB.localIndex : B2_NULL_INDEX;
+			contactSim.bodySimIndexB = bodyB.setIndex == (int)b2SetType.b2_awakeSet ? bodyB.localIndex : B2_NULL_INDEX;
 			contactSim.invMassB = bodySimB.invMass;
 			contactSim.invIB = bodySimB.invInertia;
 
@@ -596,7 +600,7 @@ static void b2UpdateTreesTask( int startIndex, int endIndex, uint threadIndex, v
 
 static void b2AddNonTouchingContact( b2World* world, b2Contact* contact, b2ContactSim* contactSim )
 {
-	Debug.Assert( contact.setIndex == b2_awakeSet );
+	Debug.Assert( contact.setIndex == (int)b2SetType.b2_awakeSet );
 	b2SolverSet* set = Array_Get( &world.solverSets, b2_awakeSet );
 	contact.colorIndex = B2_NULL_INDEX;
 	contact.localIndex = set.contactSims.count;
@@ -730,7 +734,7 @@ static void b2Collide( b2StepContext* context )
 			int contactId = (int)( 64 * k + ctz );
 
 			b2Contact* contact = Array_Get( &world.contacts, contactId );
-			Debug.Assert( contact.setIndex == b2_awakeSet );
+			Debug.Assert( contact.setIndex == (int)b2SetType.b2_awakeSet );
 
 			int colorIndex = contact.colorIndex;
 			int localIndex = contact.localIndex;
@@ -773,7 +777,7 @@ static void b2Collide( b2StepContext* context )
 				}
 
 				Debug.Assert( contactSim.manifold.pointCount > 0 );
-				Debug.Assert( contact.setIndex == b2_awakeSet );
+				Debug.Assert( contact.setIndex == (int)b2SetType.b2_awakeSet );
 
 				// Link first because this wakes colliding bodies and ensures the body sims
 				// are in the correct place.
@@ -1036,7 +1040,7 @@ static bool DrawQueryCallback( int proxyId, int shapeId, void* context )
 			// Bad body
 			color = b2_colorRed;
 		}
-		else if ( body.setIndex == b2_disabledSet )
+		else if ( body.setIndex == (int)b2SetType.b2_disabledSet )
 		{
 			color = b2_colorSlateGray;
 		}
@@ -1044,7 +1048,7 @@ static bool DrawQueryCallback( int proxyId, int shapeId, void* context )
 		{
 			color = b2_colorWheat;
 		}
-		else if ( bodySim.isBullet && body.setIndex == b2_awakeSet )
+		else if ( bodySim.isBullet && body.setIndex == (int)b2SetType.b2_awakeSet )
 		{
 			color = b2_colorTurquoise;
 		}
@@ -1064,7 +1068,7 @@ static bool DrawQueryCallback( int proxyId, int shapeId, void* context )
 		{
 			color = b2_colorRoyalBlue;
 		}
-		else if ( body.setIndex == b2_awakeSet )
+		else if ( body.setIndex == (int)b2SetType.b2_awakeSet )
 		{
 			color = b2_colorPink;
 		}
@@ -1193,7 +1197,7 @@ static void b2DrawWithBounds( b2World* world, b2DebugDraw* draw )
 			}
 
 			const float linearSlop = B2_LINEAR_SLOP;
-			if ( draw.drawContacts && body.type == b2_dynamicBody && body.setIndex == b2_awakeSet )
+			if ( draw.drawContacts && body.type == b2_dynamicBody && body.setIndex == (int)b2SetType.b2_awakeSet )
 			{
 				int contactKey = body.headContactKey;
 				while ( contactKey != B2_NULL_INDEX )
@@ -1335,7 +1339,7 @@ void b2World_Draw( b2WorldId worldId, b2DebugDraw* draw )
 						// Bad body
 						color = b2_colorRed;
 					}
-					else if ( body.setIndex == b2_disabledSet )
+					else if ( body.setIndex == (int)b2SetType.b2_disabledSet )
 					{
 						color = b2_colorSlateGray;
 					}
@@ -1343,7 +1347,7 @@ void b2World_Draw( b2WorldId worldId, b2DebugDraw* draw )
 					{
 						color = b2_colorWheat;
 					}
-					else if ( bodySim.isBullet && body.setIndex == b2_awakeSet )
+					else if ( bodySim.isBullet && body.setIndex == (int)b2SetType.b2_awakeSet )
 					{
 						color = b2_colorTurquoise;
 					}
@@ -1363,7 +1367,7 @@ void b2World_Draw( b2WorldId worldId, b2DebugDraw* draw )
 					{
 						color = b2_colorRoyalBlue;
 					}
-					else if ( body.setIndex == b2_awakeSet )
+					else if ( body.setIndex == (int)b2SetType.b2_awakeSet )
 					{
 						color = b2_colorPink;
 					}
@@ -2944,7 +2948,7 @@ void b2ValidateConnectivity( b2World* world )
 			bool touching = ( contact.flags & b2_contactTouchingFlag ) != 0;
 			if ( touching )
 			{
-				if ( bodySetIndex != b2_staticSet )
+				if ( bodySetIndex != (int)b2SetType.b2_staticSet )
 				{
 					int contactIslandId = b2GetRootIslandId( world, contact.islandId );
 					Debug.Assert( contactIslandId == bodyIslandId );
@@ -2970,13 +2974,13 @@ void b2ValidateConnectivity( b2World* world )
 
 			b2Body* otherBody = Array_Get( &world.bodies, joint.edges[otherEdgeIndex].bodyId );
 
-			if ( bodySetIndex == b2_disabledSet || otherBody.setIndex == b2_disabledSet )
+			if ( bodySetIndex == (int)b2SetType.b2_disabledSet || otherBody.setIndex == (int)b2SetType.b2_disabledSet )
 			{
 				Debug.Assert( joint.islandId == B2_NULL_INDEX );
 			}
-			else if ( bodySetIndex == b2_staticSet )
+			else if ( bodySetIndex == (int)b2SetType.b2_staticSet )
 			{
-				if ( otherBody.setIndex == b2_staticSet )
+				if ( otherBody.setIndex == (int)b2SetType.b2_staticSet )
 				{
 					Debug.Assert( joint.islandId == B2_NULL_INDEX );
 				}
@@ -3016,18 +3020,18 @@ void b2ValidateSolverSets( b2World* world )
 		{
 			activeSetCount += 1;
 
-			if ( setIndex == b2_staticSet )
+			if ( setIndex == (int)b2SetType.b2_staticSet )
 			{
 				Debug.Assert( set.contactSims.count == 0 );
 				Debug.Assert( set.islandSims.count == 0 );
 				Debug.Assert( set.bodyStates.count == 0 );
 			}
-			else if ( setIndex == b2_awakeSet )
+			else if ( setIndex == (int)b2SetType.b2_awakeSet )
 			{
 				Debug.Assert( set.bodySims.count == set.bodyStates.count );
 				Debug.Assert( set.jointSims.count == 0 );
 			}
-			else if ( setIndex == b2_disabledSet )
+			else if ( setIndex == (int)b2SetType.b2_disabledSet )
 			{
 				Debug.Assert( set.islandSims.count == 0 );
 				Debug.Assert( set.bodyStates.count == 0 );
@@ -3053,7 +3057,7 @@ void b2ValidateSolverSets( b2World* world )
 					Debug.Assert( body.localIndex == i );
 					Debug.Assert( body.generation == body.generation );
 
-					if ( setIndex == b2_disabledSet )
+					if ( setIndex == (int)b2SetType.b2_disabledSet )
 					{
 						Debug.Assert( body.headContactKey == B2_NULL_INDEX );
 					}
@@ -3067,11 +3071,11 @@ void b2ValidateSolverSets( b2World* world )
 						Debug.Assert( shape.id == shapeId );
 						Debug.Assert( shape.prevShapeId == prevShapeId );
 
-						if ( setIndex == b2_disabledSet )
+						if ( setIndex == (int)b2SetType.b2_disabledSet )
 						{
 							Debug.Assert( shape.proxyKey == B2_NULL_INDEX );
 						}
-						else if ( setIndex == b2_staticSet )
+						else if ( setIndex == (int)b2SetType.b2_staticSet )
 						{
 							Debug.Assert( B2_PROXY_TYPE( shape.proxyKey ) == b2_staticBody );
 						}
@@ -3093,7 +3097,7 @@ void b2ValidateSolverSets( b2World* world )
 						int edgeIndex = contactKey & 1;
 
 						b2Contact* contact = Array_Get( &world.contacts, contactId );
-						Debug.Assert( contact.setIndex != b2_staticSet );
+						Debug.Assert( contact.setIndex != (int)b2SetType.b2_staticSet );
 						Debug.Assert( contact.edges[0].bodyId == bodyId || contact.edges[1].bodyId == bodyId );
 						contactKey = contact.edges[edgeIndex].nextKey;
 					}
@@ -3111,19 +3115,19 @@ void b2ValidateSolverSets( b2World* world )
 
 						b2Body* otherBody = Array_Get( &world.bodies, joint.edges[otherEdgeIndex].bodyId );
 
-						if ( setIndex == b2_disabledSet || otherBody.setIndex == b2_disabledSet )
+						if ( setIndex == (int)b2SetType.b2_disabledSet || otherBody.setIndex == (int)b2SetType.b2_disabledSet )
 						{
-							Debug.Assert( joint.setIndex == b2_disabledSet );
+							Debug.Assert( joint.setIndex == (int)b2SetType.b2_disabledSet );
 						}
-						else if ( setIndex == b2_staticSet && otherBody.setIndex == b2_staticSet )
+						else if ( setIndex == (int)b2SetType.b2_staticSet && otherBody.setIndex == (int)b2SetType.b2_staticSet )
 						{
-							Debug.Assert( joint.setIndex == b2_staticSet );
+							Debug.Assert( joint.setIndex == (int)b2SetType.b2_staticSet );
 						}
-						else if ( setIndex == b2_awakeSet )
+						else if ( setIndex == (int)b2SetType.b2_awakeSet )
 						{
-							Debug.Assert( joint.setIndex == b2_awakeSet );
+							Debug.Assert( joint.setIndex == (int)b2SetType.b2_awakeSet );
 						}
-						else if ( setIndex >= b2_firstSleepingSet )
+						else if ( setIndex >= (int)b2SetType.b2_firstSleepingSet )
 						{
 							Debug.Assert( joint.setIndex == setIndex );
 						}
@@ -3146,7 +3150,7 @@ void b2ValidateSolverSets( b2World* world )
 				{
 					b2ContactSim* contactSim = set.contactSims.data + i;
 					b2Contact* contact = Array_Get( &world.contacts, contactSim.contactId );
-					if ( setIndex == b2_awakeSet )
+					if ( setIndex == (int)b2SetType.b2_awakeSet )
 					{
 						// contact should be non-touching if awake
 						// or it could be this contact hasn't been transferred yet
@@ -3219,7 +3223,7 @@ void b2ValidateSolverSets( b2World* world )
 				// contact should be touching in the constraint graph or awaiting transfer to non-touching
 				Debug.Assert( contactSim.manifold.pointCount > 0 ||
 						   ( contactSim.simFlags & ( b2_simStoppedTouching | b2_simDisjoint ) ) != 0 );
-				Debug.Assert( contact.setIndex == b2_awakeSet );
+				Debug.Assert( contact.setIndex == (int)b2SetType.b2_awakeSet );
 				Debug.Assert( contact.colorIndex == colorIndex );
 				Debug.Assert( contact.localIndex == i );
 
@@ -3243,7 +3247,7 @@ void b2ValidateSolverSets( b2World* world )
 			{
 				b2JointSim* jointSim = color.jointSims.data + i;
 				b2Joint* joint = Array_Get( &world.joints, jointSim.jointId );
-				Debug.Assert( joint.setIndex == b2_awakeSet );
+				Debug.Assert( joint.setIndex == (int)b2SetType.b2_awakeSet );
 				Debug.Assert( joint.colorIndex == colorIndex );
 				Debug.Assert( joint.localIndex == i );
 
@@ -3336,7 +3340,7 @@ void b2ValidateContacts( b2World* world )
 
 		int setId = contact.setIndex;
 
-		if ( setId == b2_awakeSet )
+		if ( setId == (int)b2SetType.b2_awakeSet )
 		{
 			// If touching and not a sensor
 			if ( touching )
@@ -3348,7 +3352,7 @@ void b2ValidateContacts( b2World* world )
 				Debug.Assert( contact.colorIndex == B2_NULL_INDEX );
 			}
 		}
-		else if ( setId >= b2_firstSleepingSet )
+		else if ( setId >= (int)b2SetType.b2_firstSleepingSet )
 		{
 			// Only touching contacts allowed in a sleeping set
 			Debug.Assert( touching == true );
@@ -3356,7 +3360,7 @@ void b2ValidateContacts( b2World* world )
 		else
 		{
 			// Sleeping and non-touching contacts or sensor contacts belong in the disabled set
-			Debug.Assert( touching == false && setId == b2_disabledSet );
+			Debug.Assert( touching == false && setId == (int)b2SetType.b2_disabledSet );
 		}
 
 		b2ContactSim* contactSim = b2GetContactSim( world, contact );

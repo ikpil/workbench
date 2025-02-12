@@ -10,7 +10,10 @@
 // scatter would write to the same kinematic body from multiple threads. Even if these writes don't modify the body, they will
 // cause horrible cache stalls. To make this feasible I would need a way to block these writes.
 
+
+// TODO: @ikpil, check 
 // This is used for debugging by making all constraints be assigned to overflow.
+#define B2_FORCE_OVERFLOW
 
 using System.Diagnostics;
 using static Box2D.NET.Engine.table;
@@ -25,6 +28,10 @@ using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.solver;
+using static Box2D.NET.Engine.body;
+using static Box2D.NET.Engine.world;
+using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.id_pool;
 using static Box2D.NET.Engine.bitset;
 
@@ -46,7 +53,7 @@ public class b2GraphColor
     // transient
     //union
     //{
-    public b2ContactConstraintSIMD* simdConstraints;
+    public b2ContactConstraintSIMD[] simdConstraints;
 
     public b2ContactConstraint[] overflowConstraints;
     //};
@@ -64,8 +71,6 @@ public class constraint_graph
 // is touching many other bodies.
     public const int B2_OVERFLOW_INDEX = B2_GRAPH_COLOR_COUNT - 1;
 
-
-#define B2_FORCE_OVERFLOW 0
 
 //Debug.Assert( B2_GRAPH_COLOR_COUNT == 12, "graph color count assumed to be 12" );
 
@@ -124,7 +129,7 @@ public class constraint_graph
         bool staticB = bodyB.setIndex == (int)b2SetType.b2_staticSet;
         Debug.Assert(staticA == false || staticB == false);
 
-#if B2_FORCE_OVERFLOW = 0
+#if B2_FORCE_OVERFLOW
         if (staticA == false && staticB == false)
         {
             for (int i = 0; i < B2_OVERFLOW_INDEX; ++i)
@@ -257,7 +262,7 @@ public class constraint_graph
     {
         Debug.Assert(staticA == false || staticB == false);
 
-#if B2_FORCE_OVERFLOW == 0
+#if B2_FORCE_OVERFLOW
         if (staticA == false && staticB == false)
         {
             for (int i = 0; i < B2_OVERFLOW_INDEX; ++i)

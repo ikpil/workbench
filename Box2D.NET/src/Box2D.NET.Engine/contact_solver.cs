@@ -15,6 +15,10 @@ using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.constraint_graph;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.solver;
+using static Box2D.NET.Engine.body;
+using static Box2D.NET.Engine.world;
+using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.id_pool;
 using static Box2D.NET.Engine.body;
 
@@ -184,11 +188,11 @@ public static void b2PrepareOverflowContacts( b2StepContext context )
 
 #if B2_VALIDATE
 		b2Body* bodyA = bodies + contactSim.bodyIdA;
-		int validIndexA = bodyA.setIndex == b2_awakeSet ? bodyA.localIndex : B2_NULL_INDEX;
+		int validIndexA = bodyA.setIndex == (int)b2SetType.b2_awakeSet ? bodyA.localIndex : B2_NULL_INDEX;
 		Debug.Assert( indexA == validIndexA );
 
 		b2Body* bodyB = bodies + contactSim.bodyIdB;
-		int validIndexB = bodyB.setIndex == b2_awakeSet ? bodyB.localIndex : B2_NULL_INDEX;
+		int validIndexB = bodyB.setIndex == (int)b2SetType.b2_awakeSet ? bodyB.localIndex : B2_NULL_INDEX;
 		Debug.Assert( indexB == validIndexB );
 #endif
 
@@ -1460,9 +1464,9 @@ void b2PrepareContactsTask( int startIndex, int endIndex, b2StepContext* context
 
 #if B2_VALIDATE
 				b2Body* bodyA = bodies + contactSim.bodyIdA;
-				int validIndexA = bodyA.setIndex == b2_awakeSet ? bodyA.localIndex : B2_NULL_INDEX;
+				int validIndexA = bodyA.setIndex == (int)b2SetType.b2_awakeSet ? bodyA.localIndex : B2_NULL_INDEX;
 				b2Body* bodyB = bodies + contactSim.bodyIdB;
-				int validIndexB = bodyB.setIndex == b2_awakeSet ? bodyB.localIndex : B2_NULL_INDEX;
+				int validIndexB = bodyB.setIndex == (int)b2SetType.b2_awakeSet ? bodyB.localIndex : B2_NULL_INDEX;
 
 				Debug.Assert( indexA == validIndexA );
 				Debug.Assert( indexB == validIndexB );

@@ -15,6 +15,10 @@ using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.solver;
+using static Box2D.NET.Engine.body;
+using static Box2D.NET.Engine.world;
+using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.id_pool;
 
 namespace Box2D.NET.Engine;
@@ -180,17 +184,17 @@ public static void b2LinkContact( b2World world, b2Contact contact )
 	b2Body bodyA = Array_Get( world.bodies, bodyIdA );
 	b2Body bodyB = Array_Get( world.bodies, bodyIdB );
 
-	Debug.Assert( bodyA.setIndex != b2_disabledSet && bodyB.setIndex != b2_disabledSet );
-	Debug.Assert( bodyA.setIndex != b2_staticSet || bodyB.setIndex != b2_staticSet );
+	Debug.Assert( bodyA.setIndex != (int)b2SetType.b2_disabledSet && bodyB.setIndex != (int)b2SetType.b2_disabledSet );
+	Debug.Assert( bodyA.setIndex != (int)b2SetType.b2_staticSet || bodyB.setIndex != (int)b2SetType.b2_staticSet );
 
 	// Wake bodyB if bodyA is awake and bodyB is sleeping
-	if ( bodyA.setIndex == b2_awakeSet && bodyB.setIndex >= b2_firstSleepingSet )
+	if ( bodyA.setIndex == (int)b2SetType.b2_awakeSet && bodyB.setIndex >= (int)b2SetType.b2_firstSleepingSet )
 	{
 		b2WakeSolverSet( world, bodyB.setIndex );
 	}
 
 	// Wake bodyA if bodyB is awake and bodyA is sleeping
-	if ( bodyB.setIndex == b2_awakeSet && bodyA.setIndex >= b2_firstSleepingSet )
+	if ( bodyB.setIndex == (int)b2SetType.b2_awakeSet && bodyA.setIndex >= (int)b2SetType.b2_firstSleepingSet )
 	{
 		b2WakeSolverSet( world, bodyA.setIndex );
 	}
@@ -199,8 +203,8 @@ public static void b2LinkContact( b2World world, b2Contact contact )
 	int islandIdB = bodyB.islandId;
 
 	// Static bodies have null island indices.
-	Debug.Assert( bodyA.setIndex != b2_staticSet || islandIdA == B2_NULL_INDEX );
-	Debug.Assert( bodyB.setIndex != b2_staticSet || islandIdB == B2_NULL_INDEX );
+	Debug.Assert( bodyA.setIndex != (int)b2SetType.b2_staticSet || islandIdA == B2_NULL_INDEX );
+	Debug.Assert( bodyB.setIndex != (int)b2SetType.b2_staticSet || islandIdB == B2_NULL_INDEX );
 	Debug.Assert( islandIdA != B2_NULL_INDEX || islandIdB != B2_NULL_INDEX );
 
 	if ( islandIdA == islandIdB )
@@ -350,11 +354,11 @@ void b2LinkJoint( b2World* world, b2Joint* joint, bool mergeIslands )
 	b2Body* bodyA = Array_Get( &world.bodies, joint.edges[0].bodyId );
 	b2Body* bodyB = Array_Get( &world.bodies, joint.edges[1].bodyId );
 
-	if ( bodyA.setIndex == b2_awakeSet && bodyB.setIndex >= b2_firstSleepingSet )
+	if ( bodyA.setIndex == (int)b2SetType.b2_awakeSet && bodyB.setIndex >= (int)b2SetType.b2_firstSleepingSet )
 	{
 		b2WakeSolverSet( world, bodyB.setIndex );
 	}
-	else if ( bodyB.setIndex == b2_awakeSet && bodyA.setIndex >= b2_firstSleepingSet )
+	else if ( bodyB.setIndex == (int)b2SetType.b2_awakeSet && bodyA.setIndex >= (int)b2SetType.b2_firstSleepingSet )
 	{
 		b2WakeSolverSet( world, bodyA.setIndex );
 	}
@@ -753,7 +757,7 @@ void b2SplitIsland( b2World* world, int baseId )
 			// Grab the next body off the stack and add it to the island.
 			int bodyId = stack[--stackCount];
 			b2Body* body = bodies + bodyId;
-			Debug.Assert( body.setIndex == b2_awakeSet );
+			Debug.Assert( body.setIndex == (int)b2SetType.b2_awakeSet );
 			Debug.Assert( body.isMarked == true );
 
 			// Add body to island
@@ -805,7 +809,7 @@ void b2SplitIsland( b2World* world, int baseId )
 				b2Body* otherBody = bodies + otherBodyId;
 
 				// Maybe add other body to stack
-				if ( otherBody.isMarked == false && otherBody.setIndex != b2_staticSet )
+				if ( otherBody.isMarked == false && otherBody.setIndex != (int)b2SetType.b2_staticSet )
 				{
 					Debug.Assert( stackCount < bodyCount );
 					stack[stackCount++] = otherBodyId;
@@ -857,13 +861,13 @@ void b2SplitIsland( b2World* world, int baseId )
 				b2Body* otherBody = bodies + otherBodyId;
 
 				// Don't simulate joints connected to disabled bodies.
-				if ( otherBody.setIndex == b2_disabledSet )
+				if ( otherBody.setIndex == (int)b2SetType.b2_disabledSet )
 				{
 					continue;
 				}
 
 				// Maybe add other body to stack
-				if ( otherBody.isMarked == false && otherBody.setIndex == b2_awakeSet )
+				if ( otherBody.isMarked == false && otherBody.setIndex == (int)b2SetType.b2_awakeSet )
 				{
 					Debug.Assert( stackCount < bodyCount );
 					stack[stackCount++] = otherBodyId;
