@@ -48,7 +48,7 @@ public class b2GraphColor
     //{
     public b2ContactConstraintSIMD* simdConstraints;
 
-    public b2ContactConstraint* overflowConstraints;
+    public b2ContactConstraint[] overflowConstraints;
     //};
 }
 

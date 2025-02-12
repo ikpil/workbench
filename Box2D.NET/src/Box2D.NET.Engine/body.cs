@@ -97,6 +97,12 @@ public class b2BodyState
     // Using delta rotation because I cannot access the full rotation on static bodies in
     // the solver and must use zero delta rotation for static bodies (c,s) = (1,0)
     public b2Rot deltaRotation; // 8
+
+    public b2BodyState Clone()
+    {
+        Debug.Assert(false);
+        return null;
+    }
 }
 
 // Body simulation data used for integration of position and velocity

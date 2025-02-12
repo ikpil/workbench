@@ -273,7 +273,7 @@ public class revolute_joint
         float iB = base->invIB;
 
         // dummy state for static bodies
-        b2BodyState dummyState = b2_identityBodyState;
+        b2BodyState dummyState = b2_identityBodyState.Clone();
 
         b2RevoluteJoint* joint = &base->revoluteJoint;
         b2BodyState* stateA = joint->indexA == B2_NULL_INDEX ? &dummyState : context->states + joint->indexA;
@@ -301,7 +301,7 @@ public class revolute_joint
         float iB = base->invIB;
 
         // dummy state for static bodies
-        b2BodyState dummyState = b2_identityBodyState;
+        b2BodyState dummyState = b2_identityBodyState.Clone();
 
         b2RevoluteJoint* joint = &base->revoluteJoint;
 

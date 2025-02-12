@@ -360,7 +360,7 @@ void b2WarmStartPrismaticJoint( b2JointSim* base, b2StepContext* context )
 	float iB = base->invIB;
 
 	// dummy state for static bodies
-	b2BodyState dummyState = b2_identityBodyState;
+	b2BodyState dummyState = b2_identityBodyState.Clone();
 
 	b2PrismaticJoint* joint = &base->prismaticJoint;
 
@@ -405,7 +405,7 @@ void b2SolvePrismaticJoint( b2JointSim* base, b2StepContext* context, bool useBi
 	float iB = base->invIB;
 
 	// dummy state for static bodies
-	b2BodyState dummyState = b2_identityBodyState;
+	b2BodyState dummyState = b2_identityBodyState.Clone();
 
 	b2PrismaticJoint* joint = &base->prismaticJoint;
 

@@ -288,7 +288,7 @@ void b2WarmStartWheelJoint( b2JointSim* base, b2StepContext* context )
 	float iB = base->invIB;
 
 	// dummy state for static bodies
-	b2BodyState dummyState = b2_identityBodyState;
+	b2BodyState dummyState = b2_identityBodyState.Clone();
 
 	b2WheelJoint* joint = &base->wheelJoint;
 
@@ -329,7 +329,7 @@ void b2SolveWheelJoint( b2JointSim* base, b2StepContext* context, bool useBias )
 	float iB = base->invIB;
 
 	// dummy state for static bodies
-	b2BodyState dummyState = b2_identityBodyState;
+	b2BodyState dummyState = b2_identityBodyState.Clone();
 
 	b2WheelJoint* joint = &base->wheelJoint;
 

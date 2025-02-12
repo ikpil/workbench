@@ -184,7 +184,7 @@ public class motor_joint
         b2MotorJoint* joint = &base->motorJoint;
 
         // dummy state for static bodies
-        b2BodyState dummyState = b2_identityBodyState;
+        b2BodyState dummyState = b2_identityBodyState.Clone();
 
         b2BodyState* bodyA = joint->indexA == B2_NULL_INDEX ? &dummyState : context->states + joint->indexA;
         b2BodyState* bodyB = joint->indexB == B2_NULL_INDEX ? &dummyState : context->states + joint->indexB;
@@ -209,7 +209,7 @@ public class motor_joint
         float iB = base->invIB;
 
         // dummy state for static bodies
-        b2BodyState dummyState = b2_identityBodyState;
+        b2BodyState dummyState = b2_identityBodyState.Clone();
 
         b2MotorJoint* joint = &base->motorJoint;
         b2BodyState* bodyA = joint->indexA == B2_NULL_INDEX ? &dummyState : context->states + joint->indexA;

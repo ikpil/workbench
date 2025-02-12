@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
+using System.Diagnostics;
 using static Box2D.NET.Engine.table;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.atomic;
@@ -11,9 +12,11 @@ using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.contact;
 using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.constants;
+using static Box2D.NET.Engine.constraint_graph;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.id;
 using static Box2D.NET.Engine.id_pool;
+using static Box2D.NET.Engine.body;
 
 
 
@@ -35,7 +38,7 @@ public class b2ContactConstraint
 {
     public int indexA;
     public int indexB;
-    public b2ContactConstraintPoint points[2];
+    public b2ContactConstraintPoint[] points = new b2ContactConstraintPoint[2];
     public b2Vec2 normal;
     public float invMassA, invMassB;
     public float invIA, invIB;
@@ -49,6 +52,98 @@ public class b2ContactConstraint
     public int pointCount;
 }
 
+#if  B2_SIMD_AVX2 
+// wide float holds 8 numbers
+typedef __m256 b2FloatW;
+#elif  B2_SIMD_NEON 
+// wide float holds 4 numbers
+typedef float32x4_t b2FloatW;
+#elif  B2_SIMD_SSE2 
+// wide float holds 4 numbers
+typedef __m128 b2FloatW;
+#else
+// scalar math
+// TODO: @ikpil, check SIMD
+public struct b2FloatW
+{
+    public float x, y, z, w;
+    public b2FloatW( float x, float y, float z, float w )
+    {
+        this.x = x;
+        this.y = y;
+        this.z = z;
+        this.w = w;
+    }
+}
+//#endif
+
+// Wide vec2
+public struct b2Vec2W
+{
+    public b2FloatW X;
+    public b2FloatW Y;
+    
+    public b2Vec2W(b2FloatW X, b2FloatW Y)
+    {
+        this.X = X;
+        this.Y = Y;
+    }
+}
+
+// Wide rotation
+public struct b2RotW
+{
+    public b2FloatW C;
+    public b2FloatW S;
+}
+
+// Soft contact constraints with sub-stepping support
+// Uses fixed anchors for Jacobians for better behavior on rolling shapes (circles & capsules)
+// http://mmacklin.com/smallsteps.pdf
+// https://box2d.org/files/ErinCatto_SoftConstraints_GDC2011.pdf
+
+public class b2ContactConstraintSIMD
+{
+    public int[] indexA = new int[B2_SIMD_WIDTH];
+    public int[] indexB = new int[B2_SIMD_WIDTH];
+
+    public b2FloatW invMassA, invMassB;
+    public b2FloatW invIA, invIB;
+    public b2Vec2W normal;
+    public b2FloatW friction;
+    public b2FloatW tangentSpeed;
+    public b2FloatW rollingResistance;
+    public b2FloatW rollingMass;
+    public b2FloatW rollingImpulse;
+    public b2FloatW biasRate;
+    public b2FloatW massScale;
+    public b2FloatW impulseScale;
+    public b2Vec2W anchorA1, anchorB1;
+    public b2FloatW normalMass1, tangentMass1;
+    public b2FloatW baseSeparation1;
+    public b2FloatW normalImpulse1;
+    public b2FloatW maxNormalImpulse1;
+    public b2FloatW tangentImpulse1;
+    public b2Vec2W anchorA2, anchorB2;
+    public b2FloatW baseSeparation2;
+    public b2FloatW normalImpulse2;
+    public b2FloatW maxNormalImpulse2;
+    public b2FloatW tangentImpulse2;
+    public b2FloatW normalMass2, tangentMass2;
+    public b2FloatW restitution;
+    public b2FloatW relativeVelocity1, relativeVelocity2;
+}
+
+// wide version of b2BodyState
+public struct b2BodyStateW
+{
+    public b2Vec2W v;
+    public b2FloatW w;
+    public b2FloatW flags;
+    public b2Vec2W dp;
+    public b2RotW dq;
+}
+
 public class contact_solver
 {
 
@@ -59,11 +154,11 @@ public static void b2PrepareOverflowContacts( b2StepContext context )
 
 	b2World world = context.world;
 	b2ConstraintGraph graph = context.graph;
-	b2GraphColor* color = graph.colors + B2_OVERFLOW_INDEX;
-	b2ContactConstraint* constraints = color.overflowConstraints;
+    b2GraphColor color = graph.colors[B2_OVERFLOW_INDEX];
+	b2ContactConstraint[] constraints = color.overflowConstraints;
 	int contactCount = color.contactSims.count;
-	b2ContactSim* contacts = color.contactSims.data;
-	b2BodyState* awakeStates = context.states;
+	b2ContactSim[] contacts = color.contactSims.data;
+	b2BodyState[] awakeStates = context.states;
 
 #if B2_VALIDATE
 	b2Body* bodies = world.bodies.data;
@@ -76,10 +171,10 @@ public static void b2PrepareOverflowContacts( b2StepContext context )
 	float warmStartScale = world.enableWarmStarting ? 1.0f : 0.0f;
 
 	for ( int i = 0; i < contactCount; ++i )
-	{
-		b2ContactSim* contactSim = contacts + i;
+    {
+        b2ContactSim contactSim = contacts[i];
 
-		const b2Manifold* manifold = &contactSim.manifold;
+		b2Manifold manifold = contactSim.manifold;
 		int pointCount = manifold.pointCount;
 
 		Debug.Assert( 0 < pointCount && pointCount <= 2 );
@@ -97,7 +192,7 @@ public static void b2PrepareOverflowContacts( b2StepContext context )
 		Debug.Assert( indexB == validIndexB );
 #endif
 
-		b2ContactConstraint* constraint = constraints + i;
+        b2ContactConstraint constraint = constraints[i];
 		constraint.indexA = indexA;
 		constraint.indexB = indexB;
 		constraint.normal = manifold.normal;
@@ -113,8 +208,8 @@ public static void b2PrepareOverflowContacts( b2StepContext context )
 		float mA = contactSim.invMassA;
 		float iA = contactSim.invIA;
 		if ( indexA != B2_NULL_INDEX )
-		{
-			b2BodyState* stateA = awakeStates + indexA;
+        {
+            b2BodyState stateA = awakeStates[indexA];
 			vA = stateA.linearVelocity;
 			wA = stateA.angularVelocity;
 		}
@@ -124,8 +219,8 @@ public static void b2PrepareOverflowContacts( b2StepContext context )
 		float mB = contactSim.invMassB;
 		float iB = contactSim.invIB;
 		if ( indexB != B2_NULL_INDEX )
-		{
-			b2BodyState* stateB = awakeStates + indexB;
+        {
+            b2BodyState stateB = awakeStates[indexB];
 			vB = stateB.linearVelocity;
 			wB = stateB.angularVelocity;
 		}
@@ -154,9 +249,9 @@ public static void b2PrepareOverflowContacts( b2StepContext context )
 		b2Vec2 tangent = b2RightPerp( constraint.normal );
 
 		for ( int j = 0; j < pointCount; ++j )
-		{
-			const b2ManifoldPoint* mp = manifold.points + j;
-			b2ContactConstraintPoint* cp = constraint.points + j;
+        {
+            b2ManifoldPoint mp = manifold.points[j];
+            b2ContactConstraintPoint cp = constraint.points[j];
 
 			cp.normalImpulse = warmStartScale * mp.normalImpulse;
 			cp.tangentImpulse = warmStartScale * mp.tangentImpulse;
@@ -189,30 +284,30 @@ public static void b2PrepareOverflowContacts( b2StepContext context )
 	b2TracyCZoneEnd( prepare_overflow_contact );
 }
 
-void b2WarmStartOverflowContacts( b2StepContext* context )
+public static void b2WarmStartOverflowContacts( b2StepContext context )
 {
 	b2TracyCZoneNC( warmstart_overflow_contact, "WarmStart Overflow Contact", b2_colorDarkOrange, true );
 
-	b2ConstraintGraph* graph = context.graph;
-	b2GraphColor* color = graph.colors + B2_OVERFLOW_INDEX;
-	b2ContactConstraint* constraints = color.overflowConstraints;
+	b2ConstraintGraph graph = context.graph;
+    b2GraphColor color = graph.colors[B2_OVERFLOW_INDEX];
+	b2ContactConstraint[] constraints = color.overflowConstraints;
 	int contactCount = color.contactSims.count;
-	b2World* world = context.world;
-	b2SolverSet* awakeSet = Array_Get( &world.solverSets, b2_awakeSet );
-	b2BodyState* states = awakeSet.bodyStates.data;
+	b2World world = context.world;
+	b2SolverSet awakeSet = Array_Get( world.solverSets, (int)b2SetType.b2_awakeSet );
+	b2BodyState[] states = awakeSet.bodyStates.data;
 
 	// This is a dummy state to represent a static body because static bodies don't have a solver body.
-	b2BodyState dummyState = b2_identityBodyState;
+    b2BodyState dummyState = b2_identityBodyState.Clone();
 
 	for ( int i = 0; i < contactCount; ++i )
-	{
-		const b2ContactConstraint* constraint = constraints + i;
+    {
+        b2ContactConstraint constraint = constraints[i];
 
 		int indexA = constraint.indexA;
 		int indexB = constraint.indexB;
 
-		b2BodyState* stateA = indexA == B2_NULL_INDEX ? &dummyState : states + indexA;
-		b2BodyState* stateB = indexB == B2_NULL_INDEX ? &dummyState : states + indexB;
+		b2BodyState stateA = indexA == B2_NULL_INDEX ? dummyState : states[indexA];
+		b2BodyState stateB = indexB == B2_NULL_INDEX ? dummyState : states[indexB];
 
 		b2Vec2 vA = stateA.linearVelocity;
 		float wA = stateA.angularVelocity;
@@ -230,8 +325,8 @@ void b2WarmStartOverflowContacts( b2StepContext* context )
 		int pointCount = constraint.pointCount;
 
 		for ( int j = 0; j < pointCount; ++j )
-		{
-			const b2ContactConstraintPoint* cp = constraint.points + j;
+        {
+            b2ContactConstraintPoint cp = constraint.points[j];
 
 			// fixed anchors
 			b2Vec2 rA = cp.anchorA;
@@ -256,38 +351,38 @@ void b2WarmStartOverflowContacts( b2StepContext* context )
 	b2TracyCZoneEnd( warmstart_overflow_contact );
 }
 
-void b2SolveOverflowContacts( b2StepContext* context, bool useBias )
+public static void b2SolveOverflowContacts( b2StepContext context, bool useBias )
 {
 	b2TracyCZoneNC( solve_contact, "Solve Contact", b2_colorAliceBlue, true );
 
-	b2ConstraintGraph* graph = context.graph;
-	b2GraphColor* color = graph.colors + B2_OVERFLOW_INDEX;
-	b2ContactConstraint* constraints = color.overflowConstraints;
+	b2ConstraintGraph graph = context.graph;
+    b2GraphColor color = graph.colors[B2_OVERFLOW_INDEX];
+	b2ContactConstraint[] constraints = color.overflowConstraints;
 	int contactCount = color.contactSims.count;
-	b2World* world = context.world;
-	b2SolverSet* awakeSet = Array_Get( &world.solverSets, b2_awakeSet );
-	b2BodyState* states = awakeSet.bodyStates.data;
+	b2World world = context.world;
+	b2SolverSet awakeSet = Array_Get( world.solverSets, (int)b2SetType.b2_awakeSet );
+	b2BodyState[] states = awakeSet.bodyStates.data;
 
 	float inv_h = context.inv_h;
-	const float pushout = context.world.contactMaxPushSpeed;
+	float pushout = context.world.contactMaxPushSpeed;
 
 	// This is a dummy body to represent a static body since static bodies don't have a solver body.
-	b2BodyState dummyState = b2_identityBodyState;
+	b2BodyState dummyState = b2_identityBodyState.Clone();
 
 	for ( int i = 0; i < contactCount; ++i )
 	{
-		b2ContactConstraint* constraint = constraints + i;
+		b2ContactConstraint constraint = constraints[i];
 		float mA = constraint.invMassA;
 		float iA = constraint.invIA;
 		float mB = constraint.invMassB;
 		float iB = constraint.invIB;
 
-		b2BodyState* stateA = constraint.indexA == B2_NULL_INDEX ? &dummyState : states + constraint.indexA;
+        b2BodyState stateA = constraint.indexA == B2_NULL_INDEX ? dummyState : states[constraint.indexA];
 		b2Vec2 vA = stateA.linearVelocity;
 		float wA = stateA.angularVelocity;
 		b2Rot dqA = stateA.deltaRotation;
 
-		b2BodyState* stateB = constraint.indexB == B2_NULL_INDEX ? &dummyState : states + constraint.indexB;
+        b2BodyState stateB = constraint.indexB == B2_NULL_INDEX ? dummyState : states[constraint.indexB];
 		b2Vec2 vB = stateB.linearVelocity;
 		float wB = stateB.angularVelocity;
 		b2Rot dqB = stateB.deltaRotation;
@@ -305,7 +400,7 @@ void b2SolveOverflowContacts( b2StepContext* context, bool useBias )
 		// Non-penetration
 		for ( int j = 0; j < pointCount; ++j )
 		{
-			b2ContactConstraintPoint* cp = constraint.points + j;
+			b2ContactConstraintPoint cp = constraint.points[j];
 
 			// compute current separation
 			// this is subject to round-off error if the anchor is far from the body center of mass
@@ -358,7 +453,7 @@ void b2SolveOverflowContacts( b2StepContext* context, bool useBias )
 		// Friction
 		for ( int j = 0; j < pointCount; ++j )
 		{
-			b2ContactConstraintPoint* cp = constraint.points + j;
+			b2ContactConstraintPoint cp = constraint.points[j];
 
 			// fixed anchor points
 			b2Vec2 rA = cp.anchorA;
@@ -411,26 +506,26 @@ void b2SolveOverflowContacts( b2StepContext* context, bool useBias )
 	b2TracyCZoneEnd( solve_contact );
 }
 
-void b2ApplyOverflowRestitution( b2StepContext* context )
+public static void b2ApplyOverflowRestitution( b2StepContext context )
 {
 	b2TracyCZoneNC( overflow_resitution, "Overflow Restitution", b2_colorViolet, true );
 
-	b2ConstraintGraph* graph = context.graph;
-	b2GraphColor* color = graph.colors + B2_OVERFLOW_INDEX;
-	b2ContactConstraint* constraints = color.overflowConstraints;
+	b2ConstraintGraph graph = context.graph;
+    b2GraphColor color = graph.colors[B2_OVERFLOW_INDEX];
+	b2ContactConstraint[] constraints = color.overflowConstraints;
 	int contactCount = color.contactSims.count;
-	b2World* world = context.world;
-	b2SolverSet* awakeSet = Array_Get( &world.solverSets, b2_awakeSet );
-	b2BodyState* states = awakeSet.bodyStates.data;
+	b2World world = context.world;
+	b2SolverSet awakeSet = Array_Get( world.solverSets, (int)b2SetType.b2_awakeSet );
+	b2BodyState[] states = awakeSet.bodyStates.data;
 
 	float threshold = context.world.restitutionThreshold;
 
 	// dummy state to represent a static body
-	b2BodyState dummyState = b2_identityBodyState;
+	b2BodyState dummyState = b2_identityBodyState.Clone();
 
 	for ( int i = 0; i < contactCount; ++i )
 	{
-		b2ContactConstraint* constraint = constraints + i;
+		b2ContactConstraint constraint = constraints[i];
 
 		float restitution = constraint.restitution;
 		if ( restitution == 0.0f )
@@ -443,11 +538,11 @@ void b2ApplyOverflowRestitution( b2StepContext* context )
 		float mB = constraint.invMassB;
 		float iB = constraint.invIB;
 
-		b2BodyState* stateA = constraint.indexA == B2_NULL_INDEX ? &dummyState : states + constraint.indexA;
+		b2BodyState stateA = constraint.indexA == B2_NULL_INDEX ? dummyState : states [constraint.indexA];
 		b2Vec2 vA = stateA.linearVelocity;
 		float wA = stateA.angularVelocity;
 
-		b2BodyState* stateB = constraint.indexB == B2_NULL_INDEX ? &dummyState : states + constraint.indexB;
+        b2BodyState stateB = constraint.indexB == B2_NULL_INDEX ? dummyState : states[constraint.indexB];
 		b2Vec2 vB = stateB.linearVelocity;
 		float wB = stateB.angularVelocity;
 
@@ -460,7 +555,7 @@ void b2ApplyOverflowRestitution( b2StepContext* context )
 		{
 			for ( int j = 0; j < pointCount; ++j )
 			{
-				b2ContactConstraintPoint* cp = constraint.points + j;
+				b2ContactConstraintPoint cp = constraint.points[j];
 
 				// if the normal impulse is zero then there was no collision
 				// this skips speculative contact points that didn't generate an impulse
@@ -507,23 +602,23 @@ void b2ApplyOverflowRestitution( b2StepContext* context )
 	b2TracyCZoneEnd( overflow_resitution );
 }
 
-void b2StoreOverflowImpulses( b2StepContext* context )
+public static void b2StoreOverflowImpulses( b2StepContext context )
 {
 	b2TracyCZoneNC( store_impulses, "Store", b2_colorFireBrick, true );
 
-	b2ConstraintGraph* graph = context.graph;
-	b2GraphColor* color = graph.colors + B2_OVERFLOW_INDEX;
-	b2ContactConstraint* constraints = color.overflowConstraints;
-	b2ContactSim* contacts = color.contactSims.data;
+	b2ConstraintGraph graph = context.graph;
+    b2GraphColor color = graph.colors[B2_OVERFLOW_INDEX];
+	b2ContactConstraint[] constraints = color.overflowConstraints;
+	b2ContactSim[] contacts = color.contactSims.data;
 	int contactCount = color.contactSims.count;
 
 	// float hitEventThreshold = context.world.hitEventThreshold;
 
 	for ( int i = 0; i < contactCount; ++i )
 	{
-		const b2ContactConstraint* constraint = constraints + i;
-		b2ContactSim* contact = contacts + i;
-		b2Manifold* manifold = &contact.manifold;
+		b2ContactConstraint constraint = constraints[i];
+        b2ContactSim contact = contacts[i];
+		b2Manifold manifold = contact.manifold;
 		int pointCount = manifold.pointCount;
 
 		for ( int j = 0; j < pointCount; ++j )
@@ -540,210 +635,168 @@ void b2StoreOverflowImpulses( b2StepContext* context )
 	b2TracyCZoneEnd( store_impulses );
 }
 
-#if defined( B2_SIMD_AVX2 )
 
 
-
-// wide float holds 8 numbers
-typedef __m256 b2FloatW;
-
-#elif defined( B2_SIMD_NEON )
-
-
-
-// wide float holds 4 numbers
-typedef float32x4_t b2FloatW;
-
-#elif defined( B2_SIMD_SSE2 )
-
-
-
-// wide float holds 4 numbers
-typedef __m128 b2FloatW;
-
-#else
-
-// scalar math
-typedef struct b2FloatW
-{
-	float x, y, z, w;
-} b2FloatW;
-
-#endif
-
-// Wide vec2
-typedef struct b2Vec2W
-{
-	b2FloatW X, Y;
-} b2Vec2W;
-
-// Wide rotation
-typedef struct b2RotW
-{
-	b2FloatW C, S;
-} b2RotW;
-
-#if defined( B2_SIMD_AVX2 )
-
-staticb2FloatW b2ZeroW()
+#if B2_SIMD_AVX2
+static b2FloatW b2ZeroW()
 {
 	return _mm256_setzero_ps();
 }
 
-staticb2FloatW b2SplatW( float scalar )
+static b2FloatW b2SplatW( float scalar )
 {
 	return _mm256_set1_ps( scalar );
 }
 
-staticb2FloatW b2AddW( b2FloatW a, b2FloatW b )
+static b2FloatW b2AddW( b2FloatW a, b2FloatW b )
 {
 	return _mm256_add_ps( a, b );
 }
 
-staticb2FloatW b2SubW( b2FloatW a, b2FloatW b )
+static b2FloatW b2SubW( b2FloatW a, b2FloatW b )
 {
 	return _mm256_sub_ps( a, b );
 }
 
-staticb2FloatW b2MulW( b2FloatW a, b2FloatW b )
+static b2FloatW b2MulW( b2FloatW a, b2FloatW b )
 {
 	return _mm256_mul_ps( a, b );
 }
 
-staticb2FloatW b2MulAddW( b2FloatW a, b2FloatW b, b2FloatW c )
+static b2FloatW b2MulAddW( b2FloatW a, b2FloatW b, b2FloatW c )
 {
 	// FMA can be emulated: https://github.com/lattera/glibc/blob/master/sysdeps/ieee754/dbl-64/s_fmaf.c#L34
 	// return _mm256_fmadd_ps( b, c, a );
 	return _mm256_add_ps( _mm256_mul_ps( b, c ), a );
 }
 
-staticb2FloatW b2MulSubW( b2FloatW a, b2FloatW b, b2FloatW c )
+static b2FloatW b2MulSubW( b2FloatW a, b2FloatW b, b2FloatW c )
 {
 	// return _mm256_fnmadd_ps(b, c, a);
 	return _mm256_sub_ps( a, _mm256_mul_ps( b, c ) );
 }
 
-staticb2FloatW b2MinW( b2FloatW a, b2FloatW b )
+static b2FloatW b2MinW( b2FloatW a, b2FloatW b )
 {
 	return _mm256_min_ps( a, b );
 }
 
-staticb2FloatW b2MaxW( b2FloatW a, b2FloatW b )
+static b2FloatW b2MaxW( b2FloatW a, b2FloatW b )
 {
 	return _mm256_max_ps( a, b );
 }
 
 // a = clamp(a, -b, b)
-staticb2FloatW b2ClampSymW( b2FloatW a, b2FloatW b )
+static b2FloatW b2ClampSymW( b2FloatW a, b2FloatW b )
 {
 	b2FloatW nb = _mm256_sub_ps( _mm256_setzero_ps(), b );
 	return _mm256_max_ps(nb, _mm256_min_ps( a, b ));
 }
 
-staticb2FloatW b2OrW( b2FloatW a, b2FloatW b )
+static b2FloatW b2OrW( b2FloatW a, b2FloatW b )
 {
 	return _mm256_or_ps( a, b );
 }
 
-staticb2FloatW b2GreaterThanW( b2FloatW a, b2FloatW b )
+static b2FloatW b2GreaterThanW( b2FloatW a, b2FloatW b )
 {
 	return _mm256_cmp_ps( a, b, _CMP_GT_OQ );
 }
 
-staticb2FloatW b2EqualsW( b2FloatW a, b2FloatW b )
+static b2FloatW b2EqualsW( b2FloatW a, b2FloatW b )
 {
 	return _mm256_cmp_ps( a, b, _CMP_EQ_OQ );
 }
 
 // component-wise returns mask ? b : a
-staticb2FloatW b2BlendW( b2FloatW a, b2FloatW b, b2FloatW mask )
+static b2FloatW b2BlendW( b2FloatW a, b2FloatW b, b2FloatW mask )
 {
 	return _mm256_blendv_ps( a, b, mask );
 }
 
-#elif defined( B2_SIMD_NEON )
+#elif  B2_SIMD_NEON
 
-staticb2FloatW b2ZeroW()
+static b2FloatW b2ZeroW()
 {
 	return vdupq_n_f32( 0.0f );
 }
 
-staticb2FloatW b2SplatW( float scalar )
+static b2FloatW b2SplatW( float scalar )
 {
 	return vdupq_n_f32( scalar );
 }
 
-staticb2FloatW b2SetW( float a, float b, float c, float d )
+static b2FloatW b2SetW( float a, float b, float c, float d )
 {
 	float32_t array[4] = { a, b, c, d };
 	return vld1q_f32( array );
 }
 
-staticb2FloatW b2AddW( b2FloatW a, b2FloatW b )
+static b2FloatW b2AddW( b2FloatW a, b2FloatW b )
 {
 	return vaddq_f32( a, b );
 }
 
-staticb2FloatW b2SubW( b2FloatW a, b2FloatW b )
+static b2FloatW b2SubW( b2FloatW a, b2FloatW b )
 {
 	return vsubq_f32( a, b );
 }
 
-staticb2FloatW b2MulW( b2FloatW a, b2FloatW b )
+static b2FloatW b2MulW( b2FloatW a, b2FloatW b )
 {
 	return vmulq_f32( a, b );
 }
 
-staticb2FloatW b2MulAddW( b2FloatW a, b2FloatW b, b2FloatW c )
+static b2FloatW b2MulAddW( b2FloatW a, b2FloatW b, b2FloatW c )
 {
 	return vmlaq_f32( a, b, c );
 }
 
-staticb2FloatW b2MulSubW( b2FloatW a, b2FloatW b, b2FloatW c )
+static b2FloatW b2MulSubW( b2FloatW a, b2FloatW b, b2FloatW c )
 {
 	return vmlsq_f32( a, b, c );
 }
 
-staticb2FloatW b2MinW( b2FloatW a, b2FloatW b )
+static b2FloatW b2MinW( b2FloatW a, b2FloatW b )
 {
 	return vminq_f32( a, b );
 }
 
-staticb2FloatW b2MaxW( b2FloatW a, b2FloatW b )
+static b2FloatW b2MaxW( b2FloatW a, b2FloatW b )
 {
 	return vmaxq_f32( a, b );
 }
 
 // a = clamp(a, -b, b)
-staticb2FloatW b2ClampSymW( b2FloatW a, b2FloatW b )
+static b2FloatW b2ClampSymW( b2FloatW a, b2FloatW b )
 {
 	b2FloatW nb = vnegq_f32( b );
 	return vmaxq_f32( nb, vminq_f32( a, b ) );
 }
 
-staticb2FloatW b2OrW( b2FloatW a, b2FloatW b )
+static b2FloatW b2OrW( b2FloatW a, b2FloatW b )
 {
 	return vreinterpretq_f32_u32( vorrq_u32( vreinterpretq_u32_f32( a ), vreinterpretq_u32_f32( b ) ) );
 }
 
-staticb2FloatW b2GreaterThanW( b2FloatW a, b2FloatW b )
+static b2FloatW b2GreaterThanW( b2FloatW a, b2FloatW b )
 {
 	return vreinterpretq_f32_u32( vcgtq_f32( a, b ) );
 }
 
-staticb2FloatW b2EqualsW( b2FloatW a, b2FloatW b )
+static b2FloatW b2EqualsW( b2FloatW a, b2FloatW b )
 {
 	return vreinterpretq_f32_u32( vceqq_f32( a, b ) );
 }
 
 // component-wise returns mask ? b : a
-staticb2FloatW b2BlendW( b2FloatW a, b2FloatW b, b2FloatW mask )
+static b2FloatW b2BlendW( b2FloatW a, b2FloatW b, b2FloatW mask )
 {
 	uint32x4_t mask32 = vreinterpretq_u32_f32( mask );
 	return vbslq_f32( mask32, b, a );
 }
 
-staticb2FloatW b2LoadW( const float32_t* data )
+static b2FloatW b2LoadW( const float32_t* data )
 {
 	return vld1q_f32( data );
 }
@@ -753,7 +806,7 @@ static void b2StoreW( float32_t* data, b2FloatW a )
 	return vst1q_f32( data, a );
 }
 
-staticb2FloatW b2UnpackLoW( b2FloatW a, b2FloatW b )
+static b2FloatW b2UnpackLoW( b2FloatW a, b2FloatW b )
 {
 #if defined( __aarch64__ )
 	return vzip1q_f32( a, b );
@@ -765,7 +818,7 @@ staticb2FloatW b2UnpackLoW( b2FloatW a, b2FloatW b )
 #endif
 }
 
-staticb2FloatW b2UnpackHiW( b2FloatW a, b2FloatW b )
+static b2FloatW b2UnpackHiW( b2FloatW a, b2FloatW b )
 {
 #if defined( __aarch64__ )
 	return vzip2q_f32( a, b );
@@ -777,60 +830,60 @@ staticb2FloatW b2UnpackHiW( b2FloatW a, b2FloatW b )
 #endif
 }
 
-#elif defined( B2_SIMD_SSE2 )
+#elif  B2_SIMD_SSE2
 
-staticb2FloatW b2ZeroW()
+static b2FloatW b2ZeroW()
 {
 	return _mm_setzero_ps();
 }
 
-staticb2FloatW b2SplatW( float scalar )
+static b2FloatW b2SplatW( float scalar )
 {
 	return _mm_set1_ps( scalar );
 }
 
-staticb2FloatW b2SetW( float a, float b, float c, float d )
+static b2FloatW b2SetW( float a, float b, float c, float d )
 {
 	return _mm_setr_ps( a, b, c, d );
 }
 
-staticb2FloatW b2AddW( b2FloatW a, b2FloatW b )
+static b2FloatW b2AddW( b2FloatW a, b2FloatW b )
 {
 	return _mm_add_ps( a, b );
 }
 
-staticb2FloatW b2SubW( b2FloatW a, b2FloatW b )
+static b2FloatW b2SubW( b2FloatW a, b2FloatW b )
 {
 	return _mm_sub_ps( a, b );
 }
 
-staticb2FloatW b2MulW( b2FloatW a, b2FloatW b )
+static b2FloatW b2MulW( b2FloatW a, b2FloatW b )
 {
 	return _mm_mul_ps( a, b );
 }
 
-staticb2FloatW b2MulAddW( b2FloatW a, b2FloatW b, b2FloatW c )
+static b2FloatW b2MulAddW( b2FloatW a, b2FloatW b, b2FloatW c )
 {
 	return _mm_add_ps( a, _mm_mul_ps( b, c ) );
 }
 
-staticb2FloatW b2MulSubW( b2FloatW a, b2FloatW b, b2FloatW c )
+static b2FloatW b2MulSubW( b2FloatW a, b2FloatW b, b2FloatW c )
 {
 	return _mm_sub_ps( a, _mm_mul_ps( b, c ) );
 }
 
-staticb2FloatW b2MinW( b2FloatW a, b2FloatW b )
+static b2FloatW b2MinW( b2FloatW a, b2FloatW b )
 {
 	return _mm_min_ps( a, b );
 }
 
-staticb2FloatW b2MaxW( b2FloatW a, b2FloatW b )
+static b2FloatW b2MaxW( b2FloatW a, b2FloatW b )
 {
 	return _mm_max_ps( a, b );
 }
 
 // a = clamp(a, -b, b)
-staticb2FloatW b2ClampSymW( b2FloatW a, b2FloatW b )
+static b2FloatW b2ClampSymW( b2FloatW a, b2FloatW b )
 {
 	// Create a mask with the sign bit set for each element
 	__m128 mask = _mm_set1_ps( -0.0f );
@@ -841,28 +894,28 @@ staticb2FloatW b2ClampSymW( b2FloatW a, b2FloatW b )
 	return _mm_max_ps( nb, _mm_min_ps( a, b ) );
 }
 
-staticb2FloatW b2OrW( b2FloatW a, b2FloatW b )
+static b2FloatW b2OrW( b2FloatW a, b2FloatW b )
 {
 	return _mm_or_ps( a, b );
 }
 
-staticb2FloatW b2GreaterThanW( b2FloatW a, b2FloatW b )
+static b2FloatW b2GreaterThanW( b2FloatW a, b2FloatW b )
 {
 	return _mm_cmpgt_ps( a, b );
 }
 
-staticb2FloatW b2EqualsW( b2FloatW a, b2FloatW b )
+static b2FloatW b2EqualsW( b2FloatW a, b2FloatW b )
 {
 	return _mm_cmpeq_ps( a, b );
 }
 
 // component-wise returns mask ? b : a
-staticb2FloatW b2BlendW( b2FloatW a, b2FloatW b, b2FloatW mask )
+static b2FloatW b2BlendW( b2FloatW a, b2FloatW b, b2FloatW mask )
 {
 	return _mm_or_ps( _mm_and_ps( mask, b ), _mm_andnot_ps( mask, a ) );
 }
 
-staticb2FloatW b2LoadW( const float* data )
+static b2FloatW b2LoadW( const float* data )
 {
 	return _mm_load_ps( data );
 }
@@ -872,54 +925,54 @@ static void b2StoreW( float* data, b2FloatW a )
 	_mm_store_ps( data, a );
 }
 
-staticb2FloatW b2UnpackLoW( b2FloatW a, b2FloatW b )
+static b2FloatW b2UnpackLoW( b2FloatW a, b2FloatW b )
 {
 	return _mm_unpacklo_ps( a, b );
 }
 
-staticb2FloatW b2UnpackHiW( b2FloatW a, b2FloatW b )
+static b2FloatW b2UnpackHiW( b2FloatW a, b2FloatW b )
 {
 	return _mm_unpackhi_ps( a, b );
 }
 
 #else
 
-staticb2FloatW b2ZeroW()
+public static b2FloatW b2ZeroW()
 {
-	return ( b2FloatW ){ 0.0f, 0.0f, 0.0f, 0.0f };
+    return new b2FloatW(0.0f, 0.0f, 0.0f, 0.0f);
 }
 
-staticb2FloatW b2SplatW( float scalar )
+public static b2FloatW b2SplatW( float scalar )
 {
-	return ( b2FloatW ){ scalar, scalar, scalar, scalar };
+    return new b2FloatW(scalar, scalar, scalar, scalar);
 }
 
-staticb2FloatW b2AddW( b2FloatW a, b2FloatW b )
+public static b2FloatW b2AddW( b2FloatW a, b2FloatW b )
 {
-	return ( b2FloatW ){ a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w };
+    return new b2FloatW(a.x + b.x, a.y + b.y, a.z + b.z, a.w + b.w);
 }
 
-staticb2FloatW b2SubW( b2FloatW a, b2FloatW b )
+public static b2FloatW b2SubW( b2FloatW a, b2FloatW b )
 {
-	return ( b2FloatW ){ a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w };
+	return new b2FloatW( a.x - b.x, a.y - b.y, a.z - b.z, a.w - b.w );
 }
 
-staticb2FloatW b2MulW( b2FloatW a, b2FloatW b )
+public static b2FloatW b2MulW( b2FloatW a, b2FloatW b )
 {
-	return ( b2FloatW ){ a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w };
+    return new b2FloatW(a.x * b.x, a.y * b.y, a.z * b.z, a.w * b.w);
 }
 
-staticb2FloatW b2MulAddW( b2FloatW a, b2FloatW b, b2FloatW c )
+public static b2FloatW b2MulAddW( b2FloatW a, b2FloatW b, b2FloatW c )
 {
-	return ( b2FloatW ){ a.x + b.x * c.x, a.y + b.y * c.y, a.z + b.z * c.z, a.w + b.w * c.w };
+    return new b2FloatW(a.x + b.x * c.x, a.y + b.y * c.y, a.z + b.z * c.z, a.w + b.w * c.w);
 }
 
-staticb2FloatW b2MulSubW( b2FloatW a, b2FloatW b, b2FloatW c )
+public static b2FloatW b2MulSubW( b2FloatW a, b2FloatW b, b2FloatW c )
 {
-	return ( b2FloatW ){ a.x - b.x * c.x, a.y - b.y * c.y, a.z - b.z * c.z, a.w - b.w * c.w };
+    return new b2FloatW(a.x - b.x * c.x, a.y - b.y * c.y, a.z - b.z * c.z, a.w - b.w * c.w);
 }
 
-staticb2FloatW b2MinW( b2FloatW a, b2FloatW b )
+public static b2FloatW b2MinW( b2FloatW a, b2FloatW b )
 {
 	b2FloatW r;
 	r.x = a.x <= b.x ? a.x : b.x;
@@ -929,7 +982,7 @@ staticb2FloatW b2MinW( b2FloatW a, b2FloatW b )
 	return r;
 }
 
-staticb2FloatW b2MaxW( b2FloatW a, b2FloatW b )
+public static b2FloatW b2MaxW( b2FloatW a, b2FloatW b )
 {
 	b2FloatW r;
 	r.x = a.x >= b.x ? a.x : b.x;
@@ -940,7 +993,7 @@ staticb2FloatW b2MaxW( b2FloatW a, b2FloatW b )
 }
 
 // a = clamp(a, -b, b)
-staticb2FloatW b2ClampSymW( b2FloatW a, b2FloatW b )
+    public static b2FloatW b2ClampSymW( b2FloatW a, b2FloatW b )
 {
 	b2FloatW r;
 	r.x = b2ClampFloat(a.x, -b.x, b.x);
@@ -950,7 +1003,7 @@ staticb2FloatW b2ClampSymW( b2FloatW a, b2FloatW b )
 	return r;
 }
 
-staticb2FloatW b2OrW( b2FloatW a, b2FloatW b )
+    public static b2FloatW b2OrW( b2FloatW a, b2FloatW b )
 {
 	b2FloatW r;
 	r.x = a.x != 0.0f || b.x != 0.0f ? 1.0f : 0.0f;
@@ -960,7 +1013,7 @@ staticb2FloatW b2OrW( b2FloatW a, b2FloatW b )
 	return r;
 }
 
-staticb2FloatW b2GreaterThanW( b2FloatW a, b2FloatW b )
+    public static b2FloatW b2GreaterThanW( b2FloatW a, b2FloatW b )
 {
 	b2FloatW r;
 	r.x = a.x > b.x ? 1.0f : 0.0f;
@@ -970,7 +1023,7 @@ staticb2FloatW b2GreaterThanW( b2FloatW a, b2FloatW b )
 	return r;
 }
 
-staticb2FloatW b2EqualsW( b2FloatW a, b2FloatW b )
+static b2FloatW b2EqualsW( b2FloatW a, b2FloatW b )
 {
 	b2FloatW r;
 	r.x = a.x == b.x ? 1.0f : 0.0f;
@@ -981,7 +1034,7 @@ staticb2FloatW b2EqualsW( b2FloatW a, b2FloatW b )
 }
 
 // component-wise returns mask ? b : a
-staticb2FloatW b2BlendW( b2FloatW a, b2FloatW b, b2FloatW mask )
+    public static b2FloatW b2BlendW( b2FloatW a, b2FloatW b, b2FloatW mask )
 {
 	b2FloatW r;
 	r.x = mask.x != 0.0f ? b.x : a.x;
@@ -993,72 +1046,29 @@ staticb2FloatW b2BlendW( b2FloatW a, b2FloatW b, b2FloatW mask )
 
 #endif
 
-staticb2FloatW b2DotW( b2Vec2W a, b2Vec2W b )
+public static b2FloatW b2DotW( b2Vec2W a, b2Vec2W b )
 {
 	return b2AddW( b2MulW( a.X, b.X ), b2MulW( a.Y, b.Y ) );
 }
 
-staticb2FloatW b2CrossW( b2Vec2W a, b2Vec2W b )
+static b2FloatW b2CrossW( b2Vec2W a, b2Vec2W b )
 {
 	return b2SubW( b2MulW( a.X, b.Y ), b2MulW( a.Y, b.X ) );
 }
 
-staticb2Vec2W b2RotateVectorW( b2RotW q, b2Vec2W v )
+static b2Vec2W b2RotateVectorW( b2RotW q, b2Vec2W v )
 {
-	return ( b2Vec2W ){ b2SubW( b2MulW( q.C, v.X ), b2MulW( q.S, v.Y ) ), b2AddW( b2MulW( q.S, v.X ), b2MulW( q.C, v.Y ) ) };
+	return new b2Vec2W(b2SubW( b2MulW( q.C, v.X ), b2MulW( q.S, v.Y ) ), b2AddW( b2MulW( q.S, v.X ), b2MulW( q.C, v.Y ) ));
 }
 
-// Soft contact constraints with sub-stepping support
-// Uses fixed anchors for Jacobians for better behavior on rolling shapes (circles & capsules)
-// http://mmacklin.com/smallsteps.pdf
-// https://box2d.org/files/ErinCatto_SoftConstraints_GDC2011.pdf
 
-typedef struct b2ContactConstraintSIMD
-{
-	int indexA[B2_SIMD_WIDTH];
-	int indexB[B2_SIMD_WIDTH];
-
-	b2FloatW invMassA, invMassB;
-	b2FloatW invIA, invIB;
-	b2Vec2W normal;
-	b2FloatW friction;
-	b2FloatW tangentSpeed;
-	b2FloatW rollingResistance;
-	b2FloatW rollingMass;
-	b2FloatW rollingImpulse;
-	b2FloatW biasRate;
-	b2FloatW massScale;
-	b2FloatW impulseScale;
-	b2Vec2W anchorA1, anchorB1;
-	b2FloatW normalMass1, tangentMass1;
-	b2FloatW baseSeparation1;
-	b2FloatW normalImpulse1;
-	b2FloatW maxNormalImpulse1;
-	b2FloatW tangentImpulse1;
-	b2Vec2W anchorA2, anchorB2;
-	b2FloatW baseSeparation2;
-	b2FloatW normalImpulse2;
-	b2FloatW maxNormalImpulse2;
-	b2FloatW tangentImpulse2;
-	b2FloatW normalMass2, tangentMass2;
-	b2FloatW restitution;
-	b2FloatW relativeVelocity1, relativeVelocity2;
-} b2ContactConstraintSIMD;
 
 int b2GetContactConstraintSIMDByteCount()
 {
 	return sizeof( b2ContactConstraintSIMD );
 }
 
-// wide version of b2BodyState
-typedef struct b2BodyStateW
-{
-	b2Vec2W v;
-	b2FloatW w;
-	b2FloatW flags;
-	b2Vec2W dp;
-	b2RotW dq;
-} b2BodyStateW;
+
 
 // Custom gather/scatter for each SIMD type
 #if defined( B2_SIMD_AVX2 )
@@ -1355,7 +1365,7 @@ static void b2ScatterBodies( b2BodyState* states, int* indices, const b2BodyStat
 #else
 
 // This is a load and transpose
-static b2BodyStateW b2GatherBodies( const b2BodyState* states, int* indices )
+public static b2BodyStateW b2GatherBodies( b2BodyState[] states, int[] indices )
 {
 	b2BodyState identity = b2_identityBodyState;
 
@@ -1364,15 +1374,15 @@ static b2BodyStateW b2GatherBodies( const b2BodyState* states, int* indices )
 	b2BodyState s3 = indices[2] == B2_NULL_INDEX ? identity : states[indices[2]];
 	b2BodyState s4 = indices[3] == B2_NULL_INDEX ? identity : states[indices[3]];
 
-	b2BodyStateW simdBody;
-	simdBody.v.X = ( b2FloatW ){ s1.linearVelocity.x, s2.linearVelocity.x, s3.linearVelocity.x, s4.linearVelocity.x };
-	simdBody.v.Y = ( b2FloatW ){ s1.linearVelocity.y, s2.linearVelocity.y, s3.linearVelocity.y, s4.linearVelocity.y };
-	simdBody.w = ( b2FloatW ){ s1.angularVelocity, s2.angularVelocity, s3.angularVelocity, s4.angularVelocity };
-	simdBody.flags = ( b2FloatW ){ (float)s1.flags, (float)s2.flags, (float)s3.flags, (float)s4.flags };
-	simdBody.dp.X = ( b2FloatW ){ s1.deltaPosition.x, s2.deltaPosition.x, s3.deltaPosition.x, s4.deltaPosition.x };
-	simdBody.dp.Y = ( b2FloatW ){ s1.deltaPosition.y, s2.deltaPosition.y, s3.deltaPosition.y, s4.deltaPosition.y };
-	simdBody.dq.C = ( b2FloatW ){ s1.deltaRotation.c, s2.deltaRotation.c, s3.deltaRotation.c, s4.deltaRotation.c };
-	simdBody.dq.S = ( b2FloatW ){ s1.deltaRotation.s, s2.deltaRotation.s, s3.deltaRotation.s, s4.deltaRotation.s };
+    b2BodyStateW simdBody = new b2BodyStateW();
+	simdBody.v.X = new b2FloatW( s1.linearVelocity.x, s2.linearVelocity.x, s3.linearVelocity.x, s4.linearVelocity.x );
+	simdBody.v.Y = new b2FloatW( s1.linearVelocity.y, s2.linearVelocity.y, s3.linearVelocity.y, s4.linearVelocity.y );
+	simdBody.w = new b2FloatW( s1.angularVelocity, s2.angularVelocity, s3.angularVelocity, s4.angularVelocity );
+	simdBody.flags = new b2FloatW( (float)s1.flags, (float)s2.flags, (float)s3.flags, (float)s4.flags );
+	simdBody.dp.X = new b2FloatW( s1.deltaPosition.x, s2.deltaPosition.x, s3.deltaPosition.x, s4.deltaPosition.x );
+	simdBody.dp.Y = new b2FloatW( s1.deltaPosition.y, s2.deltaPosition.y, s3.deltaPosition.y, s4.deltaPosition.y );
+	simdBody.dq.C = new b2FloatW( s1.deltaRotation.c, s2.deltaRotation.c, s3.deltaRotation.c, s4.deltaRotation.c );
+	simdBody.dq.S = new b2FloatW( s1.deltaRotation.s, s2.deltaRotation.s, s3.deltaRotation.s, s4.deltaRotation.s );
 
 	return simdBody;
 }
@@ -1435,7 +1445,7 @@ void b2PrepareContactsTask( int startIndex, int endIndex, b2StepContext* context
 
 	for ( int i = startIndex; i < endIndex; ++i )
 	{
-		b2ContactConstraintSIMD* constraint = constraints + i;
+		b2ContactConstraintSIMD* constraint = constraints[i];
 
 		for ( int j = 0; j < B2_SIMD_WIDTH; ++j )
 		{
@@ -1658,7 +1668,7 @@ void b2WarmStartContactsTask( int startIndex, int endIndex, b2StepContext* conte
 
 	for ( int i = startIndex; i < endIndex; ++i )
 	{
-		b2ContactConstraintSIMD* c = constraints + i;
+		b2ContactConstraintSIMD* c = constraints[i];
 		b2BodyStateW bA = b2GatherBodies( states, c.indexA );
 		b2BodyStateW bB = b2GatherBodies( states, c.indexB );
 
@@ -1718,7 +1728,7 @@ void b2SolveContactsTask( int startIndex, int endIndex, b2StepContext* context, 
 
 	for ( int i = startIndex; i < endIndex; ++i )
 	{
-		b2ContactConstraintSIMD* c = constraints + i;
+		b2ContactConstraintSIMD* c = constraints[i];
 
 		b2BodyStateW bA = b2GatherBodies( states, c.indexA );
 		b2BodyStateW bB = b2GatherBodies( states, c.indexB );
@@ -1949,7 +1959,7 @@ void b2ApplyRestitutionTask( int startIndex, int endIndex, b2StepContext* contex
 
 	for ( int i = startIndex; i < endIndex; ++i )
 	{
-		b2ContactConstraintSIMD* c = constraints + i;
+		b2ContactConstraintSIMD* c = constraints[i];
 
 		b2BodyStateW bA = b2GatherBodies( states, c.indexA );
 		b2BodyStateW bB = b2GatherBodies( states, c.indexB );
