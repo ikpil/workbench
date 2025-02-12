@@ -710,10 +710,10 @@ b2JointId b2CreateMotorJoint( b2WorldId worldId, const b2MotorJointDef* def )
 	b2Body* bodyA = b2GetBodyFullId( world, def.bodyIdA );
 	b2Body* bodyB = b2GetBodyFullId( world, def.bodyIdB );
 
-	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def.userData, 1.0f, b2_motorJoint, def.collideConnected );
+	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def.userData, 1.0f, b2JointType.b2_motorJoint, def.collideConnected );
 	b2JointSim* joint = pair.jointSim;
 
-	joint.type = b2_motorJoint;
+	joint.type = b2JointType.b2_motorJoint;
 	joint.localOriginAnchorA = new b2Vec2( 0.0f, 0.0f);
 	joint.localOriginAnchorB = new b2Vec2( 0.0f, 0.0f);
 	joint.motorJoint = ( b2MotorJoint ){ 0 };
@@ -751,10 +751,10 @@ b2JointId b2CreateMouseJoint( b2WorldId worldId, const b2MouseJointDef* def )
 	b2Transform transformA = b2GetBodyTransformQuick( world, bodyA );
 	b2Transform transformB = b2GetBodyTransformQuick( world, bodyB );
 
-	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def.userData, 1.0f, b2_mouseJoint, def.collideConnected );
+	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def.userData, 1.0f, b2JointType.b2_mouseJoint, def.collideConnected );
 
 	b2JointSim* joint = pair.jointSim;
-	joint.type = b2_mouseJoint;
+	joint.type = b2JointType.b2_mouseJoint;
 	joint.localOriginAnchorA = b2InvTransformPoint( transformA, def.target );
 	joint.localOriginAnchorB = b2InvTransformPoint( transformB, def.target );
 
@@ -1253,10 +1253,10 @@ b2Vec2 b2Joint_GetConstraintForce( b2JointId jointId )
 		case b2_distanceJoint:
 			return b2GetDistanceJointForce( world, @base );
 
-		case b2_motorJoint:
+		case b2JointType.b2_motorJoint:
 			return b2GetMotorJointForce( world, @base );
 
-		case b2_mouseJoint:
+		case b2JointType.b2_mouseJoint:
 			return b2GetMouseJointForce( world, @base );
 
 		case b2_nullJoint:
@@ -1291,10 +1291,10 @@ float b2Joint_GetConstraintTorque( b2JointId jointId )
 		case b2_distanceJoint:
 			return 0.0f;
 
-		case b2_motorJoint:
+		case b2JointType.b2_motorJoint:
 			return b2GetMotorJointTorque( world, @base );
 
-		case b2_mouseJoint:
+		case b2JointType.b2_mouseJoint:
 			return b2GetMouseJointTorque( world, @base );
 
 		case b2_nullJoint:
@@ -1326,11 +1326,11 @@ void b2PrepareJoint( b2JointSim* joint, b2StepContext* context )
 			b2PrepareDistanceJoint( joint, context );
 			break;
 
-		case b2_motorJoint:
+		case b2JointType.b2_motorJoint:
 			b2PrepareMotorJoint( joint, context );
 			break;
 
-		case b2_mouseJoint:
+		case b2JointType.b2_mouseJoint:
 			b2PrepareMouseJoint( joint, context );
 			break;
 
@@ -1366,11 +1366,11 @@ void b2WarmStartJoint( b2JointSim* joint, b2StepContext* context )
 			b2WarmStartDistanceJoint( joint, context );
 			break;
 
-		case b2_motorJoint:
+		case b2JointType.b2_motorJoint:
 			b2WarmStartMotorJoint( joint, context );
 			break;
 
-		case b2_mouseJoint:
+		case b2JointType.b2_mouseJoint:
 			b2WarmStartMouseJoint( joint, context );
 			break;
 
@@ -1406,11 +1406,11 @@ void b2SolveJoint( b2JointSim* joint, b2StepContext* context, bool useBias )
 			b2SolveDistanceJoint( joint, context, useBias );
 			break;
 
-		case b2_motorJoint:
+		case b2JointType.b2_motorJoint:
 			b2SolveMotorJoint( joint, context, useBias );
 			break;
 
-		case b2_mouseJoint:
+		case b2JointType.b2_mouseJoint:
 			b2SolveMouseJoint( joint, context );
 			break;
 
@@ -1513,7 +1513,7 @@ void b2DrawJoint( b2DebugDraw* draw, b2World* world, b2Joint* joint )
 			b2DrawDistanceJoint( draw, jointSim, transformA, transformB );
 			break;
 
-		case b2_mouseJoint:
+		case b2JointType.b2_mouseJoint:
 		{
 			b2Vec2 target = jointSim.mouseJoint.targetA;
 
