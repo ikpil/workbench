@@ -13,11 +13,13 @@ using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.shape;
 using static Box2D.NET.Engine.solver;
 using static Box2D.NET.Engine.body;
 using static Box2D.NET.Engine.world;
 using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.id_pool;
+using static Box2D.NET.Engine.manifold;
 
 
 namespace Box2D.NET.Engine;
@@ -141,7 +143,14 @@ public class b2ContactSim
     public b2SimplexCache cache;
 }
 
-public class contact
+public struct b2ContactRegister
+{
+    public b2ManifoldFcn fcn;
+    public bool primary;
+};
+
+
+public static class contact
 {
     public static bool b2ShouldShapesCollide( b2Filter filterA, b2Filter filterB )
     {
@@ -154,12 +163,6 @@ public class contact
         return collide;
     } 
 
-B2_ARRAY_INLINE( b2Contact, b2Contact );
-B2_ARRAY_INLINE( b2ContactSim, b2ContactSim );
-
-
-B2_ARRAY_SOURCE( b2Contact, b2Contact );
-B2_ARRAY_SOURCE( b2ContactSim, b2ContactSim );
 
 // Contacts and determinism
 // A deterministic simulation requires contacts to exist in the same order in b2Island no matter the thread count.
@@ -194,20 +197,13 @@ B2_ARRAY_SOURCE( b2ContactSim, b2ContactSim );
 // Third:
 // The user may call the manifold functions directly and they should be easy to use and have easy to use
 // results.
-typedef b2Manifold b2ManifoldFcn( const b2Shape* shapeA, b2Transform xfA, const b2Shape* shapeB, b2Transform xfB,
-								  b2SimplexCache* cache );
+public delegate b2Manifold b2ManifoldFcn( b2Shape shapeA, b2Transform xfA, b2Shape shapeB, b2Transform xfB, b2SimplexCache cache );
 
-struct b2ContactRegister
-{
-	b2ManifoldFcn* fcn;
-	bool primary;
-};
 
-static struct b2ContactRegister s_registers[b2_shapeTypeCount][b2_shapeTypeCount];
-static bool s_initialized = false;
+public static b2ContactRegister[][] s_registers = new b2ContactRegister[(int)b2ShapeType.b2_shapeTypeCount][b2_shapeTypeCount];
+    public static bool s_initialized = false;
 
-static b2Manifold b2CircleManifold( const b2Shape* shapeA, b2Transform xfA, const b2Shape* shapeB, b2Transform xfB,
-									b2SimplexCache* cache )
+public static b2Manifold b2CircleManifold( b2Shape shapeA, b2Transform xfA, b2Shape shapeB, b2Transform xfB,b2SimplexCache cache )
 {
 	B2_UNUSED( cache );
 	return b2CollideCircles( &shapeA->circle, xfA, &shapeB->circle, xfB );
@@ -307,18 +303,18 @@ void b2InitializeContactRegisters()
 {
 	if ( s_initialized == false )
 	{
-		b2AddType( b2CircleManifold, b2_circleShape, b2_circleShape );
-		b2AddType( b2CapsuleAndCircleManifold, b2_capsuleShape, b2_circleShape );
-		b2AddType( b2CapsuleManifold, b2_capsuleShape, b2_capsuleShape );
-		b2AddType( b2PolygonAndCircleManifold, b2_polygonShape, b2_circleShape );
-		b2AddType( b2PolygonAndCapsuleManifold, b2_polygonShape, b2_capsuleShape );
-		b2AddType( b2PolygonManifold, b2_polygonShape, b2_polygonShape );
-		b2AddType( b2SegmentAndCircleManifold, b2_segmentShape, b2_circleShape );
-		b2AddType( b2SegmentAndCapsuleManifold, b2_segmentShape, b2_capsuleShape );
-		b2AddType( b2SegmentAndPolygonManifold, b2_segmentShape, b2_polygonShape );
-		b2AddType( b2ChainSegmentAndCircleManifold, b2_chainSegmentShape, b2_circleShape );
-		b2AddType( b2ChainSegmentAndCapsuleManifold, b2_chainSegmentShape, b2_capsuleShape );
-		b2AddType( b2ChainSegmentAndPolygonManifold, b2_chainSegmentShape, b2_polygonShape );
+		b2AddType( b2CircleManifold, Engine.b2ShapeType.b2_circleShape, Engine.b2ShapeType.b2_circleShape );
+		b2AddType( b2CapsuleAndCircleManifold, Engine.b2ShapeType.b2_capsuleShape, Engine.b2ShapeType.b2_circleShape );
+		b2AddType( b2CapsuleManifold, Engine.b2ShapeType.b2_capsuleShape, Engine.b2ShapeType.b2_capsuleShape );
+		b2AddType( b2PolygonAndCircleManifold, Engine.b2ShapeType.b2_polygonShape, Engine.b2ShapeType.b2_circleShape );
+		b2AddType( b2PolygonAndCapsuleManifold, Engine.b2ShapeType.b2_polygonShape, Engine.b2ShapeType.b2_capsuleShape );
+		b2AddType( b2PolygonManifold, Engine.b2ShapeType.b2_polygonShape, Engine.b2ShapeType.b2_polygonShape );
+		b2AddType( b2SegmentAndCircleManifold, Engine.b2ShapeType.b2_segmentShape, Engine.b2ShapeType.b2_circleShape );
+		b2AddType( b2SegmentAndCapsuleManifold, Engine.b2ShapeType.b2_segmentShape, Engine.b2ShapeType.b2_capsuleShape );
+		b2AddType( b2SegmentAndPolygonManifold, Engine.b2ShapeType.b2_segmentShape, Engine.b2ShapeType.b2_polygonShape );
+		b2AddType( b2ChainSegmentAndCircleManifold, Engine.b2ShapeType.b2_chainSegmentShape, Engine.b2ShapeType.b2_circleShape );
+		b2AddType( b2ChainSegmentAndCapsuleManifold, Engine.b2ShapeType.b2_chainSegmentShape, Engine.b2ShapeType.b2_capsuleShape );
+		b2AddType( b2ChainSegmentAndPolygonManifold, Engine.b2ShapeType.b2_chainSegmentShape, Engine.b2ShapeType.b2_polygonShape );
 		s_initialized = true;
 	}
 }
@@ -475,7 +471,7 @@ void b2CreateContact( b2World* world, b2Shape* shapeA, b2Shape* shapeB )
 // - a shape is destroyed
 // - contact filtering is modified
 // - a shape becomes a sensor (check this!!!)
-void b2DestroyContact( b2World* world, b2Contact* contact, bool wakeBodies )
+public static void b2DestroyContact( b2World world, b2Contact contact, bool wakeBodies )
 {
 	// Remove pair from set
 	ulong pairKey = B2_SHAPE_PAIR_KEY( contact->shapeIdA, contact->shapeIdB );

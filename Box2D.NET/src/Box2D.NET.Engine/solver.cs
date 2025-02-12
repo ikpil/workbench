@@ -15,11 +15,13 @@ using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.shape;
 using static Box2D.NET.Engine.solver;
 using static Box2D.NET.Engine.body;
 using static Box2D.NET.Engine.world;
 using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.id_pool;
+using static Box2D.NET.Engine.manifold;
 
 
 namespace Box2D.NET.Engine;
@@ -430,7 +432,7 @@ static bool b2ContinuousQueryCallback( int proxyId, int shapeId, void* context )
 	}
 
 	// Prevent pausing on chain segment junctions
-	if ( shape.type == b2_chainSegmentShape )
+	if ( shape.type == Engine.b2ShapeType.b2_chainSegmentShape )
 	{
 		b2Transform transform = bodySim.transform;
 		b2Vec2 p1 = b2TransformPoint( transform, shape.chainSegment.segment.point1 );
@@ -456,7 +458,7 @@ static bool b2ContinuousQueryCallback( int proxyId, int shapeId, void* context )
 
 	// todo_erin testing early out for segments
 #if 0
-	if ( shape.type == b2_segmentShape )
+	if ( shape.type == Engine.b2ShapeType.b2_segmentShape )
 	{
 		b2Transform transform = bodySim.transform;
 		b2Vec2 p1 = b2TransformPoint( transform, shape.segment.point1 );

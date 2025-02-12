@@ -15,11 +15,13 @@ using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.shape;
 using static Box2D.NET.Engine.solver;
 using static Box2D.NET.Engine.body;
 using static Box2D.NET.Engine.world;
 using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.id_pool;
+using static Box2D.NET.Engine.manifold;
 
 
 namespace Box2D.NET.Engine;
@@ -306,6 +308,18 @@ public class b2JointSim
     }
 }
 
+public struct b2JointPair
+{
+    public b2Joint joint;
+    public b2JointSim jointSim;
+
+    public b2JointPair(b2Joint joint, b2JointSim jointSim)
+    {
+        this.joint = joint;
+        this.jointSim = jointSim;
+    }
+}
+
 
 
 public class joint
@@ -403,53 +417,47 @@ public static b2JointSim b2GetJointSim( b2World world, b2Joint joint )
 	if ( joint.setIndex == (int)b2SetType.b2_awakeSet )
 	{
 		Debug.Assert( 0 <= joint.colorIndex && joint.colorIndex < B2_GRAPH_COLOR_COUNT );
-		b2GraphColor* color = world.constraintGraph.colors + joint.colorIndex;
-		return Array_Get( &color.jointSims, joint.localIndex );
+        b2GraphColor color = world.constraintGraph.colors[joint.colorIndex];
+		return Array_Get( color.jointSims, joint.localIndex );
 	}
 
-	b2SolverSet* set = Array_Get( &world.solverSets, joint.setIndex );
-	return Array_Get( &set.jointSims, joint.localIndex );
+	b2SolverSet set = Array_Get( world.solverSets, joint.setIndex );
+	return Array_Get( set.jointSims, joint.localIndex );
 }
 
 public static b2JointSim b2GetJointSimCheckType( b2JointId jointId, b2JointType type )
 {
 	B2_UNUSED( type );
 
-	b2World* world = b2GetWorld( jointId.world0 );
+	b2World world = b2GetWorld( jointId.world0 );
 	Debug.Assert( world.locked == false );
 	if ( world.locked )
-	{
-		return NULL;
-	}
+    {
+        return null;
+    }
 
-	b2Joint* joint = b2GetJointFullId( world, jointId );
+	b2Joint joint = b2GetJointFullId( world, jointId );
 	Debug.Assert( joint.type == type );
-	b2JointSim* jointSim = b2GetJointSim( world, joint );
+	b2JointSim jointSim = b2GetJointSim( world, joint );
 	Debug.Assert( jointSim.type == type );
 	return jointSim;
 }
 
-typedef struct b2JointPair
-{
-	b2Joint* joint;
-	b2JointSim* jointSim;
-} b2JointPair;
 
-static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, void* userData, float drawSize, b2JointType type,
-								  bool collideConnected )
+public static b2JointPair b2CreateJoint( b2World world, b2Body bodyA, b2Body bodyB, object userData, float drawSize, b2JointType type, bool collideConnected )
 {
 	int bodyIdA = bodyA.id;
 	int bodyIdB = bodyB.id;
 	int maxSetIndex = b2MaxInt( bodyA.setIndex, bodyB.setIndex );
 
 	// Create joint id and joint
-	int jointId = b2AllocId( &world.jointIdPool );
+	int jointId = b2AllocId( world.jointIdPool );
 	if ( jointId == world.joints.count )
-	{
-		Array_Push( &world.joints, ( b2Joint ){ 0 } );
-	}
+    {
+        Array_Push(world.joints, new b2Joint());
+    }
 
-	b2Joint* joint = Array_Get( &world.joints, jointId );
+	b2Joint joint = Array_Get( world.joints, jointId );
 	joint.jointId = jointId;
 	joint.userData = userData;
 	joint.generation += 1;
@@ -472,8 +480,8 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 	int keyA = ( jointId << 1 ) | 0;
 	if ( bodyA.headJointKey != B2_NULL_INDEX )
 	{
-		b2Joint* jointA = Array_Get( &world.joints, bodyA.headJointKey >> 1 );
-		b2JointEdge* edgeA = jointA.edges + ( bodyA.headJointKey & 1 );
+		b2Joint jointA = Array_Get(world.joints, bodyA.headJointKey >> 1 );
+        b2JointEdge edgeA = jointA.edges[bodyA.headJointKey & 1];
 		edgeA.prevKey = keyA;
 	}
 	bodyA.headJointKey = keyA;
@@ -487,24 +495,24 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 	int keyB = ( jointId << 1 ) | 1;
 	if ( bodyB.headJointKey != B2_NULL_INDEX )
 	{
-		b2Joint* jointB = Array_Get( &world.joints, bodyB.headJointKey >> 1 );
-		b2JointEdge* edgeB = jointB.edges + ( bodyB.headJointKey & 1 );
+		b2Joint jointB = Array_Get( world.joints, bodyB.headJointKey >> 1 );
+        b2JointEdge edgeB = jointB.edges[(bodyB.headJointKey & 1)];
 		edgeB.prevKey = keyB;
 	}
 	bodyB.headJointKey = keyB;
 	bodyB.jointCount += 1;
 
-	b2JointSim* jointSim;
+	b2JointSim jointSim;
 
 	if ( bodyA.setIndex == (int)b2SetType.b2_disabledSet || bodyB.setIndex == (int)b2SetType.b2_disabledSet )
 	{
 		// if either body is disabled, create in disabled set
-		b2SolverSet* set = Array_Get( &world.solverSets, b2_disabledSet );
-		joint.setIndex = b2_disabledSet;
+		b2SolverSet set = Array_Get( world.solverSets, (int)b2SetType.b2_disabledSet );
+		joint.setIndex = (int)b2SetType.b2_disabledSet;
 		joint.localIndex = set.jointSims.count;
 
-		jointSim = Array_Add( &set.jointSims );
-		memset( jointSim, 0, sizeof( b2JointSim ) );
+		jointSim = Array_Add(set.jointSims );
+		//memset( jointSim, 0, sizeof( b2JointSim ) );
 
 		jointSim.jointId = jointId;
 		jointSim.bodyIdA = bodyIdA;
@@ -513,12 +521,12 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 	else if ( bodyA.setIndex == (int)b2SetType.b2_staticSet && bodyB.setIndex == (int)b2SetType.b2_staticSet )
 	{
 		// joint is connecting static bodies
-		b2SolverSet* set = Array_Get( &world.solverSets, b2_staticSet );
-		joint.setIndex = b2_staticSet;
+		b2SolverSet set = Array_Get( world.solverSets, (int)b2SetType.b2_staticSet );
+		joint.setIndex = (int)b2SetType.b2_staticSet;
 		joint.localIndex = set.jointSims.count;
 
-		jointSim = Array_Add( &set.jointSims );
-		memset( jointSim, 0, sizeof( b2JointSim ) );
+		jointSim = Array_Add( set.jointSims );
+		//memset( jointSim, 0, sizeof( b2JointSim ) );
 
 		jointSim.jointId = jointId;
 		jointSim.bodyIdA = bodyIdA;
@@ -532,7 +540,7 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 			b2WakeSolverSet( world, maxSetIndex );
 		}
 
-		joint.setIndex = b2_awakeSet;
+		joint.setIndex = (int)b2SetType.b2_awakeSet;
 
 		jointSim = b2CreateJointInGraph( world, joint );
 		jointSim.jointId = jointId;
@@ -548,12 +556,12 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 		// joint should go into the sleeping set (not static set)
 		int setIndex = maxSetIndex;
 
-		b2SolverSet* set = Array_Get( &world.solverSets, setIndex );
+		b2SolverSet set = Array_Get( world.solverSets, setIndex );
 		joint.setIndex = setIndex;
 		joint.localIndex = set.jointSims.count;
 
-		jointSim = Array_Add( &set.jointSims );
-		memset( jointSim, 0, sizeof( b2JointSim ) );
+		jointSim = Array_Add( set.jointSims );
+		//memset( jointSim, 0, sizeof( b2JointSim ) );
 
 		jointSim.jointId = jointId;
 		jointSim.bodyIdA = bodyIdA;
@@ -569,10 +577,10 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 			// fix potentially invalid set index
 			setIndex = bodyA.setIndex;
 
-			b2SolverSet* mergedSet = Array_Get( &world.solverSets, setIndex );
+			b2SolverSet mergedSet = Array_Get( world.solverSets, setIndex );
 
 			// Careful! The joint sim pointer was orphaned by the set merge.
-			jointSim = Array_Get( &mergedSet.jointSims, joint.localIndex );
+			jointSim = Array_Get( mergedSet.jointSims, joint.localIndex );
 		}
 
 		Debug.Assert( joint.setIndex == setIndex );
@@ -582,7 +590,7 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 	Debug.Assert( jointSim.bodyIdA == bodyIdA );
 	Debug.Assert( jointSim.bodyIdB == bodyIdB );
 
-	if ( joint.setIndex > b2_disabledSet )
+	if ( joint.setIndex > (int)b2SetType.b2_disabledSet )
 	{
 		// Add edge to island graph
 		bool mergeIslands = true;
@@ -591,10 +599,10 @@ static b2JointPair b2CreateJoint( b2World* world, b2Body* bodyA, b2Body* bodyB, 
 
 	b2ValidateSolverSets( world );
 
-	return ( b2JointPair ){ joint, jointSim };
+    return new b2JointPair(joint, jointSim);
 }
 
-static void b2DestroyContactsBetweenBodies( b2World* world, b2Body* bodyA, b2Body* bodyB )
+public static void b2DestroyContactsBetweenBodies( b2World world, b2Body bodyA, b2Body bodyB )
 {
 	int contactKey;
 	int otherBodyId;
@@ -620,7 +628,7 @@ static void b2DestroyContactsBetweenBodies( b2World* world, b2Body* bodyA, b2Bod
 		int contactId = contactKey >> 1;
 		int edgeIndex = contactKey & 1;
 
-		b2Contact* contact = Array_Get( &world.contacts, contactId );
+		b2Contact contact = Array_Get( world.contacts, contactId );
 		contactKey = contact.edges[edgeIndex].nextKey;
 
 		int otherEdgeIndex = edgeIndex ^ 1;
@@ -911,7 +919,7 @@ b2JointId b2CreateWeldJoint( b2WorldId worldId, const b2WeldJointDef* def )
 	b2Body* bodyA = b2GetBodyFullId( world, def.bodyIdA );
 	b2Body* bodyB = b2GetBodyFullId( world, def.bodyIdB );
 
-	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def.userData, 1.0f, b2_weldJoint, def.collideConnected );
+	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def.userData, 1.0f, b2JointType.b2_weldJoint, def.collideConnected );
 
 	b2JointSim* joint = pair.jointSim;
 	joint.type = b2_weldJoint;

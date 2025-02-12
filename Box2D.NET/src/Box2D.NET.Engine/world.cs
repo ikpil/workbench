@@ -15,11 +15,13 @@ using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.shape;
 using static Box2D.NET.Engine.solver;
 using static Box2D.NET.Engine.body;
 using static Box2D.NET.Engine.world;
 using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.id_pool;
+using static Box2D.NET.Engine.manifold;
 
 
 namespace Box2D.NET.Engine;
@@ -956,7 +958,7 @@ static void b2DrawShape( b2DebugDraw* draw, b2Shape* shape, b2Transform xf, b2He
 {
 	switch ( shape.type )
 	{
-		case b2_capsuleShape:
+		case Engine.b2ShapeType.b2_capsuleShape:
 		{
 			b2Capsule* capsule = &shape.capsule;
 			b2Vec2 p1 = b2TransformPoint( xf, capsule.center1 );
@@ -965,7 +967,7 @@ static void b2DrawShape( b2DebugDraw* draw, b2Shape* shape, b2Transform xf, b2He
 		}
 		break;
 
-		case b2_circleShape:
+		case Engine.b2ShapeType.b2_circleShape:
 		{
 			b2Circle* circle = &shape.circle;
 			xf.p = b2TransformPoint( xf, circle.center );
@@ -973,14 +975,14 @@ static void b2DrawShape( b2DebugDraw* draw, b2Shape* shape, b2Transform xf, b2He
 		}
 		break;
 
-		case b2_polygonShape:
+		case Engine.b2ShapeType.b2_polygonShape:
 		{
 			b2Polygon* poly = &shape.polygon;
 			draw.DrawSolidPolygon( xf, poly.vertices, poly.count, poly.radius, color, draw.context );
 		}
 		break;
 
-		case b2_segmentShape:
+		case Engine.b2ShapeType.b2_segmentShape:
 		{
 			b2Segment* segment = &shape.segment;
 			b2Vec2 p1 = b2TransformPoint( xf, segment.point1 );
@@ -989,7 +991,7 @@ static void b2DrawShape( b2DebugDraw* draw, b2Shape* shape, b2Transform xf, b2He
 		}
 		break;
 
-		case b2_chainSegmentShape:
+		case Engine.b2ShapeType.b2_chainSegmentShape:
 		{
 			b2Segment* segment = &shape.chainSegment.segment;
 			b2Vec2 p1 = b2TransformPoint( xf, segment.point1 );
@@ -3381,17 +3383,17 @@ void b2ValidateContacts( b2World* world )
 
 #else
 
-void b2ValidateConnectivity( b2World* world )
+public static void b2ValidateConnectivity( b2World world )
 {
 	B2_UNUSED( world );
 }
 
-void b2ValidateSolverSets( b2World* world )
+public static void b2ValidateSolverSets( b2World world )
 {
 	B2_UNUSED( world );
 }
 
-void b2ValidateContacts( b2World* world )
+public static void b2ValidateContacts( b2World world )
 {
 	B2_UNUSED( world );
 }

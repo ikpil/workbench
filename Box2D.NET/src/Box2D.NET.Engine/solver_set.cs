@@ -13,11 +13,13 @@ using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.shape;
 using static Box2D.NET.Engine.solver;
 using static Box2D.NET.Engine.body;
 using static Box2D.NET.Engine.world;
 using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.id_pool;
+using static Box2D.NET.Engine.manifold;
 
 
 namespace Box2D.NET.Engine;
@@ -109,7 +111,7 @@ void b2WakeSolverSet( b2World* world, int setIndex )
 	Debug.Assert( setIndex >= (int)b2SetType.b2_firstSleepingSet );
 	b2SolverSet* set = Array_Get( &world->solverSets, setIndex );
 	b2SolverSet* awakeSet = Array_Get( &world->solverSets, b2_awakeSet );
-	b2SolverSet* disabledSet = Array_Get( &world->solverSets, b2_disabledSet );
+	b2SolverSet* disabledSet = Array_Get( &world->solverSets, (int)b2SetType.b2_disabledSet );
 
 	b2Body* bodies = world->bodies.data;
 
@@ -263,7 +265,7 @@ void b2TrySleepIsland( b2World* world, int islandId )
 	// move awake bodies to sleeping set
 	// this shuffles around bodies in the awake set
 	{
-		b2SolverSet* disabledSet = Array_Get( &world->solverSets, b2_disabledSet );
+		b2SolverSet* disabledSet = Array_Get( &world->solverSets, (int)b2SetType.b2_disabledSet );
 		int bodyId = island->headBody;
 		while ( bodyId != B2_NULL_INDEX )
 		{

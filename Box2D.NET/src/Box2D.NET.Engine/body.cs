@@ -15,11 +15,13 @@ using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.id;
+using static Box2D.NET.Engine.shape;
 using static Box2D.NET.Engine.solver;
 using static Box2D.NET.Engine.body;
 using static Box2D.NET.Engine.world;
 using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.id_pool;
+using static Box2D.NET.Engine.manifold;
 
 namespace Box2D.NET.Engine;
 
@@ -671,9 +673,9 @@ public class body
         return aabb;
     }
 
-    void b2UpdateBodyMassData( b2World* world, b2Body* body )
+    public static void b2UpdateBodyMassData( b2World world, b2Body body )
     {
-        b2BodySim* bodySim = b2GetBodySim( world, body );
+        b2BodySim bodySim = b2GetBodySim( world, body );
 
         // Compute mass data from shapes. Each shape has its own density.
         body.mass = 0.0f;
@@ -686,17 +688,17 @@ public class body
         bodySim.maxExtent = 0.0f;
 
         // Static and kinematic sims have zero mass.
-        if ( body.type != b2_dynamicBody )
+        if ( body.type != b2BodyType.b2_dynamicBody )
         {
             bodySim.center = bodySim.transform.p;
 
             // Need extents for kinematic bodies for sleeping to work correctly.
-            if ( body.type == b2_kinematicBody )
+            if ( body.type == b2BodyType.b2_kinematicBody )
             {
                 int shapeId = body.headShapeId;
                 while ( shapeId != B2_NULL_INDEX )
                 {
-                    const b2Shape* s = Array_Get( &world.shapes, shapeId );
+                    b2Shape s = Array_Get( world.shapes, shapeId );
 
                     b2ShapeExtent extent = b2ComputeShapeExtent( s, b2Vec2_zero );
                     bodySim.minExtent = b2MinFloat( bodySim.minExtent, extent.minExtent );
@@ -1679,7 +1681,7 @@ public class body
 
         // Transfer simulation data to disabled set
         b2SolverSet* set = Array_Get( &world.solverSets, body.setIndex );
-        b2SolverSet* disabledSet = Array_Get( &world.solverSets, b2_disabledSet );
+        b2SolverSet* disabledSet = Array_Get( &world.solverSets, (int)b2SetType.b2_disabledSet );
 
         // Transfer body sim
         b2TransferBody( world, disabledSet, set, body );
@@ -1731,7 +1733,7 @@ public class body
             return;
         }
 
-        b2SolverSet* disabledSet = Array_Get( &world.solverSets, b2_disabledSet );
+        b2SolverSet* disabledSet = Array_Get( &world.solverSets, (int)b2SetType.b2_disabledSet );
         int setId = body.type == b2_staticBody ? b2_staticSet : b2_awakeSet;
         b2SolverSet* targetSet = Array_Get( &world.solverSets, setId );
 

@@ -203,6 +203,11 @@ public static class core
         Debug.Assert(DEF.internalValue == B2_SECRET_COOKIE);
     }
 
+    public static void B2_CHECK_DEF(b2ShapeDef DEF)
+    {
+        Debug.Assert(DEF.internalValue == B2_SECRET_COOKIE);
+    }
+
 
 
 #if BOX2D_PROFILE
