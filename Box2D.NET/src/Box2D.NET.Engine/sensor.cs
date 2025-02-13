@@ -93,7 +93,7 @@ public static bool b2SensorQueryCallback( int proxyId, int shapeId, object conte
 	}
 
 	b2World world = queryContext.world;
-	b2Shape otherShape = Array_Get( &world.shapes, shapeId );
+	b2Shape otherShape = Array_Get( world.shapes, shapeId );
 
 	// Sensors don't overlap with other sensors
 	if ( otherShape.sensorIndex != B2_NULL_INDEX )

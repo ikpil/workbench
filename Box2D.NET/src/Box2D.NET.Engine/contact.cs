@@ -602,7 +602,7 @@ public static void b2DestroyContact( b2World world, b2Contact contact, bool wake
 	}
 }
 
-b2ContactSim* b2GetContactSim( b2World* world, b2Contact* contact )
+public static b2ContactSim b2GetContactSim( b2World world, b2Contact contact )
 {
 	if ( contact->setIndex == (int)b2SetType.b2_awakeSet && contact->colorIndex != B2_NULL_INDEX )
 	{

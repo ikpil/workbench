@@ -1157,9 +1157,9 @@ public struct b2BodyEvents
 /// @see b2Shape_GetContactData() and b2Body_GetContactData()
 public class b2ContactData
 {
-    b2ShapeId shapeIdA;
-    b2ShapeId shapeIdB;
-    b2Manifold manifold;
+    public b2ShapeId shapeIdA;
+    public b2ShapeId shapeIdB;
+    public b2Manifold manifold;
 }
 
 /**@}*/
