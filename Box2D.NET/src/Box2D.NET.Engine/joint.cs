@@ -22,6 +22,7 @@ using static Box2D.NET.Engine.world;
 using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.id_pool;
 using static Box2D.NET.Engine.manifold;
+using static Box2D.NET.Engine.solver_set;
 
 
 namespace Box2D.NET.Engine;
@@ -1060,7 +1061,7 @@ void b2DestroyJointInternal( b2World* world, b2Joint* joint, bool wakeBodies )
 	}
 	else
 	{
-		Debug.Assert( joint.setIndex <= b2_disabledSet );
+		Debug.Assert( joint.setIndex <= b2SetType.b2_disabledSet );
 	}
 
 	// Remove joint from solver set that owns it
@@ -1318,7 +1319,7 @@ float b2Joint_GetConstraintTorque( b2JointId jointId )
 	}
 }
 
-void b2PrepareJoint( b2JointSim* joint, b2StepContext* context )
+public static void b2PrepareJoint( b2JointSim* joint, b2StepContext* context )
 {
 	switch ( joint.type )
 	{

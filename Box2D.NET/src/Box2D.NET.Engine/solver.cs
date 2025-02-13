@@ -3,6 +3,8 @@
 
 // Compare to SDL_CPUPauseInstruction
 
+using System.Diagnostics;
+using System.Threading.Tasks;
 using static Box2D.NET.Engine.table;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.atomic;
@@ -185,32 +187,11 @@ public static b2Softness b2MakeSoft( float hertz, float zeta, float h )
 }
 
 
-#if ( defined( __GNUC__ ) || defined( __clang__ ) ) && ( defined( __i386__ ) || defined( __x86_64__ ) )
-static void b2Pause()
+public static void b2Pause()
 {
-	__asm__ __volatile__( "pause\n" );
+    // TODO: @ikpil, check sleep or yield
+    Task.Yield();
 }
-#elif ( defined( __arm__ ) && defined( __ARM_ARCH ) && __ARM_ARCH >= 7 ) || defined( __aarch64__ )
-static void b2Pause()
-{
-	__asm__ __volatile__( "yield" ::: "memory" );
-}
-#elif defined( _MSC_VER ) && ( defined( _M_IX86 ) || defined( _M_X64 ) )
-//
-static void b2Pause()
-{
-	_mm_pause();
-}
-#elif defined( _MSC_VER ) && ( defined( _M_ARM ) || defined( _M_ARM64 ) )
-static void b2Pause()
-{
-	__yield();
-}
-#else
-static void b2Pause()
-{
-}
-#endif
 
 
 
@@ -283,7 +264,7 @@ public static void b2IntegrateVelocitiesTask( int startIndex, int endIndex, b2St
 
 public static void b2PrepareJointsTask( int startIndex, int endIndex, b2StepContext context )
 {
-	b2TracyCZoneNC( prepare_joints, "PrepJoints", b2_colorOldLace, true );
+	b2TracyCZoneNC( prepare_joints, "PrepJoints", b2HexColor.b2_colorOldLace, true );
 
 	b2JointSim[] joints = context.joints;
 
@@ -296,18 +277,18 @@ public static void b2PrepareJointsTask( int startIndex, int endIndex, b2StepCont
 	b2TracyCZoneEnd( prepare_joints );
 }
 
-static void b2WarmStartJointsTask( int startIndex, int endIndex, b2StepContext* context, int colorIndex )
+public static void b2WarmStartJointsTask( int startIndex, int endIndex, b2StepContext context, int colorIndex )
 {
-	b2TracyCZoneNC( warm_joints, "WarmJoints", b2_colorGold, true );
+	b2TracyCZoneNC( warm_joints, "WarmJoints", b2HexColor.b2_colorGold, true );
 
-	b2GraphColor* color = context.graph.colors + colorIndex;
-	b2JointSim* joints = color.jointSims.data;
+    b2GraphColor color = context.graph.colors[colorIndex];
+	b2JointSim[] joints = color.jointSims.data;
 	Debug.Assert( 0 <= startIndex && startIndex < color.jointSims.count );
 	Debug.Assert( startIndex <= endIndex && endIndex <= color.jointSims.count );
 
 	for ( int i = startIndex; i < endIndex; ++i )
-	{
-		b2JointSim* joint = joints + i;
+    {
+        b2JointSim joint = joints[i];
 		b2WarmStartJoint( joint, context );
 	}
 
@@ -316,7 +297,7 @@ static void b2WarmStartJointsTask( int startIndex, int endIndex, b2StepContext* 
 
 static void b2SolveJointsTask( int startIndex, int endIndex, b2StepContext* context, int colorIndex, bool useBias )
 {
-	b2TracyCZoneNC( solve_joints, "SolveJoints", b2_colorLemonChiffon, true );
+	b2TracyCZoneNC( solve_joints, "SolveJoints", b2HexColor.b2_colorLemonChiffon, true );
 
 	b2GraphColor* color = context.graph.colors + colorIndex;
 	b2JointSim* joints = color.jointSims.data;
@@ -334,7 +315,7 @@ static void b2SolveJointsTask( int startIndex, int endIndex, b2StepContext* cont
 
 static void b2IntegratePositionsTask( int startIndex, int endIndex, b2StepContext* context )
 {
-	b2TracyCZoneNC( integrate_positions, "IntPos", b2_colorDarkSeaGreen, true );
+	b2TracyCZoneNC( integrate_positions, "IntPos", b2HexColor.b2_colorDarkSeaGreen, true );
 
 	b2BodyState* states = context.states;
 	float h = context.h;
@@ -539,7 +520,7 @@ static void b2SolveContinuous( b2World* world, int bodySimIndex )
 {
 	b2TracyCZoneNC( ccd, "CCD", b2_colorDarkGoldenRod, true );
 
-	b2SolverSet* awakeSet = Array_Get( &world.solverSets, b2_awakeSet );
+	b2SolverSet* awakeSet = Array_Get( &world.solverSets, (int)b2SetType.b2_awakeSet );
 	b2BodySim* fastBodySim = Array_Get( &awakeSet.bodySims, bodySimIndex );
 	Debug.Assert( fastBodySim.isFast );
 
@@ -1343,7 +1324,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 	}
 
 	// Are there any awake bodies? This scenario should not be important for profiling.
-	b2SolverSet* awakeSet = Array_Get( &world.solverSets, b2_awakeSet );
+	b2SolverSet* awakeSet = Array_Get( &world.solverSets, (int)b2SetType.b2_awakeSet );
 	int awakeBodyCount = awakeSet.bodySims.count;
 	if ( awakeBodyCount == 0 )
 	{

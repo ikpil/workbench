@@ -537,12 +537,12 @@ static void b2CollideTask( int startIndex, int endIndex, uint threadIndex, void*
 		if ( overlap == false )
 		{
 			contactSim.simFlags |= b2_simDisjoint;
-			contactSim.simFlags &= ~b2_simTouchingFlag;
+			contactSim.simFlags &= ~b2ContactSimFlags.b2_simTouchingFlag;
 			b2SetBit( &taskContext.contactStateBitSet, contactId );
 		}
 		else
 		{
-			bool wasTouching = ( contactSim.simFlags & b2_simTouchingFlag );
+			bool wasTouching = ( contactSim.simFlags & b2ContactSimFlags.b2_simTouchingFlag );
 
 			// Update contact respecting shape/body order (A,B)
 			b2Body* bodyA = bodies + shapeA.bodyId;
@@ -603,7 +603,7 @@ static void b2UpdateTreesTask( int startIndex, int endIndex, uint threadIndex, v
 static void b2AddNonTouchingContact( b2World* world, b2Contact* contact, b2ContactSim* contactSim )
 {
 	Debug.Assert( contact.setIndex == (int)b2SetType.b2_awakeSet );
-	b2SolverSet* set = Array_Get( &world.solverSets, b2_awakeSet );
+	b2SolverSet* set = Array_Get( &world.solverSets, (int)b2SetType.b2_awakeSet );
 	contact.colorIndex = B2_NULL_INDEX;
 	contact.localIndex = set.contactSims.count;
 
@@ -719,7 +719,7 @@ static void b2Collide( b2StepContext* context )
 		b2InPlaceUnion( bitSet, &world.taskContexts.data[i].contactStateBitSet );
 	}
 
-	b2SolverSet* awakeSet = Array_Get( &world.solverSets, b2_awakeSet );
+	b2SolverSet* awakeSet = Array_Get( &world.solverSets, (int)b2SetType.b2_awakeSet );
 
 	int endEventArrayIndex = world.endEventArrayIndex;
 
@@ -772,7 +772,7 @@ static void b2Collide( b2StepContext* context )
 			{
 				Debug.Assert( contact.islandId == B2_NULL_INDEX );
 				// Contact is solid
-				if ( flags & b2_contactEnableContactEvents )
+				if ( flags & b2ContactFlags.b2_contactEnableContactEvents )
 				{
 					b2ContactBeginTouchEvent event = { shapeIdA, shapeIdB, contactSim.manifold };
 					Array_Push( &world.contactBeginEvents, event );
@@ -783,7 +783,7 @@ static void b2Collide( b2StepContext* context )
 
 				// Link first because this wakes colliding bodies and ensures the body sims
 				// are in the correct place.
-				contact.flags |= b2_contactTouchingFlag;
+				contact.flags |= b2ContactFlags.b2_contactTouchingFlag;
 				b2LinkContact( world, contact );
 
 				// Make sure these didn't change
@@ -797,7 +797,7 @@ static void b2Collide( b2StepContext* context )
 				contactSim.simFlags &= ~b2_simStartedTouching;
 
 				b2AddContactToGraph( world, contactSim, contact );
-				b2RemoveNonTouchingContact( world, b2_awakeSet, localIndex );
+				b2RemoveNonTouchingContact( world, (int)b2SetType.b2_awakeSet, localIndex );
 				contactSim = NULL;
 			}
 			else if ( simFlags & b2_simStoppedTouching )
@@ -805,9 +805,9 @@ static void b2Collide( b2StepContext* context )
 				contactSim.simFlags &= ~b2_simStoppedTouching;
 
 				// Contact is solid
-				contact.flags &= ~b2_contactTouchingFlag;
+				contact.flags &= ~b2ContactFlags.b2_contactTouchingFlag;
 
-				if ( contact.flags & b2_contactEnableContactEvents )
+				if ( contact.flags & b2ContactFlags.b2_contactEnableContactEvents )
 				{
 					b2ContactEndTouchEvent event = { shapeIdA, shapeIdB };
 					Array_Push( world.contactEndEvents + endEventArrayIndex, event );
@@ -1209,7 +1209,7 @@ static void b2DrawWithBounds( b2World* world, b2DebugDraw* draw )
 					b2Contact* contact = Array_Get( &world.contacts, contactId );
 					contactKey = contact.edges[edgeIndex].nextKey;
 
-					if ( contact.setIndex != b2_awakeSet || contact.colorIndex == B2_NULL_INDEX )
+					if ( contact.setIndex != (int)b2SetType.b2_awakeSet || contact.colorIndex == B2_NULL_INDEX )
 					{
 						continue;
 					}
@@ -1850,7 +1850,7 @@ bool b2World_IsWarmStartingEnabled( b2WorldId worldId )
 int b2World_GetAwakeBodyCount( b2WorldId worldId )
 {
 	b2World* world = b2GetWorldFromId( worldId );
-	b2SolverSet* awakeSet = Array_Get( &world.solverSets, b2_awakeSet );
+	b2SolverSet* awakeSet = Array_Get( &world.solverSets, (int)b2SetType.b2_awakeSet );
 	return awakeSet.bodySims.count;
 }
 
@@ -2801,7 +2801,7 @@ static bool ExplosionCallback( int proxyId, int shapeId, void* context )
 
 	b2WakeBody( world, body );
 
-	if ( body.setIndex != b2_awakeSet )
+	if ( body.setIndex != (int)b2SetType.b2_awakeSet )
 	{
 		return true;
 	}
@@ -2835,7 +2835,7 @@ static bool ExplosionCallback( int proxyId, int shapeId, void* context )
 	b2Vec2 impulse = b2MulSV( magnitude, direction );
 
 	int localIndex = body.localIndex;
-	b2SolverSet* set = Array_Get( &world.solverSets, b2_awakeSet );
+	b2SolverSet* set = Array_Get( &world.solverSets, (int)b2SetType.b2_awakeSet );
 	b2BodyState* state = Array_Get( &set.bodyStates, localIndex );
 	b2BodySim* bodySim = Array_Get( &set.bodySims, localIndex );
 	state.linearVelocity = b2MulAdd( state.linearVelocity, bodySim.invMass, impulse );
@@ -2947,7 +2947,7 @@ void b2ValidateConnectivity( b2World* world )
 
 			b2Contact* contact = Array_Get( &world.contacts, contactId );
 
-			bool touching = ( contact.flags & b2_contactTouchingFlag ) != 0;
+			bool touching = ( contact.flags & b2ContactFlags.b2_contactTouchingFlag ) != 0;
 			if ( touching )
 			{
 				if ( bodySetIndex != (int)b2SetType.b2_staticSet )
@@ -3338,7 +3338,7 @@ void b2ValidateContacts( b2World* world )
 
 		allocatedContactCount += 1;
 
-		bool touching = ( contact.flags & b2_contactTouchingFlag ) != 0;
+		bool touching = ( contact.flags & b2ContactFlags.b2_contactTouchingFlag ) != 0;
 
 		int setId = contact.setIndex;
 
@@ -3371,7 +3371,7 @@ void b2ValidateContacts( b2World* world )
 		Debug.Assert( contactSim.bodyIdB == contact.edges[1].bodyId );
 
 		// Sim touching is true for solid and sensor contacts
-		bool simTouching = ( contactSim.simFlags & b2_simTouchingFlag ) != 0;
+		bool simTouching = ( contactSim.simFlags & b2ContactSimFlags.b2_simTouchingFlag ) != 0;
 		Debug.Assert( touching == simTouching );
 
 		Debug.Assert( 0 <= contactSim.manifold.pointCount && contactSim.manifold.pointCount <= 2 );

@@ -109,6 +109,17 @@ public class b2BodyState
         Debug.Assert(false);
         return null;
     }
+
+    public void CopyFrom(b2BodyState other)
+    {
+        linearVelocity = other.linearVelocity;
+        angularVelocity = other.angularVelocity;
+        flags = other.flags;
+        
+        deltaPosition = other.deltaPosition;
+        
+        deltaRotation = other.deltaRotation;
+    }
 }
 
 // Body simulation data used for integration of position and velocity
@@ -152,6 +163,39 @@ public class b2BodySim
     public bool isSpeedCapped;
     public bool allowFastRotation;
     public bool enlargeAABB;
+
+    public void CopyFrom(b2BodySim other)
+    {
+        transform = other.transform;
+        
+        center = other.center;
+        
+        rotation0 = other.rotation0;
+        center0 = other.center0;
+        
+        localCenter = other.localCenter;
+        
+        force = other.force;
+        torque = other.torque;
+        
+        invMass = other.invMass;
+        invInertia = other.invInertia;
+        
+        minExtent = other.minExtent;
+        maxExtent = other.maxExtent;
+        linearDamping = other.linearDamping;
+        angularDamping = other.angularDamping;
+        gravityScale = other.gravityScale;
+        
+        bodyId = other.bodyId;
+        
+        isFast = other.isFast;
+        isBullet = other.isBullet;
+        
+        isSpeedCapped = other.isSpeedCapped;
+        allowFastRotation = other.allowFastRotation;
+        enlargeAABB = other.enlargeAABB;
+    }
 }
 
 public class body
@@ -625,7 +669,7 @@ public class body
             b2Contact* contact = Array_Get( &world.contacts, contactId );
 
             // Is contact touching?
-            if ( contact.flags & b2_contactTouchingFlag )
+            if ( contact.flags & b2ContactFlags.b2_contactTouchingFlag )
             {
                 b2Shape* shapeA = Array_Get( &world.shapes, contact.shapeIdA );
                 b2Shape* shapeB = Array_Get( &world.shapes, contact.shapeIdB );
@@ -1060,7 +1104,7 @@ public class body
         if ( body.setIndex == (int)b2SetType.b2_awakeSet )
         {
             int localIndex = body.localIndex;
-            b2SolverSet* set = Array_Get( &world.solverSets, b2_awakeSet );
+            b2SolverSet* set = Array_Get( &world.solverSets, (int)b2SetType.b2_awakeSet );
             b2BodyState* state = Array_Get( &set.bodyStates, localIndex );
             b2BodySim* bodySim = Array_Get( &set.bodySims, localIndex );
             state.linearVelocity = b2MulAdd( state.linearVelocity, bodySim.invMass, impulse );
@@ -1081,7 +1125,7 @@ public class body
         if ( body.setIndex == (int)b2SetType.b2_awakeSet )
         {
             int localIndex = body.localIndex;
-            b2SolverSet* set = Array_Get( &world.solverSets, b2_awakeSet );
+            b2SolverSet* set = Array_Get( &world.solverSets, (int)b2SetType.b2_awakeSet );
             b2BodyState* state = Array_Get( &set.bodyStates, localIndex );
             b2BodySim* bodySim = Array_Get( &set.bodySims, localIndex );
             state.linearVelocity = b2MulAdd( state.linearVelocity, bodySim.invMass, impulse );
@@ -1106,7 +1150,7 @@ public class body
         if ( body.setIndex == (int)b2SetType.b2_awakeSet )
         {
             int localIndex = body.localIndex;
-            b2SolverSet* set = Array_Get( &world.solverSets, b2_awakeSet );
+            b2SolverSet* set = Array_Get( &world.solverSets, (int)b2SetType.b2_awakeSet );
             b2BodyState* state = Array_Get( &set.bodyStates, localIndex );
             b2BodySim* bodySim = Array_Get( &set.bodySims, localIndex );
             state.angularVelocity += bodySim.invInertia * impulse;
@@ -1189,13 +1233,13 @@ public class body
             Debug.Assert( body.setIndex == (int)b2SetType.b2_staticSet );
 
             b2SolverSet* staticSet = Array_Get( &world.solverSets, b2_staticSet );
-            b2SolverSet* awakeSet = Array_Get( &world.solverSets, b2_awakeSet );
+            b2SolverSet* awakeSet = Array_Get( &world.solverSets, (int)b2SetType.b2_awakeSet );
 
             // Transfer body to awake set
             b2TransferBody( world, awakeSet, staticSet, body );
 
             // Create island for body
-            b2CreateIslandForBody( world, b2_awakeSet, body );
+            b2CreateIslandForBody( world, (int)b2SetType.b2_awakeSet, body );
 
             // Transfer static joints to awake set
             int jointKey = body.headJointKey;
@@ -1250,7 +1294,7 @@ public class body
             Debug.Assert( body.setIndex == (int)b2SetType.b2_awakeSet );
 
             b2SolverSet* staticSet = Array_Get( &world.solverSets, b2_staticSet );
-            b2SolverSet* awakeSet = Array_Get( &world.solverSets, b2_awakeSet );
+            b2SolverSet* awakeSet = Array_Get( &world.solverSets, (int)b2SetType.b2_awakeSet );
 
             // Transfer body to static set
             b2TransferBody( world, staticSet, awakeSet, body );

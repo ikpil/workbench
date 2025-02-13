@@ -74,6 +74,11 @@ public class b2Island
 public class b2IslandSim
 {
     public int islandId;
+
+    public void CopyFrom(b2IslandSim other)
+    {
+        islandId = other.islandId;
+    }
 }
 
 
@@ -604,7 +609,7 @@ void b2MergeAwakeIslands( b2World* world )
 {
 	b2TracyCZoneNC( merge_islands, "Merge Islands", b2_colorMediumTurquoise, true );
 
-	b2SolverSet* awakeSet = Array_Get( &world.solverSets, b2_awakeSet );
+	b2SolverSet* awakeSet = Array_Get( &world.solverSets, (int)b2SetType.b2_awakeSet );
 	b2IslandSim* islandSims = awakeSet.islandSims.data;
 	int awakeIslandCount = awakeSet.islandSims.count;
 
@@ -668,7 +673,7 @@ void b2SplitIsland( b2World* world, int baseId )
 	b2Island* baseIsland = Array_Get( &world.islands, baseId );
 	int setIndex = baseIsland.setIndex;
 
-	if ( setIndex != b2_awakeSet )
+	if ( setIndex != (int)b2SetType.b2_awakeSet )
 	{
 		// can only split awake island
 		return;
@@ -799,7 +804,7 @@ void b2SplitIsland( b2World* world, int baseId )
 				}
 
 				// Is this contact enabled and touching?
-				if ( ( contact.flags & b2_contactTouchingFlag ) == 0 )
+				if ( ( contact.flags & b2ContactFlags.b2_contactTouchingFlag ) == 0 )
 				{
 					continue;
 				}

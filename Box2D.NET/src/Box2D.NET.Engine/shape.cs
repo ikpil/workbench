@@ -1663,7 +1663,7 @@ int b2Shape_GetContactData( b2ShapeId shapeId, b2ContactData* contactData, int c
 
 		// Does contact involve this shape and is it touching?
 		if ( ( contact.shapeIdA == shapeId.index1 - 1 || contact.shapeIdB == shapeId.index1 - 1 ) &&
-			 ( contact.flags & b2_contactTouchingFlag ) != 0 )
+			 ( contact.flags & b2ContactFlags.b2_contactTouchingFlag ) != 0 )
 		{
 			b2Shape* shapeA = world.shapes.data + contact.shapeIdA;
 			b2Shape* shapeB = world.shapes.data + contact.shapeIdB;

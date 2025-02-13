@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
+using System.Diagnostics;
 using static Box2D.NET.Engine.table;
 using static Box2D.NET.Engine.array;
 using static Box2D.NET.Engine.atomic;
@@ -141,6 +142,12 @@ public class b2ContactSim
     public uint simFlags;
 
     public b2SimplexCache cache;
+
+    public void CopyFrom(b2ContactSim other)
+    {
+        Debug.Assert(false);
+        // TODO: @ikpil class type copy!?
+    }
 }
 
 public struct b2ContactRegister
@@ -349,14 +356,14 @@ void b2CreateContact( b2World* world, b2Shape* shapeA, b2Shape* shapeB )
 	int setIndex;
 	if ( bodyA->setIndex == (int)b2SetType.b2_awakeSet || bodyB->setIndex == (int)b2SetType.b2_awakeSet )
 	{
-		setIndex = b2_awakeSet;
+		setIndex = (int)b2SetType.b2_awakeSet;
 	}
 	else
 	{
 		// sleeping and non-touching contacts live in the disabled set
 		// later if this set is found to be touching then the sleeping
 		// islands will be linked and the contact moved to the merged island
-		setIndex = b2_disabledSet;
+		setIndex = b2SetType.b2_disabledSet;
 	}
 
 	b2SolverSet* set = Array_Get( &world->solverSets, setIndex );
@@ -388,7 +395,7 @@ void b2CreateContact( b2World* world, b2Shape* shapeA, b2Shape* shapeB )
 
 	if ( shapeA->enableContactEvents || shapeB->enableContactEvents )
 	{
-		contact->flags |= b2_contactEnableContactEvents;
+		contact->flags |= b2ContactFlags.b2_contactEnableContactEvents;
 	}
 
 	// Connect to body A
@@ -488,7 +495,7 @@ public static void b2DestroyContact( b2World world, b2Contact contact, bool wake
 	uint flags = contact->flags;
 
 	// End touch event
-	if ( ( flags & b2_contactTouchingFlag ) != 0 && ( flags & b2_contactEnableContactEvents ) != 0 )
+	if ( ( flags & b2ContactFlags.b2_contactTouchingFlag ) != 0 && ( flags & b2ContactFlags.b2_contactEnableContactEvents ) != 0 )
 	{
 		ushort worldId = world->worldId;
 		const b2Shape* shapeA = Array_Get( &world->shapes, contact->shapeIdA );
@@ -563,7 +570,7 @@ public static void b2DestroyContact( b2World world, b2Contact contact, bool wake
 	else
 	{
 		// contact is non-touching or is sleeping or is a sensor
-		Debug.Assert( contact->setIndex != b2_awakeSet || ( contact->flags & b2_contactTouchingFlag ) == 0 );
+		Debug.Assert( contact->setIndex != (int)b2SetType.b2_awakeSet || ( contact->flags & b2ContactFlags.b2_contactTouchingFlag ) == 0 );
 		b2SolverSet* set = Array_Get( &world->solverSets, contact->setIndex );
 		int movedIndex = Array_RemoveSwap( &set->contactSims, contact->localIndex );
 		if ( movedIndex != B2_NULL_INDEX )
@@ -759,11 +766,11 @@ bool b2UpdateContact( b2World* world, b2ContactSim* contactSim, b2Shape* shapeA,
 
 	if ( touching )
 	{
-		contactSim->simFlags |= b2_simTouchingFlag;
+		contactSim->simFlags |= b2ContactSimFlags.b2_simTouchingFlag;
 	}
 	else
 	{
-		contactSim->simFlags &= ~b2_simTouchingFlag;
+		contactSim->simFlags &= ~b2ContactSimFlags.b2_simTouchingFlag;
 	}
 
 	return touching;
