@@ -37,6 +37,47 @@ public struct b2Version
     }
 }
 
+public enum b2TracyCZone
+{
+    pair_task,
+    update_pairs,
+    create_contacts,
+    prepare_overflow_contact,
+    warmstart_overflow_contact,
+    solve_contact,
+    overflow_resitution,
+    prepare_contact,
+    warm_start_contact,
+    restitution,
+    store_impulses,
+    merge_islands,
+    split,
+    sensor_task,
+    overlap_sensors,
+    sensor_state,
+    integrate_velocity,
+    prepare_joints,
+    warm_joints,
+    solve_joints,
+    integrate_positions,
+    ccd,
+    finalize_transfprms,
+    bullet_body_task,
+    merge,
+    prepare_stages,
+    solve_constraints,
+    update_transforms,
+    hit_events,
+    refit_bvh,
+    bullets,
+    sleep_islands,
+    collide_task,
+    tree_task,
+    collide,
+    contact_state,
+    world_step,
+}
+
 public static class core
 {
     private static readonly b2AtomicInt b2_byteCount = new b2AtomicInt();
@@ -76,32 +117,31 @@ public static class core
     {
         // ...
     }
-    
+
     public static void B2_UNUSED<T1, T2>(T1 a, T2 b)
     {
         // ...
     }
-    
+
     public static void B2_UNUSED<T1, T2, T3>(T1 a, T2 b, T3 c)
     {
         // ...
     }
-    
+
     public static void B2_UNUSED<T1, T2, T3, T4>(T1 a, T2 b, T3 c, T4 d)
     {
         // ...
     }
-    
+
     public static void B2_UNUSED<T1, T2, T3, T4, T5>(T1 a, T2 b, T3 c, T4 d, T5 e)
     {
         // ...
     }
-    
+
     public static void B2_UNUSED<T1, T2, T3, T4, T5, T6>(T1 a, T2 b, T3 c, T4 d, T5 e, T6 f)
     {
         // ...
     }
-
 
 
     /// Prototype for user allocation function
@@ -132,7 +172,7 @@ public static class core
 
 
 // Define SIMD
-#if  BOX2D_ENABLE_SIMD 
+#if BOX2D_ENABLE_SIMD
 	#if defined( B2_CPU_X86_X64 )
 		#if defined( BOX2D_AVX2 )
 			#define B2_SIMD_AVX2
@@ -164,24 +204,24 @@ public static class core
     {
         TracyCZoneC(ctx, color, active);
     }
-    public static void b2TracyCZoneNC( object ctx, object name, object color, object active )
+    public static void b2TracyCZoneNC(object object ctx, object name, object color, object active )
     {
         TracyCZoneNC(ctx, name, color, active);
     }
-    public static void b2TracyCZoneEnd( object ctx )
+    public static void b2TracyCZoneEnd(object ctx)
     {
         TracyCZoneEnd(ctx);
     }
 #else
-    public static void b2TracyCZoneC(object ctx, object color, object active)
+    public static void b2TracyCZoneC(b2TracyCZone ctx, object color, object active)
     {
     }
 
-    public static void b2TracyCZoneNC(object ctx, object name, object color, object active)
+    public static void b2TracyCZoneNC(b2TracyCZone ctx, object name, object color, object active)
     {
     }
 
-    public static void b2TracyCZoneEnd(object ctx)
+    public static void b2TracyCZoneEnd(b2TracyCZone ctx)
     {
     }
 #endif
@@ -192,7 +232,48 @@ public static class core
         return A.Length;
     }
 
-    
+    public static void B2_CHECK_DEF(b2WheelJointDef DEF)
+    {
+        Debug.Assert(DEF.internalValue == B2_SECRET_COOKIE);
+    }
+
+
+    public static void B2_CHECK_DEF(b2WeldJointDef DEF)
+    {
+        Debug.Assert(DEF.internalValue == B2_SECRET_COOKIE);
+    }
+
+    public static void B2_CHECK_DEF(b2PrismaticJointDef DEF)
+    {
+        Debug.Assert(DEF.internalValue == B2_SECRET_COOKIE);
+    }
+
+    public static void B2_CHECK_DEF(b2RevoluteJointDef DEF)
+    {
+        Debug.Assert(DEF.internalValue == B2_SECRET_COOKIE);
+    }
+
+
+    public static void B2_CHECK_DEF(b2NullJointDef DEF)
+    {
+        Debug.Assert(DEF.internalValue == B2_SECRET_COOKIE);
+    }
+
+    public static void B2_CHECK_DEF(b2MouseJointDef DEF)
+    {
+        Debug.Assert(DEF.internalValue == B2_SECRET_COOKIE);
+    }
+
+    public static void B2_CHECK_DEF(b2MotorJointDef DEF)
+    {
+        Debug.Assert(DEF.internalValue == B2_SECRET_COOKIE);
+    }
+
+    public static void B2_CHECK_DEF(b2DistanceJointDef DEF)
+    {
+        Debug.Assert(DEF.internalValue == B2_SECRET_COOKIE);
+    }
+
     public static void B2_CHECK_DEF(b2ChainDef DEF)
     {
         Debug.Assert(DEF.internalValue == B2_SECRET_COOKIE);
@@ -202,7 +283,7 @@ public static class core
     {
         Debug.Assert(DEF.internalValue == B2_SECRET_COOKIE);
     }
-    
+
     public static void B2_CHECK_DEF(b2WorldDef DEF)
     {
         Debug.Assert(DEF.internalValue == B2_SECRET_COOKIE);
@@ -212,7 +293,6 @@ public static class core
     {
         Debug.Assert(DEF.internalValue == B2_SECRET_COOKIE);
     }
-
 
 
 #if BOX2D_PROFILE

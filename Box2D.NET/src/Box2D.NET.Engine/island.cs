@@ -20,6 +20,13 @@ using static Box2D.NET.Engine.solver;
 using static Box2D.NET.Engine.body;
 using static Box2D.NET.Engine.world;
 using static Box2D.NET.Engine.joint;
+using static Box2D.NET.Engine.distance_joint;
+using static Box2D.NET.Engine.motor_joint;
+using static Box2D.NET.Engine.mouse_joint;
+using static Box2D.NET.Engine.prismatic_joint;
+using static Box2D.NET.Engine.revolute_joint;
+using static Box2D.NET.Engine.weld_joint;
+using static Box2D.NET.Engine.wheel_joint;
 using static Box2D.NET.Engine.id_pool;
 using static Box2D.NET.Engine.manifold;
 
@@ -356,10 +363,10 @@ static void b2AddJointToIsland( b2World* world, int islandId, b2Joint* joint )
 }
 
 // Link a joint into the island graph when it is created
-void b2LinkJoint( b2World* world, b2Joint* joint, bool mergeIslands )
+public static void b2LinkJoint( b2World world, b2Joint joint, bool mergeIslands )
 {
-	b2Body* bodyA = Array_Get( &world.bodies, joint.edges[0].bodyId );
-	b2Body* bodyB = Array_Get( &world.bodies, joint.edges[1].bodyId );
+	b2Body bodyA = Array_Get( world.bodies, joint.edges[0].bodyId );
+	b2Body bodyB = Array_Get( world.bodies, joint.edges[1].bodyId );
 
 	if ( bodyA.setIndex == (int)b2SetType.b2_awakeSet && bodyB.setIndex >= (int)b2SetType.b2_firstSleepingSet )
 	{
@@ -450,7 +457,7 @@ void b2LinkJoint( b2World* world, b2Joint* joint, bool mergeIslands )
 }
 
 // Unlink a joint from the island graph when it is destroyed
-void b2UnlinkJoint( b2World* world, b2Joint* joint )
+public static void b2UnlinkJoint( b2World world, b2Joint joint )
 {
 	Debug.Assert( joint.islandId != B2_NULL_INDEX );
 
@@ -607,7 +614,7 @@ static void b2MergeIsland( b2World* world, b2Island* island )
 // todo this might be faster if b2IslandSim held the connectivity data
 void b2MergeAwakeIslands( b2World* world )
 {
-	b2TracyCZoneNC( merge_islands, "Merge Islands", b2_colorMediumTurquoise, true );
+	b2TracyCZoneNC(b2TracyCZone.merge_islands, "Merge Islands", b2_colorMediumTurquoise, true );
 
 	b2SolverSet* awakeSet = Array_Get( &world.solverSets, (int)b2SetType.b2_awakeSet );
 	b2IslandSim* islandSims = awakeSet.islandSims.data;
@@ -663,7 +670,7 @@ void b2MergeAwakeIslands( b2World* world )
 
 	b2ValidateConnectivity( world );
 
-	b2TracyCZoneEnd( merge_islands );
+	b2TracyCZoneEnd(b2TracyCZone.merge_islands );
 }
 
 #define B2_CONTACT_REMOVE_THRESHOLD 1
@@ -917,7 +924,7 @@ void b2SplitIsland( b2World* world, int baseId )
 // are interacting with these data structures.
 void b2SplitIslandTask( int startIndex, int endIndex, uint threadIndex, void* context )
 {
-	b2TracyCZoneNC( split, "Split Island", b2_colorOlive, true );
+	b2TracyCZoneNC(b2TracyCZone.split, "Split Island", b2_colorOlive, true );
 
 	B2_UNUSED( startIndex, endIndex, threadIndex );
 
@@ -929,7 +936,7 @@ void b2SplitIslandTask( int startIndex, int endIndex, uint threadIndex, void* co
 	b2SplitIsland( world, world.splitIslandId );
 
 	world.profile.splitIslands += b2GetMilliseconds( ticks );
-	b2TracyCZoneEnd( split );
+	b2TracyCZoneEnd(b2TracyCZone.split );
 }
 
 #if B2_VALIDATE

@@ -19,6 +19,13 @@ using static Box2D.NET.Engine.solver;
 using static Box2D.NET.Engine.body;
 using static Box2D.NET.Engine.world;
 using static Box2D.NET.Engine.joint;
+using static Box2D.NET.Engine.distance_joint;
+using static Box2D.NET.Engine.motor_joint;
+using static Box2D.NET.Engine.mouse_joint;
+using static Box2D.NET.Engine.prismatic_joint;
+using static Box2D.NET.Engine.revolute_joint;
+using static Box2D.NET.Engine.weld_joint;
+using static Box2D.NET.Engine.wheel_joint;
 using static Box2D.NET.Engine.id_pool;
 using static Box2D.NET.Engine.manifold;
 
@@ -154,7 +161,7 @@ public static int b2CompareShapeRefs( b2ShapeRef a, b2ShapeRef b )
 
 public static void b2SensorTask( int startIndex, int endIndex, uint threadIndex, b2World context )
 {
-	b2TracyCZoneNC( sensor_task, "Overlap", b2_colorBrown, true );
+	b2TracyCZoneNC(b2TracyCZone.sensor_task, "Overlap", b2_colorBrown, true );
 
 	b2World world = context;
 	Debug.Assert( (int)threadIndex < world.workerCount );
@@ -219,7 +226,7 @@ public static void b2SensorTask( int startIndex, int endIndex, uint threadIndex,
 		}
 	}
 
-	b2TracyCZoneEnd( sensor_task );
+	b2TracyCZoneEnd(b2TracyCZone.sensor_task );
 }
 
 public static void b2OverlapSensors( b2World world )
@@ -232,7 +239,7 @@ public static void b2OverlapSensors( b2World world )
 
 	Debug.Assert( world.workerCount > 0 );
 
-	b2TracyCZoneNC( overlap_sensors, "Sensors", b2_colorMediumPurple, true );
+	b2TracyCZoneNC(b2TracyCZone.overlap_sensors, "Sensors", b2_colorMediumPurple, true );
 
 	for ( int i = 0; i < world.workerCount; ++i )
 	{
@@ -248,7 +255,7 @@ public static void b2OverlapSensors( b2World world )
 		world.finishTaskFcn( userSensorTask, world.userTaskContext );
 	}
 
-	b2TracyCZoneNC( sensor_state, "Events", b2_colorLightSlateGray, true );
+	b2TracyCZoneNC(b2TracyCZone.sensor_state, "Events", b2_colorLightSlateGray, true );
 
 	b2BitSet bitSet = &world.sensorTaskContexts.data[0].eventBits;
 	for ( int i = 1; i < world.workerCount; ++i )
@@ -353,8 +360,8 @@ public static void b2OverlapSensors( b2World world )
 		}
 	}
 
-	b2TracyCZoneEnd( sensor_state );
-	b2TracyCZoneEnd( overlap_sensors );
+	b2TracyCZoneEnd(b2TracyCZone.sensor_state );
+	b2TracyCZoneEnd(b2TracyCZone.overlap_sensors );
 }
 
 void b2DestroySensor( b2World* world, b2Shape* sensorShape )

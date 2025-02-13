@@ -20,6 +20,13 @@ using static Box2D.NET.Engine.solver;
 using static Box2D.NET.Engine.body;
 using static Box2D.NET.Engine.world;
 using static Box2D.NET.Engine.joint;
+using static Box2D.NET.Engine.distance_joint;
+using static Box2D.NET.Engine.motor_joint;
+using static Box2D.NET.Engine.mouse_joint;
+using static Box2D.NET.Engine.prismatic_joint;
+using static Box2D.NET.Engine.revolute_joint;
+using static Box2D.NET.Engine.weld_joint;
+using static Box2D.NET.Engine.wheel_joint;
 using static Box2D.NET.Engine.id_pool;
 using static Box2D.NET.Engine.manifold;
 
@@ -511,7 +518,7 @@ void b2DestroyWorld( b2WorldId worldId )
 
 static void b2CollideTask( int startIndex, int endIndex, uint threadIndex, void* context )
 {
-	b2TracyCZoneNC( collide_task, "Collide", b2_colorDodgerBlue, true );
+	b2TracyCZoneNC(b2TracyCZone.collide_task, "Collide", b2_colorDodgerBlue, true );
 
 	b2StepContext* stepContext = context;
 	b2World* world = stepContext.world;
@@ -583,7 +590,7 @@ static void b2CollideTask( int startIndex, int endIndex, uint threadIndex, void*
 		}
 	}
 
-	b2TracyCZoneEnd( collide_task );
+	b2TracyCZoneEnd(b2TracyCZone.collide_task );
 }
 
 static void b2UpdateTreesTask( int startIndex, int endIndex, uint threadIndex, void* context )
@@ -592,12 +599,12 @@ static void b2UpdateTreesTask( int startIndex, int endIndex, uint threadIndex, v
 	B2_UNUSED( endIndex );
 	B2_UNUSED( threadIndex );
 
-	b2TracyCZoneNC( tree_task, "Rebuild BVH", b2_colorFireBrick, true );
+	b2TracyCZoneNC(b2TracyCZone.tree_task, "Rebuild BVH", b2_colorFireBrick, true );
 
 	b2World* world = context;
 	b2BroadPhase_RebuildTrees( &world.broadPhase );
 
-	b2TracyCZoneEnd( tree_task );
+	b2TracyCZoneEnd(b2TracyCZone.tree_task );
 }
 
 static void b2AddNonTouchingContact( b2World* world, b2Contact* contact, b2ContactSim* contactSim )
@@ -633,7 +640,7 @@ static void b2Collide( b2StepContext* context )
 
 	Debug.Assert( world.workerCount > 0 );
 
-	b2TracyCZoneNC( collide, "Narrow Phase", b2_colorDodgerBlue, true );
+	b2TracyCZoneNC(b2TracyCZone.collide, "Narrow Phase", b2_colorDodgerBlue, true );
 
 	// Task that can be done in parallel with the narrow-phase
 	// - rebuild the collision tree for dynamic and kinematic bodies to keep their query performance good
@@ -655,7 +662,7 @@ static void b2Collide( b2StepContext* context )
 
 	if ( contactCount == 0 )
 	{
-		b2TracyCZoneEnd( collide );
+		b2TracyCZoneEnd(b2TracyCZone.collide );
 		return;
 	}
 
@@ -710,7 +717,7 @@ static void b2Collide( b2StepContext* context )
 
 	// Serially update contact state
 	// todo_erin bring this zone together with island merge
-	b2TracyCZoneNC( contact_state, "Contact State", b2_colorLightSlateGray, true );
+	b2TracyCZoneNC(b2TracyCZone.contact_state, "Contact State", b2_colorLightSlateGray, true );
 
 	// Bitwise OR all contact bits
 	b2BitSet bitSet = &world.taskContexts.data[0].contactStateBitSet;
@@ -833,8 +840,8 @@ static void b2Collide( b2StepContext* context )
 	b2ValidateSolverSets( world );
 	b2ValidateContacts( world );
 
-	b2TracyCZoneEnd( contact_state );
-	b2TracyCZoneEnd( collide );
+	b2TracyCZoneEnd(b2TracyCZone.contact_state );
+	b2TracyCZoneEnd(b2TracyCZone.collide );
 }
 
 void b2World_Step( b2WorldId worldId, float timeStep, int subStepCount )
@@ -866,7 +873,7 @@ void b2World_Step( b2WorldId worldId, float timeStep, int subStepCount )
 		return;
 	}
 
-	b2TracyCZoneNC( world_step, "Step", b2_colorBox2DGreen, true );
+	b2TracyCZoneNC(b2TracyCZone.world_step, "Step", b2_colorBox2DGreen, true );
 
 	world.locked = true;
 	world.activeTaskCount = 0;
@@ -945,7 +952,7 @@ void b2World_Step( b2WorldId worldId, float timeStep, int subStepCount )
 	// Make sure all tasks that were started were also finished
 	Debug.Assert( world.activeTaskCount == 0 );
 
-	b2TracyCZoneEnd( world_step );
+	b2TracyCZoneEnd(b2TracyCZone.world_step );
 
 	// Swap end event array buffers
 	world.endEventArrayIndex = 1 - world.endEventArrayIndex;
@@ -1658,7 +1665,7 @@ bool b2World_IsValid( b2WorldId id )
 	return id.generation == world.generation;
 }
 
-bool b2Body_IsValid( b2BodyId id )
+public static bool b2Body_IsValid( b2BodyId id )
 {
 	if ( id.world0 < 0 || B2_MAX_WORLDS <= id.world0 )
 	{

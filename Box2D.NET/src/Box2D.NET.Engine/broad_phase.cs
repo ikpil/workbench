@@ -19,6 +19,13 @@ using static Box2D.NET.Engine.solver;
 using static Box2D.NET.Engine.body;
 using static Box2D.NET.Engine.world;
 using static Box2D.NET.Engine.joint;
+using static Box2D.NET.Engine.distance_joint;
+using static Box2D.NET.Engine.motor_joint;
+using static Box2D.NET.Engine.mouse_joint;
+using static Box2D.NET.Engine.prismatic_joint;
+using static Box2D.NET.Engine.revolute_joint;
+using static Box2D.NET.Engine.weld_joint;
+using static Box2D.NET.Engine.wheel_joint;
 using static Box2D.NET.Engine.id_pool;
 using static Box2D.NET.Engine.manifold;
 
@@ -384,7 +391,7 @@ b2TreeStats b2_staticStats;
 
 static void b2FindPairsTask( int startIndex, int endIndex, uint threadIndex, void* context )
 {
-	b2TracyCZoneNC( pair_task, "Pair", b2_colorMediumSlateBlue, true );
+	b2TracyCZoneNC(b2TracyCZone.pair_task, "Pair", b2_colorMediumSlateBlue, true );
 
 	B2_UNUSED( threadIndex );
 
@@ -444,7 +451,7 @@ static void b2FindPairsTask( int startIndex, int endIndex, uint threadIndex, voi
 		stats.leafVisits += statsDynamic.leafVisits;
 	}
 
-	b2TracyCZoneEnd( pair_task );
+	b2TracyCZoneEnd(b2TracyCZone.pair_task );
 }
 
 void b2UpdateBroadPhasePairs( b2World* world )
@@ -459,7 +466,7 @@ void b2UpdateBroadPhasePairs( b2World* world )
 		return;
 	}
 
-	b2TracyCZoneNC( update_pairs, "Find Pairs", b2_colorMediumSlateBlue, true );
+	b2TracyCZoneNC(b2TracyCZone.update_pairs, "Find Pairs", b2_colorMediumSlateBlue, true );
 
 	b2ArenaAllocator* alloc = &world.stackAllocator;
 
@@ -484,7 +491,7 @@ void b2UpdateBroadPhasePairs( b2World* world )
 
 	// todo_erin could start tree rebuild here
 
-	b2TracyCZoneNC( create_contacts, "Create Contacts", b2_colorCoral, true );
+	b2TracyCZoneNC(b2TracyCZone.create_contacts, "Create Contacts", b2_colorCoral, true );
 
 	// Single-threaded work
 	// - Clear move flags
@@ -542,9 +549,9 @@ void b2UpdateBroadPhasePairs( b2World* world )
 
 	b2ValidateSolverSets( world );
 
-	b2TracyCZoneEnd( create_contacts );
+	b2TracyCZoneEnd(b2TracyCZone.create_contacts );
 
-	b2TracyCZoneEnd( update_pairs );
+	b2TracyCZoneEnd(b2TracyCZone.update_pairs );
 }
 
 bool b2BroadPhase_TestOverlap( const b2BroadPhase* bp, int proxyKeyA, int proxyKeyB )

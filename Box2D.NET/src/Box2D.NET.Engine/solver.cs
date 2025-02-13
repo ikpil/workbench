@@ -22,6 +22,13 @@ using static Box2D.NET.Engine.solver;
 using static Box2D.NET.Engine.body;
 using static Box2D.NET.Engine.world;
 using static Box2D.NET.Engine.joint;
+using static Box2D.NET.Engine.distance_joint;
+using static Box2D.NET.Engine.motor_joint;
+using static Box2D.NET.Engine.mouse_joint;
+using static Box2D.NET.Engine.prismatic_joint;
+using static Box2D.NET.Engine.revolute_joint;
+using static Box2D.NET.Engine.weld_joint;
+using static Box2D.NET.Engine.wheel_joint;
 using static Box2D.NET.Engine.id_pool;
 using static Box2D.NET.Engine.manifold;
 
@@ -198,7 +205,7 @@ public static void b2Pause()
 // Integrate velocities and apply damping
 public static void b2IntegrateVelocitiesTask( int startIndex, int endIndex, b2StepContext context )
 {
-	b2TracyCZoneNC( integrate_velocity, "IntVel", b2HexColor.b2_colorDeepPink, true );
+	b2TracyCZoneNC(b2TracyCZone.integrate_velocity, "IntVel", b2HexColor.b2_colorDeepPink, true );
 
 	b2BodyState[] states = context.states;
 	b2BodySim[] sims = context.sims;
@@ -259,12 +266,12 @@ public static void b2IntegrateVelocitiesTask( int startIndex, int endIndex, b2St
 		state.angularVelocity = w;
 	}
 
-	b2TracyCZoneEnd( integrate_velocity );
+	b2TracyCZoneEnd(b2TracyCZone.integrate_velocity );
 }
 
 public static void b2PrepareJointsTask( int startIndex, int endIndex, b2StepContext context )
 {
-	b2TracyCZoneNC( prepare_joints, "PrepJoints", b2HexColor.b2_colorOldLace, true );
+	b2TracyCZoneNC(b2TracyCZone.prepare_joints, "PrepJoints", b2HexColor.b2_colorOldLace, true );
 
 	b2JointSim[] joints = context.joints;
 
@@ -274,12 +281,12 @@ public static void b2PrepareJointsTask( int startIndex, int endIndex, b2StepCont
 		b2PrepareJoint( joint, context );
 	}
 
-	b2TracyCZoneEnd( prepare_joints );
+	b2TracyCZoneEnd(b2TracyCZone.prepare_joints );
 }
 
 public static void b2WarmStartJointsTask( int startIndex, int endIndex, b2StepContext context, int colorIndex )
 {
-	b2TracyCZoneNC( warm_joints, "WarmJoints", b2HexColor.b2_colorGold, true );
+	b2TracyCZoneNC(b2TracyCZone.warm_joints, "WarmJoints", b2HexColor.b2_colorGold, true );
 
     b2GraphColor color = context.graph.colors[colorIndex];
 	b2JointSim[] joints = color.jointSims.data;
@@ -292,12 +299,12 @@ public static void b2WarmStartJointsTask( int startIndex, int endIndex, b2StepCo
 		b2WarmStartJoint( joint, context );
 	}
 
-	b2TracyCZoneEnd( warm_joints );
+	b2TracyCZoneEnd(b2TracyCZone.warm_joints );
 }
 
 static void b2SolveJointsTask( int startIndex, int endIndex, b2StepContext* context, int colorIndex, bool useBias )
 {
-	b2TracyCZoneNC( solve_joints, "SolveJoints", b2HexColor.b2_colorLemonChiffon, true );
+	b2TracyCZoneNC(b2TracyCZone.solve_joints, "SolveJoints", b2HexColor.b2_colorLemonChiffon, true );
 
 	b2GraphColor* color = context.graph.colors + colorIndex;
 	b2JointSim* joints = color.jointSims.data;
@@ -310,12 +317,12 @@ static void b2SolveJointsTask( int startIndex, int endIndex, b2StepContext* cont
 		b2SolveJoint( joint, context, useBias );
 	}
 
-	b2TracyCZoneEnd( solve_joints );
+	b2TracyCZoneEnd(b2TracyCZone.solve_joints );
 }
 
 static void b2IntegratePositionsTask( int startIndex, int endIndex, b2StepContext* context )
 {
-	b2TracyCZoneNC( integrate_positions, "IntPos", b2HexColor.b2_colorDarkSeaGreen, true );
+	b2TracyCZoneNC(b2TracyCZone.integrate_positions, "IntPos", b2HexColor.b2_colorDarkSeaGreen, true );
 
 	b2BodyState* states = context.states;
 	float h = context.h;
@@ -329,7 +336,7 @@ static void b2IntegratePositionsTask( int startIndex, int endIndex, b2StepContex
 		state.deltaPosition = b2MulAdd( state.deltaPosition, h, state.linearVelocity );
 	}
 
-	b2TracyCZoneEnd( integrate_positions );
+	b2TracyCZoneEnd(b2TracyCZone.integrate_positions );
 }
 
 struct b2ContinuousContext
@@ -518,7 +525,7 @@ static bool b2ContinuousQueryCallback( int proxyId, int shapeId, void* context )
 // Continuous collision of dynamic versus static
 static void b2SolveContinuous( b2World* world, int bodySimIndex )
 {
-	b2TracyCZoneNC( ccd, "CCD", b2_colorDarkGoldenRod, true );
+	b2TracyCZoneNC(b2TracyCZone.ccd, "CCD", b2_colorDarkGoldenRod, true );
 
 	b2SolverSet* awakeSet = Array_Get( &world.solverSets, (int)b2SetType.b2_awakeSet );
 	b2BodySim* fastBodySim = Array_Get( &awakeSet.bodySims, bodySimIndex );
@@ -662,12 +669,12 @@ static void b2SolveContinuous( b2World* world, int bodySimIndex )
 		}
 	}
 
-	b2TracyCZoneEnd( ccd );
+	b2TracyCZoneEnd(b2TracyCZone.ccd );
 }
 
 static void b2FinalizeBodiesTask( int startIndex, int endIndex, uint threadIndex, void* context )
 {
-	b2TracyCZoneNC( finalize_transfprms, "Transforms", b2_colorMediumSeaGreen, true );
+	b2TracyCZoneNC(b2TracyCZone.finalize_transfprms, "Transforms", b2_colorMediumSeaGreen, true );
 
 	b2StepContext* stepContext = context;
 	b2World* world = stepContext.world;
@@ -847,7 +854,7 @@ static void b2FinalizeBodiesTask( int startIndex, int endIndex, uint threadIndex
 		}
 	}
 
-	b2TracyCZoneEnd( finalize_transfprms );
+	b2TracyCZoneEnd(b2TracyCZone.finalize_transfprms );
 }
 
 /*
@@ -1284,7 +1291,7 @@ static void b2BulletBodyTask( int startIndex, int endIndex, uint threadIndex, vo
 {
 	B2_UNUSED( threadIndex );
 
-	b2TracyCZoneNC( bullet_body_task, "Bullet", b2_colorLightSkyBlue, true );
+	b2TracyCZoneNC(b2TracyCZone.bullet_body_task, "Bullet", b2_colorLightSkyBlue, true );
 
 	b2StepContext* stepContext = taskContext;
 
@@ -1296,7 +1303,7 @@ static void b2BulletBodyTask( int startIndex, int endIndex, uint threadIndex, vo
 		b2SolveContinuous( stepContext.world, simIndex );
 	}
 
-	b2TracyCZoneEnd( bullet_body_task );
+	b2TracyCZoneEnd(b2TracyCZone.bullet_body_task );
 }
 
 #if B2_SIMD_WIDTH == 8
@@ -1314,13 +1321,13 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 
 	// Merge islands
 	{
-		b2TracyCZoneNC( merge, "Merge", b2_colorLightGoldenRodYellow, true );
+		b2TracyCZoneNC(b2TracyCZone.merge, "Merge", b2_colorLightGoldenRodYellow, true );
 		ulong mergeTicks = b2GetTicks();
 
 		b2MergeAwakeIslands( world );
 
 		world.profile.mergeIslands = b2GetMilliseconds( mergeTicks );
-		b2TracyCZoneEnd( merge );
+		b2TracyCZoneEnd(b2TracyCZone.merge );
 	}
 
 	// Are there any awake bodies? This scenario should not be important for profiling.
@@ -1346,7 +1353,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 		b2AtomicStoreInt(&stepContext.bulletBodyCount, 0);
 		stepContext.bulletBodies = b2AllocateArenaItem( &world.stackAllocator, awakeBodyCount * sizeof( int ), "bullet bodies" );
 
-		b2TracyCZoneNC( prepare_stages, "Prepare Stages", b2_colorDarkOrange, true );
+		b2TracyCZoneNC(b2TracyCZone.prepare_stages, "Prepare Stages", b2_colorDarkOrange, true );
 		ulong prepareTicks = b2GetTicks();
 
 		b2ConstraintGraph* graph = &world.constraintGraph;
@@ -1797,9 +1804,9 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 		b2AtomicStoreU32(&stepContext.atomicSyncBits, 0);
 
 		world.profile.prepareStages = b2GetMillisecondsAndReset( &prepareTicks );
-		b2TracyCZoneEnd( prepare_stages );
+		b2TracyCZoneEnd(b2TracyCZone.prepare_stages );
 
-		b2TracyCZoneNC( solve_constraints, "Solve Constraints", b2_colorIndigo, true );
+		b2TracyCZoneNC(b2TracyCZone.solve_constraints, "Solve Constraints", b2_colorIndigo, true );
 		ulong constraintTicks = b2GetTicks();
 
 		// Must use worker index because thread 0 can be assigned multiple tasks by enkiTS
@@ -1831,9 +1838,9 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 		}
 
 		world.profile.solveConstraints = b2GetMillisecondsAndReset( &constraintTicks );
-		b2TracyCZoneEnd( solve_constraints );
+		b2TracyCZoneEnd(b2TracyCZone.solve_constraints );
 
-		b2TracyCZoneNC( update_transforms, "Update Transforms", b2_colorMediumSeaGreen, true );
+		b2TracyCZoneNC(b2TracyCZone.update_transforms, "Update Transforms", b2_colorMediumSeaGreen, true );
 		ulong transformTicks = b2GetTicks();
 
 		// Prepare contact, enlarged body, and island bit sets used in body finalization.
@@ -1867,14 +1874,14 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 		b2FreeArenaItem( &world.stackAllocator, contacts );
 
 		world.profile.transforms = b2GetMilliseconds( transformTicks );
-		b2TracyCZoneEnd( update_transforms );
+		b2TracyCZoneEnd(b2TracyCZone.update_transforms );
 	}
 
 	// Report hit events
 	// todo_erin perhaps optimize this with a bitset
 	// todo_erin perhaps do this in parallel with other work below
 	{
-		b2TracyCZoneNC( hit_events, "Hit Events", b2_colorRosyBrown, true );
+		b2TracyCZoneNC(b2TracyCZone.hit_events, "Hit Events", b2_colorRosyBrown, true );
 		ulong hitTicks = b2GetTicks();
 
 		Debug.Assert( world.contactHitEvents.count == 0 );
@@ -1929,11 +1936,11 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 		}
 
 		world.profile.hitEvents = b2GetMillisecondsAndReset( &hitTicks );
-		b2TracyCZoneEnd( hit_events );
+		b2TracyCZoneEnd(b2TracyCZone.hit_events );
 	}
 
 	{
-		b2TracyCZoneNC( refit_bvh, "Refit BVH", b2_colorFireBrick, true );
+		b2TracyCZoneNC(b2TracyCZone.refit_bvh, "Refit BVH", b2_colorFireBrick, true );
 		ulong refitTicks = b2GetTicks();
 
 		// Finish the user tree task that was queued earlier in the time step. This must be complete before touching the
@@ -2024,13 +2031,13 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 		b2ValidateBroadphase( &world.broadPhase );
 
 		world.profile.refit = b2GetMilliseconds( refitTicks );
-		b2TracyCZoneEnd( refit_bvh );
+		b2TracyCZoneEnd(b2TracyCZone.refit_bvh );
 	}
 
 	int bulletBodyCount = b2AtomicLoadInt( &stepContext.bulletBodyCount );
 	if ( bulletBodyCount > 0 )
 	{
-		b2TracyCZoneNC( bullets, "Bullets", b2_colorLightYellow, true );
+		b2TracyCZoneNC(b2TracyCZone.bullets, "Bullets", b2_colorLightYellow, true );
 		ulong bulletTicks = b2GetTicks();
 
 		// Fast bullet bodies
@@ -2099,7 +2106,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 		}
 
 		world.profile.bullets = b2GetMilliseconds( bulletTicks );
-		b2TracyCZoneEnd( bullets );
+		b2TracyCZoneEnd(b2TracyCZone.bullets );
 	}
 
 	// Need to free this even if no bullets got processed.
@@ -2112,7 +2119,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 	// todo_erin figure out how to do this in parallel with tree refit
 	if ( world.enableSleep == true )
 	{
-		b2TracyCZoneNC( sleep_islands, "Island Sleep", b2_colorLightSlateGray, true );
+		b2TracyCZoneNC(b2TracyCZone.sleep_islands, "Island Sleep", b2_colorLightSlateGray, true );
 		ulong sleepTicks = b2GetTicks();
 
 		// Collect split island candidate for the next time step. No need to split if sleeping is disabled.
@@ -2162,7 +2169,7 @@ void b2Solve( b2World* world, b2StepContext* stepContext )
 		b2ValidateSolverSets( world );
 
 		world.profile.sleepIslands = b2GetMilliseconds( sleepTicks );
-		b2TracyCZoneEnd( sleep_islands );
+		b2TracyCZoneEnd(b2TracyCZone.sleep_islands );
 	}
 }
 
