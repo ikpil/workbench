@@ -812,10 +812,10 @@ b2JointId b2CreateRevoluteJoint( b2WorldId worldId, const b2RevoluteJointDef* de
 	b2Body* bodyB = b2GetBodyFullId( world, def.bodyIdB );
 
 	b2JointPair pair =
-		b2CreateJoint( world, bodyA, bodyB, def.userData, def.drawSize, b2_revoluteJoint, def.collideConnected );
+		b2CreateJoint( world, bodyA, bodyB, def.userData, def.drawSize, b2JointType.b2_revoluteJoint, def.collideConnected );
 
 	b2JointSim* joint = pair.jointSim;
-	joint.type = b2_revoluteJoint;
+	joint.type = b2JointType.b2_revoluteJoint;
 	joint.localOriginAnchorA = def.localAnchorA;
 	joint.localOriginAnchorB = def.localAnchorB;
 
@@ -1265,7 +1265,7 @@ b2Vec2 b2Joint_GetConstraintForce( b2JointId jointId )
 		case b2JointType.b2_prismaticJoint:
 			return b2GetPrismaticJointForce( world, @base );
 
-		case b2_revoluteJoint:
+		case b2JointType.b2_revoluteJoint:
 			return b2GetRevoluteJointForce( world, @base );
 
 		case b2_weldJoint:
@@ -1303,7 +1303,7 @@ float b2Joint_GetConstraintTorque( b2JointId jointId )
 		case b2JointType.b2_prismaticJoint:
 			return b2GetPrismaticJointTorque( world, @base );
 
-		case b2_revoluteJoint:
+		case b2JointType.b2_revoluteJoint:
 			return b2GetRevoluteJointTorque( world, @base );
 
 		case b2_weldJoint:
@@ -1341,7 +1341,7 @@ void b2PrepareJoint( b2JointSim* joint, b2StepContext* context )
 			b2PreparePrismaticJoint( joint, context );
 			break;
 
-		case b2_revoluteJoint:
+		case b2JointType.b2_revoluteJoint:
 			b2PrepareRevoluteJoint( joint, context );
 			break;
 
@@ -1381,7 +1381,7 @@ void b2WarmStartJoint( b2JointSim* joint, b2StepContext* context )
 			b2WarmStartPrismaticJoint( joint, context );
 			break;
 
-		case b2_revoluteJoint:
+		case b2JointType.b2_revoluteJoint:
 			b2WarmStartRevoluteJoint( joint, context );
 			break;
 
@@ -1421,7 +1421,7 @@ void b2SolveJoint( b2JointSim* joint, b2StepContext* context, bool useBias )
 			b2SolvePrismaticJoint( joint, context, useBias );
 			break;
 
-		case b2_revoluteJoint:
+		case b2JointType.b2_revoluteJoint:
 			b2SolveRevoluteJoint( joint, context, useBias );
 			break;
 
@@ -1536,7 +1536,7 @@ void b2DrawJoint( b2DebugDraw* draw, b2World* world, b2Joint* joint )
 			b2DrawPrismaticJoint( draw, jointSim, transformA, transformB );
 			break;
 
-		case b2_revoluteJoint:
+		case b2JointType.b2_revoluteJoint:
 			b2DrawRevoluteJoint( draw, jointSim, transformA, transformB, joint.drawSize );
 			break;
 
