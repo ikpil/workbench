@@ -866,10 +866,10 @@ b2JointId b2CreatePrismaticJoint( b2WorldId worldId, const b2PrismaticJointDef* 
 	b2Body* bodyA = b2GetBodyFullId( world, def.bodyIdA );
 	b2Body* bodyB = b2GetBodyFullId( world, def.bodyIdB );
 
-	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def.userData, 1.0f, b2_prismaticJoint, def.collideConnected );
+	b2JointPair pair = b2CreateJoint( world, bodyA, bodyB, def.userData, 1.0f, b2JointType.b2_prismaticJoint, def.collideConnected );
 
 	b2JointSim* joint = pair.jointSim;
-	joint.type = b2_prismaticJoint;
+	joint.type = b2JointType.b2_prismaticJoint;
 	joint.localOriginAnchorA = def.localAnchorA;
 	joint.localOriginAnchorB = def.localAnchorB;
 
@@ -1262,7 +1262,7 @@ b2Vec2 b2Joint_GetConstraintForce( b2JointId jointId )
 		case b2_nullJoint:
 			return b2Vec2_zero;
 
-		case b2_prismaticJoint:
+		case b2JointType.b2_prismaticJoint:
 			return b2GetPrismaticJointForce( world, @base );
 
 		case b2_revoluteJoint:
@@ -1300,7 +1300,7 @@ float b2Joint_GetConstraintTorque( b2JointId jointId )
 		case b2_nullJoint:
 			return 0.0f;
 
-		case b2_prismaticJoint:
+		case b2JointType.b2_prismaticJoint:
 			return b2GetPrismaticJointTorque( world, @base );
 
 		case b2_revoluteJoint:
@@ -1337,7 +1337,7 @@ void b2PrepareJoint( b2JointSim* joint, b2StepContext* context )
 		case b2_nullJoint:
 			break;
 
-		case b2_prismaticJoint:
+		case b2JointType.b2_prismaticJoint:
 			b2PreparePrismaticJoint( joint, context );
 			break;
 
@@ -1377,7 +1377,7 @@ void b2WarmStartJoint( b2JointSim* joint, b2StepContext* context )
 		case b2_nullJoint:
 			break;
 
-		case b2_prismaticJoint:
+		case b2JointType.b2_prismaticJoint:
 			b2WarmStartPrismaticJoint( joint, context );
 			break;
 
@@ -1417,7 +1417,7 @@ void b2SolveJoint( b2JointSim* joint, b2StepContext* context, bool useBias )
 		case b2_nullJoint:
 			break;
 
-		case b2_prismaticJoint:
+		case b2JointType.b2_prismaticJoint:
 			b2SolvePrismaticJoint( joint, context, useBias );
 			break;
 
@@ -1532,7 +1532,7 @@ void b2DrawJoint( b2DebugDraw* draw, b2World* world, b2Joint* joint )
 		}
 		break;
 
-		case b2_prismaticJoint:
+		case b2JointType.b2_prismaticJoint:
 			b2DrawPrismaticJoint( draw, jointSim, transformA, transformB );
 			break;
 
