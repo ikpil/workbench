@@ -1394,35 +1394,35 @@ public static b2BodyStateW b2GatherBodies( b2BodyState[] states, int[] indices )
 }
 
 // This writes only the velocities back to the solver bodies
-static void b2ScatterBodies( b2BodyState* states, int* indices, const b2BodyStateW* simdBody )
+public static void b2ScatterBodies( b2BodyState[] states, int[] indices, ref b2BodyStateW simdBody )
 {
 	if ( indices[0] != B2_NULL_INDEX )
-	{
-		b2BodyState* state = states + indices[0];
+    {
+        b2BodyState state = states[indices[0]];
 		state.linearVelocity.x = simdBody.v.X.x;
 		state.linearVelocity.y = simdBody.v.Y.x;
 		state.angularVelocity = simdBody.w.x;
 	}
 
 	if ( indices[1] != B2_NULL_INDEX )
-	{
-		b2BodyState* state = states + indices[1];
+    {
+        b2BodyState state = states[indices[1]];
 		state.linearVelocity.x = simdBody.v.X.y;
 		state.linearVelocity.y = simdBody.v.Y.y;
 		state.angularVelocity = simdBody.w.y;
 	}
 
 	if ( indices[2] != B2_NULL_INDEX )
-	{
-		b2BodyState* state = states + indices[2];
+    {
+        b2BodyState state = states[indices[2]];
 		state.linearVelocity.x = simdBody.v.X.z;
 		state.linearVelocity.y = simdBody.v.Y.z;
 		state.angularVelocity = simdBody.w.z;
 	}
 
 	if ( indices[3] != B2_NULL_INDEX )
-	{
-		b2BodyState* state = states + indices[3];
+    {
+        b2BodyState state = states[indices[3]];
 		state.linearVelocity.x = simdBody.v.X.w;
 		state.linearVelocity.y = simdBody.v.Y.w;
 		state.angularVelocity = simdBody.w.w;
@@ -1432,13 +1432,13 @@ static void b2ScatterBodies( b2BodyState* states, int* indices, const b2BodyStat
 #endif
 
 // Contacts that live within the constraint graph coloring
-void b2PrepareContactsTask( int startIndex, int endIndex, b2StepContext* context )
+public static void b2PrepareContactsTask( int startIndex, int endIndex, b2StepContext context )
 {
-	b2TracyCZoneNC( prepare_contact, "Prepare Contact", b2_colorYellow, true );
-	b2World* world = context.world;
-	b2ContactSim** contacts = context.contacts;
-	b2ContactConstraintSIMD* constraints = context.simdContactConstraints;
-	b2BodyState* awakeStates = context.states;
+	b2TracyCZoneNC( prepare_contact, "Prepare Contact", b2HexColor.b2_colorYellow, true );
+	b2World world = context.world;
+	b2ContactSim[] contacts = context.contacts;
+	b2ContactConstraintSIMD[] constraints = context.simdContactConstraints;
+	b2BodyState[] awakeStates = context.states;
 #if B2_VALIDATE
 	b2Body* bodies = world.bodies.data;
 #endif
@@ -1451,15 +1451,15 @@ void b2PrepareContactsTask( int startIndex, int endIndex, b2StepContext* context
 
 	for ( int i = startIndex; i < endIndex; ++i )
 	{
-		b2ContactConstraintSIMD* constraint = constraints[i];
+		b2ContactConstraintSIMD constraint = constraints[i];
 
 		for ( int j = 0; j < B2_SIMD_WIDTH; ++j )
 		{
-			b2ContactSim* contactSim = contacts[B2_SIMD_WIDTH * i + j];
+			b2ContactSim contactSim = contacts[B2_SIMD_WIDTH * i + j];
 
-			if ( contactSim != NULL )
+			if ( contactSim != null)
 			{
-				const b2Manifold* manifold = &contactSim.manifold;
+				b2Manifold manifold = contactSim.manifold;
 
 				int indexA = contactSim.bodySimIndexA;
 				int indexB = contactSim.bodySimIndexB;
@@ -1481,8 +1481,8 @@ void b2PrepareContactsTask( int startIndex, int endIndex, b2StepContext* context
 				float mA = contactSim.invMassA;
 				float iA = contactSim.invIA;
 				if ( indexA != B2_NULL_INDEX )
-				{
-					b2BodyState* stateA = awakeStates + indexA;
+                {
+                    b2BodyState stateA = awakeStates[indexA];
 					vA = stateA.linearVelocity;
 					wA = stateA.angularVelocity;
 				}
@@ -1492,12 +1492,13 @@ void b2PrepareContactsTask( int startIndex, int endIndex, b2StepContext* context
 				float mB = contactSim.invMassB;
 				float iB = contactSim.invIB;
 				if ( indexB != B2_NULL_INDEX )
-				{
-					b2BodyState* stateB = awakeStates + indexB;
+                {
+                    b2BodyState stateB = awakeStates[indexB];
 					vB = stateB.linearVelocity;
 					wB = stateB.angularVelocity;
 				}
 
+                // TODO: @ikpil, check
 				( (float*)&constraint.invMassA )[j] = mA;
 				( (float*)&constraint.invMassB )[j] = mB;
 				( (float*)&constraint.invIA )[j] = iA;
@@ -1526,8 +1527,8 @@ void b2PrepareContactsTask( int startIndex, int endIndex, b2StepContext* context
 
 				b2Vec2 tangent = b2RightPerp( normal );
 
-				{
-					const b2ManifoldPoint* mp = manifold.points + 0;
+                {
+                    b2ManifoldPoint mp = manifold.points[0];
 
 					b2Vec2 rA = mp.anchorA;
 					b2Vec2 rB = mp.anchorB;
@@ -1563,8 +1564,8 @@ void b2PrepareContactsTask( int startIndex, int endIndex, b2StepContext* context
 				Debug.Assert( 0 < pointCount && pointCount <= 2 );
 
 				if ( pointCount == 2 )
-				{
-					const b2ManifoldPoint* mp = manifold.points + 1;
+                {
+                    b2ManifoldPoint mp = manifold.points[1];
 
 					b2Vec2 rA = mp.anchorA;
 					b2Vec2 rB = mp.anchorB;
@@ -1665,16 +1666,16 @@ void b2PrepareContactsTask( int startIndex, int endIndex, b2StepContext* context
 	b2TracyCZoneEnd( prepare_contact );
 }
 
-void b2WarmStartContactsTask( int startIndex, int endIndex, b2StepContext* context, int colorIndex )
+public static void b2WarmStartContactsTask( int startIndex, int endIndex, b2StepContext context, int colorIndex )
 {
-	b2TracyCZoneNC( warm_start_contact, "Warm Start", b2_colorGreen, true );
+	b2TracyCZoneNC( warm_start_contact, "Warm Start", b2HexColor.b2_colorGreen, true );
 
-	b2BodyState* states = context.states;
-	b2ContactConstraintSIMD* constraints = context.graph.colors[colorIndex].simdConstraints;
+	b2BodyState[] states = context.states;
+	b2ContactConstraintSIMD[] constraints = context.graph.colors[colorIndex].simdConstraints;
 
 	for ( int i = startIndex; i < endIndex; ++i )
 	{
-		b2ContactConstraintSIMD* c = constraints[i];
+		b2ContactConstraintSIMD c = constraints[i];
 		b2BodyStateW bA = b2GatherBodies( states, c.indexA );
 		b2BodyStateW bB = b2GatherBodies( states, c.indexB );
 
@@ -1716,25 +1717,25 @@ void b2WarmStartContactsTask( int startIndex, int endIndex, b2StepContext* conte
 		bA.w = b2MulSubW(bA.w, c.invIA, c.rollingImpulse);
 		bB.w = b2MulAddW(bB.w, c.invIB, c.rollingImpulse);
 
-		b2ScatterBodies( states, c.indexA, &bA );
-		b2ScatterBodies( states, c.indexB, &bB );
+		b2ScatterBodies( states, c.indexA, ref bA );
+		b2ScatterBodies( states, c.indexB, ref bB );
 	}
 
 	b2TracyCZoneEnd( warm_start_contact );
 }
 
-void b2SolveContactsTask( int startIndex, int endIndex, b2StepContext* context, int colorIndex, bool useBias )
+public static void b2SolveContactsTask( int startIndex, int endIndex, b2StepContext context, int colorIndex, bool useBias )
 {
-	b2TracyCZoneNC( solve_contact, "Solve Contact", b2_colorAliceBlue, true );
+	b2TracyCZoneNC( solve_contact, "Solve Contact", b2HexColor.b2_colorAliceBlue, true );
 
-	b2BodyState* states = context.states;
-	b2ContactConstraintSIMD* constraints = context.graph.colors[colorIndex].simdConstraints;
+	b2BodyState[] states = context.states;
+	b2ContactConstraintSIMD[] constraints = context.graph.colors[colorIndex].simdConstraints;
 	b2FloatW inv_h = b2SplatW( context.inv_h );
 	b2FloatW minBiasVel = b2SplatW( -context.world.contactMaxPushSpeed );
 
 	for ( int i = startIndex; i < endIndex; ++i )
 	{
-		b2ContactConstraintSIMD* c = constraints[i];
+		b2ContactConstraintSIMD c = constraints[i];
 
 		b2BodyStateW bA = b2GatherBodies( states, c.indexA );
 		b2BodyStateW bB = b2GatherBodies( states, c.indexB );
@@ -1755,7 +1756,7 @@ void b2SolveContactsTask( int startIndex, int endIndex, b2StepContext* context, 
 
 		b2FloatW totalNormalImpulse = b2ZeroW();
 
-		b2Vec2W dp = { b2SubW( bB.dp.X, bA.dp.X ), b2SubW( bB.dp.Y, bA.dp.Y ) };
+        b2Vec2W dp = new b2Vec2W(b2SubW(bB.dp.X, bA.dp.X), b2SubW(bB.dp.Y, bA.dp.Y));
 
 		// point1 non-penetration constraint
 		{
@@ -1765,7 +1766,7 @@ void b2SolveContactsTask( int startIndex, int endIndex, b2StepContext* context, 
 
 			// compute current separation
 			// this is subject to round-off error if the anchor is far from the body center of mass
-			b2Vec2W ds = { b2AddW( dp.X, b2SubW( rsB.X, rsA.X ) ), b2AddW( dp.Y, b2SubW( rsB.Y, rsA.Y ) ) };
+            b2Vec2W ds = new b2Vec2W(b2AddW(dp.X, b2SubW(rsB.X, rsA.X)), b2AddW(dp.Y, b2SubW(rsB.Y, rsA.Y)));
 			b2FloatW s = b2AddW( b2DotW( c.normal, ds ), c.baseSeparation1 );
 
 			// Apply speculative bias if separation is greater than zero, otherwise apply soft constraint bias
@@ -1816,7 +1817,7 @@ void b2SolveContactsTask( int startIndex, int endIndex, b2StepContext* context, 
 			b2Vec2W rsB = b2RotateVectorW( bB.dq, c.anchorB2 );
 
 			// compute current separation
-			b2Vec2W ds = { b2AddW( dp.X, b2SubW( rsB.X, rsA.X ) ), b2AddW( dp.Y, b2SubW( rsB.Y, rsA.Y ) ) };
+            b2Vec2W ds = new b2Vec2W(b2AddW(dp.X, b2SubW(rsB.X, rsA.X)), b2AddW(dp.Y, b2SubW(rsB.Y, rsA.Y)));
 			b2FloatW s = b2AddW( b2DotW( c.normal, ds ), c.baseSeparation2 );
 
 			b2FloatW mask = b2GreaterThanW( s, b2ZeroW() );
@@ -1954,18 +1955,18 @@ void b2SolveContactsTask( int startIndex, int endIndex, b2StepContext* context, 
 	b2TracyCZoneEnd( solve_contact );
 }
 
-void b2ApplyRestitutionTask( int startIndex, int endIndex, b2StepContext* context, int colorIndex )
+public static void b2ApplyRestitutionTask( int startIndex, int endIndex, b2StepContext context, int colorIndex )
 {
-	b2TracyCZoneNC( restitution, "Restitution", b2_colorDodgerBlue, true );
+	b2TracyCZoneNC( restitution, "Restitution", b2HexColor.b2_colorDodgerBlue, true );
 
-	b2BodyState* states = context.states;
-	b2ContactConstraintSIMD* constraints = context.graph.colors[colorIndex].simdConstraints;
+	b2BodyState[] states = context.states;
+	b2ContactConstraintSIMD[] constraints = context.graph.colors[colorIndex].simdConstraints;
 	b2FloatW threshold = b2SplatW( context.world.restitutionThreshold );
 	b2FloatW zero = b2ZeroW();
 
 	for ( int i = startIndex; i < endIndex; ++i )
 	{
-		b2ContactConstraintSIMD* c = constraints[i];
+		b2ContactConstraintSIMD c = constraints[i];
 
 		b2BodyStateW bA = b2GatherBodies( states, c.indexA );
 		b2BodyStateW bB = b2GatherBodies( states, c.indexB );
@@ -2046,25 +2047,25 @@ void b2ApplyRestitutionTask( int startIndex, int endIndex, b2StepContext* contex
 			bB.w = b2MulAddW( bB.w, c.invIB, b2SubW( b2MulW( rB.X, Py ), b2MulW( rB.Y, Px ) ) );
 		}
 
-		b2ScatterBodies( states, c.indexA, &bA );
-		b2ScatterBodies( states, c.indexB, &bB );
+		b2ScatterBodies( states, c.indexA, ref bA );
+		b2ScatterBodies( states, c.indexB, ref bB );
 	}
 
 	b2TracyCZoneEnd( restitution );
 }
 
-void b2StoreImpulsesTask( int startIndex, int endIndex, b2StepContext* context )
+public static void b2StoreImpulsesTask( int startIndex, int endIndex, b2StepContext context )
 {
-	b2TracyCZoneNC( store_impulses, "Store", b2_colorFireBrick, true );
+	b2TracyCZoneNC( tore_impulses, "Store", b2HexColor.b2_colorFireBrick, true );
 
-	b2ContactSim** contacts = context.contacts;
-	const b2ContactConstraintSIMD* constraints = context.simdContactConstraints;
+	b2ContactSim[] contacts = context.contacts;
+	b2ContactConstraintSIMD[] constraints = context.simdContactConstraints;
 
-	b2Manifold dummy = { 0 };
+    b2Manifold dummy = new b2Manifold();
 
 	for ( int constraintIndex = startIndex; constraintIndex < endIndex; ++constraintIndex )
-	{
-		const b2ContactConstraintSIMD* c = constraints + constraintIndex;
+    {
+        b2ContactConstraintSIMD c = constraints[constraintIndex];
 		const float* rollingImpulse = (float*)&c.rollingImpulse;
 		const float* normalImpulse1 = (float*)&c.normalImpulse1;
 		const float* normalImpulse2 = (float*)&c.normalImpulse2;
@@ -2079,7 +2080,7 @@ void b2StoreImpulsesTask( int startIndex, int endIndex, b2StepContext* context )
 
 		for ( int laneIndex = 0; laneIndex < B2_SIMD_WIDTH; ++laneIndex )
 		{
-			b2Manifold* m = contacts[baseIndex + laneIndex] == NULL ? &dummy : &contacts[baseIndex + laneIndex].manifold;
+			b2Manifold m = contacts[baseIndex + laneIndex] == null ? dummy : contacts[baseIndex + laneIndex].manifold;
 			m.rollingImpulse = rollingImpulse[laneIndex];
 
 			m.points[0].normalImpulse = normalImpulse1[laneIndex];

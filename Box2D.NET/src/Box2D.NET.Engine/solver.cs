@@ -138,13 +138,13 @@ public class b2StepContext
     // - parallel-for prepare and store contacts with NULL gaps for SIMD remainders
     // despite being an array of pointers, these are contiguous sub-arrays corresponding
     // to constraint graph colors
-    public b2ContactSim** contacts;
+    public b2ContactSim[] contacts;
 
-    public struct b2ContactConstraintSIMD* simdContactConstraints;
+    public b2ContactConstraintSIMD[] simdContactConstraints;
     public int activeColorCount;
     public int workerCount;
 
-    public b2SolverStage* stages;
+    public b2SolverStage[] stages;
     public int stageCount;
     public bool enableWarmStarting;
 
