@@ -22,6 +22,7 @@ using static Box2D.NET.Engine.world;
 using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.id_pool;
 using static Box2D.NET.Engine.manifold;
+using static Box2D.NET.Engine.geometry;
 
 namespace Box2D.NET.Engine;
 
@@ -74,8 +75,8 @@ public class b2ChainShape
     public int nextChainId;
     public int count;
     public int materialCount;
-    public int shapeIndices;
-    public b2SurfaceMaterial materials;
+    public int[] shapeIndices;
+    public b2SurfaceMaterial[] materials;
     public ushort generation;
 }
 
@@ -360,7 +361,7 @@ public static void b2DestroyShapeInternal( b2World world, b2Shape shape, b2Body 
 		int contactId = contactKey >> 1;
 		int edgeIndex = contactKey & 1;
 
-		b2Contact* contact = Array_Get( &world.contacts, contactId );
+		b2Contact contact = Array_Get( world.contacts, contactId );
 		contactKey = contact.edges[edgeIndex].nextKey;
 
 		if ( contact.shapeIdA == shapeId || contact.shapeIdB == shapeId )
@@ -371,63 +372,62 @@ public static void b2DestroyShapeInternal( b2World world, b2Shape shape, b2Body 
 
 	if ( shape.sensorIndex != B2_NULL_INDEX )
 	{
-		b2Sensor* sensor = Array_Get( &world.sensors, shape.sensorIndex );
+		b2Sensor sensor = Array_Get( world.sensors, shape.sensorIndex );
 		for ( int i = 0; i < sensor.overlaps2.count; ++i )
-		{
-			b2ShapeRef* ref = sensor.overlaps2.data + i;
-			b2SensorEndTouchEvent event = {
-				.sensorShapeId =
-					{
-						.index1 = shapeId + 1,
-						.generation = shape.generation,
-						.world0 = world.worldId,
-					},
-				.visitorShapeId =
-					{
-						.index1 = ref.shapeId + 1,
-						.generation = ref.generation,
-						.world0 = world.worldId,
-					},
+        {
+            b2ShapeRef @ref = sensor.overlaps2.data[i];
+			b2SensorEndTouchEvent @event = new b2SensorEndTouchEvent()
+            {
+				sensorShapeId = new b2ShapeId(
+                    shapeId + 1, 
+                    shape.generation, 
+                    world.worldId
+                    ),
+				visitorShapeId = new b2ShapeId(
+                    @ref.shapeId + 1, 
+                    @ref.generation, 
+                    world.worldId
+                    )
 			};
 
-			Array_Push( world.sensorEndEvents + world.endEventArrayIndex, event );
+			Array_Push( world.sensorEndEvents[world.endEventArrayIndex], @event );
 		}
 
 		// Destroy sensor
-		Array_Destroy( &sensor.overlaps1 );
-		Array_Destroy( &sensor.overlaps2 );
+		Array_Destroy( sensor.overlaps1 );
+		Array_Destroy( sensor.overlaps2 );
 
-		int movedIndex = Array_RemoveSwap( &world.sensors, shape.sensorIndex );
+		int movedIndex = Array_RemoveSwap( world.sensors, shape.sensorIndex );
 		if ( movedIndex != B2_NULL_INDEX )
 		{
 			// Fixup moved sensor
-			b2Sensor* movedSensor = Array_Get( &world.sensors, shape.sensorIndex );
-			b2Shape* otherSensorShape = Array_Get( &world.shapes, movedSensor.shapeId );
+			b2Sensor movedSensor = Array_Get( world.sensors, shape.sensorIndex );
+			b2Shape otherSensorShape = Array_Get( world.shapes, movedSensor.shapeId );
 			otherSensorShape.sensorIndex = shape.sensorIndex;
 		}
 	}
 
 	// Return shape to free list.
-	b2FreeId( &world.shapeIdPool, shapeId );
+	b2FreeId( world.shapeIdPool, shapeId );
 	shape.id = B2_NULL_INDEX;
 
 	b2ValidateSolverSets( world );
 }
 
-void b2DestroyShape( b2ShapeId shapeId, bool updateBodyMass )
+public static void b2DestroyShape( b2ShapeId shapeId, bool updateBodyMass )
 {
-	b2World* world = b2GetWorldLocked( shapeId.world0 );
-	if ( world == NULL )
+	b2World world = b2GetWorldLocked( shapeId.world0 );
+	if ( world == null)
 	{
 		return;
 	}
 
-	b2Shape* shape = b2GetShape( world, shapeId );
+	b2Shape shape = b2GetShape( world, shapeId );
 
 	// need to wake bodies because this might be a static body
 	bool wakeBodies = true;
 
-	b2Body* body = Array_Get( &world.bodies, shape.bodyId );
+	b2Body body = Array_Get( world.bodies, shape.bodyId );
 	b2DestroyShapeInternal( world, shape, body, wakeBodies );
 
 	if ( updateBodyMass == true )
@@ -436,33 +436,33 @@ void b2DestroyShape( b2ShapeId shapeId, bool updateBodyMass )
 	}
 }
 
-b2ChainId b2CreateChain( b2BodyId bodyId, const b2ChainDef* def )
+public static b2ChainId b2CreateChain( b2BodyId bodyId, b2ChainDef def )
 {
 	B2_CHECK_DEF( def );
 	Debug.Assert( def.count >= 4 );
 	Debug.Assert( def.materialCount == 1 || def.materialCount == def.count );
 
-	b2World* world = b2GetWorldLocked( bodyId.world0 );
-	if ( world == NULL )
-	{
-		return ( b2ChainId ){ 0 };
-	}
+	b2World world = b2GetWorldLocked( bodyId.world0 );
+	if ( world == null)
+    {
+        return new b2ChainId();
+    }
 
-	b2Body* body = b2GetBodyFullId( world, bodyId );
+	b2Body body = b2GetBodyFullId( world, bodyId );
 	b2Transform transform = b2GetBodyTransformQuick( world, body );
 
-	int chainId = b2AllocId( &world.chainIdPool );
+	int chainId = b2AllocId( world.chainIdPool );
 
 	if ( chainId == world.chainShapes.count )
-	{
-		Array_Push( &world.chainShapes, ( b2ChainShape ){ 0 } );
-	}
+    {
+        Array_Push(world.chainShapes, new b2ChainShape());
+    }
 	else
 	{
 		Debug.Assert( world.chainShapes.data[chainId].id == B2_NULL_INDEX );
 	}
 
-	b2ChainShape* chainShape = Array_Get( &world.chainShapes, chainId );
+	b2ChainShape chainShape = Array_Get( world.chainShapes, chainId );
 
 	chainShape.id = chainId;
 	chainShape.bodyId = body.id;
@@ -471,18 +471,18 @@ b2ChainId b2CreateChain( b2BodyId bodyId, const b2ChainDef* def )
 
 	int materialCount = def.materialCount;
 	chainShape.materialCount = materialCount;
-	chainShape.materials = b2Alloc( materialCount * sizeof( b2SurfaceMaterial ) );
+    chainShape.materials = b2Alloc<b2SurfaceMaterial>(materialCount);
 
 	for ( int i = 0; i < materialCount; ++i )
-	{
-		const b2SurfaceMaterial* material = def.materials + i;
+    {
+        b2SurfaceMaterial material = def.materials[i];
 		Debug.Assert( b2IsValidFloat( material.friction ) && material.friction >= 0.0f );
 		Debug.Assert( b2IsValidFloat( material.restitution ) && material.restitution >= 0.0f );
 		Debug.Assert( b2IsValidFloat( material.rollingResistance ) && material.rollingResistance >= 0.0f );
 		Debug.Assert( b2IsValidFloat( material.tangentSpeed ) );
 
-		chainShape.materials[i] = *material;
-	}
+        chainShape.materials[i] = material.Clone();
+    }
 
 	body.headChainId = chainId;
 
@@ -492,15 +492,15 @@ b2ChainId b2CreateChain( b2BodyId bodyId, const b2ChainDef* def )
 	shapeDef.enableContactEvents = false;
 	shapeDef.enableHitEvents = false;
 
-	const b2Vec2* points = def.points;
+	b2Vec2[] points = def.points;
 	int n = def.count;
 
 	if ( def.isLoop )
 	{
 		chainShape.count = n;
-		chainShape.shapeIndices = b2Alloc( chainShape.count * sizeof( int ) );
+        chainShape.shapeIndices = b2Alloc<int>(chainShape.count);
 
-		b2ChainSegment chainSegment;
+        b2ChainSegment chainSegment = new b2ChainSegment();
 
 		int prevIndex = n - 1;
 		for ( int i = 0; i < n - 2; ++i )
@@ -513,7 +513,7 @@ b2ChainId b2CreateChain( b2BodyId bodyId, const b2ChainDef* def )
 			prevIndex = i;
 
 			int materialIndex = materialCount == 1 ? 0 : i;
-			const b2SurfaceMaterial* material = def.materials + materialIndex;
+            b2SurfaceMaterial material = def.materials[materialIndex];
 			shapeDef.friction = material.friction;
 			shapeDef.restitution = material.restitution;
 			shapeDef.rollingResistance = material.rollingResistance;
@@ -521,7 +521,7 @@ b2ChainId b2CreateChain( b2BodyId bodyId, const b2ChainDef* def )
 			shapeDef.customColor = material.customColor;
 			shapeDef.material = material.material;
 
-			b2Shape* shape = b2CreateShapeInternal( world, body, transform, &shapeDef, &chainSegment, Engine.b2ShapeType.b2_chainSegmentShape );
+			b2Shape shape = b2CreateShapeInternal( world, body, transform, shapeDef, chainSegment, Engine.b2ShapeType.b2_chainSegmentShape );
 			chainShape.shapeIndices[i] = shape.id;
 		}
 
@@ -533,7 +533,7 @@ b2ChainId b2CreateChain( b2BodyId bodyId, const b2ChainDef* def )
 			chainSegment.chainId = chainId;
 
 			int materialIndex = materialCount == 1 ? 0 : n - 2;
-			const b2SurfaceMaterial* material = def.materials + materialIndex;
+            b2SurfaceMaterial material = def.materials[materialIndex];
 			shapeDef.friction = material.friction;
 			shapeDef.restitution = material.restitution;
 			shapeDef.rollingResistance = material.rollingResistance;
@@ -541,7 +541,7 @@ b2ChainId b2CreateChain( b2BodyId bodyId, const b2ChainDef* def )
 			shapeDef.customColor = material.customColor;
 			shapeDef.material = material.material;
 
-			b2Shape* shape = b2CreateShapeInternal( world, body, transform, &shapeDef, &chainSegment, Engine.b2ShapeType.b2_chainSegmentShape );
+			b2Shape shape = b2CreateShapeInternal( world, body, transform, shapeDef, chainSegment, Engine.b2ShapeType.b2_chainSegmentShape );
 			chainShape.shapeIndices[n - 2] = shape.id;
 		}
 
@@ -553,7 +553,7 @@ b2ChainId b2CreateChain( b2BodyId bodyId, const b2ChainDef* def )
 			chainSegment.chainId = chainId;
 
 			int materialIndex = materialCount == 1 ? 0 : n - 1;
-			const b2SurfaceMaterial* material = def.materials + materialIndex;
+            b2SurfaceMaterial material = def.materials[materialIndex];
 			shapeDef.friction = material.friction;
 			shapeDef.restitution = material.restitution;
 			shapeDef.rollingResistance = material.rollingResistance;
@@ -561,16 +561,16 @@ b2ChainId b2CreateChain( b2BodyId bodyId, const b2ChainDef* def )
 			shapeDef.customColor = material.customColor;
 			shapeDef.material = material.material;
 
-			b2Shape* shape = b2CreateShapeInternal( world, body, transform, &shapeDef, &chainSegment, Engine.b2ShapeType.b2_chainSegmentShape );
+			b2Shape shape = b2CreateShapeInternal( world, body, transform, shapeDef, chainSegment, Engine.b2ShapeType.b2_chainSegmentShape );
 			chainShape.shapeIndices[n - 1] = shape.id;
 		}
 	}
 	else
 	{
 		chainShape.count = n - 3;
-		chainShape.shapeIndices = b2Alloc( chainShape.count * sizeof( int ) );
+        chainShape.shapeIndices = b2Alloc<int>(chainShape.count);
 
-		b2ChainSegment chainSegment;
+		b2ChainSegment chainSegment = new b2ChainSegment();
 
 		for ( int i = 0; i < n - 3; ++i )
 		{
@@ -582,7 +582,7 @@ b2ChainId b2CreateChain( b2BodyId bodyId, const b2ChainDef* def )
 
 			// Material is associated with leading point of solid segment
 			int materialIndex = materialCount == 1 ? 0 : i + 1;
-			const b2SurfaceMaterial* material = def.materials + materialIndex;
+            b2SurfaceMaterial material = def.materials[materialIndex];
 			shapeDef.friction = material.friction;
 			shapeDef.restitution = material.restitution;
 			shapeDef.rollingResistance = material.rollingResistance;
@@ -590,51 +590,53 @@ b2ChainId b2CreateChain( b2BodyId bodyId, const b2ChainDef* def )
 			shapeDef.customColor = material.customColor;
 			shapeDef.material = material.material;
 
-			b2Shape* shape = b2CreateShapeInternal( world, body, transform, &shapeDef, &chainSegment, Engine.b2ShapeType.b2_chainSegmentShape );
+			b2Shape shape = b2CreateShapeInternal( world, body, transform, shapeDef, chainSegment, Engine.b2ShapeType.b2_chainSegmentShape );
 			chainShape.shapeIndices[i] = shape.id;
 		}
 	}
 
-	b2ChainId id = { chainId + 1, world.worldId, chainShape.generation };
+    b2ChainId id = new b2ChainId(chainId + 1, world.worldId, chainShape.generation);
 	return id;
 }
 
-void b2FreeChainData(b2ChainShape* chain)
+public static void b2FreeChainData(b2ChainShape chain)
 {
-	b2Free( chain.shapeIndices, chain.count * sizeof( int ) );
-	chain.shapeIndices = NULL;
+    b2Free(chain.shapeIndices, chain.count);
+	chain.shapeIndices = null;
 
-	b2Free( chain.materials, chain.materialCount * sizeof( b2SurfaceMaterial ) );
-	chain.materials = NULL;
+    b2Free(chain.materials, chain.materialCount);
+	chain.materials = null;
 }
 
-void b2DestroyChain( b2ChainId chainId )
+public static void b2DestroyChain( b2ChainId chainId )
 {
-	b2World* world = b2GetWorldLocked( chainId.world0 );
-	if ( world == NULL )
+	b2World world = b2GetWorldLocked( chainId.world0 );
+	if ( world == null)
 	{
 		return;
 	}
 
-	b2ChainShape* chain = b2GetChainShape( world, chainId );
+	b2ChainShape chain = b2GetChainShape( world, chainId );
 	bool wakeBodies = true;
 
-	b2Body* body = Array_Get( &world.bodies, chain.bodyId );
+	b2Body body = Array_Get( world.bodies, chain.bodyId );
 
+    // TODO: @ikpil, check!
 	// Remove the chain from the body's singly linked list.
-	int* chainIdPtr = &body.headChainId;
+	int chainIdPtr = body.headChainId;
 	bool found = false;
-	while ( *chainIdPtr != B2_NULL_INDEX )
+	while ( chainIdPtr != B2_NULL_INDEX )
 	{
-		if ( *chainIdPtr == chain.id )
+		if ( chainIdPtr == chain.id )
 		{
-			*chainIdPtr = chain.nextChainId;
+			chainIdPtr = chain.nextChainId;
+            body.headChainId = chain.nextChainId;
 			found = true;
 			break;
 		}
 
-		chainIdPtr = &( world.chainShapes.data[*chainIdPtr].nextChainId );
-	}
+        chainIdPtr = world.chainShapes.data[chainIdPtr].nextChainId;
+    }
 
 	Debug.Assert( found == true );
 	if ( found == false )
@@ -646,54 +648,54 @@ void b2DestroyChain( b2ChainId chainId )
 	for ( int i = 0; i < count; ++i )
 	{
 		int shapeId = chain.shapeIndices[i];
-		b2Shape* shape = Array_Get( &world.shapes, shapeId );
+		b2Shape shape = Array_Get( world.shapes, shapeId );
 		b2DestroyShapeInternal( world, shape, body, wakeBodies );
 	}
 
 	b2FreeChainData( chain );
 
 	// Return chain to free list.
-	b2FreeId( &world.chainIdPool, chain.id );
+	b2FreeId( world.chainIdPool, chain.id );
 	chain.id = B2_NULL_INDEX;
 
 	b2ValidateSolverSets( world );
 }
 
-b2WorldId b2Chain_GetWorld( b2ChainId chainId )
+public static b2WorldId b2Chain_GetWorld( b2ChainId chainId )
 {
 	b2World world = b2GetWorld( chainId.world0 );
-	return ( b2WorldId ){ chainId.world0 + 1, world.generation };
+    return new b2WorldId((ushort)(chainId.world0 + 1), world.generation);
 }
 
-int b2Chain_GetSegmentCount( b2ChainId chainId )
+public static int b2Chain_GetSegmentCount( b2ChainId chainId )
 {
-	b2World* world = b2GetWorldLocked( chainId.world0 );
-	if ( world == NULL )
+	b2World world = b2GetWorldLocked( chainId.world0 );
+	if ( world == null)
 	{
 		return 0;
 	}
 
-	b2ChainShape* chain = b2GetChainShape( world, chainId );
+	b2ChainShape chain = b2GetChainShape( world, chainId );
 	return chain.count;
 }
 
-int b2Chain_GetSegments( b2ChainId chainId, b2ShapeId* segmentArray, int capacity )
+public static int b2Chain_GetSegments( b2ChainId chainId, b2ShapeId[] segmentArray, int capacity )
 {
-	b2World* world = b2GetWorldLocked( chainId.world0 );
-	if ( world == NULL )
+	b2World world = b2GetWorldLocked( chainId.world0 );
+	if ( world == null)
 	{
 		return 0;
 	}
 
-	b2ChainShape* chain = b2GetChainShape( world, chainId );
+	b2ChainShape chain = b2GetChainShape( world, chainId );
 
 	int count = b2MinInt( chain.count, capacity );
 	for ( int i = 0; i < count; ++i )
 	{
 		int shapeId = chain.shapeIndices[i];
-		b2Shape* shape = Array_Get( &world.shapes, shapeId );
-		segmentArray[i] = ( b2ShapeId ){ shapeId + 1, chainId.world0, shape.generation };
-	}
+		b2Shape shape = Array_Get( world.shapes, shapeId );
+        segmentArray[i] = new b2ShapeId(shapeId + 1, chainId.world0, shape.generation);
+    }
 
 	return count;
 }
@@ -703,19 +705,19 @@ public static b2AABB b2ComputeShapeAABB( b2Shape shape, b2Transform xf )
 	switch ( shape.type )
 	{
 		case Engine.b2ShapeType.b2_capsuleShape:
-			return b2ComputeCapsuleAABB( &shape.capsule, xf );
+			return b2ComputeCapsuleAABB( shape.capsule, xf );
 		case Engine.b2ShapeType.b2_circleShape:
-			return b2ComputeCircleAABB( &shape.circle, xf );
+			return b2ComputeCircleAABB( shape.circle, xf );
 		case Engine.b2ShapeType.b2_polygonShape:
-			return b2ComputePolygonAABB( &shape.polygon, xf );
+			return b2ComputePolygonAABB( shape.polygon, xf );
 		case Engine.b2ShapeType.b2_segmentShape:
-			return b2ComputeSegmentAABB( &shape.segment, xf );
+			return b2ComputeSegmentAABB( shape.segment, xf );
 		case Engine.b2ShapeType.b2_chainSegmentShape:
-			return b2ComputeSegmentAABB( &shape.chainSegment.segment, xf );
+			return b2ComputeSegmentAABB( shape.chainSegment.segment, xf );
 		default:
 		{
 			Debug.Assert( false );
-			b2AABB empty = { xf.p, xf.p };
+            b2AABB empty = new b2AABB(xf.p, xf.p);
 			return empty;
 		}
 	}
@@ -741,7 +743,7 @@ public static b2Vec2 b2GetShapeCentroid( b2Shape shape )
 }
 
 // todo_erin maybe compute this on shape creation
-float b2GetShapePerimeter( const b2Shape* shape )
+public static float b2GetShapePerimeter( b2Shape shape )
 {
 	switch ( shape.type )
 	{
@@ -752,7 +754,7 @@ float b2GetShapePerimeter( const b2Shape* shape )
 			return 2.0f * B2_PI * shape.circle.radius;
 		case Engine.b2ShapeType.b2_polygonShape:
 		{
-			const b2Vec2* points = shape.polygon.vertices;
+			b2Vec2[] points = shape.polygon.vertices;
 			int count = shape.polygon.count;
 			float perimeter = 2.0f * B2_PI * shape.polygon.radius;
 			Debug.Assert( count > 0 );

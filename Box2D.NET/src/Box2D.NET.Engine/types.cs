@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 using System;
+using System.Diagnostics;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.core;
 using static Box2D.NET.Engine.math_function;
@@ -459,6 +460,12 @@ public class b2SurfaceMaterial
 
     /// Custom debug draw color.
     public uint customColor;
+
+    public b2SurfaceMaterial Clone()
+    {
+        Debug.Assert(false);
+        return null;
+    }
 }
 
 /// Used to create a chain of line segments. This is designed to eliminate ghost collisions with some limitations.

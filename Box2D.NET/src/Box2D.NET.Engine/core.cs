@@ -192,6 +192,11 @@ public static class core
         return A.Length;
     }
 
+    
+    public static void B2_CHECK_DEF(b2ChainDef DEF)
+    {
+        Debug.Assert(DEF.internalValue == B2_SECRET_COOKIE);
+    }
 
     public static void B2_CHECK_DEF(b2BodyDef DEF)
     {
