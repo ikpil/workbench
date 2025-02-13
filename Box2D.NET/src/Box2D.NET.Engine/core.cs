@@ -213,11 +213,11 @@ public static class core
         TracyCZoneEnd(ctx);
     }
 #else
-    public static void b2TracyCZoneC(b2TracyCZone ctx, object color, object active)
+    public static void b2TracyCZoneC(b2TracyCZone ctx, b2HexColor color, bool active)
     {
     }
 
-    public static void b2TracyCZoneNC(b2TracyCZone ctx, object name, object color, object active)
+    public static void b2TracyCZoneNC(b2TracyCZone ctx, string name, b2HexColor color, bool active)
     {
     }
 

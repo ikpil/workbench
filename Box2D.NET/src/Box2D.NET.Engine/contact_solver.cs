@@ -163,7 +163,7 @@ public class contact_solver
 // Overflow contacts don't fit into the constraint graph coloring
 public static void b2PrepareOverflowContacts( b2StepContext context )
 {
-	b2TracyCZoneNC(b2TracyCZone.prepare_overflow_contact, "Prepare Overflow Contact", b2_colorYellow, true );
+	b2TracyCZoneNC(b2TracyCZone.prepare_overflow_contact, "Prepare Overflow Contact", b2HexColor.b2_colorYellow, true );
 
 	b2World world = context.world;
 	b2ConstraintGraph graph = context.graph;
@@ -299,7 +299,7 @@ public static void b2PrepareOverflowContacts( b2StepContext context )
 
 public static void b2WarmStartOverflowContacts( b2StepContext context )
 {
-	b2TracyCZoneNC(b2TracyCZone.warmstart_overflow_contact, "WarmStart Overflow Contact", b2_colorDarkOrange, true );
+	b2TracyCZoneNC(b2TracyCZone.warmstart_overflow_contact, "WarmStart Overflow Contact", b2HexColor.b2_colorDarkOrange, true );
 
 	b2ConstraintGraph graph = context.graph;
     b2GraphColor color = graph.colors[B2_OVERFLOW_INDEX];
@@ -366,7 +366,7 @@ public static void b2WarmStartOverflowContacts( b2StepContext context )
 
 public static void b2SolveOverflowContacts( b2StepContext context, bool useBias )
 {
-	b2TracyCZoneNC(b2TracyCZone.solve_contact, "Solve Contact", b2_colorAliceBlue, true );
+	b2TracyCZoneNC(b2TracyCZone.solve_contact, "Solve Contact", b2HexColor.b2_colorAliceBlue, true );
 
 	b2ConstraintGraph graph = context.graph;
     b2GraphColor color = graph.colors[B2_OVERFLOW_INDEX];
@@ -521,7 +521,7 @@ public static void b2SolveOverflowContacts( b2StepContext context, bool useBias 
 
 public static void b2ApplyOverflowRestitution( b2StepContext context )
 {
-	b2TracyCZoneNC(b2TracyCZone.overflow_resitution, "Overflow Restitution", b2_colorViolet, true );
+	b2TracyCZoneNC(b2TracyCZone.overflow_resitution, "Overflow Restitution", b2HexColor.b2_colorViolet, true );
 
 	b2ConstraintGraph graph = context.graph;
     b2GraphColor color = graph.colors[B2_OVERFLOW_INDEX];
@@ -1955,8 +1955,8 @@ public static void b2SolveContactsTask( int startIndex, int endIndex, b2StepCont
 			bB.w = b2MulAddW( bB.w, c.invIB, deltaLambda );
 		}
 
-		b2ScatterBodies( states, c.indexA, &bA );
-		b2ScatterBodies( states, c.indexB, &bB );
+		b2ScatterBodies( states, c.indexA, ref bA );
+		b2ScatterBodies( states, c.indexB, ref bB );
 	}
 
 	b2TracyCZoneEnd(b2TracyCZone.solve_contact );
@@ -2063,7 +2063,7 @@ public static void b2ApplyRestitutionTask( int startIndex, int endIndex, b2StepC
 
 public static void b2StoreImpulsesTask( int startIndex, int endIndex, b2StepContext context )
 {
-	b2TracyCZoneNC(b2TracyCZone.tore_impulses, "Store", b2HexColor.b2_colorFireBrick, true );
+	b2TracyCZoneNC(b2TracyCZone.store_impulses, "Store", b2HexColor.b2_colorFireBrick, true );
 
 	b2ContactSim[] contacts = context.contacts;
 	b2ContactConstraintSIMD[] constraints = context.simdContactConstraints;
