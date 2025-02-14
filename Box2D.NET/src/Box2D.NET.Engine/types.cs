@@ -1011,6 +1011,18 @@ public class b2SensorBeginTouchEvent
 
     /// The id of the dynamic shape that began touching the sensor shape
     public b2ShapeId visitorShapeId;
+    
+    public b2SensorBeginTouchEvent()
+    {
+        
+    }
+
+    public b2SensorBeginTouchEvent(b2ShapeId sensorShapeId, b2ShapeId visitorShapeId)
+    {
+        this.sensorShapeId = sensorShapeId;
+        this.visitorShapeId = visitorShapeId;
+    }
+
 }
 
 /// An end touch event is generated when a shape stops overlapping a sensor shape.
@@ -1028,6 +1040,17 @@ public class b2SensorEndTouchEvent
     ///	@warning this shape may have been destroyed
     ///	@see b2Shape_IsValid
     public b2ShapeId visitorShapeId;
+
+    public b2SensorEndTouchEvent()
+    {
+        
+    }
+
+    public b2SensorEndTouchEvent(b2ShapeId sensorShapeId, b2ShapeId visitorShapeId)
+    {
+        this.sensorShapeId = sensorShapeId;
+        this.visitorShapeId = visitorShapeId;
+    }
 }
 
 /// Sensor events are buffered in the Box2D world and are available
