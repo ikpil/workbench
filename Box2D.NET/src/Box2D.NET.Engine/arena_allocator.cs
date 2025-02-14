@@ -16,36 +16,35 @@ using static Box2D.NET.Engine.array;
 
 namespace Box2D.NET.Engine;
 
-public class arena_allocator
+public class b2ArenaEntry
 {
-    B2_ARRAY_DECLARE(b2ArenaEntry, b2ArenaEntry);
+    public byte[] data;
+    public string name;
+    public int size;
+    public bool usedMalloc;
+}
 
-    typedef struct b2ArenaEntry
-    {
-        char* data;
-        const char* name;
-        int size;
-        bool usedMalloc;
-    }
-
-    b2ArenaEntry;
 
 // This is a stack-like arena allocator used for fast per step allocations.
 // You must nest allocate/free pairs. The code will Debug.Assert
 // if you try to interleave multiple allocate/free pairs.
 // This allocator uses the heap if space is insufficient.
 // I could remove the need to free entries individually.
-    typedef struct b2ArenaAllocator
-    {
-        char* data;
-        int capacity;
-        int index;
+public class b2ArenaAllocator
+{
+    public byte[] data;
+    public int capacity;
+    public int index;
 
-        int allocation;
-        int maxAllocation;
+    public int allocation;
+    public int maxAllocation;
 
-        b2Array<b2ArenaEntry> entries;
-    }
+    public b2Array<b2ArenaEntry> entries;
+}
+
+public class arena_allocator
+{
+
 
     b2ArenaAllocator;
 
@@ -86,7 +85,7 @@ public class arena_allocator
         b2Free(allocator->data, allocator->capacity);
     }
 
-    void* b2AllocateArenaItem(b2ArenaAllocator* alloc, int size,  const char* name )
+    public static T[] b2AllocateArenaItem<T>(b2ArenaAllocator alloc, int size,  string name )
     {
         // ensure allocation is 32 byte aligned to support 256-bit SIMD
         int size32 = ((size - 1) | 0x1F) + 1;
@@ -121,7 +120,7 @@ public class arena_allocator
         return entry.data;
     }
 
-    void b2FreeArenaItem(b2ArenaAllocator* alloc, void* mem)
+    public static void b2FreeArenaItem<T>(b2ArenaAllocator alloc, T[] mem)
     {
         int entryCount = alloc->entries.count;
         Debug.Assert(entryCount > 0);

@@ -25,7 +25,7 @@ namespace Box2D.NET.Engine;
 /// }
 /// @endcode
 /// @ingroup world
-public delegate void b2TaskCallback(int startIndex, int endIndex, uint workerIndex, object taskContext);
+public delegate void b2TaskCallback(int startIndex, int endIndex, uint workerIndex, b2World taskContext);
 
 /// These functions can be provided to Box2D to invoke a task system. These are designed to work well with enkiTS.
 /// Returns a pointer to the user's task object. May be nullptr. A nullptr indicates to Box2D that the work was executed

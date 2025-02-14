@@ -2003,7 +2003,7 @@ public class body
         return jointCount;
     }
 
-    bool b2ShouldBodiesCollide( b2World* world, b2Body* bodyA, b2Body* bodyB )
+    public static bool b2ShouldBodiesCollide( b2World world, b2Body bodyA, b2Body bodyB )
     {
         if ( bodyA.type != b2_dynamicBody && bodyB.type != b2_dynamicBody )
         {

@@ -333,7 +333,7 @@ void b2InitializeContactRegisters()
 	}
 }
 
-void b2CreateContact( b2World* world, b2Shape* shapeA, b2Shape* shapeB )
+public static void b2CreateContact( b2World world, b2Shape shapeA, b2Shape shapeB )
 {
 	b2ShapeType type1 = shapeA->type;
 	b2ShapeType type2 = shapeB->type;
