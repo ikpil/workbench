@@ -176,11 +176,11 @@ public class sensor
         return 1;
     }
 
-    public static void b2SensorTask(int startIndex, int endIndex, uint threadIndex, b2World context)
+    public static void b2SensorTask(int startIndex, int endIndex, uint threadIndex, object context)
     {
         b2TracyCZoneNC(b2TracyCZone.sensor_task, "Overlap", b2HexColor.b2_colorBrown, true);
 
-        b2World world = context;
+        b2World world = context as b2World;
         Debug.Assert((int)threadIndex < world.workerCount);
         b2SensorTaskContext taskContext = world.sensorTaskContexts.data[threadIndex];
 

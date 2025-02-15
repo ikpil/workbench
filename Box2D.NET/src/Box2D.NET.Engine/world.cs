@@ -341,7 +341,7 @@ public class world
 
         world.stackAllocator = b2CreateArenaAllocator(2048);
         b2CreateBroadPhase(world.broadPhase);
-        b2CreateGraph(world.constraintGraph, 16);
+        b2CreateGraph(ref world.constraintGraph, 16);
 
         // pools
         world.bodyIdPool = b2CreateIdPool();

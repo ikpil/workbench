@@ -777,7 +777,7 @@ public static class contact
 
     public static b2Manifold b2ComputeManifold(b2Shape shapeA, b2Transform transformA, b2Shape shapeB, b2Transform transformB)
     {
-        b2ManifoldFcn fcn = s_registers[(int)shapeA.type][(int)shapeB.type].fcn;
+        b2ManifoldFcn fcn = s_registers[(int)shapeA.type, (int)shapeB.type].fcn;
         b2SimplexCache cache = new b2SimplexCache();
         return fcn(shapeA, transformA, shapeB, transformB, cache);
     }

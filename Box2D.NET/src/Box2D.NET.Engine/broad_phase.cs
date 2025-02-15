@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
+using System;
 using System.Diagnostics;
 using static Box2D.NET.Engine.table;
 using static Box2D.NET.Engine.array;
@@ -52,8 +53,8 @@ public class b2BroadPhase
     // These are the results from the pair query and are used to create new contacts
     // in deterministic order.
     // todo these could be in the step context
-    public b2MoveResult[] moveResults;
-    public b2MovePair[] movePairs;
+    public ArraySegment<b2MoveResult> moveResults;
+    public ArraySegment<b2MovePair> movePairs;
     public int movePairCapacity;
     public b2AtomicInt movePairIndex;
 
@@ -392,13 +393,13 @@ b2TreeStats b2_kinematicStats;
 b2TreeStats b2_staticStats;
 #endif
 
-    public static void b2FindPairsTask(int startIndex, int endIndex, uint threadIndex, b2World context)
+    public static void b2FindPairsTask(int startIndex, int endIndex, uint threadIndex, object context)
     {
         b2TracyCZoneNC(b2TracyCZone.pair_task, "Pair", b2HexColor.b2_colorMediumSlateBlue, true);
 
         B2_UNUSED(threadIndex);
 
-        b2World world = context;
+        b2World world = context as b2World;
         b2BroadPhase bp = world.broadPhase;
 
         b2QueryPairContext queryContext = new b2QueryPairContext();

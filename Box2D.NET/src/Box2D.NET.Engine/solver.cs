@@ -359,11 +359,11 @@ public class solver
 
 
 // This is called from b2DynamicTree_Query for continuous collision
-    public static bool b2ContinuousQueryCallback(int proxyId, int shapeId, b2ContinuousContext context)
+    public static bool b2ContinuousQueryCallback(int proxyId, int shapeId, object context)
     {
         B2_UNUSED(proxyId);
 
-        b2ContinuousContext continuousContext = context;
+        b2ContinuousContext continuousContext = context as b2ContinuousContext;
         b2Shape fastShape = continuousContext.fastShape;
         b2BodySim fastBodySim = continuousContext.fastBodySim;
 
@@ -1323,17 +1323,18 @@ public enum b2SolverBlockType
         b2TracyCZoneEnd(b2TracyCZone.bullet_body_task);
     }
 
-#if BOX2D_ENABLE_SIMD
-#if B2_SIMD_WIDTH == 8
-    public const int B2_SIMD_SHIFT = 3;
-#elif B2_SIMD_WIDTH == 4
-    public const int B2_SIMD_SHIFT = 2;
-#else
+    // TODO: @ikpil. check SIMD
+// #if BOX2D_ENABLE_SIMD
+// #if B2_SIMD_WIDTH == 8
+//     public const int B2_SIMD_SHIFT = 3;
+// #elif B2_SIMD_WIDTH == 4
+//     public const int B2_SIMD_SHIFT = 2;
+// #else
+//     public const int B2_SIMD_SHIFT = 0;
+// #endif
+// #else
     public const int B2_SIMD_SHIFT = 0;
-#endif
-#else
-    public const int B2_SIMD_SHIFT = 0;
-#endif
+//#endif
 
 // Solve with graph coloring
     public static void b2Solve(b2World world, b2StepContext stepContext)
