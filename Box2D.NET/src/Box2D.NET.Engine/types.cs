@@ -537,6 +537,32 @@ public class b2Profile
     public float bullets;
     public float sleepIslands;
     public float sensors;
+
+    public void Clear()
+    {
+        step  = 0;
+        pairs  = 0;
+        collide  = 0;
+        solve  = 0;
+        mergeIslands  = 0;
+        prepareStages  = 0;
+        solveConstraints  = 0;
+        prepareConstraints  = 0;
+        integrateVelocities  = 0;
+        warmStart  = 0;
+        solveImpulses  = 0;
+        integratePositions  = 0;
+        relaxImpulses  = 0;
+        applyRestitution  = 0;
+        storeImpulses  = 0;
+        splitIslands  = 0;
+        transforms  = 0;
+        hitEvents  = 0;
+        refit  = 0;
+        bullets  = 0;
+        sleepIslands  = 0;
+        sensors  = 0;
+    }
 }
 
 /// Counters that give details of the simulation size.
@@ -1083,6 +1109,18 @@ public class b2ContactBeginTouchEvent
     /// The initial contact manifold. This is recorded before the solver is called,
     /// so all the impulses will be zero.
     public b2Manifold manifold;
+
+    public b2ContactBeginTouchEvent()
+    {
+        
+    }
+
+    public b2ContactBeginTouchEvent(b2ShapeId shapeIdA, b2ShapeId shapeIdB, b2Manifold manifold)
+    {
+        this.shapeIdA = shapeIdA;
+        this.shapeIdB = shapeIdB;
+        this.manifold = manifold;
+    }
 }
 
 /// An end touch event is generated when two shapes stop touching.
@@ -1184,6 +1222,12 @@ public struct b2BodyEvents
 
     /// Number of move events
     public int moveCount;
+
+    public b2BodyEvents(b2BodyMoveEvent[] moveEvents, int moveCount)
+    {
+        this.moveEvents = moveEvents;
+        this.moveCount = moveCount;
+    }
 }
 
 /// The contact data for two shapes. By convention the manifold normal points

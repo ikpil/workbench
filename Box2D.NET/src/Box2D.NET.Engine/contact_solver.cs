@@ -1,6 +1,7 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
+using System;
 using System.Diagnostics;
 using static Box2D.NET.Engine.table;
 using static Box2D.NET.Engine.array;
@@ -168,7 +169,7 @@ public static void b2PrepareOverflowContacts( b2StepContext context )
 	b2World world = context.world;
 	b2ConstraintGraph graph = context.graph;
     b2GraphColor color = graph.colors[B2_OVERFLOW_INDEX];
-	b2ContactConstraint[] constraints = color.overflowConstraints;
+	ArraySegment<b2ContactConstraint> constraints = color.overflowConstraints;
 	int contactCount = color.contactSims.count;
 	b2ContactSim[] contacts = color.contactSims.data;
 	b2BodyState[] awakeStates = context.states;
@@ -303,7 +304,7 @@ public static void b2WarmStartOverflowContacts( b2StepContext context )
 
 	b2ConstraintGraph graph = context.graph;
     b2GraphColor color = graph.colors[B2_OVERFLOW_INDEX];
-	b2ContactConstraint[] constraints = color.overflowConstraints;
+	ArraySegment<b2ContactConstraint> constraints = color.overflowConstraints;
 	int contactCount = color.contactSims.count;
 	b2World world = context.world;
 	b2SolverSet awakeSet = Array_Get( world.solverSets, (int)b2SetType.b2_awakeSet );
@@ -370,7 +371,7 @@ public static void b2SolveOverflowContacts( b2StepContext context, bool useBias 
 
 	b2ConstraintGraph graph = context.graph;
     b2GraphColor color = graph.colors[B2_OVERFLOW_INDEX];
-	b2ContactConstraint[] constraints = color.overflowConstraints;
+	ArraySegment<b2ContactConstraint> constraints = color.overflowConstraints;
 	int contactCount = color.contactSims.count;
 	b2World world = context.world;
 	b2SolverSet awakeSet = Array_Get( world.solverSets, (int)b2SetType.b2_awakeSet );
@@ -525,7 +526,7 @@ public static void b2ApplyOverflowRestitution( b2StepContext context )
 
 	b2ConstraintGraph graph = context.graph;
     b2GraphColor color = graph.colors[B2_OVERFLOW_INDEX];
-	b2ContactConstraint[] constraints = color.overflowConstraints;
+	ArraySegment<b2ContactConstraint> constraints = color.overflowConstraints;
 	int contactCount = color.contactSims.count;
 	b2World world = context.world;
 	b2SolverSet awakeSet = Array_Get( world.solverSets, (int)b2SetType.b2_awakeSet );
@@ -617,11 +618,11 @@ public static void b2ApplyOverflowRestitution( b2StepContext context )
 
 public static void b2StoreOverflowImpulses( b2StepContext context )
 {
-	b2TracyCZoneNC(b2TracyCZone.store_impulses, "Store", b2_colorFireBrick, true );
+	b2TracyCZoneNC(b2TracyCZone.store_impulses, "Store", b2HexColor.b2_colorFireBrick, true );
 
 	b2ConstraintGraph graph = context.graph;
     b2GraphColor color = graph.colors[B2_OVERFLOW_INDEX];
-	b2ContactConstraint[] constraints = color.overflowConstraints;
+	ArraySegment<b2ContactConstraint> constraints = color.overflowConstraints;
 	b2ContactSim[] contacts = color.contactSims.data;
 	int contactCount = color.contactSims.count;
 
@@ -1443,8 +1444,8 @@ public static void b2PrepareContactsTask( int startIndex, int endIndex, b2StepCo
 {
 	b2TracyCZoneNC(b2TracyCZone.prepare_contact, "Prepare Contact", b2HexColor.b2_colorYellow, true );
 	b2World world = context.world;
-	b2ContactSim[] contacts = context.contacts;
-	b2ContactConstraintSIMD[] constraints = context.simdContactConstraints;
+	ArraySegment<b2ContactSim> contacts = context.contacts;
+	ArraySegment<b2ContactConstraintSIMD> constraints = context.simdContactConstraints;
 	b2BodyState[] awakeStates = context.states;
 #if B2_VALIDATE
 	b2Body* bodies = world.bodies.data;
@@ -1967,7 +1968,7 @@ public static void b2ApplyRestitutionTask( int startIndex, int endIndex, b2StepC
 	b2TracyCZoneNC(b2TracyCZone.restitution, "Restitution", b2HexColor.b2_colorDodgerBlue, true );
 
 	b2BodyState[] states = context.states;
-	b2ContactConstraintSIMD[] constraints = context.graph.colors[colorIndex].simdConstraints;
+	ArraySegment<b2ContactConstraintSIMD> constraints = context.graph.colors[colorIndex].simdConstraints;
 	b2FloatW threshold = b2SplatW( context.world.restitutionThreshold );
 	b2FloatW zero = b2ZeroW();
 
@@ -2065,8 +2066,8 @@ public static void b2StoreImpulsesTask( int startIndex, int endIndex, b2StepCont
 {
 	b2TracyCZoneNC(b2TracyCZone.store_impulses, "Store", b2HexColor.b2_colorFireBrick, true );
 
-	b2ContactSim[] contacts = context.contacts;
-	b2ContactConstraintSIMD[] constraints = context.simdContactConstraints;
+	ArraySegment<b2ContactSim> contacts = context.contacts;
+    ArraySegment<b2ContactConstraintSIMD> constraints = context.simdContactConstraints;
 
     b2Manifold dummy = new b2Manifold();
 

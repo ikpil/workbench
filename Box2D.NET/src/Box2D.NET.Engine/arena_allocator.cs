@@ -55,6 +55,11 @@ public class b2ArenaAllocator
         // TODO: @ikpil, check
         return null;
     }
+
+    public IArenaAllocator[] GetAll()
+    {
+        return null;
+    }
 }
 
 public class arena_allocator
@@ -140,36 +145,45 @@ public class arena_allocator
         Array_Pop(alloc.entries);
     }
 
-    public static void b2GrowArena<T>(b2ArenaAllocator allocator) where T : new()
+    public static void b2GrowArena(b2ArenaAllocator allocator)
     {
-        var alloc = allocator.GetAlloc<T>();
-        // Stack must not be in use
-        Debug.Assert(alloc.allocation == 0);
+        var allocs = allocator.GetAll();
 
-        if (alloc.maxAllocation > alloc.capacity)
+        for (int i = 0; i < allocs.Length; ++i)
         {
-            b2Free(alloc.data.Array, alloc.capacity);
-            alloc.capacity = alloc.maxAllocation + alloc.maxAllocation / 2;
-            alloc.data = b2Alloc<T>(alloc.capacity);
+            var alloc = allocs[i];
+            // TODO: @ikpil. check
+            // // Stack must not be in use
+            // Debug.Assert(alloc.allocation == 0);
+            //
+            // if (alloc.maxAllocation > alloc.capacity)
+            // {
+            //     b2Free(alloc.data.Array, alloc.capacity);
+            //     alloc.capacity = alloc.maxAllocation + alloc.maxAllocation / 2;
+            //     alloc.data = b2Alloc<T>(alloc.capacity);
+            // }
         }
     }
 
     // Grow the arena based on usage
-    public static int b2GetArenaCapacity<T>(b2ArenaAllocator allocator)
+    public static int b2GetArenaCapacity(b2ArenaAllocator allocator)
     {
-        var alloc = allocator.GetAlloc<T>();
-        return alloc.capacity;
+        // var alloc = allocator.GetAlloc<T>();
+        // return alloc.capacity;
+        return -1;
     }
 
-    public static int b2GetArenaAllocation<T>(b2ArenaAllocator allocator)
+    public static int b2GetArenaAllocation(b2ArenaAllocator allocator)
     {
-        var alloc = allocator.GetAlloc<T>();
-        return alloc.allocation;
+        // var alloc = allocator.GetAlloc<T>();
+        // return alloc.allocation;
+        return -1;
     }
 
-    public static int b2GetMaxArenaAllocation<T>(b2ArenaAllocator allocator)
+    public static int b2GetMaxArenaAllocation(b2ArenaAllocator allocator)
     {
-        var alloc = allocator.GetAlloc<T>();
-        return alloc.maxAllocation;
+        // var alloc = allocator.GetAlloc<T>();
+        // return alloc.maxAllocation;
+        return -1;
     }
 }

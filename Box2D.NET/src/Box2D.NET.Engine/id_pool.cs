@@ -41,7 +41,7 @@ public class id_pool
     public static void b2DestroyIdPool(ref b2IdPool pool)
     {
         Array_Destroy(pool.freeArray);
-        pool = new b2IdPool();
+        pool = new b2IdPool(); // TODO: @ikpil check pool
     }
 
     public static int b2AllocId(b2IdPool pool)

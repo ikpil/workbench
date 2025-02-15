@@ -123,7 +123,7 @@ public class b2SolverStage
 }
 
 // Context for a time step. Recreated each time step.
-public class b2StepContext
+public class b2StepContext // TODO: @ikpil, check struct or class
 {
     // time step
     public float dt;

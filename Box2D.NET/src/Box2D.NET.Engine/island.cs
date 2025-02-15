@@ -924,7 +924,7 @@ void b2SplitIsland( b2World* world, int baseId )
 // are interacting with these data structures.
 public static void b2SplitIslandTask( int startIndex, int endIndex, uint threadIndex, object context )
 {
-	b2TracyCZoneNC(b2TracyCZone.split, "Split Island", b2_colorOlive, true );
+	b2TracyCZoneNC(b2TracyCZone.split, "Split Island", b2HexColor.b2_colorOlive, true );
 
 	B2_UNUSED( startIndex, endIndex, threadIndex );
 
