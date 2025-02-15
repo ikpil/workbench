@@ -67,7 +67,7 @@ public class test_determinism : test_macros
         {
             box2dTask( 0, itemCount, 0, box2dContext );
 
-            return NULL;
+            return null;
         }
     }
 

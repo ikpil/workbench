@@ -252,7 +252,7 @@ public class test_world : test_macros
     {
         (void)shapeIdA;
         (void)shapeIdB;
-        ENSURE( context == NULL );
+        ENSURE( context == null );
         return true;
     }
 
@@ -261,7 +261,7 @@ public class test_world : test_macros
         (void)shapeIdA;
         (void)shapeIdB;
         (void)manifold;
-        ENSURE( context == NULL );
+        ENSURE( context == null );
         return false;
     }
 
@@ -294,8 +294,8 @@ public class test_world : test_macros
         value = b2World_GetHitEventThreshold( worldId );
         ENSURE( value == 100.0f );
 
-        b2World_SetCustomFilterCallback( worldId, CustomFilter, NULL );
-        b2World_SetPreSolveCallback( worldId, PreSolveStatic, NULL );
+        b2World_SetCustomFilterCallback( worldId, CustomFilter, null );
+        b2World_SetPreSolveCallback( worldId, PreSolveStatic, null );
 
         b2Vec2 g = new b2Vec2( 1.0f, 2.0f );
         b2World_SetGravity( worldId, g );
