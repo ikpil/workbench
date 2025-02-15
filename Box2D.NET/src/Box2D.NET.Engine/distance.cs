@@ -1089,31 +1089,31 @@ public static class distance
 
             // Initialize the separating axis.
             b2SeparationFunction fcn = b2MakeSeparationFunction(cache, proxyA, sweepA, proxyB, sweepB, t1);
-            // #if 0
-            //         // Dump the curve seen by the root finder
-            //         {
-            //             const int N = 100;
-            //             float dx = 1.0f / N;
-            //             float xs[N + 1];
-            //             float fs[N + 1];
-            //
-            //             float x = 0.0f;
-            //
-            //             for (int i = 0; i <= N; ++i)
-            //             {
-            //                 sweepA.GetTransform(&xfA, x);
-            //                 sweepB.GetTransform(&xfB, x);
-            //                 float f = fcn.Evaluate(xfA, xfB) - target;
-            //
-            //                 Console.Write("%g %g\n", x, f);
-            //
-            //                 xs[i] = x;
-            //                 fs[i] = f;
-            //
-            //                 x += dx;
-            //             }
-            //         }
-            // #endif
+#if ZERO_DEFINE
+                    // Dump the curve seen by the root finder
+                    {
+                        const int N = 100;
+                        float dx = 1.0f / N;
+                        float xs[N + 1];
+                        float fs[N + 1];
+            
+                        float x = 0.0f;
+            
+                        for (int i = 0; i <= N; ++i)
+                        {
+                            sweepA.GetTransform(&xfA, x);
+                            sweepB.GetTransform(&xfB, x);
+                            float f = fcn.Evaluate(xfA, xfB) - target;
+            
+                            Console.Write("%g %g\n", x, f);
+            
+                            xs[i] = x;
+                            fs[i] = f;
+            
+                            x += dx;
+                        }
+                    }
+#endif
 
             // Compute the TOI on the separating axis. We do this by successively
             // resolving the deepest point. This loop is bounded by the number of vertices.

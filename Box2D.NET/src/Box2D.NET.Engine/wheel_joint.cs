@@ -510,28 +510,28 @@ public class wheel_joint
         stateB.angularVelocity = wB;
     }
 
-// #if 0
-// void b2WheelJoint_Dump()
-// {
-// 	int32 indexA = joint.bodyA.joint.islandIndex;
-// 	int32 indexB = joint.bodyB.joint.islandIndex;
-//
-// 	b2Dump("  b2WheelJointDef jd;\n");
-// 	b2Dump("  jd.bodyA = sims[%d];\n", indexA);
-// 	b2Dump("  jd.bodyB = sims[%d];\n", indexB);
-// 	b2Dump("  jd.collideConnected = bool(%d);\n", joint.collideConnected);
-// 	b2Dump("  jd.localAnchorA.Set(%.9g, %.9g);\n", joint.localAnchorA.x, joint.localAnchorA.y);
-// 	b2Dump("  jd.localAnchorB.Set(%.9g, %.9g);\n", joint.localAnchorB.x, joint.localAnchorB.y);
-// 	b2Dump("  jd.referenceAngle = %.9g;\n", joint.referenceAngle);
-// 	b2Dump("  jd.enableLimit = bool(%d);\n", joint.enableLimit);
-// 	b2Dump("  jd.lowerAngle = %.9g;\n", joint.lowerAngle);
-// 	b2Dump("  jd.upperAngle = %.9g;\n", joint.upperAngle);
-// 	b2Dump("  jd.enableMotor = bool(%d);\n", joint.enableMotor);
-// 	b2Dump("  jd.motorSpeed = %.9g;\n", joint.motorSpeed);
-// 	b2Dump("  jd.maxMotorTorque = %.9g;\n", joint.maxMotorTorque);
-// 	b2Dump("  joints[%d] = joint.world.CreateJoint(&jd);\n", joint.index);
-// }
-// #endif
+#if ZERO_DEFINE
+    void b2WheelJoint_Dump()
+    {
+        int32 indexA = joint.bodyA.joint.islandIndex;
+        int32 indexB = joint.bodyB.joint.islandIndex;
+
+        b2Dump("  b2WheelJointDef jd;\n");
+        b2Dump("  jd.bodyA = sims[%d];\n", indexA);
+        b2Dump("  jd.bodyB = sims[%d];\n", indexB);
+        b2Dump("  jd.collideConnected = bool(%d);\n", joint.collideConnected);
+        b2Dump("  jd.localAnchorA.Set(%.9g, %.9g);\n", joint.localAnchorA.x, joint.localAnchorA.y);
+        b2Dump("  jd.localAnchorB.Set(%.9g, %.9g);\n", joint.localAnchorB.x, joint.localAnchorB.y);
+        b2Dump("  jd.referenceAngle = %.9g;\n", joint.referenceAngle);
+        b2Dump("  jd.enableLimit = bool(%d);\n", joint.enableLimit);
+        b2Dump("  jd.lowerAngle = %.9g;\n", joint.lowerAngle);
+        b2Dump("  jd.upperAngle = %.9g;\n", joint.upperAngle);
+        b2Dump("  jd.enableMotor = bool(%d);\n", joint.enableMotor);
+        b2Dump("  jd.motorSpeed = %.9g;\n", joint.motorSpeed);
+        b2Dump("  jd.maxMotorTorque = %.9g;\n", joint.maxMotorTorque);
+        b2Dump("  joints[%d] = joint.world.CreateJoint(&jd);\n", joint.index);
+    }
+#endif
 
     public static void b2DrawWheelJoint(b2DebugDraw draw, b2JointSim @base, b2Transform transformA, b2Transform transformB)
     {

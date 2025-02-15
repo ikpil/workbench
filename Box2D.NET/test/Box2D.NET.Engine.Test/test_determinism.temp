@@ -128,7 +128,7 @@ public class test_determinism : test_macros
             for ( int i = 0; i < e_rows; ++i )
             {
                 b2BodyDef bd = b2DefaultBodyDef();
-                bd.type = b2_dynamicBody;
+                bd.type = b2BodyType.b2_dynamicBody;
 
                 int n = j * e_rows + i;
 
@@ -248,7 +248,7 @@ public class test_determinism : test_macros
             for ( int i = 0; i < rowCount; ++i )
             {
                 b2BodyDef bodyDef = b2DefaultBodyDef();
-                bodyDef.type = b2_dynamicBody;
+                bodyDef.type = b2BodyType.b2_dynamicBody;
 
                 bodyDef.position.x = x + offset * i;
                 bodyDef.position.y = h + 2.0f * h * i;

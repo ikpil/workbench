@@ -508,26 +508,26 @@ public class distance_joint
         stateB.angularVelocity = wB;
     }
 
-// #if 0
-    // public static void b2DistanceJoint::Dump()
-    // {
-    // 	int32 indexA = m_bodyA.m_islandIndex;
-    // 	int32 indexB = m_bodyB.m_islandIndex;
-    //
-    // 	b2Dump("  b2DistanceJointDef jd;\n");
-    // 	b2Dump("  jd.bodyA = sims[%d];\n", indexA);
-    // 	b2Dump("  jd.bodyB = sims[%d];\n", indexB);
-    // 	b2Dump("  jd.collideConnected = bool(%d);\n", m_collideConnected);
-    // 	b2Dump("  jd.localAnchorA.Set(%.9g, %.9g);\n", m_localAnchorA.x, m_localAnchorA.y);
-    // 	b2Dump("  jd.localAnchorB.Set(%.9g, %.9g);\n", m_localAnchorB.x, m_localAnchorB.y);
-    // 	b2Dump("  jd.length = %.9g;\n", m_length);
-    // 	b2Dump("  jd.minLength = %.9g;\n", m_minLength);
-    // 	b2Dump("  jd.maxLength = %.9g;\n", m_maxLength);
-    // 	b2Dump("  jd.stiffness = %.9g;\n", m_stiffness);
-    // 	b2Dump("  jd.damping = %.9g;\n", m_damping);
-    // 	b2Dump("  joints[%d] = m_world.CreateJoint(&jd);\n", m_index);
-    // }
-// #endif
+#if ZERO_DEFINE
+    public static void b2DistanceJoint::Dump()
+    {
+    	int32 indexA = m_bodyA.m_islandIndex;
+    	int32 indexB = m_bodyB.m_islandIndex;
+    
+    	b2Dump("  b2DistanceJointDef jd;\n");
+    	b2Dump("  jd.bodyA = sims[%d];\n", indexA);
+    	b2Dump("  jd.bodyB = sims[%d];\n", indexB);
+    	b2Dump("  jd.collideConnected = bool(%d);\n", m_collideConnected);
+    	b2Dump("  jd.localAnchorA.Set(%.9g, %.9g);\n", m_localAnchorA.x, m_localAnchorA.y);
+    	b2Dump("  jd.localAnchorB.Set(%.9g, %.9g);\n", m_localAnchorB.x, m_localAnchorB.y);
+    	b2Dump("  jd.length = %.9g;\n", m_length);
+    	b2Dump("  jd.minLength = %.9g;\n", m_minLength);
+    	b2Dump("  jd.maxLength = %.9g;\n", m_maxLength);
+    	b2Dump("  jd.stiffness = %.9g;\n", m_stiffness);
+    	b2Dump("  jd.damping = %.9g;\n", m_damping);
+    	b2Dump("  joints[%d] = m_world.CreateJoint(&jd);\n", m_index);
+    }
+#endif
 
     public static void b2DrawDistanceJoint(b2DebugDraw draw, b2JointSim @base, b2Transform transformA, b2Transform transformB)
     {

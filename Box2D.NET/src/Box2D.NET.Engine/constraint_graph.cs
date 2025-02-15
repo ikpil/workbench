@@ -15,6 +15,7 @@
 // This is used for debugging by making all constraints be assigned to overflow.
 #define B2_FORCE_OVERFLOW
 
+using System;
 using System.Diagnostics;
 using static Box2D.NET.Engine.table;
 using static Box2D.NET.Engine.array;
@@ -62,9 +63,9 @@ public class b2GraphColor
     // transient
     //union
     //{
-    public b2ContactConstraintSIMD[] simdConstraints;
+    public ArraySegment<b2ContactConstraintSIMD> simdConstraints;
 
-    public b2ContactConstraint[] overflowConstraints;
+    public ArraySegment<b2ContactConstraint> overflowConstraints;
     //};
 }
 

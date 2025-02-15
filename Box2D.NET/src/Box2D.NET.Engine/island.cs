@@ -612,7 +612,7 @@ static void b2MergeIsland( b2World* world, b2Island* island )
 // Islands that get merged into a root island will be removed from the awake island array
 // and returned to the pool.
 // todo this might be faster if b2IslandSim held the connectivity data
-void b2MergeAwakeIslands( b2World* world )
+public static void b2MergeAwakeIslands( b2World world )
 {
 	b2TracyCZoneNC(b2TracyCZone.merge_islands, "Merge Islands", b2_colorMediumTurquoise, true );
 
@@ -922,14 +922,14 @@ void b2SplitIsland( b2World* world, int baseId )
 // Note: static bodies are never in an island
 // Note: this task interacts with some allocators without locks under the assumption that no other tasks
 // are interacting with these data structures.
-void b2SplitIslandTask( int startIndex, int endIndex, uint threadIndex, void* context )
+public static void b2SplitIslandTask( int startIndex, int endIndex, uint threadIndex, object context )
 {
 	b2TracyCZoneNC(b2TracyCZone.split, "Split Island", b2_colorOlive, true );
 
 	B2_UNUSED( startIndex, endIndex, threadIndex );
 
 	ulong ticks = b2GetTicks();
-	b2World* world = context;
+	b2World world = context as b2World;
 
 	Debug.Assert( world.splitIslandId != B2_NULL_INDEX );
 

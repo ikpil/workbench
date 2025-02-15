@@ -965,7 +965,7 @@ static void b2DrawShape( b2DebugDraw* draw, b2Shape* shape, b2Transform xf, b2He
 {
 	switch ( shape.type )
 	{
-		case Engine.b2ShapeType.b2_capsuleShape:
+		case b2ShapeType.b2_capsuleShape:
 		{
 			b2Capsule* capsule = &shape.capsule;
 			b2Vec2 p1 = b2TransformPoint( xf, capsule.center1 );
@@ -974,7 +974,7 @@ static void b2DrawShape( b2DebugDraw* draw, b2Shape* shape, b2Transform xf, b2He
 		}
 		break;
 
-		case Engine.b2ShapeType.b2_circleShape:
+		case b2ShapeType.b2_circleShape:
 		{
 			b2Circle* circle = &shape.circle;
 			xf.p = b2TransformPoint( xf, circle.center );
@@ -982,14 +982,14 @@ static void b2DrawShape( b2DebugDraw* draw, b2Shape* shape, b2Transform xf, b2He
 		}
 		break;
 
-		case Engine.b2ShapeType.b2_polygonShape:
+		case b2ShapeType.b2_polygonShape:
 		{
 			b2Polygon* poly = &shape.polygon;
 			draw.DrawSolidPolygon( xf, poly.vertices, poly.count, poly.radius, color, draw.context );
 		}
 		break;
 
-		case Engine.b2ShapeType.b2_segmentShape:
+		case b2ShapeType.b2_segmentShape:
 		{
 			b2Segment* segment = &shape.segment;
 			b2Vec2 p1 = b2TransformPoint( xf, segment.point1 );
@@ -998,7 +998,7 @@ static void b2DrawShape( b2DebugDraw* draw, b2Shape* shape, b2Transform xf, b2He
 		}
 		break;
 
-		case Engine.b2ShapeType.b2_chainSegmentShape:
+		case b2ShapeType.b2_chainSegmentShape:
 		{
 			b2Segment* segment = &shape.chainSegment.segment;
 			b2Vec2 p1 = b2TransformPoint( xf, segment.point1 );
@@ -1044,7 +1044,7 @@ static bool DrawQueryCallback( int proxyId, int shapeId, void* context )
 		{
 			color = shape.customColor;
 		}
-		else if ( body.type == b2_dynamicBody && body.mass == 0.0f )
+		else if ( body.type == b2BodyType.b2_dynamicBody && body.mass == 0.0f )
 		{
 			// Bad body
 			color = b2_colorRed;
@@ -1069,11 +1069,11 @@ static bool DrawQueryCallback( int proxyId, int shapeId, void* context )
 		{
 			color = b2_colorSalmon;
 		}
-		else if ( body.type == b2_staticBody )
+		else if ( body.type == b2BodyType.b2_staticBody )
 		{
 			color = b2_colorPaleGreen;
 		}
-		else if ( body.type == b2_kinematicBody )
+		else if ( body.type == b2BodyType.b2_kinematicBody )
 		{
 			color = b2_colorRoyalBlue;
 		}
@@ -1165,7 +1165,7 @@ static void b2DrawWithBounds( b2World* world, b2DebugDraw* draw )
 				draw.DrawString( p, body.name, b2_colorBlueViolet, draw.context );
 			}
 
-			if ( draw.drawMass && body.type == b2_dynamicBody )
+			if ( draw.drawMass && body.type == b2BodyType.b2_dynamicBody )
 			{
 				b2Vec2 offset = new b2Vec2( 0.1f, 0.1f );
 				b2BodySim* bodySim = b2GetBodySim( world, body );
@@ -1206,7 +1206,7 @@ static void b2DrawWithBounds( b2World* world, b2DebugDraw* draw )
 			}
 
 			const float linearSlop = B2_LINEAR_SLOP;
-			if ( draw.drawContacts && body.type == b2_dynamicBody && body.setIndex == (int)b2SetType.b2_awakeSet )
+			if ( draw.drawContacts && body.type == b2BodyType.b2_dynamicBody && body.setIndex == (int)b2SetType.b2_awakeSet )
 			{
 				int contactKey = body.headContactKey;
 				while ( contactKey != B2_NULL_INDEX )
@@ -1343,7 +1343,7 @@ void b2World_Draw( b2WorldId worldId, b2DebugDraw* draw )
 					{
 						color = shape.customColor;
 					}
-					else if ( body.type == b2_dynamicBody && body.mass == 0.0f )
+					else if ( body.type == b2BodyType.b2_dynamicBody && body.mass == 0.0f )
 					{
 						// Bad body
 						color = b2_colorRed;
@@ -1368,11 +1368,11 @@ void b2World_Draw( b2WorldId worldId, b2DebugDraw* draw )
 					{
 						color = b2_colorSalmon;
 					}
-					else if ( body.type == b2_staticBody )
+					else if ( body.type == b2BodyType.b2_staticBody )
 					{
 						color = b2_colorPaleGreen;
 					}
-					else if ( body.type == b2_kinematicBody )
+					else if ( body.type == b2BodyType.b2_kinematicBody )
 					{
 						color = b2_colorRoyalBlue;
 					}
@@ -1978,11 +1978,11 @@ b2Counters b2World_GetCounters( b2WorldId worldId )
 	s.jointCount = b2GetIdCount( &world.jointIdPool );
 	s.islandCount = b2GetIdCount( &world.islandIdPool );
 
-	b2DynamicTree* staticTree = world.broadPhase.trees + b2_staticBody;
+	b2DynamicTree* staticTree = world.broadPhase.trees + b2BodyType.b2_staticBody;
 	s.staticTreeHeight = b2DynamicTree_GetHeight( staticTree );
 
-	b2DynamicTree* dynamicTree = world.broadPhase.trees + b2_dynamicBody;
-	b2DynamicTree* kinematicTree = world.broadPhase.trees + b2_kinematicBody;
+	b2DynamicTree* dynamicTree = world.broadPhase.trees + b2BodyType.b2_dynamicBody;
+	b2DynamicTree* kinematicTree = world.broadPhase.trees + b2BodyType.b2_kinematicBody;
 	s.treeHeight = b2MaxInt( b2DynamicTree_GetHeight( dynamicTree ), b2DynamicTree_GetHeight( kinematicTree ) );
 
 	s.stackUsed = b2GetMaxArenaAllocation( &world.stackAllocator );
@@ -2078,9 +2078,9 @@ void b2World_DumpMemoryStats( b2WorldId worldId )
 
 	// broad-phase
 	fprintf( file, "broad-phase\n" );
-	fprintf( file, "static tree: %d\n", b2DynamicTree_GetByteCount( world.broadPhase.trees + b2_staticBody ) );
-	fprintf( file, "kinematic tree: %d\n", b2DynamicTree_GetByteCount( world.broadPhase.trees + b2_kinematicBody ) );
-	fprintf( file, "dynamic tree: %d\n", b2DynamicTree_GetByteCount( world.broadPhase.trees + b2_dynamicBody ) );
+	fprintf( file, "static tree: %d\n", b2DynamicTree_GetByteCount( world.broadPhase.trees + b2BodyType.b2_staticBody ) );
+	fprintf( file, "kinematic tree: %d\n", b2DynamicTree_GetByteCount( world.broadPhase.trees + b2BodyType.b2_kinematicBody ) );
+	fprintf( file, "dynamic tree: %d\n", b2DynamicTree_GetByteCount( world.broadPhase.trees + b2BodyType.b2_dynamicBody ) );
 	b2HashSet* moveSet = &world.broadPhase.moveSet;
 	fprintf( file, "moveSet: %d (%d, %d)\n", b2GetHashSetBytes( moveSet ), moveSet.count, moveSet.capacity );
 	fprintf( file, "moveArray: %d\n", b2IntArray_ByteCount( &world.broadPhase.moveArray ) );
@@ -2650,8 +2650,7 @@ b2TreeStats b2World_CastPolygon( b2WorldId worldId, const b2Polygon* polygon, b2
 	return treeStats;
 }
 
-#if 0
-
+#if ZERO_DEFINE
 void b2World_ShiftOrigin(b2WorldId worldId, b2Vec2 newOrigin)
 {
 	Debug.Assert(m_locked == false);
@@ -2785,7 +2784,7 @@ static bool ExplosionCallback( int proxyId, int shapeId, void* context )
 	b2Shape* shape = Array_Get( &world.shapes, shapeId );
 
 	b2Body* body = Array_Get( &world.bodies, shape.bodyId );
-	Debug.Assert( body.type == b2_dynamicBody );
+	Debug.Assert( body.type == b2BodyType.b2_dynamicBody );
 
 	b2Transform transform = b2GetBodyTransformQuick( world, body );
 
@@ -2879,7 +2878,7 @@ void b2World_Explode( b2WorldId worldId, const b2ExplosionDef* explosionDef )
 	aabb.upperBound.x = position.x + ( radius + falloff );
 	aabb.upperBound.y = position.y + ( radius + falloff );
 
-	b2DynamicTree_Query( world.broadPhase.trees + b2_dynamicBody, aabb, maskBits, ExplosionCallback, &explosionContext );
+	b2DynamicTree_Query( world.broadPhase.trees + b2BodyType.b2_dynamicBody, aabb, maskBits, ExplosionCallback, &explosionContext );
 }
 
 void b2World_RebuildStaticTree( b2WorldId worldId )
@@ -2891,7 +2890,7 @@ void b2World_RebuildStaticTree( b2WorldId worldId )
 		return;
 	}
 
-	b2DynamicTree* staticTree = world.broadPhase.trees + b2_staticBody;
+	b2DynamicTree* staticTree = world.broadPhase.trees + b2BodyType.b2_staticBody;
 	b2DynamicTree_Rebuild( staticTree, true );
 }
 
@@ -3086,12 +3085,12 @@ void b2ValidateSolverSets( b2World* world )
 						}
 						else if ( setIndex == (int)b2SetType.b2_staticSet )
 						{
-							Debug.Assert( B2_PROXY_TYPE( shape.proxyKey ) == b2_staticBody );
+							Debug.Assert( B2_PROXY_TYPE( shape.proxyKey ) == b2BodyType.b2_staticBody );
 						}
 						else
 						{
 							b2BodyType proxyType = B2_PROXY_TYPE( shape.proxyKey );
-							Debug.Assert( proxyType == b2_kinematicBody || proxyType == b2_dynamicBody );
+							Debug.Assert( proxyType == b2BodyType.b2_kinematicBody || proxyType == b2BodyType.b2_dynamicBody );
 						}
 
 						prevShapeId = shapeId;
@@ -3243,8 +3242,8 @@ void b2ValidateSolverSets( b2World* world )
 				{
 					b2Body* bodyA = Array_Get( &world.bodies, bodyIdA );
 					b2Body* bodyB = Array_Get( &world.bodies, bodyIdB );
-					Debug.Assert( b2GetBit( &color.bodySet, bodyIdA ) == ( bodyA.type != b2_staticBody ) );
-					Debug.Assert( b2GetBit( &color.bodySet, bodyIdB ) == ( bodyB.type != b2_staticBody ) );
+					Debug.Assert( b2GetBit( &color.bodySet, bodyIdA ) == ( bodyA.type != b2BodyType.b2_staticBody ) );
+					Debug.Assert( b2GetBit( &color.bodySet, bodyIdB ) == ( bodyB.type != b2BodyType.b2_staticBody ) );
 				}
 			}
 		}
@@ -3267,8 +3266,8 @@ void b2ValidateSolverSets( b2World* world )
 				{
 					b2Body* bodyA = Array_Get( &world.bodies, bodyIdA );
 					b2Body* bodyB = Array_Get( &world.bodies, bodyIdB );
-					Debug.Assert( b2GetBit( &color.bodySet, bodyIdA ) == ( bodyA.type != b2_staticBody ) );
-					Debug.Assert( b2GetBit( &color.bodySet, bodyIdB ) == ( bodyB.type != b2_staticBody ) );
+					Debug.Assert( b2GetBit( &color.bodySet, bodyIdA ) == ( bodyA.type != b2BodyType.b2_staticBody ) );
+					Debug.Assert( b2GetBit( &color.bodySet, bodyIdB ) == ( bodyB.type != b2BodyType.b2_staticBody ) );
 				}
 			}
 		}
@@ -3283,7 +3282,7 @@ void b2ValidateSolverSets( b2World* world )
 
 // Validate shapes
 // This is very slow on compounds
-#if 0
+#if ZERO_DEFINE
 	int shapeCapacity = b2Array(world.shapeArray).count;
 	for (int shapeIndex = 0; shapeIndex < shapeCapacity; shapeIndex += 1)
 	{

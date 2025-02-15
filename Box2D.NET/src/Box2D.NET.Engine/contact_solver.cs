@@ -1076,7 +1076,7 @@ static b2Vec2W b2RotateVectorW( b2RotW q, b2Vec2W v )
 
 
 
-int b2GetContactConstraintSIMDByteCount()
+public static int b2GetContactConstraintSIMDByteCount()
 {
 	return sizeof( b2ContactConstraintSIMD );
 }

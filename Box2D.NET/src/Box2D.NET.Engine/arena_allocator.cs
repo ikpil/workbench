@@ -120,7 +120,7 @@ public class arena_allocator
         return entry.data;
     }
 
-    public static void b2FreeArenaItem<T>(b2ArenaAllocator allocator, T[] mem)
+    public static void b2FreeArenaItem<T>(b2ArenaAllocator allocator, ArraySegment<T> mem)
     {
         var alloc = allocator.GetAlloc<T>();
         int entryCount = alloc.entries.count;
@@ -129,7 +129,7 @@ public class arena_allocator
         Debug.Assert(mem == entry.data);
         if (entry.usedMalloc)
         {
-            b2Free(mem, entry.size);
+            b2Free(mem.Array, entry.size);
         }
         else
         {

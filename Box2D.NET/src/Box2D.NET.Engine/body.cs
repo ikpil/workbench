@@ -967,7 +967,7 @@ public class body
         b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
 
-        if ( body.type == b2_staticBody )
+        if ( body.type == b2BodyType.b2_staticBody )
         {
             return;
         }
@@ -991,7 +991,7 @@ public class body
         b2World world = b2GetWorld( bodyId.world0 );
         b2Body* body = b2GetBodyFullId( world, bodyId );
 
-        if ( body.type == b2_staticBody || body.fixedRotation )
+        if ( body.type == b2BodyType.b2_staticBody || body.fixedRotation )
         {
             return;
         }
@@ -1234,7 +1234,7 @@ public class body
 
         body.type = type;
 
-        if ( originalType == b2_staticBody )
+        if ( originalType == b2BodyType.b2_staticBody )
         {
             // Body is going from static to dynamic or kinematic. It only makes sense to move it to the awake set.
             Debug.Assert( body.setIndex == (int)b2SetType.b2_staticSet );
@@ -1295,7 +1295,7 @@ public class body
                 b2CreateShapeProxy( shape, &world.broadPhase, proxyType, transform, forcePairCreation );
             }
         }
-        else if ( type == b2_staticBody )
+        else if ( type == b2BodyType.b2_staticBody )
         {
             // The body is going from dynamic/kinematic to static. It should be awake.
             Debug.Assert( body.setIndex == (int)b2SetType.b2_awakeSet );
@@ -1369,13 +1369,13 @@ public class body
                 shapeId = shape.nextShapeId;
                 b2DestroyShapeProxy( shape, &world.broadPhase );
                 bool forcePairCreation = true;
-                b2CreateShapeProxy( shape, &world.broadPhase, b2_staticBody, transform, forcePairCreation );
+                b2CreateShapeProxy( shape, &world.broadPhase, b2BodyType.b2_staticBody, transform, forcePairCreation );
             }
         }
         else
         {
-            Debug.Assert( originalType == b2_dynamicBody || originalType == b2_kinematicBody );
-            Debug.Assert( type == b2_dynamicBody || type == b2_kinematicBody );
+            Debug.Assert( originalType == b2BodyType.b2_dynamicBody || originalType == b2BodyType.b2_kinematicBody );
+            Debug.Assert( type == b2BodyType.b2_dynamicBody || type == b2BodyType.b2_kinematicBody );
 
             // Recreate shape proxies in static tree.
             b2Transform transform = b2GetBodyTransformQuick( world, body );
@@ -1411,7 +1411,7 @@ public class body
                     continue;
                 }
 
-                if ( body.type == b2_staticBody && otherBody.type == b2_staticBody )
+                if ( body.type == b2BodyType.b2_staticBody && otherBody.type == b2BodyType.b2_staticBody )
                 {
                     continue;
                 }
@@ -1785,7 +1785,7 @@ public class body
         }
 
         b2SolverSet* disabledSet = Array_Get( &world.solverSets, (int)b2SetType.b2_disabledSet );
-        int setId = body.type == b2_staticBody ? b2_staticSet : b2_awakeSet;
+        int setId = body.type == b2BodyType.b2_staticBody ? b2_staticSet : b2_awakeSet;
         b2SolverSet* targetSet = Array_Get( &world.solverSets, setId );
 
         b2TransferBody( world, targetSet, disabledSet, body );
@@ -2005,7 +2005,7 @@ public class body
 
     public static bool b2ShouldBodiesCollide( b2World world, b2Body bodyA, b2Body bodyB )
     {
-        if ( bodyA.type != b2_dynamicBody && bodyB.type != b2_dynamicBody )
+        if ( bodyA.type != b2BodyType.b2_dynamicBody && bodyB.type != b2BodyType.b2_dynamicBody )
         {
             return false;
         }

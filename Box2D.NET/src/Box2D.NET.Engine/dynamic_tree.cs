@@ -111,7 +111,7 @@ public static class dynamic_tree
 
     /// This function receives proxies found in the AABB query.
     /// @return true if the query should continue
-    public delegate bool b2TreeQueryCallbackFcn(int proxyId, int userData, object context);
+    public delegate bool b2TreeQueryCallbackFcn(int proxyId, int userData, b2ContinuousContext context);
 
     /// This function receives clipped ray cast input for a proxy. The function
     /// returns the new ray fraction.

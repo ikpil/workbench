@@ -317,18 +317,18 @@ void b2InitializeContactRegisters()
 {
 	if ( s_initialized == false )
 	{
-		b2AddType( b2CircleManifold, Engine.b2ShapeType.b2_circleShape, Engine.b2ShapeType.b2_circleShape );
-		b2AddType( b2CapsuleAndCircleManifold, Engine.b2ShapeType.b2_capsuleShape, Engine.b2ShapeType.b2_circleShape );
-		b2AddType( b2CapsuleManifold, Engine.b2ShapeType.b2_capsuleShape, Engine.b2ShapeType.b2_capsuleShape );
-		b2AddType( b2PolygonAndCircleManifold, Engine.b2ShapeType.b2_polygonShape, Engine.b2ShapeType.b2_circleShape );
-		b2AddType( b2PolygonAndCapsuleManifold, Engine.b2ShapeType.b2_polygonShape, Engine.b2ShapeType.b2_capsuleShape );
-		b2AddType( b2PolygonManifold, Engine.b2ShapeType.b2_polygonShape, Engine.b2ShapeType.b2_polygonShape );
-		b2AddType( b2SegmentAndCircleManifold, Engine.b2ShapeType.b2_segmentShape, Engine.b2ShapeType.b2_circleShape );
-		b2AddType( b2SegmentAndCapsuleManifold, Engine.b2ShapeType.b2_segmentShape, Engine.b2ShapeType.b2_capsuleShape );
-		b2AddType( b2SegmentAndPolygonManifold, Engine.b2ShapeType.b2_segmentShape, Engine.b2ShapeType.b2_polygonShape );
-		b2AddType( b2ChainSegmentAndCircleManifold, Engine.b2ShapeType.b2_chainSegmentShape, Engine.b2ShapeType.b2_circleShape );
-		b2AddType( b2ChainSegmentAndCapsuleManifold, Engine.b2ShapeType.b2_chainSegmentShape, Engine.b2ShapeType.b2_capsuleShape );
-		b2AddType( b2ChainSegmentAndPolygonManifold, Engine.b2ShapeType.b2_chainSegmentShape, Engine.b2ShapeType.b2_polygonShape );
+		b2AddType( b2CircleManifold, b2ShapeType.b2_circleShape, b2ShapeType.b2_circleShape );
+		b2AddType( b2CapsuleAndCircleManifold, b2ShapeType.b2_capsuleShape, b2ShapeType.b2_circleShape );
+		b2AddType( b2CapsuleManifold, b2ShapeType.b2_capsuleShape, b2ShapeType.b2_capsuleShape );
+		b2AddType( b2PolygonAndCircleManifold, b2ShapeType.b2_polygonShape, b2ShapeType.b2_circleShape );
+		b2AddType( b2PolygonAndCapsuleManifold, b2ShapeType.b2_polygonShape, b2ShapeType.b2_capsuleShape );
+		b2AddType( b2PolygonManifold, b2ShapeType.b2_polygonShape, b2ShapeType.b2_polygonShape );
+		b2AddType( b2SegmentAndCircleManifold, b2ShapeType.b2_segmentShape, b2ShapeType.b2_circleShape );
+		b2AddType( b2SegmentAndCapsuleManifold, b2ShapeType.b2_segmentShape, b2ShapeType.b2_capsuleShape );
+		b2AddType( b2SegmentAndPolygonManifold, b2ShapeType.b2_segmentShape, b2ShapeType.b2_polygonShape );
+		b2AddType( b2ChainSegmentAndCircleManifold, b2ShapeType.b2_chainSegmentShape, b2ShapeType.b2_circleShape );
+		b2AddType( b2ChainSegmentAndCapsuleManifold, b2ShapeType.b2_chainSegmentShape, b2ShapeType.b2_capsuleShape );
+		b2AddType( b2ChainSegmentAndPolygonManifold, b2ShapeType.b2_chainSegmentShape, b2ShapeType.b2_polygonShape );
 		s_initialized = true;
 	}
 }
@@ -738,7 +738,7 @@ bool b2UpdateContact( b2World* world, b2ContactSim* contactSim, b2Shape* shapeA,
 
 	B2_UNUSED( unmatchedCount );
 
-#if 0
+#if ZERO_DEFINE
 		// todo I haven't found an improvement from this yet
 		// If there are unmatched new contact points, apply any left over old impulse.
 		if (unmatchedCount > 0)
@@ -783,7 +783,7 @@ bool b2UpdateContact( b2World* world, b2ContactSim* contactSim, b2Shape* shapeA,
 	return touching;
 }
 
-b2Manifold b2ComputeManifold( b2Shape* shapeA, b2Transform transformA, b2Shape* shapeB, b2Transform transformB )
+public static b2Manifold b2ComputeManifold( b2Shape shapeA, b2Transform transformA, b2Shape shapeB, b2Transform transformB )
 {
 	b2ManifoldFcn* fcn = s_registers[shapeA->type][shapeB->type].fcn;
 	b2SimplexCache cache = { 0 };
