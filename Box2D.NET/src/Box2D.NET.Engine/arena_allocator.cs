@@ -52,6 +52,7 @@ public class b2ArenaAllocator
 {
     public b2ArenaAllocator<T> GetAlloc<T>()
     {
+        // TODO: @ikpil, check
         return null;
     }
 }
