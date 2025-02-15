@@ -3,7 +3,10 @@
 
 
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using static Box2D.NET.Engine.geometry;
 using static Box2D.NET.Engine.math_function;
@@ -26,101 +29,139 @@ public class TaskData
     public object box2dContext;
 }
 
-
-public class test_determinism : test_macros
+public class b2TaskTester : IDisposable
 {
-	private const int e_columns = 10;
-	private const int e_rows = 10;
-	private const int e_count = e_columns * e_rows;
-	private const int e_maxTasks = 128;
+    private readonly int _workerCount;
+    private SemaphoreSlim _semaphore;
+    private int e_maxTasks;
+    public int taskCount;
 
-    b2Vec2 finalPositions[2][e_count];
-    b2Rot finalRotations[2][e_count];
-
-    enkiTaskScheduler* scheduler;
-    enkiTaskSet* tasks[e_maxTasks];
-    TaskData taskData[e_maxTasks];
-    int taskCount;
-
-    public void ExecuteRangeTask( int start, int end, uint threadIndex, object context )
+    public b2TaskTester(int workerCount, int maxTasks)
     {
-        TaskData data = context as TaskData;
-        data.box2dTask( start, end, threadIndex, data.box2dContext );
+        _workerCount = workerCount;
+        _semaphore = new SemaphoreSlim(workerCount);
+        e_maxTasks = maxTasks;
     }
 
-    public object EnqueueTask( b2TaskCallback box2dTask, int itemCount, int minRange, object box2dContext, object userContext )
+    public void Dispose()
     {
-        MAYBE_UNUSED( userContext );
+        _semaphore?.Dispose();
+        _semaphore = null;
+    }
 
-        if ( taskCount < e_maxTasks )
+    IEnumerable<int> Next(int itemCount, int minRange)
+    {
+        if (itemCount <= minRange)
         {
-            enkiTaskSet* task = tasks[taskCount];
-            TaskData* data = taskData + taskCount;
-            data.box2dTask = box2dTask;
-            data.box2dContext = box2dContext;
-
-            struct enkiParamsTaskSet params;
-            params.minRange = minRange;
-            params.setSize = itemCount;
-            params.pArgs = data;
-            params.priority = 0;
-
-            enkiSetParamsTaskSet( task, params );
-            enkiAddTaskSet( scheduler, task );
-
-            ++taskCount;
-
-            return task;
+            yield return itemCount;
         }
         else
         {
-            box2dTask( 0, itemCount, 0, box2dContext );
+            var workerCount = Math.Min(_workerCount, minRange);
+            int quotient = itemCount / workerCount;
+            int remainder = itemCount % workerCount;
+
+            int distributeValue = remainder / quotient;
+            int extraValueCount = remainder % quotient;
+
+            int index = 0;
+            for (int i = 0; i < workerCount; i++)
+            {
+                int count = quotient + distributeValue;
+                if (i < extraValueCount)
+                {
+                    count = +1;
+                }
+
+                yield return count;
+            }
+        }
+    }
+
+    public object EnqueueTask(b2TaskCallback box2dTask, int itemCount, int minRange, object box2dContext, object userContext)
+    {
+        B2_UNUSED(userContext);
+
+        if (taskCount < e_maxTasks)
+        {
+            int loop = 0;
+            int idx = 0;
+            foreach (var count in Next(itemCount, minRange))
+            {
+                int startIndex = idx;
+                int endIndex = idx + count;
+                idx = endIndex;
+
+                uint workerIndex = (uint)(++loop % _workerCount);
+                Task.Run(async () =>
+                {
+                    await _semaphore.WaitAsync();
+                    try
+                    {
+                        box2dTask(startIndex, endIndex, workerIndex, box2dContext);
+                    }
+                    finally
+                    {
+                        _semaphore.Release();
+                    }
+                });
+            }
+
+            ++taskCount;
+
+            return box2dTask;
+        }
+        else
+        {
+            box2dTask(0, itemCount, 0, box2dContext);
 
             return null;
         }
     }
 
-    static void FinishTask( void* userTask, void* userContext )
+    public void FinishTask(object userTask, object userContext)
     {
-        MAYBE_UNUSED( userContext );
-
-        enkiTaskSet* task = userTask;
-        enkiWaitForTaskSet( scheduler, task );
+        B2_UNUSED(userContext);
+        // .,,
     }
+}
+
+public class test_determinism : test_macros
+{
+    private const int e_columns = 10;
+    private const int e_rows = 10;
+    private const int e_count = e_columns * e_rows;
+    private const int e_maxTasks = 128;
+
+    private b2Vec2[][] finalPositions = new b2Vec2[][] { new b2Vec2[e_count], new b2Vec2[e_count] };
+    private b2Rot[][] finalRotations = new b2Rot[][] { new b2Rot[e_count], new b2Rot[e_count] };
+
 
     // todo_erin move this to shared
-    public void TiltedStacks( int testIndex, int workerCount )
+    public void TiltedStacks(int testIndex, int workerCount)
     {
-        scheduler = enkiNewTaskScheduler();
-        struct enkiTaskSchedulerConfig config = enkiGetTaskSchedulerConfig( scheduler );
-        config.numTaskThreadsToCreate = workerCount - 1;
-        enkiInitTaskSchedulerWithConfig( scheduler, config );
-
-        for ( int i = 0; i < e_maxTasks; ++i )
-        {
-            tasks[i] = enkiCreateTaskSet( scheduler, ExecuteRangeTask );
-        }
+        using var tester = new b2TaskTester(workerCount, e_maxTasks);
 
         b2WorldDef worldDef = b2DefaultWorldDef();
-        worldDef.enqueueTask = EnqueueTask;
-        worldDef.finishTask = FinishTask;
+        worldDef.enqueueTask = tester.EnqueueTask;
+        worldDef.finishTask = tester.FinishTask;
         worldDef.workerCount = workerCount;
         worldDef.enableSleep = false;
 
-        b2WorldId worldId = b2CreateWorld( worldDef );
+        b2WorldId worldId = b2CreateWorld(worldDef);
 
         b2BodyId[] bodies = new b2BodyId[e_count];
 
         {
             b2BodyDef bd = b2DefaultBodyDef();
-            bd.position = new b2Vec2( 0.0f, -1.0f);
-            b2BodyId groundId = b2CreateBody( worldId, bd );
+            bd.position = new b2Vec2(0.0f, -1.0f);
+            b2BodyId groundId = b2CreateBody(worldId, bd);
 
-            b2Polygon box = b2MakeBox( 1000.0f, 1.0f );
+            b2Polygon box = b2MakeBox(1000.0f, 1.0f);
             b2ShapeDef sd = b2DefaultShapeDef();
-            b2CreatePolygonShape( groundId, sd, box );
+            b2CreatePolygonShape(groundId, sd, box);
         }
-        
+
         {
             b2Polygon box = b2MakeRoundedBox(0.45f, 0.45f, 0.05f);
             b2ShapeDef sd = b2DefaultShapeDef();
@@ -129,24 +170,24 @@ public class test_determinism : test_macros
 
             float offset = 0.2f;
             float dx = 5.0f;
-            float xroot = -0.5f * dx * ( e_columns - 1.0f );
+            float xroot = -0.5f * dx * (e_columns - 1.0f);
 
-            for ( int j = 0; j < e_columns; ++j )
+            for (int j = 0; j < e_columns; ++j)
             {
                 float x = xroot + j * dx;
 
-                for ( int i = 0; i < e_rows; ++i )
+                for (int i = 0; i < e_rows; ++i)
                 {
                     b2BodyDef bd = b2DefaultBodyDef();
                     bd.type = b2BodyType.b2_dynamicBody;
 
                     int n = j * e_rows + i;
 
-                    bd.position = new b2Vec2( x + offset * i, 0.5f + 1.0f * i);
-                    b2BodyId bodyId = b2CreateBody( worldId, bd );
+                    bd.position = new b2Vec2(x + offset * i, 0.5f + 1.0f * i);
+                    b2BodyId bodyId = b2CreateBody(worldId, bd);
                     bodies[n] = bodyId;
 
-                    b2CreatePolygonShape( bodyId, sd, box );
+                    b2CreatePolygonShape(bodyId, sd, box);
                 }
             }
         }
@@ -154,27 +195,20 @@ public class test_determinism : test_macros
         float timeStep = 1.0f / 60.0f;
         int subStepCount = 3;
 
-        for ( int i = 0; i < 100; ++i )
+        for (int i = 0; i < 100; ++i)
         {
-            b2World_Step( worldId, timeStep, subStepCount );
-            taskCount = 0;
+            b2World_Step(worldId, timeStep, subStepCount);
+            tester.taskCount = 0;
             TracyCFrameMark();
         }
 
-        for ( int i = 0; i < e_count; ++i )
+        for (int i = 0; i < e_count; ++i)
         {
-            finalPositions[testIndex][i] = b2Body_GetPosition( bodies[i] );
-            finalRotations[testIndex][i] = b2Body_GetRotation( bodies[i] );
+            finalPositions[testIndex][i] = b2Body_GetPosition(bodies[i]);
+            finalRotations[testIndex][i] = b2Body_GetRotation(bodies[i]);
         }
 
-        b2DestroyWorld( worldId );
-
-        for ( int i = 0; i < e_maxTasks; ++i )
-        {
-            enkiDeleteTaskSet( scheduler, tasks[i] );
-        }
-
-        enkiDeleteTaskScheduler( scheduler );
+        b2DestroyWorld(worldId);
     }
 
     // Test multithreaded determinism.
@@ -182,25 +216,24 @@ public class test_determinism : test_macros
     public void MultithreadingTest()
     {
         // Test 1 : 4 threads
-        TiltedStacks( 0, 4 );
+        TiltedStacks(0, 4);
 
         // Test 2 : 1 thread
-        TiltedStacks( 1, 1 );
+        TiltedStacks(1, 1);
 
         // Both runs should produce identical results
-        for ( int i = 0; i < e_count; ++i )
+        for (int i = 0; i < e_count; ++i)
         {
             b2Vec2 p1 = finalPositions[0][i];
             b2Vec2 p2 = finalPositions[1][i];
             b2Rot rot1 = finalRotations[0][i];
             b2Rot rot2 = finalRotations[1][i];
 
-            ENSURE( p1.x == p2.x );
-            ENSURE( p1.y == p2.y );
-            ENSURE( rot1.c == rot2.c );
-            ENSURE( rot1.s == rot2.s );
+            ENSURE(p1.x == p2.x);
+            ENSURE(p1.y == p2.y);
+            ENSURE(rot1.c == rot2.c);
+            ENSURE(rot1.s == rot2.s);
         }
-
     }
 
     // Test cross platform determinism based on the FallingHinges sample.
@@ -208,20 +241,19 @@ public class test_determinism : test_macros
     public void CrossPlatformTest()
     {
         b2WorldDef worldDef = b2DefaultWorldDef();
-        b2WorldId worldId = b2CreateWorld( worldDef );
+        b2WorldId worldId = b2CreateWorld(worldDef);
 
         {
             b2BodyDef bodyDef = b2DefaultBodyDef();
-            bodyDef.position = new b2Vec2( 0.0f, -1.0f );
-            b2BodyId groundId = b2CreateBody( worldId, bodyDef );
+            bodyDef.position = new b2Vec2(0.0f, -1.0f);
+            b2BodyId groundId = b2CreateBody(worldId, bodyDef);
 
-            b2Polygon box = b2MakeBox( 20.0f, 1.0f );
+            b2Polygon box = b2MakeBox(20.0f, 1.0f);
             b2ShapeDef shapeDef = b2DefaultShapeDef();
-            b2CreatePolygonShape( groundId, shapeDef, box );
+            b2CreatePolygonShape(groundId, shapeDef, box);
         }
 
         {
-
             int columnCount = 4;
             int rowCount = 30;
             int bodyCount = rowCount * columnCount;
@@ -346,5 +378,4 @@ public class test_determinism : test_macros
             b2DestroyWorld(worldId);
         }
     }
-
 }

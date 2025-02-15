@@ -51,15 +51,4 @@ public class test_macros
 
         return 0;
     }
-
-    public static int ARRAY_COUNT<T>(T[] A)
-    {
-        return A.Length;
-    }
-
-    /// Used to prevent the compiler from warning about unused variables
-    public static void MAYBE_UNUSED<T>(T x)
-    {
-        // ((void)(x))
-    }
 }

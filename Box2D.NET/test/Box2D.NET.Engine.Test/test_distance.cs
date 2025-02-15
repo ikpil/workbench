@@ -4,6 +4,7 @@
 using NUnit.Framework;
 using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.distance;
+using static Box2D.NET.Engine.core;
 
 namespace Box2D.NET.Engine.Test;
 
@@ -45,8 +46,8 @@ public class test_distance : test_macros
         ];
 
         b2DistanceInput input = new b2DistanceInput();
-        input.proxyA = b2MakeProxy(vas, ARRAY_COUNT(vas), 0.0f);
-        input.proxyB = b2MakeProxy(vbs, ARRAY_COUNT(vbs), 0.0f);
+        input.proxyA = b2MakeProxy(vas, B2_ARRAY_COUNT(vas), 0.0f);
+        input.proxyB = b2MakeProxy(vbs, B2_ARRAY_COUNT(vbs), 0.0f);
         input.transformA = b2Transform_identity;
         input.transformB = b2Transform_identity;
         input.useRadii = false;
@@ -75,8 +76,8 @@ public class test_distance : test_macros
         ];
 
         b2ShapeCastPairInput input = new b2ShapeCastPairInput();
-        input.proxyA = b2MakeProxy(vas, ARRAY_COUNT(vas), 0.0f);
-        input.proxyB = b2MakeProxy(vbs, ARRAY_COUNT(vbs), 0.0f);
+        input.proxyA = b2MakeProxy(vas, B2_ARRAY_COUNT(vas), 0.0f);
+        input.proxyB = b2MakeProxy(vbs, B2_ARRAY_COUNT(vbs), 0.0f);
         input.transformA = b2Transform_identity;
         input.transformB = b2Transform_identity;
         input.translationB = new b2Vec2(-2.0f, 0.0f);
@@ -106,8 +107,8 @@ public class test_distance : test_macros
         ];
 
         b2TOIInput input = new b2TOIInput();
-        input.proxyA = b2MakeProxy(vas, ARRAY_COUNT(vas), 0.0f);
-        input.proxyB = b2MakeProxy(vbs, ARRAY_COUNT(vbs), 0.0f);
+        input.proxyA = b2MakeProxy(vas, B2_ARRAY_COUNT(vas), 0.0f);
+        input.proxyB = b2MakeProxy(vbs, B2_ARRAY_COUNT(vbs), 0.0f);
         input.sweepA = new b2Sweep(b2Vec2_zero, b2Vec2_zero, b2Vec2_zero, b2Rot_identity, b2Rot_identity);
         input.sweepB = new b2Sweep(b2Vec2_zero, b2Vec2_zero, new b2Vec2(-2.0f, 0.0f), b2Rot_identity, b2Rot_identity);
         input.maxFraction = 1.0f;

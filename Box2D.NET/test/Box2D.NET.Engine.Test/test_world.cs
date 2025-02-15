@@ -13,6 +13,8 @@ using static Box2D.NET.Engine.math_function;
 using static Box2D.NET.Engine.id;
 using static Box2D.NET.Engine.constants;
 using static Box2D.NET.Engine.joint;
+using static Box2D.NET.Engine.core;
+
 
 
 namespace Box2D.NET.Engine.Test;
@@ -250,17 +252,17 @@ public class test_world : test_macros
 
     public static bool CustomFilter(b2ShapeId shapeIdA, b2ShapeId shapeIdB, object context)
     {
-        MAYBE_UNUSED(shapeIdA);
-        MAYBE_UNUSED(shapeIdB);
+        B2_UNUSED(shapeIdA);
+        B2_UNUSED(shapeIdB);
         ENSURE(context == null);
         return true;
     }
 
     public static bool PreSolveStatic(b2ShapeId shapeIdA, b2ShapeId shapeIdB, b2Manifold manifold, object context)
     {
-        MAYBE_UNUSED(shapeIdA);
-        MAYBE_UNUSED(shapeIdB);
-        MAYBE_UNUSED(manifold);
+        B2_UNUSED(shapeIdA);
+        B2_UNUSED(shapeIdB);
+        B2_UNUSED(manifold);
         ENSURE(context == null);
         return false;
     }
@@ -271,7 +273,7 @@ public class test_world : test_macros
     {
         b2WorldDef worldDef = b2DefaultWorldDef();
 
-        b2WorldId worldId = b2CreateWorld(&worldDef);
+        b2WorldId worldId = b2CreateWorld(worldDef);
         ENSURE(b2World_IsValid(worldId));
 
         b2World_EnableSleeping(worldId, true);
@@ -304,7 +306,7 @@ public class test_world : test_macros
         ENSURE(v.y == g.y);
 
         b2ExplosionDef explosionDef = b2DefaultExplosionDef();
-        b2World_Explode(worldId, &explosionDef);
+        b2World_Explode(worldId, explosionDef);
 
         b2World_SetContactTuning(worldId, 10.0f, 2.0f, 4.0f);
         b2World_SetJointTuning(worldId, 10.0f, 2.0f);
@@ -322,7 +324,7 @@ public class test_world : test_macros
 
         b2World_SetUserData(worldId, value);
         object userData = b2World_GetUserData(worldId);
-        ENSURE(userData == value);
+        ENSURE((float)userData == value);
 
         b2World_Step(worldId, 1.0f, 1);
 
@@ -343,7 +345,7 @@ public class test_world : test_macros
         b2BodyId wallId = b2CreateBody(worldId, bodyDef);
         b2Polygon box = b2MakeBox(0.5f, 10.0f);
         b2ShapeDef shapeDef = b2DefaultShapeDef();
-        b2CreatePolygonShape(wallId, &shapeDef, &box);
+        b2CreatePolygonShape(wallId, shapeDef, box);
 
         // Bullet fired towards the wall
         bodyDef = b2DefaultBodyDef();
