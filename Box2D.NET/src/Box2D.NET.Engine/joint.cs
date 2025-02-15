@@ -804,7 +804,7 @@ public class joint
         return jointId;
     }
 
-    public b2JointId b2CreateRevoluteJoint(b2WorldId worldId, b2RevoluteJointDef def)
+    public static b2JointId b2CreateRevoluteJoint(b2WorldId worldId, b2RevoluteJointDef def)
     {
         B2_CHECK_DEF(def);
         b2World world = b2GetWorldFromId(worldId);

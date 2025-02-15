@@ -225,6 +225,11 @@ public static class core
     public static void b2TracyCZoneEnd(b2TracyCZone ctx)
     {
     }
+
+    public static void TracyCFrameMark()
+    {
+        
+    }
 #endif
 
     // Returns the number of elements of an array
