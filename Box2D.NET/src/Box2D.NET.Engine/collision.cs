@@ -250,7 +250,7 @@ public class b2ShapeProxy
 /// transforms this might improve performance. Otherwise you can zero initialize this.
 /// The distance cache must be initialized to zero on the first call.
 /// Users should generally just zero initialize this structure for each call.
-public class b2SimplexCache
+public class b2SimplexCache // TODO: @ikpil, check class or struct, struct 성격이 강하다
 {
     /// The number of stored simplex points
     public ushort count;
@@ -435,7 +435,7 @@ public class b2ManifoldPoint
 
 /// A contact manifold describes the contact points between colliding shapes.
 /// @note Box2D uses speculative collision so some contact points may be separated.
-public class b2Manifold
+public class b2Manifold // TODO: @ikpil class or struct
 {
     /// The unit normal vector in world space, points from shape A to bodyB
     public b2Vec2 normal;
@@ -533,5 +533,6 @@ public class b2TreeStats
 
 public static class collision
 {
+    // TODO: @ikpil, check empty or class
     public static readonly b2SimplexCache b2_emptySimplexCache = new b2SimplexCache();
 }

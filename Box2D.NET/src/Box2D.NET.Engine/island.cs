@@ -292,7 +292,7 @@ public static void b2LinkContact( b2World world, b2Contact contact )
 
 // Unlink contact from the island graph when it stops having contact points
 // This is called when a contact no longer has contact points or when a contact is destroyed.
-void b2UnlinkContact( b2World* world, b2Contact* contact )
+public static void b2UnlinkContact( b2World world, b2Contact contact )
 {
 	Debug.Assert( contact.islandId != B2_NULL_INDEX );
 

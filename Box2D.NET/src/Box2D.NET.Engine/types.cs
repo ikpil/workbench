@@ -1100,6 +1100,17 @@ public class b2ContactEndTouchEvent
     ///	@warning this shape may have been destroyed
     ///	@see b2Shape_IsValid
     public b2ShapeId shapeIdB;
+
+    public b2ContactEndTouchEvent()
+    {
+        
+    }
+
+    public b2ContactEndTouchEvent(b2ShapeId shapeIdA, b2ShapeId shapeIdB)
+    {
+        this.shapeIdA = shapeIdA;
+        this.shapeIdB = shapeIdB;
+    }
 }
 
 /// A hit touch event is generated when two shapes collide with a speed faster than the hit speed threshold.
