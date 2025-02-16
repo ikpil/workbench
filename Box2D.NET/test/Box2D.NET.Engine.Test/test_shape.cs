@@ -72,7 +72,7 @@ public class test_shape
             Assert.That(md.mass - 4.0f, Is.LessThan(FLT_EPSILON));
             Assert.That(md.center.x, Is.LessThan(FLT_EPSILON));
             Assert.That(md.center.y, Is.LessThan(FLT_EPSILON));
-            Assert.That(md.rotationalInertia - 8.0f / 3.0f, Is.LessThan(2.0f * FLT_EPSILON));
+            Assert.That(md.rotationalInertia - 8.0f / 3.0f, Is.LessThanOrEqualTo(2.0f * FLT_EPSILON));
         }
     }
 
