@@ -390,18 +390,8 @@ public class sensor
             b2ShapeRef @ref = sensor.overlaps2.data[i];
             b2SensorEndTouchEvent @event = new b2SensorEndTouchEvent()
             {
-                sensorShapeId = new b2ShapeId
-                {
-                    index1 = sensorShape.id + 1,
-                    generation = sensorShape.generation,
-                    world0 = world.worldId,
-                },
-                visitorShapeId = new b2ShapeId()
-                {
-                    index1 = @ref.shapeId + 1,
-                    generation = @ref.generation,
-                    world0 = world.worldId,
-                },
+                sensorShapeId = new b2ShapeId(sensorShape.id + 1, world.worldId, sensorShape.generation),
+                visitorShapeId = new b2ShapeId(@ref.shapeId + 1, world.worldId, @ref.generation),
             };
 
             Array_Push(world.sensorEndEvents[world.endEventArrayIndex], @event);

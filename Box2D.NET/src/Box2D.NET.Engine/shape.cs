@@ -385,16 +385,8 @@ public class shape
                 b2ShapeRef @ref = sensor.overlaps2.data[i];
                 b2SensorEndTouchEvent @event = new b2SensorEndTouchEvent()
                 {
-                    sensorShapeId = new b2ShapeId(
-                        shapeId + 1,
-                        shape.generation,
-                        world.worldId
-                    ),
-                    visitorShapeId = new b2ShapeId(
-                        @ref.shapeId + 1,
-                        @ref.generation,
-                        world.worldId
-                    )
+                    sensorShapeId = new b2ShapeId(shapeId + 1, world.worldId, shape.generation),
+                    visitorShapeId = new b2ShapeId(@ref.shapeId + 1, world.worldId, @ref.generation),
                 };
 
                 Array_Push(world.sensorEndEvents[world.endEventArrayIndex], @event);
@@ -1729,11 +1721,7 @@ public class shape
         b2ShapeRef[] refs = sensor.overlaps2.data;
         for (int i = 0; i < count; ++i)
         {
-            overlaps[i] = new b2ShapeId(
-                refs[i].shapeId + 1,
-                refs[i].generation,
-                shapeId.world0
-            );
+            overlaps[i] = new b2ShapeId(refs[i].shapeId + 1, shapeId.world0, refs[i].generation);
         }
 
         return count;

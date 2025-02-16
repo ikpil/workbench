@@ -29,11 +29,11 @@ namespace Box2D.NET.Engine;
  * @{
  */
 /// World id references a world instance. This should be treated as an opaque handle.
-public struct b2WorldId
+public readonly struct b2WorldId
 {
-    public ushort index1;
-    public ushort generation;
-    
+    public readonly ushort index1;
+    public readonly ushort generation;
+
     public b2WorldId(ushort index1, ushort generation)
     {
         this.index1 = index1;
@@ -42,11 +42,11 @@ public struct b2WorldId
 }
 
 /// Body id references a body instance. This should be treated as an opaque handle.
-public struct b2BodyId
+public readonly struct b2BodyId
 {
-    public int index1;
-    public ushort world0;
-    public ushort generation;
+    public readonly int index1;
+    public readonly ushort world0;
+    public readonly ushort generation;
 
     public b2BodyId(int index1, ushort world0, ushort generation)
     {
@@ -57,61 +57,60 @@ public struct b2BodyId
 }
 
 /// Shape id references a shape instance. This should be treated as an opaque handle.
-public struct b2ShapeId
+public readonly struct b2ShapeId
 {
-    public int index1;
-    public ushort world0;
-    public ushort generation;
-    
+    public readonly int index1;
+    public readonly ushort world0;
+    public readonly ushort generation;
+
     public b2ShapeId(int index1, ushort world0, ushort generation)
     {
         this.index1 = index1;
         this.world0 = world0;
         this.generation = generation;
     }
-
 }
 
 /// Chain id references a chain instances. This should be treated as an opaque handle.
-public struct b2ChainId
+public readonly struct b2ChainId
 {
-    public int index1;
-    public ushort world0;
-    public ushort generation;
+    public readonly int index1;
+    public readonly ushort world0;
+    public readonly ushort generation;
+
     public b2ChainId(int index1, ushort world0, ushort generation)
     {
         this.index1 = index1;
         this.world0 = world0;
         this.generation = generation;
     }
-
 }
 
 /// Joint id references a joint instance. This should be treated as an opaque handle.
-public struct b2JointId
+public readonly struct b2JointId
 {
-    public int index1;
-    public ushort world0;
-    public ushort generation;
+    public readonly int index1;
+    public readonly ushort world0;
+    public readonly ushort generation;
+
     public b2JointId(int index1, ushort world0, ushort generation)
     {
         this.index1 = index1;
         this.world0 = world0;
         this.generation = generation;
     }
-
 }
 
 public static class id
 {
     /// Use these to make your identifiers null.
     /// You may also use zero initialization to get null.
-    public static readonly b2WorldId b2_nullWorldId = new b2WorldId { index1 = 0, generation = 0 };
+    public static readonly b2WorldId b2_nullWorldId = new b2WorldId(0, 0);
 
-    public static readonly b2BodyId b2_nullBodyId = new b2BodyId { index1 = 0, world0 = 0, generation = 0 };
-    public static readonly b2ShapeId b2_nullShapeId = new b2ShapeId { index1 = 0, world0 = 0, generation = 0 };
-    public static readonly b2ChainId b2_nullChainId = new b2ChainId { index1 = 0, world0 = 0, generation = 0 };
-    public static readonly b2JointId b2_nullJointId = new b2JointId { index1 = 0, world0 = 0, generation = 0 };
+    public static readonly b2BodyId b2_nullBodyId = new b2BodyId(0, 0, 0);
+    public static readonly b2ShapeId b2_nullShapeId = new b2ShapeId(0, 0, 0);
+    public static readonly b2ChainId b2_nullChainId = new b2ChainId(0, 0, 0);
+    public static readonly b2JointId b2_nullJointId = new b2JointId(0, 0, 0);
 
     /// Macro to determine if any id is null.
     public static bool B2_IS_NULL(b2WorldId id) => id.index1 == 0;
@@ -141,7 +140,7 @@ public static class id
     /// Load a ulong into a body id.
     public static b2BodyId b2LoadBodyId(ulong x)
     {
-        b2BodyId id = new b2BodyId { index1 = (int)(x >> 32), world0 = (ushort)(x >> 16), generation = (ushort)(x) };
+        b2BodyId id = new b2BodyId((int)(x >> 32), (ushort)(x >> 16), (ushort)(x));
         return id;
     }
 
@@ -154,7 +153,7 @@ public static class id
     /// Load a ulong into a shape id.
     public static b2ShapeId b2LoadShapeId(ulong x)
     {
-        b2ShapeId id = new b2ShapeId { index1 = (int)(x >> 32), world0 = (ushort)(x >> 16), generation = (ushort)(x) };
+        b2ShapeId id = new b2ShapeId((int)(x >> 32), (ushort)(x >> 16), (ushort)(x));
         return id;
     }
 
@@ -167,7 +166,7 @@ public static class id
     /// Load a ulong into a chain id.
     public static b2ChainId b2LoadChainId(ulong x)
     {
-        b2ChainId id = new b2ChainId { index1 = (int)(x >> 32), world0 = (ushort)(x >> 16), generation = (ushort)(x) };
+        b2ChainId id = new b2ChainId((int)(x >> 32), (ushort)(x >> 16), (ushort)(x));
         return id;
     }
 
@@ -180,7 +179,7 @@ public static class id
     /// Load a ulong into a joint id.
     public static b2JointId b2LoadJointId(ulong x)
     {
-        b2JointId id = new b2JointId { index1 = (int)(x >> 32), world0 = (ushort)(x >> 16), generation = (ushort)(x) };
+        b2JointId id = new b2JointId((int)(x >> 32), (ushort)(x >> 16), (ushort)(x));
         return id;
     }
 
