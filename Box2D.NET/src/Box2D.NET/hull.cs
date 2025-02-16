@@ -81,6 +81,14 @@ public static class hull
         return hull;
     }
 
+    /// Compute the convex hull of a set of points. Returns an empty hull if it fails.
+    /// Some failure cases:
+    /// - all points very close together
+    /// - all points on a line
+    /// - less than 3 points
+    /// - more than B2_MAX_POLYGON_VERTICES points
+    /// This welds close points and removes collinear points.
+    /// @warning Do not modify a hull once it has been computed
     // quickhull algorithm
     // - merges vertices based on B2_LINEAR_SLOP
     // - removes collinear points using B2_LINEAR_SLOP
@@ -272,6 +280,10 @@ public static class hull
         return hull;
     }
 
+    /// This determines if a hull is valid. Checks for:
+    /// - convexity
+    /// - collinear points
+    /// This is expensive and should not be called at runtime.
     public static bool b2ValidateHull(b2Hull hull)
     {
         if (hull.count < 3 || B2_MAX_POLYGON_VERTICES < hull.count)

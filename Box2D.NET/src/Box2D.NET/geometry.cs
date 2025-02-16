@@ -14,6 +14,7 @@ public static class geometry
 {
     // Debug.Assert( B2_MAX_POLYGON_VERTICES > 2, "must be 3 or more" );
 
+    /// Validate ray cast input data (NaN, etc)
     public static bool b2IsValidRay(b2RayCastInput input)
     {
         bool isValid = b2IsValidVec2(input.origin) && b2IsValidVec2(input.translation) && b2IsValidFloat(input.maxFraction) &&
@@ -55,6 +56,8 @@ public static class geometry
         return center;
     }
 
+    /// Make a convex polygon from a convex hull. This will assert if the hull is not valid.
+    /// @warning Do not manually fill in the hull data, it must come directly from b2ComputeHull
     public static b2Polygon b2MakePolygon(b2Hull hull, float radius)
     {
         Debug.Assert(b2ValidateHull(hull));
@@ -90,11 +93,15 @@ public static class geometry
         return shape;
     }
 
+    /// Make an offset convex polygon from a convex hull. This will assert if the hull is not valid.
+    /// @warning Do not manually fill in the hull data, it must come directly from b2ComputeHull
     public static b2Polygon b2MakeOffsetPolygon(b2Hull hull, b2Vec2 position, b2Rot rotation)
     {
         return b2MakeOffsetRoundedPolygon(hull, position, rotation, 0.0f);
     }
 
+    /// Make an offset convex polygon from a convex hull. This will assert if the hull is not valid.
+    /// @warning Do not manually fill in the hull data, it must come directly from b2ComputeHull
     public static b2Polygon b2MakeOffsetRoundedPolygon(b2Hull hull, b2Vec2 position, b2Rot rotation, float radius)
     {
         Debug.Assert(b2ValidateHull(hull));
@@ -132,11 +139,16 @@ public static class geometry
         return shape;
     }
 
+    /// Make a square polygon, bypassing the need for a convex hull.
+    /// @param halfWidth the half-width
     public static b2Polygon b2MakeSquare(float halfWidth)
     {
         return b2MakeBox(halfWidth, halfWidth);
     }
 
+    /// Make a box (rectangle) polygon, bypassing the need for a convex hull.
+    /// @param halfWidth the half-width (x-axis)
+    /// @param halfHeight the half-height (y-axis)
     public static b2Polygon b2MakeBox(float halfWidth, float halfHeight)
     {
         Debug.Assert(b2IsValidFloat(halfWidth) && halfWidth > 0.0f);
@@ -157,6 +169,10 @@ public static class geometry
         return shape;
     }
 
+    /// Make a rounded box, bypassing the need for a convex hull.
+    /// @param halfWidth the half-width (x-axis)
+    /// @param halfHeight the half-height (y-axis)
+    /// @param radius the radius of the rounded extension
     public static b2Polygon b2MakeRoundedBox(float halfWidth, float halfHeight, float radius)
     {
         Debug.Assert(b2IsValidFloat(radius) && radius >= 0.0f);
@@ -165,6 +181,11 @@ public static class geometry
         return shape;
     }
 
+    /// Make an offset box, bypassing the need for a convex hull.
+    /// @param halfWidth the half-width (x-axis)
+    /// @param halfHeight the half-height (y-axis)
+    /// @param center the local center of the box
+    /// @param rotation the local rotation of the box
     public static b2Polygon b2MakeOffsetBox(float halfWidth, float halfHeight, b2Vec2 center, b2Rot rotation)
     {
         b2Transform xf = new b2Transform(center, rotation);
@@ -184,6 +205,12 @@ public static class geometry
         return shape;
     }
 
+    /// Make an offset rounded box, bypassing the need for a convex hull.
+    /// @param halfWidth the half-width (x-axis)
+    /// @param halfHeight the half-height (y-axis)
+    /// @param center the local center of the box
+    /// @param rotation the local rotation of the box
+    /// @param radius the radius of the rounded extension
     public static b2Polygon b2MakeOffsetRoundedBox(float halfWidth, float halfHeight, b2Vec2 center, b2Rot rotation, float radius)
     {
         Debug.Assert(b2IsValidFloat(radius) && radius >= 0.0f);
@@ -204,6 +231,7 @@ public static class geometry
         return shape;
     }
 
+    /// Transform a polygon. This is useful for transferring a shape from one body to another.
     public static b2Polygon b2TransformPolygon(b2Transform transform, b2Polygon polygon)
     {
         b2Polygon p = polygon.Clone();
@@ -219,6 +247,7 @@ public static class geometry
         return p;
     }
 
+    /// Compute mass properties of a circle
     public static b2MassData b2ComputeCircleMass(b2Circle shape, float density)
     {
         float rr = shape.radius * shape.radius;
@@ -233,6 +262,7 @@ public static class geometry
         return massData;
     }
 
+    /// Compute mass properties of a capsule
     public static b2MassData b2ComputeCapsuleMass(b2Capsule shape, float density)
     {
         float radius = shape.radius;
@@ -275,6 +305,7 @@ public static class geometry
         return massData;
     }
 
+    /// Compute mass properties of a polygon
     public static b2MassData b2ComputePolygonMass(b2Polygon shape, float density)
     {
         // Polygon mass, centroid, and inertia.
@@ -398,6 +429,7 @@ public static class geometry
         return massData;
     }
 
+    /// Compute the bounding box of a transformed circle
     public static b2AABB b2ComputeCircleAABB(b2Circle shape, b2Transform xf)
     {
         b2Vec2 p = b2TransformPoint(xf, shape.center);
@@ -407,6 +439,7 @@ public static class geometry
         return aabb;
     }
 
+    /// Compute the bounding box of a transformed capsule
     public static b2AABB b2ComputeCapsuleAABB(b2Capsule shape, b2Transform xf)
     {
         b2Vec2 v1 = b2TransformPoint(xf, shape.center1);
@@ -420,6 +453,7 @@ public static class geometry
         return aabb;
     }
 
+    /// Compute the bounding box of a transformed polygon
     public static b2AABB b2ComputePolygonAABB(b2Polygon shape, b2Transform xf)
     {
         Debug.Assert(shape.count > 0);
@@ -441,6 +475,7 @@ public static class geometry
         return aabb;
     }
 
+    /// Compute the bounding box of a transformed line segment
     public static b2AABB b2ComputeSegmentAABB(b2Segment shape, b2Transform xf)
     {
         b2Vec2 v1 = b2TransformPoint(xf, shape.point1);
@@ -453,12 +488,14 @@ public static class geometry
         return aabb;
     }
 
+    /// Test a point for overlap with a circle in local space
     public static bool b2PointInCircle(b2Vec2 point, b2Circle shape)
     {
         b2Vec2 center = shape.center;
         return b2DistanceSquared(point, center) <= shape.radius * shape.radius;
     }
 
+    /// Test a point for overlap with a capsule in local space
     public static bool b2PointInCapsule(b2Vec2 point, b2Capsule shape)
     {
         float rr = shape.radius * shape.radius;
@@ -486,6 +523,7 @@ public static class geometry
         return b2DistanceSquared(point, c) <= rr;
     }
 
+    /// Test a point for overlap with a convex polygon in local space
     public static bool b2PointInPolygon(b2Vec2 point, b2Polygon shape)
     {
         b2DistanceInput input = new b2DistanceInput();
@@ -501,6 +539,7 @@ public static class geometry
         return output.distance <= shape.radius;
     }
 
+    /// Ray cast versus circle shape in local space. Initial overlap is treated as a miss.
     // Precision Improvements for Ray / Sphere Intersection - Ray Tracing Gems 2019
     // http://www.codercorner.com/blog/?p=321
     public static b2CastOutput b2RayCastCircle(b2RayCastInput input, b2Circle shape)
@@ -561,6 +600,7 @@ public static class geometry
         return output;
     }
 
+    /// Ray cast versus capsule shape in local space. Initial overlap is treated as a miss.
     public static b2CastOutput b2RayCastCapsule(b2RayCastInput input, b2Capsule shape)
     {
         Debug.Assert(b2IsValidRay(input));
@@ -694,6 +734,8 @@ public static class geometry
         }
     }
 
+    /// Ray cast versus segment shape in local space. Optionally treat the segment as one-sided with hits from
+    /// the left side being treated as a miss.
     // Ray vs line segment
     public static b2CastOutput b2RayCastSegment(b2RayCastInput input, b2Segment shape, bool oneSided)
     {
@@ -776,6 +818,7 @@ public static class geometry
         return output;
     }
 
+    /// Ray cast versus polygon shape in local space. Initial overlap is treated as a miss.
     public static b2CastOutput b2RayCastPolygon(b2RayCastInput input, b2Polygon shape)
     {
         Debug.Assert(b2IsValidRay(input));
@@ -862,6 +905,7 @@ public static class geometry
         return b2ShapeCast(castInput);
     }
 
+    /// Shape cast versus a circle. Initial overlap is treated as a miss.
     public static b2CastOutput b2ShapeCastCircle(b2ShapeCastInput input, b2Circle shape)
     {
         b2ShapeCastPairInput pairInput = new b2ShapeCastPairInput();
@@ -876,6 +920,7 @@ public static class geometry
         return output;
     }
 
+    /// Shape cast versus a capsule. Initial overlap is treated as a miss.
     public static b2CastOutput b2ShapeCastCapsule(b2ShapeCastInput input, b2Capsule shape)
     {
         b2ShapeCastPairInput pairInput = new b2ShapeCastPairInput();
@@ -890,6 +935,7 @@ public static class geometry
         return output;
     }
 
+    /// Shape cast versus a line segment. Initial overlap is treated as a miss.
     public static b2CastOutput b2ShapeCastSegment(b2ShapeCastInput input, b2Segment shape)
     {
         b2ShapeCastPairInput pairInput = new b2ShapeCastPairInput();
@@ -904,6 +950,7 @@ public static class geometry
         return output;
     }
 
+    /// Shape cast versus a convex polygon. Initial overlap is treated as a miss.
     public static b2CastOutput b2ShapeCastPolygon(b2ShapeCastInput input, b2Polygon shape)
     {
         b2ShapeCastPairInput pairInput = new b2ShapeCastPairInput();

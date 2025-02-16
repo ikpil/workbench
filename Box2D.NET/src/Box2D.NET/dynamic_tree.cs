@@ -154,6 +154,7 @@ public static class dynamic_tree
         return a > b ? a : b;
     }
 
+    /// Constructing the tree initializes the node pool.
     public static b2DynamicTree b2DynamicTree_Create()
     {
         b2DynamicTree tree = new b2DynamicTree();
@@ -184,6 +185,7 @@ public static class dynamic_tree
         return tree;
     }
 
+    /// Destroy the tree, freeing the node pool.
     public static void b2DynamicTree_Destroy(b2DynamicTree tree)
     {
         b2Free(tree.nodes, tree.nodeCapacity);
@@ -841,6 +843,7 @@ public static class dynamic_tree
         }
     }
 
+    /// Create a proxy. Provide an AABB and a userData value.
     // Create a proxy in the tree as a leaf node. We return the index of the node instead of a pointer so that we can grow
     // the node pool.
     public static int b2DynamicTree_CreateProxy(b2DynamicTree tree, b2AABB aabb, ulong categoryBits, int userData)
@@ -867,6 +870,7 @@ public static class dynamic_tree
         return proxyId;
     }
 
+    /// Destroy a proxy. This asserts if the id is invalid.
     public static void b2DynamicTree_DestroyProxy(b2DynamicTree tree, int proxyId)
     {
         Debug.Assert(0 <= proxyId && proxyId < tree.nodeCapacity);
@@ -879,11 +883,13 @@ public static class dynamic_tree
         tree.proxyCount -= 1;
     }
 
+    /// Get the number of proxies created
     public static int b2DynamicTree_GetProxyCount(b2DynamicTree tree)
     {
         return tree.proxyCount;
     }
 
+    /// Move a proxy to a new AABB by removing and reinserting into the tree.
     public static void b2DynamicTree_MoveProxy(b2DynamicTree tree, int proxyId, b2AABB aabb)
     {
         Debug.Assert(b2IsValidAABB(aabb));
@@ -900,6 +906,7 @@ public static class dynamic_tree
         b2InsertLeaf(tree, proxyId, shouldRotate);
     }
 
+    /// Enlarge a proxy and enlarge ancestors as necessary.
     public static void b2DynamicTree_EnlargeProxy(b2DynamicTree tree, int proxyId, b2AABB aabb)
     {
         b2TreeNode[] nodes = tree.nodes;
@@ -941,6 +948,7 @@ public static class dynamic_tree
         }
     }
 
+    /// Get the height of the binary tree.
     public static int b2DynamicTree_GetHeight(b2DynamicTree tree)
     {
         if (tree.root == B2_NULL_INDEX)
@@ -951,6 +959,7 @@ public static class dynamic_tree
         return tree.nodes[tree.root].height;
     }
 
+    /// Get the ratio of the sum of the node areas to the root area.
     public static float b2DynamicTree_GetAreaRatio(b2DynamicTree tree)
     {
         if (tree.root == B2_NULL_INDEX)
@@ -1077,6 +1086,7 @@ public static class dynamic_tree
     }
 #endif
 
+    /// Validate this tree. For testing.
     public static void b2DynamicTree_Validate(b2DynamicTree tree)
     {
 #if B2_VALIDATE
@@ -1107,6 +1117,7 @@ public static class dynamic_tree
 #endif
     }
 
+    /// Validate this tree has no enlarged AABBs. For testing.
     public static void b2DynamicTree_ValidateNoEnlarged(b2DynamicTree tree)
     {
 #if B2_VALIDATE
@@ -1125,6 +1136,7 @@ public static class dynamic_tree
 #endif
     }
 
+    /// Get the number of bytes used by this tree
     public static int b2DynamicTree_GetByteCount(b2DynamicTree tree)
     {
         // TODO: @ikpil, check
@@ -1134,17 +1146,21 @@ public static class dynamic_tree
         return -1;
     }
 
+    /// Get proxy user data
     public static int b2DynamicTree_GetUserData(b2DynamicTree tree, int proxyId)
     {
         return tree.nodes[proxyId].userData;
     }
 
+    /// Get the AABB of a proxy
     public static b2AABB b2DynamicTree_GetAABB(b2DynamicTree tree, int proxyId)
     {
         return tree.nodes[proxyId].aabb;
     }
 
 
+    /// Query an AABB for overlapping proxies. The callback class is called for each proxy that overlaps the supplied AABB.
+    /// @return performance data
     public static b2TreeStats b2DynamicTree_Query(b2DynamicTree tree, b2AABB aabb, ulong maskBits, b2TreeQueryCallbackFcn callback, object context)
     {
         b2TreeStats result = new b2TreeStats();
@@ -1202,6 +1218,19 @@ public static class dynamic_tree
         return result;
     }
 
+    /// Ray cast against the proxies in the tree. This relies on the callback
+    /// to perform a exact ray cast in the case were the proxy contains a shape.
+    /// The callback also performs the any collision filtering. This has performance
+    /// roughly equal to k * log(n), where k is the number of collisions and n is the
+    /// number of proxies in the tree.
+    /// Bit-wise filtering using mask bits can greatly improve performance in some scenarios.
+    /// However, this filtering may be approximate, so the user should still apply filtering to results.
+    /// @param tree the dynamic tree to ray cast
+    /// @param input the ray cast input data. The ray extends from p1 to p1 + maxFraction * (p2 - p1)
+    /// @param maskBits mask bit hint: `bool accept = (maskBits & node->categoryBits) != 0;`
+    /// @param callback a callback class that is called for each proxy that is hit by the ray
+    /// @param context user context that is passed to the callback
+    /// @return performance data
     public static b2TreeStats b2DynamicTree_RayCast(b2DynamicTree tree, b2RayCastInput input, ulong maskBits, b2TreeRayCastCallbackFcn callback, object context)
     {
         b2TreeStats result = new b2TreeStats();
@@ -1321,6 +1350,17 @@ public static class dynamic_tree
         return result;
     }
 
+    /// Ray cast against the proxies in the tree. This relies on the callback
+    /// to perform a exact ray cast in the case were the proxy contains a shape.
+    /// The callback also performs the any collision filtering. This has performance
+    /// roughly equal to k * log(n), where k is the number of collisions and n is the
+    /// number of proxies in the tree.
+    /// @param tree the dynamic tree to ray cast
+    /// @param input the ray cast input data. The ray extends from p1 to p1 + maxFraction * (p2 - p1).
+    /// @param maskBits filter bits: `bool accept = (maskBits & node->categoryBits) != 0;`
+    /// @param callback a callback class that is called for each proxy that is hit by the shape
+    /// @param context user context that is passed to the callback
+    /// @return performance data
     public static b2TreeStats b2DynamicTree_ShapeCast(b2DynamicTree tree, b2ShapeCastInput input, ulong maskBits, b2TreeShapeCastCallbackFcn callback, object context)
     {
         b2TreeStats stats = new b2TreeStats();
@@ -1890,6 +1930,7 @@ public static class dynamic_tree
         return stack[0].nodeIndex;
     }
 
+    /// Rebuild the tree while retaining subtrees that haven't changed. Returns the number of boxes sorted.
     // Not safe to access tree during this operation because it may grow
     public static int b2DynamicTree_Rebuild(b2DynamicTree tree, bool fullBuild)
     {

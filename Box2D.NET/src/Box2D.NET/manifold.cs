@@ -58,6 +58,7 @@ public class manifold
         return shape;
     }
 
+    /// Compute the contact manifold between two circles
     // point = qA * localAnchorA + pA
     // localAnchorB = qBc * (point - pB)
     // anchorB = point - pB = qA * localAnchorA + pA - pB
@@ -98,6 +99,7 @@ public class manifold
         return manifold;
     }
 
+    /// Compute the contact manifold between a capsule and circle
     /// Compute the collision manifold between a capsule and circle
     public static b2Manifold b2CollideCapsuleAndCircle(b2Capsule capsuleA, b2Transform xfA, b2Circle circleB, b2Transform xfB)
     {
@@ -163,6 +165,7 @@ public class manifold
         return manifold;
     }
 
+    /// Compute the contact manifold between a polygon and a circle
     public static b2Manifold b2CollidePolygonAndCircle(b2Polygon polygonA, b2Transform xfA, b2Circle circleB, b2Transform xfB)
     {
         b2Manifold manifold = new b2Manifold();
@@ -281,6 +284,7 @@ public class manifold
         return manifold;
     }
 
+    /// Compute the contact manifold between a capsule and circle
     // Follows Ericson 5.1.9 Closest Points of Two Line Segments
     // Adds some logic to support clipping to get two contact points
     public static b2Manifold b2CollideCapsules(b2Capsule capsuleA, b2Transform xfA, b2Capsule capsuleB, b2Transform xfB)
@@ -552,12 +556,14 @@ public class manifold
         return manifold;
     }
 
+    /// Compute the contact manifold between an segment and a capsule
     public static b2Manifold b2CollideSegmentAndCapsule(b2Segment segmentA, b2Transform xfA, b2Capsule capsuleB, b2Transform xfB)
     {
         b2Capsule capsuleA = new b2Capsule(segmentA.point1, segmentA.point2, 0.0f);
         return b2CollideCapsules(capsuleA, xfA, capsuleB, xfB);
     }
 
+    /// Compute the contact manifold between a polygon and capsule
     public static b2Manifold b2CollidePolygonAndCapsule(b2Polygon polygonA, b2Transform xfA, b2Capsule capsuleB, b2Transform xfB)
     {
         b2Polygon polyB = b2MakeCapsule(capsuleB.center1, capsuleB.center2, capsuleB.radius);
@@ -741,6 +747,7 @@ public class manifold
         return maxSeparation;
     }
 
+    /// Compute the contact manifold between two polygons
     // Due to speculation, every polygon is rounded
     // Algorithm:
     //
@@ -758,7 +765,6 @@ public class manifold
     // else
     //   clip edges
     // end
-
     public static b2Manifold b2CollidePolygons(b2Polygon polygonA, b2Transform xfA, b2Polygon polygonB, b2Transform xfB)
     {
         b2Vec2 origin = polygonA.vertices[0];
@@ -995,18 +1001,21 @@ public class manifold
         return manifold;
     }
 
+    /// Compute the contact manifold between an segment and a circle
     public static b2Manifold b2CollideSegmentAndCircle(b2Segment segmentA, b2Transform xfA, b2Circle circleB, b2Transform xfB)
     {
         b2Capsule capsuleA = new b2Capsule(segmentA.point1, segmentA.point2, 0.0f);
         return b2CollideCapsuleAndCircle(capsuleA, xfA, circleB, xfB);
     }
 
+    /// Compute the contact manifold between an segment and a polygon
     public static b2Manifold b2CollideSegmentAndPolygon(b2Segment segmentA, b2Transform xfA, b2Polygon polygonB, b2Transform xfB)
     {
         b2Polygon polygonA = b2MakeCapsule(segmentA.point1, segmentA.point2, 0.0f);
         return b2CollidePolygons(polygonA, xfA, polygonB, xfB);
     }
 
+    /// Compute the contact manifold between a chain segment and a circle
     public static b2Manifold b2CollideChainSegmentAndCircle(b2ChainSegment segmentA, b2Transform xfA, b2Circle circleB, b2Transform xfB)
     {
         b2Manifold manifold = new b2Manifold();
@@ -1094,6 +1103,7 @@ public class manifold
         return manifold;
     }
 
+    /// Compute the contact manifold between a chain segment and a capsule
     public static b2Manifold b2CollideChainSegmentAndCapsule(b2ChainSegment segmentA, b2Transform xfA, b2Capsule capsuleB, b2Transform xfB, b2SimplexCache cache)
     {
         b2Polygon polyB = b2MakeCapsule(capsuleB.center1, capsuleB.center2, capsuleB.radius);
@@ -1214,6 +1224,7 @@ public class manifold
         }
     }
 
+    /// Compute the contact manifold between a chain segment and a rounded polygon
     public static b2Manifold b2CollideChainSegmentAndPolygon(b2ChainSegment segmentA, b2Transform xfA, b2Polygon polygonB, b2Transform xfB, b2SimplexCache cache)
     {
         b2Manifold manifold = new b2Manifold();

@@ -27,6 +27,7 @@ public class b2SeparationFunction
 
 public static class distance
 {
+    /// Evaluate the transform sweep at a specific time.
     public static b2Transform b2GetSweepTransform(b2Sweep sweep, float time)
     {
         // https://fgiesen.wordpress.com/2012/08/15/linear-interpolation-past-present-and-future/
@@ -45,6 +46,7 @@ public static class distance
         return xf;
     }
 
+    /// Compute the distance between two line segments, clamping at the end points if needed.
     /// Follows Ericson 5.1.9 Closest Points of Two Line Segments
     public static b2SegmentDistanceResult b2SegmentDistance(b2Vec2 p1, b2Vec2 q1, b2Vec2 p2, b2Vec2 q2)
     {
@@ -121,6 +123,7 @@ public static class distance
         return result;
     }
 
+    /// Make a proxy for use in GJK and related functions.
     // GJK using Voronoi regions (Christer Ericson) and Barycentric coordinates.
     // todo try not copying
     public static b2ShapeProxy b2MakeProxy(ReadOnlySpan<b2Vec2> vertices, int count, float radius)
@@ -473,6 +476,9 @@ public static class distance
         s.count = 3;
     }
 
+    /// Compute the closest points between two shapes represented as point clouds.
+    /// b2SimplexCache cache is input/output. On the first call set b2SimplexCache.count to zero.
+    /// The underlying GJK algorithm may be debugged by passing in debug simplexes and capacity. You may pass in NULL and 0 for these.
     public static b2DistanceOutput b2ShapeDistance(b2SimplexCache cache, b2DistanceInput input, b2Simplex[] simplexes, int simplexCapacity)
     {
         b2DistanceOutput output = new b2DistanceOutput();
@@ -634,6 +640,7 @@ public static class distance
         return output;
     }
 
+    /// Perform a linear shape cast of shape B moving and shape A fixed. Determines the hit point, normal, and translation fraction.
     // GJK-raycast
     // Algorithm by Gino van den Bergen.
     // "Smooth Mesh Contacts with GJK" in Game Physics Pearls. 2010
@@ -1001,6 +1008,10 @@ public static class distance
         }
     }
 
+    /// Compute the upper bound on time before two shapes penetrate. Time is represented as
+    /// a fraction between [0,tMax]. This uses a swept separating axis and may miss some intermediate,
+    /// non-tunneling collisions. If you change the time interval, you should call this function
+    /// again.
     // CCD via the local separating axis method. This seeks progression
     // by computing the largest time at which separation is maintained.
     public static b2TOIOutput b2TimeOfImpact(b2TOIInput input)
