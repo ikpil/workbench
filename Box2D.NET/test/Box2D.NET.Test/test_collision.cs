@@ -5,7 +5,7 @@ using NUnit.Framework;
 using static Box2D.NET.aabb;
 using static Box2D.NET.math_function;
 
-namespace Box2D.NET.Engine.Test;
+namespace Box2D.NET.Test;
 
 public class test_collision
 {

@@ -6,7 +6,7 @@ using static Box2D.NET.math_function;
 using static Box2D.NET.distance;
 using static Box2D.NET.core;
 
-namespace Box2D.NET.Engine.Test;
+namespace Box2D.NET.Test;
 
 public class test_distance
 {

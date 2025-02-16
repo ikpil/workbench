@@ -7,7 +7,7 @@ using static Box2D.NET.ctz;
 using static Box2D.NET.table;
 using static Box2D.NET.timer;
 
-namespace Box2D.NET.Engine.Test;
+namespace Box2D.NET.Test;
 
 public class test_table
 {

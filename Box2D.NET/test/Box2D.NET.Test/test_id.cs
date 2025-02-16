@@ -18,7 +18,7 @@ using static Box2D.NET.wheel_joint;
 using static Box2D.NET.id_pool;
 using static Box2D.NET.manifold;
 
-namespace Box2D.NET.Engine.Test;
+namespace Box2D.NET.Test;
 
 public class test_id
 {

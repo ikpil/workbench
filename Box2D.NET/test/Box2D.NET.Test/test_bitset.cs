@@ -3,7 +3,7 @@
 
 using NUnit.Framework;
 
-namespace Box2D.NET.Engine.Test;
+namespace Box2D.NET.Test;
 
 using static NET.bitset;
 

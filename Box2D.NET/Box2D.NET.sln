@@ -14,7 +14,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Box2D.NET.Samples", "src\Bo
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{536EAF45-6BD7-441A-85AC-061D77F593FB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Box2D.NET.Engine.Test", "test\Box2D.NET.Engine.Test\Box2D.NET.Engine.Test.csproj", "{1646ABAA-1CD4-45D1-82D1-13639573837B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Box2D.NET.Test", "test\Box2D.NET.Test\Box2D.NET.Test.csproj", "{1646ABAA-1CD4-45D1-82D1-13639573837B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -20,7 +20,7 @@ using static Box2D.NET.joint;
 using static Box2D.NET.timer;
 using static Box2D.NET.core;
 
-namespace Box2D.NET.Engine.Test;
+namespace Box2D.NET.Test;
 
 public class b2TaskTester : IDisposable
 {
