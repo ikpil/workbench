@@ -8,7 +8,7 @@ using static Box2D.NET.Engine.core;
 
 namespace Box2D.NET.Engine.Test;
 
-public class test_distance : test_macros
+public class test_distance
 {
     [Test]
     public void SegmentDistanceTest()
@@ -20,13 +20,13 @@ public class test_distance : test_macros
 
         b2SegmentDistanceResult result = b2SegmentDistance(p1, q1, p2, q2);
 
-        ENSURE_SMALL(result.fraction1 - 0.5f, Epsilon);
-        ENSURE_SMALL(result.fraction2 - 1.0f, Epsilon);
-        ENSURE_SMALL(result.closest1.x + 1.0f, Epsilon);
-        ENSURE_SMALL(result.closest1.y, Epsilon);
-        ENSURE_SMALL(result.closest2.x - 1.0f, Epsilon);
-        ENSURE_SMALL(result.closest2.y, Epsilon);
-        ENSURE_SMALL(result.distanceSquared - 4.0f, Epsilon);
+        Assert.That(result.fraction1 - 0.5f, Is.LessThan(FLT_EPSILON));
+        Assert.That(result.fraction2 - 1.0f, Is.LessThan(FLT_EPSILON));
+        Assert.That(result.closest1.x + 1.0f, Is.LessThan(FLT_EPSILON));
+        Assert.That(result.closest1.y, Is.LessThan(FLT_EPSILON));
+        Assert.That(result.closest2.x - 1.0f, Is.LessThan(FLT_EPSILON));
+        Assert.That(result.closest2.y, Is.LessThan(FLT_EPSILON));
+        Assert.That(result.distanceSquared - 4.0f, Is.LessThan(FLT_EPSILON));
     }
 
     [Test]
@@ -55,7 +55,7 @@ public class test_distance : test_macros
         b2SimplexCache cache = new b2SimplexCache();
         b2DistanceOutput output = b2ShapeDistance(cache, input, null, 0);
 
-        ENSURE_SMALL(output.distance - 1.0f, Epsilon);
+        Assert.That(output.distance - 1.0f, Is.LessThan(FLT_EPSILON));
     }
 
     [Test]
@@ -85,8 +85,8 @@ public class test_distance : test_macros
 
         b2CastOutput output = b2ShapeCast(input);
 
-        ENSURE(output.hit);
-        ENSURE_SMALL(output.fraction - 0.5f, 0.005f);
+        Assert.That(output.hit);
+        Assert.That(output.fraction - 0.5f, Is.LessThan(0.005f));
     }
 
     [Test]
@@ -115,7 +115,7 @@ public class test_distance : test_macros
 
         b2TOIOutput output = b2TimeOfImpact(input);
 
-        ENSURE(output.state == b2TOIState.b2_toiStateHit);
-        ENSURE_SMALL(output.fraction - 0.5f, 0.005f);
+        Assert.That(output.state, Is.EqualTo(b2TOIState.b2_toiStateHit));
+        Assert.That(output.fraction - 0.5f, Is.LessThan(0.005f));
     }
 }

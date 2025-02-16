@@ -6,6 +6,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Silk.NET" Version="2.22.0" />
+  </ItemGroup>
+
+  
+  <ItemGroup>
     <ProjectReference Include="..\Box2D.NET.Engine\Box2D.NET.Engine.csproj" />
   </ItemGroup>
 

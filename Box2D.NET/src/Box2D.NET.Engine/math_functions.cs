@@ -174,7 +174,8 @@ public static class math_function
 
     /// https://en.wikipedia.org/wiki/Pi
     public const float B2_PI = 3.14159265359f;
-
+    public const float FLT_EPSILON = 1.1920929e-7f;
+    
     public static readonly b2Vec2 b2Vec2_zero = new b2Vec2 { x = 0.0f, y = 0.0f };
     public static readonly b2Rot b2Rot_identity = new b2Rot{ c = 1.0f, s = 0.0f };
     public static readonly b2Transform b2Transform_identity = new b2Transform{ p = { x = 0.0f, y = 0.0f }, q = { c = 1.0f, s = 0.0f } };
@@ -369,7 +370,7 @@ public static class math_function
     public static b2Vec2 b2Normalize( b2Vec2 v )
     {
         float length = MathF.Sqrt( v.x * v.x + v.y * v.y );
-        if ( length < Epsilon )
+        if ( length < FLT_EPSILON )
         {
             return b2Vec2_zero;
         }
@@ -384,7 +385,7 @@ public static class math_function
     public static b2Vec2 b2GetLengthAndNormalize( ref float length, b2Vec2 v )
     {
         length = b2Length( v );
-        if ( length < Epsilon )
+        if ( length < FLT_EPSILON )
         {
             return b2Vec2_zero;
         }
@@ -851,13 +852,12 @@ public static class math_function
         return cs;
     }
 
-    public const float Epsilon = 1.1920929e-7f;
 
     /// Compute the rotation between two unit vectors
     public static b2Rot b2ComputeRotationBetweenUnitVectors(b2Vec2 v1, b2Vec2 v2)
     {
-        Debug.Assert( b2AbsFloat( 1.0f - b2Length( v1 ) ) < 100.0f * Epsilon );
-        Debug.Assert( b2AbsFloat( 1.0f - b2Length( v2 ) ) < 100.0f * Epsilon );
+        Debug.Assert( b2AbsFloat( 1.0f - b2Length( v1 ) ) < 100.0f * FLT_EPSILON );
+        Debug.Assert( b2AbsFloat( 1.0f - b2Length( v2 ) ) < 100.0f * FLT_EPSILON );
 
         b2Rot rot;
         rot.c = b2Dot( v1, v2 );

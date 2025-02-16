@@ -9,7 +9,7 @@ using static Box2D.NET.Engine.timer;
 
 namespace Box2D.NET.Engine.Test;
 
-public class test_table : test_macros
+public class test_table
 {
     public const int SET_SPAN = 317;
     public const int ITEM_COUNT = ((SET_SPAN * SET_SPAN - SET_SPAN) / 2);
@@ -18,10 +18,10 @@ public class test_table : test_macros
     public void TableTest()
     {
         int power = b2BoundingPowerOf2(3008);
-        ENSURE(power == 12);
+        Assert.That(power, Is.EqualTo(12));
 
         int nextPowerOf2 = b2RoundUpPowerOf2(3008);
-        ENSURE(nextPowerOf2 == (1 << power));
+        Assert.That(nextPowerOf2, Is.EqualTo((1 << power)));
 
         const int N = SET_SPAN;
         const uint itemCount = ITEM_COUNT;
@@ -41,7 +41,7 @@ public class test_table : test_macros
                 }
             }
 
-            ENSURE(set.count == itemCount);
+            Assert.That(set.count, Is.EqualTo(itemCount));
 
             // Remove a portion of the set
             int k = 0;
@@ -64,7 +64,7 @@ public class test_table : test_macros
                 }
             }
 
-            ENSURE(set.count == (itemCount - removeCount));
+            Assert.That(set.count, Is.EqualTo((itemCount - removeCount)));
 
 #if B2_SNOOP_TABLE_COUNTERS
 		extern b2AtomicInt b2_probeCount;
@@ -81,7 +81,7 @@ public class test_table : test_macros
                 for (int j = i + 1; j < N; ++j)
                 {
                     ulong key = B2_SHAPE_PAIR_KEY(j, i);
-                    ENSURE(b2ContainsKey(set, key) || removed[k], $"b2ContainsKey(set, {key}) = {b2ContainsKey(set, key)} || removed[{k}] = {removed[k]}");
+                    Assert.That(b2ContainsKey(set, key) || removed[k], $"b2ContainsKey(set, {key}) = {b2ContainsKey(set, key)} || removed[{k}] = {removed[k]}");
                     k += 1;
                 }
             }
@@ -108,7 +108,7 @@ public class test_table : test_macros
                 }
             }
 
-            ENSURE(set.count == 0);
+            Assert.That(set.count, Is.EqualTo(0));
 
             b2DestroySet(set);
         }

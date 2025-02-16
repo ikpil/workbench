@@ -2875,7 +2875,7 @@ void b2World_Dump()
         }
 
         b2Vec2 direction = b2Sub(closestPoint, explosionContext.position);
-        if (b2LengthSquared(direction) > 100.0f * Epsilon * Epsilon)
+        if (b2LengthSquared(direction) > 100.0f * FLT_EPSILON * FLT_EPSILON)
         {
             direction = b2Normalize(direction);
         }

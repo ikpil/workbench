@@ -7,7 +7,7 @@ namespace Box2D.NET.Engine.Test;
 
 using static Box2D.NET.Engine.bitset;
 
-public class test_bitset : test_macros
+public class test_bitset
 {
     private const int COUNT = 169;
 
@@ -35,7 +35,7 @@ public class test_bitset : test_macros
         for (int i = 0; i < COUNT; ++i)
         {
             bool value = b2GetBit(bitSet, i);
-            ENSURE(value == values[i]);
+            Assert.That(value, Is.EqualTo(values[i]));
         }
 
         b2DestroyBitSet(bitSet);

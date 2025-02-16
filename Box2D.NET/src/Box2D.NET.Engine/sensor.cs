@@ -135,7 +135,7 @@ public class sensor
         b2SimplexCache cache = new b2SimplexCache();
         b2DistanceOutput output = b2ShapeDistance(cache, input, null, 0);
 
-        bool overlaps = output.distance < 10.0f * Epsilon;
+        bool overlaps = output.distance < 10.0f * FLT_EPSILON;
         if (overlaps == false)
         {
             return true;

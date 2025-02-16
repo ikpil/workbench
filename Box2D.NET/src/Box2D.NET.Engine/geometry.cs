@@ -44,7 +44,7 @@ public static class geometry
             area += a;
         }
 
-        Debug.Assert(area > Epsilon);
+        Debug.Assert(area > FLT_EPSILON);
         float invArea = 1.0f / area;
         center.x *= invArea;
         center.y *= invArea;
@@ -81,7 +81,7 @@ public static class geometry
             int i1 = i;
             int i2 = i + 1 < shape.count ? i + 1 : 0;
             b2Vec2 edge = b2Sub(shape.vertices[i2], shape.vertices[i1]);
-            Debug.Assert(b2Dot(edge, edge) > Epsilon * Epsilon);
+            Debug.Assert(b2Dot(edge, edge) > FLT_EPSILON * FLT_EPSILON);
             shape.normals[i] = b2Normalize(b2CrossVS(edge, 1.0f));
         }
 
@@ -123,7 +123,7 @@ public static class geometry
             int i1 = i;
             int i2 = i + 1 < shape.count ? i + 1 : 0;
             b2Vec2 edge = b2Sub(shape.vertices[i2], shape.vertices[i1]);
-            Debug.Assert(b2Dot(edge, edge) > Epsilon * Epsilon);
+            Debug.Assert(b2Dot(edge, edge) > FLT_EPSILON * FLT_EPSILON);
             shape.normals[i] = b2Normalize(b2CrossVS(edge, 1.0f));
         }
 
@@ -383,7 +383,7 @@ public static class geometry
         massData.mass = density * area;
 
         // Center of mass, shift back from origin at r
-        Debug.Assert(area > Epsilon);
+        Debug.Assert(area > FLT_EPSILON);
         float invArea = 1.0f / area;
         center.x *= invArea;
         center.y *= invArea;
@@ -575,7 +575,7 @@ public static class geometry
         float capsuleLength = 0;
         b2Vec2 a = b2GetLengthAndNormalize(ref capsuleLength, e);
 
-        if (capsuleLength < Epsilon)
+        if (capsuleLength < FLT_EPSILON)
         {
             // Capsule is really a circle
             b2Circle circle = new b2Circle(v1, shape.radius);
@@ -632,7 +632,7 @@ public static class geometry
 
         // Cramer's rule [a -u]
         float den = -a.x * u.y + u.x * a.y;
-        if (-Epsilon < den && den < Epsilon)
+        if (-FLT_EPSILON < den && den < FLT_EPSILON)
         {
             // Ray is parallel to capsule and outside infinite length capsule
             return output;

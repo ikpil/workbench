@@ -46,7 +46,7 @@ public class manifold
         shape.centroid = b2Lerp(p1, p2, 0.5f);
 
         b2Vec2 d = b2Sub(p2, p1);
-        Debug.Assert(b2LengthSquared(d) > Epsilon);
+        Debug.Assert(b2LengthSquared(d) > FLT_EPSILON);
         b2Vec2 axis = b2Normalize(d);
         b2Vec2 normal = b2RightPerp(axis);
 
@@ -208,7 +208,7 @@ public class manifold
         float u1 = b2Dot(b2Sub(center, v1), b2Sub(v2, v1));
         float u2 = b2Dot(b2Sub(center, v2), b2Sub(v1, v2));
 
-        if (u1 < 0.0f && separation > Epsilon)
+        if (u1 < 0.0f && separation > FLT_EPSILON)
         {
             // Circle center is closest to v1 and safely outside the polygon
             b2Vec2 normal = b2Normalize(b2Sub(center, v1));
@@ -231,7 +231,7 @@ public class manifold
             mp.id = 0;
             manifold.pointCount = 1;
         }
-        else if (u2 < 0.0f && separation > Epsilon)
+        else if (u2 < 0.0f && separation > FLT_EPSILON)
         {
             // Circle center is closest to v2 and safely outside the polygon
             b2Vec2 normal = b2Normalize(b2Sub(center, v2));
@@ -306,7 +306,7 @@ public class manifold
         float dd1 = b2Dot(d1, d1);
         float dd2 = b2Dot(d2, d2);
 
-        const float epsSqr = Epsilon * Epsilon;
+        const float epsSqr = FLT_EPSILON * FLT_EPSILON;
         Debug.Assert(dd1 > epsSqr && dd2 > epsSqr);
 
         b2Vec2 r = b2Sub(p1, p2);
@@ -625,7 +625,7 @@ public class manifold
         //}
 
         b2Vec2 vLower;
-        if (lower2 < lower1 && upper2 - lower2 > Epsilon)
+        if (lower2 < lower1 && upper2 - lower2 > FLT_EPSILON)
         {
             vLower = b2Lerp(v22, v21, (lower1 - lower2) / (upper2 - lower2));
         }
@@ -635,7 +635,7 @@ public class manifold
         }
 
         b2Vec2 vUpper;
-        if (upper2 > upper1 && upper2 - lower2 > Epsilon)
+        if (upper2 > upper1 && upper2 - lower2 > FLT_EPSILON)
         {
             vUpper = b2Lerp(v22, v21, (upper1 - lower2) / (upper2 - lower2));
         }
@@ -1121,7 +1121,7 @@ public class manifold
         }
 
         b2Vec2 vLower;
-        if (lower2 < lower1 && upper2 - lower2 > Epsilon)
+        if (lower2 < lower1 && upper2 - lower2 > FLT_EPSILON)
         {
             vLower = b2Lerp(b2, b1, (lower1 - lower2) / (upper2 - lower2));
         }
@@ -1131,7 +1131,7 @@ public class manifold
         }
 
         b2Vec2 vUpper;
-        if (upper2 > upper1 && upper2 - lower2 > Epsilon)
+        if (upper2 > upper1 && upper2 - lower2 > FLT_EPSILON)
         {
             vUpper = b2Lerp(b2, b1, (upper1 - lower2) / (upper2 - lower2));
         }

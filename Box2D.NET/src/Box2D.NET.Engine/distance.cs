@@ -58,7 +58,7 @@ public static class distance
         float rd1 = b2Dot(r, d1);
         float rd2 = b2Dot(r, d2);
 
-        const float epsSqr = Epsilon * Epsilon;
+        const float epsSqr = FLT_EPSILON * FLT_EPSILON;
 
         if (dd1 < epsSqr || dd2 < epsSqr)
         {
@@ -546,7 +546,7 @@ public static class distance
             b2Vec2 d = b2ComputeSimplexSearchDirection(simplex);
 
             // Ensure the search direction is numerically fit.
-            if (b2Dot(d, d) < Epsilon * Epsilon)
+            if (b2Dot(d, d) < FLT_EPSILON * FLT_EPSILON)
             {
                 // The origin is probably contained by a line segment
                 // or triangle. Thus the shapes are overlapped.
@@ -608,7 +608,7 @@ public static class distance
         // Apply radii if requested
         if (input.useRadii)
         {
-            if (output.distance < Epsilon)
+            if (output.distance < FLT_EPSILON)
             {
                 // Shapes are too close to safely compute normal
                 b2Vec2 p = new b2Vec2(0.5f * (output.pointA.x + output.pointB.x), 0.5f * (output.pointA.y + output.pointB.y));

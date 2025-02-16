@@ -20,14 +20,7 @@ using static Box2D.NET.Engine.joint;
 using static Box2D.NET.Engine.timer;
 using static Box2D.NET.Engine.core;
 
-
 namespace Box2D.NET.Engine.Test;
-
-public class TaskData
-{
-    public b2TaskCallback box2dTask;
-    public object box2dContext;
-}
 
 public class b2TaskTester : IDisposable
 {
@@ -126,7 +119,7 @@ public class b2TaskTester : IDisposable
     }
 }
 
-public class test_determinism : test_macros
+public class test_determinism
 {
     private const int e_columns = 10;
     private const int e_rows = 10;
@@ -229,10 +222,10 @@ public class test_determinism : test_macros
             b2Rot rot1 = finalRotations[0][i];
             b2Rot rot2 = finalRotations[1][i];
 
-            ENSURE(p1.x == p2.x);
-            ENSURE(p1.y == p2.y);
-            ENSURE(rot1.c == rot2.c);
-            ENSURE(rot1.s == rot2.s);
+            Assert.That(p1.x, Is.EqualTo(p2.x));
+            Assert.That(p1.y, Is.EqualTo(p2.y));
+            Assert.That(rot1.c, Is.EqualTo(rot2.c));
+            Assert.That(rot1.s, Is.EqualTo(rot2.s));
         }
     }
 
@@ -345,7 +338,7 @@ public class test_determinism : test_macros
                     if (bodyEvents.moveCount == 0)
                     {
                         int awakeCount = b2World_GetAwakeBodyCount(worldId);
-                        ENSURE(awakeCount == 0);
+                        Assert.That(awakeCount, Is.EqualTo(0));
 
                         hash = B2_HASH_INIT;
                         for (int i = 0; i < bodyCount; ++i)
@@ -369,9 +362,9 @@ public class test_determinism : test_macros
                 stepCount += 1;
             }
 
-            ENSURE(stepCount < maxSteps);
-            ENSURE(sleepStep == 263);
-            ENSURE(hash == 0x7de58fbe);
+            Assert.That(stepCount, Is.LessThan(maxSteps));
+            Assert.That(sleepStep, Is.EqualTo(263));
+            Assert.That(hash, Is.EqualTo(0x7de58fbe));
 
             //free(bodies);
 
