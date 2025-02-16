@@ -11,7 +11,7 @@
 
   
   <ItemGroup>
-    <ProjectReference Include="..\Box2D.NET.Engine\Box2D.NET.Engine.csproj" />
+    <ProjectReference Include="..\Box2D.NET\Box2D.NET.csproj" />
   </ItemGroup>
 
 </Project>

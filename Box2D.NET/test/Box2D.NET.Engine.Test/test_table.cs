@@ -3,9 +3,9 @@
 
 using System;
 using NUnit.Framework;
-using static Box2D.NET.Engine.ctz;
-using static Box2D.NET.Engine.table;
-using static Box2D.NET.Engine.timer;
+using static Box2D.NET.ctz;
+using static Box2D.NET.table;
+using static Box2D.NET.timer;
 
 namespace Box2D.NET.Engine.Test;
 

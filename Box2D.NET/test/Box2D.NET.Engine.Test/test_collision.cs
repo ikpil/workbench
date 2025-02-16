@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: MIT
 
 using NUnit.Framework;
-using static Box2D.NET.Engine.aabb;
-using static Box2D.NET.Engine.math_function;
+using static Box2D.NET.aabb;
+using static Box2D.NET.math_function;
 
 namespace Box2D.NET.Engine.Test;
 

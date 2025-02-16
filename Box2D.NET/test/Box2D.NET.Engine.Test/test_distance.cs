@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: MIT
 
 using NUnit.Framework;
-using static Box2D.NET.Engine.math_function;
-using static Box2D.NET.Engine.distance;
-using static Box2D.NET.Engine.core;
+using static Box2D.NET.math_function;
+using static Box2D.NET.distance;
+using static Box2D.NET.core;
 
 namespace Box2D.NET.Engine.Test;
 

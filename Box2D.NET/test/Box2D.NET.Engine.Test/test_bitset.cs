@@ -5,7 +5,7 @@ using NUnit.Framework;
 
 namespace Box2D.NET.Engine.Test;
 
-using static Box2D.NET.Engine.bitset;
+using static NET.bitset;
 
 public class test_bitset
 {

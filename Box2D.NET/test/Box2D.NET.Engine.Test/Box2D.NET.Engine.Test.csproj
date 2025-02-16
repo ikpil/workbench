@@ -20,7 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Box2D.NET.Engine\Box2D.NET.Engine.csproj" />
+    <ProjectReference Include="..\..\src\Box2D.NET\Box2D.NET.csproj" />
   </ItemGroup>
 
 </Project>

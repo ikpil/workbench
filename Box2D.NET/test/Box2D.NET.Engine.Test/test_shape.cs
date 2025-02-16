@@ -3,9 +3,9 @@
 
 using System;
 using NUnit.Framework;
-using static Box2D.NET.Engine.geometry;
-using static Box2D.NET.Engine.math_function;
-using static Box2D.NET.Engine.hull;
+using static Box2D.NET.geometry;
+using static Box2D.NET.math_function;
+using static Box2D.NET.hull;
 
 namespace Box2D.NET.Engine.Test;
 
