@@ -1,4 +1,4 @@
-﻿namespace MauiSandbox;
+﻿namespace MauiSandbox.Views;
 
 public partial class MainPage : ContentPage
 {
