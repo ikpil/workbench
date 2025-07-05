@@ -21,11 +21,11 @@ using Netty.NET.Common.Util.Internal.ObjectUtil;
 using java.util.concurrent.TimeUnit;
 
 /**
- * A skeletal {@link Future} implementation which represents a {@link Future} which has been completed already.
+ * A skeletal {@link Task} implementation which represents a {@link Task} which has been completed already.
  */
 public abstract class CompleteFuture<V> extends AbstractFuture<V> {
 
-    private final EventExecutor executor;
+    private readonly EventExecutor executor;
 
     /**
      * Creates a new instance.
@@ -44,14 +44,14 @@ public abstract class CompleteFuture<V> extends AbstractFuture<V> {
     }
 
     @Override
-    public Future<V> addListener(GenericFutureListener<? extends Future<? super V>> listener) {
+    public Task<V> addListener(GenericFutureListener<? extends Task<? super V>> listener) {
         DefaultPromise.notifyListener(executor(), this, ObjectUtil.checkNotNull(listener, "listener"));
         return this;
     }
 
     @Override
-    public Future<V> addListeners(GenericFutureListener<? extends Future<? super V>>... listeners) {
-        for (GenericFutureListener<? extends Future<? super V>> l:
+    public Task<V> addListeners(GenericFutureListener<? extends Task<? super V>>... listeners) {
+        for (GenericFutureListener<? extends Task<? super V>> l:
                 ObjectUtil.checkNotNull(listeners, "listeners")) {
 
             if (l == null) {
@@ -63,19 +63,19 @@ public abstract class CompleteFuture<V> extends AbstractFuture<V> {
     }
 
     @Override
-    public Future<V> removeListener(GenericFutureListener<? extends Future<? super V>> listener) {
+    public Task<V> removeListener(GenericFutureListener<? extends Task<? super V>> listener) {
         // NOOP
         return this;
     }
 
     @Override
-    public Future<V> removeListeners(GenericFutureListener<? extends Future<? super V>>... listeners) {
+    public Task<V> removeListeners(GenericFutureListener<? extends Task<? super V>>... listeners) {
         // NOOP
         return this;
     }
 
     @Override
-    public Future<V> await() throws InterruptedException {
+    public Task<V> await() throws InterruptedException {
         if (Thread.interrupted()) {
             throw new InterruptedException();
         }
@@ -91,12 +91,12 @@ public abstract class CompleteFuture<V> extends AbstractFuture<V> {
     }
 
     @Override
-    public Future<V> sync() throws InterruptedException {
+    public Task<V> sync() throws InterruptedException {
         return this;
     }
 
     @Override
-    public Future<V> syncUninterruptibly() {
+    public Task<V> syncUninterruptibly() {
         return this;
     }
 
@@ -109,7 +109,7 @@ public abstract class CompleteFuture<V> extends AbstractFuture<V> {
     }
 
     @Override
-    public Future<V> awaitUninterruptibly() {
+    public Task<V> awaitUninterruptibly() {
         return this;
     }
 

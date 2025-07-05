@@ -27,16 +27,16 @@ using java.util.concurrent.TimeUnit;
  * Executes {@link Runnable} objects in the caller's thread. If the {@link #execute(Runnable)} is reentrant it will be
  * queued until the original {@link Runnable} finishes execution.
  * <p>
- * All {@link Throwable} objects thrown from {@link #execute(Runnable)} will be swallowed and logged. This is to ensure
+ * All {@link Exception} objects thrown from {@link #execute(Runnable)} will be swallowed and logged. This is to ensure
  * that all queued {@link Runnable} objects have the chance to be run.
  */
-public final class ImmediateEventExecutor extends AbstractEventExecutor {
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(ImmediateEventExecutor.class);
-    public static final ImmediateEventExecutor INSTANCE = new ImmediateEventExecutor();
+public sealed class ImmediateEventExecutor extends AbstractEventExecutor {
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(ImmediateEventExecutor.class);
+    public static readonly ImmediateEventExecutor INSTANCE = new ImmediateEventExecutor();
     /**
      * A Runnable will be queued if we are executing a Runnable. This is to prevent a {@link StackOverflowError}.
      */
-    private static final FastThreadLocal<Queue<Runnable>> DELAYED_RUNNABLES = new FastThreadLocal<Queue<Runnable>>() {
+    private static readonly FastThreadLocal<Queue<Runnable>> DELAYED_RUNNABLES = new FastThreadLocal<Queue<Runnable>>() {
         @Override
         protected Queue<Runnable> initialValue() throws Exception {
             return new ArrayDeque<Runnable>();
@@ -45,14 +45,14 @@ public final class ImmediateEventExecutor extends AbstractEventExecutor {
     /**
      * Set to {@code true} if we are executing a runnable.
      */
-    private static final FastThreadLocal<Boolean> RUNNING = new FastThreadLocal<Boolean>() {
+    private static readonly FastThreadLocal<bool> RUNNING = new FastThreadLocal<bool>() {
         @Override
-        protected Boolean initialValue() throws Exception {
+        protected bool initialValue() throws Exception {
             return false;
         }
     };
 
-    private final Future<?> terminationFuture = new FailedFuture<object>(
+    private readonly Task<?> terminationFuture = new FailedFuture<object>(
             GlobalEventExecutor.INSTANCE, new UnsupportedOperationException());
 
     private ImmediateEventExecutor() { }
@@ -68,12 +68,12 @@ public final class ImmediateEventExecutor extends AbstractEventExecutor {
     }
 
     @Override
-    public Future<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
+    public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
         return terminationFuture();
     }
 
     @Override
-    public Future<?> terminationFuture() {
+    public Task<?> terminationFuture() {
         return terminationFuture;
     }
 
@@ -108,16 +108,16 @@ public final class ImmediateEventExecutor extends AbstractEventExecutor {
             RUNNING.set(true);
             try {
                 command.run();
-            } catch (Throwable cause) {
-                logger.info("Throwable caught while executing Runnable {}", command, cause);
+            } catch (Exception cause) {
+                logger.info("Exception caught while executing Runnable {}", command, cause);
             } finally {
                 Queue<Runnable> delayedRunnables = DELAYED_RUNNABLES.get();
                 Runnable runnable;
                 while ((runnable = delayedRunnables.poll()) != null) {
                     try {
                         runnable.run();
-                    } catch (Throwable cause) {
-                        logger.info("Throwable caught while executing Runnable {}", runnable, cause);
+                    } catch (Exception cause) {
+                        logger.info("Exception caught while executing Runnable {}", runnable, cause);
                     }
                 }
                 RUNNING.set(false);
@@ -128,7 +128,7 @@ public final class ImmediateEventExecutor extends AbstractEventExecutor {
     }
 
     @Override
-    public <V> Promise<V> newPromise() {
+    public <V> TaskCompletionSource<V> newPromise() {
         return new ImmediatePromise<V>(this);
     }
 

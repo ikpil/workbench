@@ -28,10 +28,10 @@ using static java.lang.invoke.MethodType.methodType;
  * Provide a way to clean direct {@link ByteBuffer} instances on Java 24+,
  * where we don't have {@code Unsafe} available, but we have memory segments.
  */
-final class CleanerJava25 implements Cleaner {
-    private static final InternalLogger logger;
+sealed class CleanerJava25 : Cleaner {
+    private static readonly InternalLogger logger;
 
-    private static final MethodHandle INVOKE_ALLOCATOR;
+    private static readonly MethodHandle INVOKE_ALLOCATOR;
 
     static {
         bool suitableJavaVersion;
@@ -40,7 +40,7 @@ final class CleanerJava25 implements Cleaner {
             // we need to initialize CleanerJava25 at build time.
             string v = System.getProperty("java.specification.version");
             try {
-                suitableJavaVersion = Integer.parseInt(v) >= 25;
+                suitableJavaVersion = int.parseInt(v) >= 25;
             } catch (NumberFormatException e) {
                 suitableJavaVersion = false;
             }
@@ -55,7 +55,7 @@ final class CleanerJava25 implements Cleaner {
         }
 
         MethodHandle method;
-        Throwable error;
+        Exception error;
         if (suitableJavaVersion) {
             try {
                 // Here we compose and construct a MethodHandle that takes an 'int' capacity argument,
@@ -138,7 +138,7 @@ final class CleanerJava25 implements Cleaner {
                 // ctorInt.type() = (int)CleanableDirectBufferImpl
                 method = MethodHandles.foldArguments(ctorArenaInt, ofShared);
                 error = null;
-            } catch (Throwable throwable) {
+            } catch (Exception throwable) {
                 method = null;
                 error = throwable;
             }
@@ -167,7 +167,7 @@ final class CleanerJava25 implements Cleaner {
             return (CleanableDirectBufferImpl) INVOKE_ALLOCATOR.invokeExact(capacity);
         } catch (RuntimeException e) {
             throw e; // Propagate the runtime exceptions that the Arena would normally throw.
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new IllegalStateException("Unexpected allocation exception", e);
         }
     }
@@ -177,10 +177,10 @@ final class CleanerJava25 implements Cleaner {
         throw new UnsupportedOperationException("Cannot clean arbitrary ByteBuffer instances");
     }
 
-    private static final class CleanableDirectBufferImpl implements CleanableDirectBuffer {
-        private final AutoCloseable closeable;
-        private final ByteBuffer buffer;
-        private final long memoryAddress;
+    private static class CleanableDirectBufferImpl implements CleanableDirectBuffer {
+        private readonly AutoCloseable closeable;
+        private readonly ByteBuffer buffer;
+        private readonly long memoryAddress;
 
         // NOTE: must be at least package-protected to allow calls from the method handles!
         CleanableDirectBufferImpl(AutoCloseable closeable, ByteBuffer buffer, long memoryAddress) {

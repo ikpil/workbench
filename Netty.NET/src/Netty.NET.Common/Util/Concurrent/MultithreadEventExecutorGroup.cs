@@ -32,11 +32,11 @@ using java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class MultithreadEventExecutorGroup extends AbstractEventExecutorGroup {
 
-    private final EventExecutor[] children;
-    private final Set<EventExecutor> readonlyChildren;
-    private final AtomicInteger terminatedChildren = new AtomicInteger();
-    private final Promise<?> terminationFuture = new DefaultPromise(GlobalEventExecutor.INSTANCE);
-    private final EventExecutorChooserFactory.EventExecutorChooser chooser;
+    private readonly EventExecutor[] children;
+    private readonly Set<EventExecutor> readonlyChildren;
+    private readonly AtomicInteger terminatedChildren = new AtomicInteger();
+    private readonly TaskCompletionSource<?> terminationFuture = new DefaultPromise(GlobalEventExecutor.INSTANCE);
+    private readonly EventExecutorChooserFactory.EventExecutorChooser chooser;
 
     /**
      * Create a new instance.
@@ -96,7 +96,7 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
                         EventExecutor e = children[j];
                         try {
                             while (!e.isTerminated()) {
-                                e.awaitTermination(Integer.MAX_VALUE, TimeUnit.SECONDS);
+                                e.awaitTermination(int.MAX_VALUE, TimeUnit.SECONDS);
                             }
                         } catch (InterruptedException interrupted) {
                             // Let the caller handle the interruption.
@@ -112,7 +112,7 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
 
         final FutureListener<object> terminationListener = new FutureListener<object>() {
             @Override
-            public void operationComplete(Future<object> future) throws Exception {
+            public void operationComplete(Task<object> future) throws Exception {
                 if (terminatedChildren.incrementAndGet() == children.length) {
                     terminationFuture.setSuccess(null);
                 }
@@ -158,7 +158,7 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
     protected abstract EventExecutor newChild(Executor executor, object... args) throws Exception;
 
     @Override
-    public Future<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
+    public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
         for (EventExecutor l: children) {
             l.shutdownGracefully(quietPeriod, timeout, unit);
         }
@@ -166,7 +166,7 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
     }
 
     @Override
-    public Future<?> terminationFuture() {
+    public Task<?> terminationFuture() {
         return terminationFuture;
     }
 

@@ -28,11 +28,11 @@ using java.io.Serializable;
  */
 public abstract class AbstractInternalLogger implements InternalLogger, Serializable {
 
-    private static final long serialVersionUID = -6382972526573193470L;
+    private static readonly long serialVersionUID = -6382972526573193470L;
 
-    static final string EXCEPTION_MESSAGE = "Unexpected exception:";
+    static readonly string EXCEPTION_MESSAGE = "Unexpected exception:";
 
-    private final string name;
+    private readonly string name;
 
     /**
      * Creates a new instance.
@@ -65,32 +65,32 @@ public abstract class AbstractInternalLogger implements InternalLogger, Serializ
     }
 
     @Override
-    public void trace(Throwable t) {
+    public void trace(Exception t) {
         trace(EXCEPTION_MESSAGE, t);
     }
 
     @Override
-    public void debug(Throwable t) {
+    public void debug(Exception t) {
         debug(EXCEPTION_MESSAGE, t);
     }
 
     @Override
-    public void info(Throwable t) {
+    public void info(Exception t) {
         info(EXCEPTION_MESSAGE, t);
     }
 
     @Override
-    public void warn(Throwable t) {
+    public void warn(Exception t) {
         warn(EXCEPTION_MESSAGE, t);
     }
 
     @Override
-    public void error(Throwable t) {
+    public void error(Exception t) {
         error(EXCEPTION_MESSAGE, t);
     }
 
     @Override
-    public void log(InternalLogLevel level, string msg, Throwable cause) {
+    public void log(InternalLogLevel level, string msg, Exception cause) {
         switch (level) {
         case TRACE:
             trace(msg, cause);
@@ -113,7 +113,7 @@ public abstract class AbstractInternalLogger implements InternalLogger, Serializ
     }
 
     @Override
-    public void log(InternalLogLevel level, Throwable cause) {
+    public void log(InternalLogLevel level, Exception cause) {
         switch (level) {
             case TRACE:
                 trace(cause);

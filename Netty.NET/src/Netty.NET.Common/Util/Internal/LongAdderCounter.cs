@@ -21,7 +21,7 @@ using java.util.concurrent.atomic.LongAdder;
  * @deprecated please use {@link LongAdder} instead.
  */
 @Deprecated
-final class LongAdderCounter extends LongAdder implements LongCounter {
+sealed class LongAdderCounter extends LongAdder implements LongCounter {
 
     @Override
     public long value() {

@@ -15,10 +15,6 @@
  */
 namespace Netty.NET.Common.Util;
 
-using java.util.Set;
-using java.util.concurrent.RejectedExecutionException;
-using java.util.concurrent.TimeUnit;
-
 /**
  * Schedules {@link TimerTask}s for one-time future execution in a background
  * thread.

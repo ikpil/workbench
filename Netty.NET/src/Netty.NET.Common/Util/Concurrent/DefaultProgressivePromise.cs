@@ -41,7 +41,7 @@ public class DefaultProgressivePromise<V> extends DefaultPromise<V> implements P
             total = -1; // normalize
             checkPositiveOrZero(progress, "progress");
         } else if (progress < 0 || progress > total) {
-            throw new IllegalArgumentException(
+            throw new ArgumentException(
                     "progress: " + progress + " (expected: 0 <= progress <= total (" + total + "))");
         }
 
@@ -69,25 +69,25 @@ public class DefaultProgressivePromise<V> extends DefaultPromise<V> implements P
     }
 
     @Override
-    public ProgressivePromise<V> addListener(GenericFutureListener<? extends Future<? super V>> listener) {
+    public ProgressivePromise<V> addListener(GenericFutureListener<? extends Task<? super V>> listener) {
         super.addListener(listener);
         return this;
     }
 
     @Override
-    public ProgressivePromise<V> addListeners(GenericFutureListener<? extends Future<? super V>>... listeners) {
+    public ProgressivePromise<V> addListeners(GenericFutureListener<? extends Task<? super V>>... listeners) {
         super.addListeners(listeners);
         return this;
     }
 
     @Override
-    public ProgressivePromise<V> removeListener(GenericFutureListener<? extends Future<? super V>> listener) {
+    public ProgressivePromise<V> removeListener(GenericFutureListener<? extends Task<? super V>> listener) {
         super.removeListener(listener);
         return this;
     }
 
     @Override
-    public ProgressivePromise<V> removeListeners(GenericFutureListener<? extends Future<? super V>>... listeners) {
+    public ProgressivePromise<V> removeListeners(GenericFutureListener<? extends Task<? super V>>... listeners) {
         super.removeListeners(listeners);
         return this;
     }
@@ -123,7 +123,7 @@ public class DefaultProgressivePromise<V> extends DefaultPromise<V> implements P
     }
 
     @Override
-    public ProgressivePromise<V> setFailure(Throwable cause) {
+    public ProgressivePromise<V> setFailure(Exception cause) {
         super.setFailure(cause);
         return this;
     }

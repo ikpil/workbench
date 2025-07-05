@@ -25,7 +25,7 @@ namespace Netty.NET.Common.Util.Internal;
  * the native library would be loaded into the native library's ClassLoader, not the
  * caller's ClassLoader.
  */
-final class NativeLibraryUtil {
+sealed class NativeLibraryUtil {
     /**
      * Delegate the calling to {@link System#load(string)} or {@link System#loadLibrary(string)}.
      * @param libName - The native library path or name

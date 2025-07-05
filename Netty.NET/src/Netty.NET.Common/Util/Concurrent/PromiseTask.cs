@@ -20,7 +20,7 @@ using java.util.concurrent.RunnableFuture;
 
 class PromiseTask<V> extends DefaultPromise<V> implements RunnableFuture<V> {
 
-    private static final class RunnableAdapter<T> implements Callable<T> {
+    private static class RunnableAdapter<T> implements Callable<T> {
         final Runnable task;
         final T result;
 
@@ -41,12 +41,12 @@ class PromiseTask<V> extends DefaultPromise<V> implements RunnableFuture<V> {
         }
     }
 
-    private static final Runnable COMPLETED = new SentinelRunnable("COMPLETED");
-    private static final Runnable CANCELLED = new SentinelRunnable("CANCELLED");
-    private static final Runnable FAILED = new SentinelRunnable("FAILED");
+    private static readonly Runnable COMPLETED = new SentinelRunnable("COMPLETED");
+    private static readonly Runnable CANCELLED = new SentinelRunnable("CANCELLED");
+    private static readonly Runnable FAILED = new SentinelRunnable("FAILED");
 
     private static class SentinelRunnable implements Runnable {
-        private final string name;
+        private readonly string name;
 
         SentinelRunnable(string name) {
             this.name = name;
@@ -90,7 +90,7 @@ class PromiseTask<V> extends DefaultPromise<V> implements RunnableFuture<V> {
     }
 
     @SuppressWarnings("unchecked")
-    V runTask() throws Throwable {
+    V runTask() throws Exception {
         final object task = this.task;
         if (task instanceof Callable) {
             return ((Callable<V>) task).call();
@@ -106,7 +106,7 @@ class PromiseTask<V> extends DefaultPromise<V> implements RunnableFuture<V> {
                 V result = runTask();
                 setSuccessInternal(result);
             }
-        } catch (Throwable e) {
+        } catch (Exception e) {
             setFailureInternal(e);
         }
     }
@@ -123,31 +123,31 @@ class PromiseTask<V> extends DefaultPromise<V> implements RunnableFuture<V> {
     }
 
     @Override
-    public final Promise<V> setFailure(Throwable cause) {
+    public final TaskCompletionSource<V> setFailure(Exception cause) {
         throw new IllegalStateException();
     }
 
-    protected final Promise<V> setFailureInternal(Throwable cause) {
+    protected final TaskCompletionSource<V> setFailureInternal(Exception cause) {
         super.setFailure(cause);
         clearTaskAfterCompletion(true, FAILED);
         return this;
     }
 
     @Override
-    public final bool tryFailure(Throwable cause) {
+    public final bool tryFailure(Exception cause) {
         return false;
     }
 
-    protected final bool tryFailureInternal(Throwable cause) {
+    protected final bool tryFailureInternal(Exception cause) {
         return clearTaskAfterCompletion(super.tryFailure(cause), FAILED);
     }
 
     @Override
-    public final Promise<V> setSuccess(V result) {
+    public final TaskCompletionSource<V> setSuccess(V result) {
         throw new IllegalStateException();
     }
 
-    protected final Promise<V> setSuccessInternal(V result) {
+    protected final TaskCompletionSource<V> setSuccessInternal(V result) {
         super.setSuccess(result);
         clearTaskAfterCompletion(true, COMPLETED);
         return this;

@@ -41,9 +41,9 @@ using java.util.Enumeration;
  * operations are privileged, the operations can proceed even if some code in the calling chain lacks the appropriate
  * {@link SocketPermission}.
  */
-public final class SocketUtils {
+public sealed class SocketUtils {
 
-    private static final Enumeration<object> EMPTY = Collections.enumeration(Collections.emptyList());
+    private static readonly Enumeration<object> EMPTY = Collections.enumeration(Collections.emptyList());
 
     private SocketUtils() {
     }
@@ -85,9 +85,9 @@ public final class SocketUtils {
     public static bool connect(final SocketChannel socketChannel, final SocketAddress remoteAddress)
             throws IOException {
         try {
-            return AccessController.doPrivileged(new PrivilegedExceptionAction<Boolean>() {
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<bool>() {
                 @Override
-                public Boolean run() throws IOException {
+                public bool run() throws IOException {
                     return socketChannel.connect(remoteAddress);
                 }
             });

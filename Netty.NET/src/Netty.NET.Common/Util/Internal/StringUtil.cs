@@ -26,33 +26,33 @@ using static Netty.NET.Common.Util.Internal.ObjectUtil.*;
 /**
  * string utility class.
  */
-public final class StringUtil {
+public sealed class StringUtil {
 
-    public static final string EMPTY_STRING = "";
-    public static final string NEWLINE = SystemPropertyUtil.get("line.separator", "\n");
+    public static readonly string EMPTY_STRING = "";
+    public static readonly string NEWLINE = SystemPropertyUtil.get("line.separator", "\n");
 
-    public static final char DOUBLE_QUOTE = '\"';
-    public static final char COMMA = ',';
-    public static final char LINE_FEED = '\n';
-    public static final char CARRIAGE_RETURN = '\r';
-    public static final char TAB = '\t';
-    public static final char SPACE = 0x20;
+    public static readonly char DOUBLE_QUOTE = '\"';
+    public static readonly char COMMA = ',';
+    public static readonly char LINE_FEED = '\n';
+    public static readonly char CARRIAGE_RETURN = '\r';
+    public static readonly char TAB = '\t';
+    public static readonly char SPACE = 0x20;
 
-    private static final string[] BYTE2HEX_PAD = new string[256];
-    private static final string[] BYTE2HEX_NOPAD = new string[256];
-    private static final byte[] HEX2B;
+    private static readonly string[] BYTE2HEX_PAD = new string[256];
+    private static readonly string[] BYTE2HEX_NOPAD = new string[256];
+    private static readonly byte[] HEX2B;
 
     /**
      * 2 - Quote character at beginning and end.
      * 5 - Extra allowance for anticipated escape characters that may be added.
      */
-    private static final int CSV_NUMBER_ESCAPE_CHARACTERS = 2 + 5;
-    private static final char PACKAGE_SEPARATOR_CHAR = '.';
+    private static readonly int CSV_NUMBER_ESCAPE_CHARACTERS = 2 + 5;
+    private static readonly char PACKAGE_SEPARATOR_CHAR = '.';
 
     static {
         // Generate the lookup table that converts a byte into a 2-digit hexadecimal integer.
         for (int i = 0; i < BYTE2HEX_PAD.length; i++) {
-            string str = Integer.toHexString(i);
+            string str = int.toHexString(i);
             BYTE2HEX_PAD[i] = i > 0xf ? str : ('0' + str);
             BYTE2HEX_NOPAD[i] = str;
         }
@@ -278,7 +278,7 @@ public final class StringUtil {
         int hi = decodeHexNibble(s.charAt(pos));
         int lo = decodeHexNibble(s.charAt(pos + 1));
         if (hi == -1 || lo == -1) {
-            throw new IllegalArgumentException(string.format(
+            throw new ArgumentException(string.format(
                     "invalid hex byte '%s' at index %d of '%s'", s.subSequence(pos, pos + 2), pos, s));
         }
         return (byte) ((hi << 4) + lo);
@@ -293,7 +293,7 @@ public final class StringUtil {
      */
     public static byte[] decodeHexDump(CharSequence hexDump, int fromIndex, int length) {
         if (length < 0 || (length & 1) != 0) {
-            throw new IllegalArgumentException("length: " + length);
+            throw new ArgumentException("length: " + length);
         }
         if (length == 0) {
             return EmptyArrays.EMPTY_BYTES;
@@ -482,7 +482,7 @@ public final class StringUtil {
      * @return {@link List} the list of unescaped fields
      */
     public static List<CharSequence> unescapeCsvFields(CharSequence value) {
-        List<CharSequence> unescaped = new ArrayList<CharSequence>(2);
+        List<CharSequence> unescaped = new List<CharSequence>(2);
         StringBuilder current = InternalThreadLocalMap.get().stringBuilder();
         bool quoted = false;
         int last = value.length() - 1;
@@ -548,7 +548,7 @@ public final class StringUtil {
     /**
      * Validate if {@code value} is a valid csv field without double-quotes.
      *
-     * @throws IllegalArgumentException if {@code value} needs to be encoded with double-quotes.
+     * @throws ArgumentException if {@code value} needs to be encoded with double-quotes.
      */
     private static void validateCsvFormat(CharSequence value) {
         int length = value.length();
@@ -565,8 +565,8 @@ public final class StringUtil {
         }
     }
 
-    private static IllegalArgumentException newInvalidEscapedCsvFieldException(CharSequence value, int index) {
-        return new IllegalArgumentException("invalid escaped CSV field: " + value + " index: " + index);
+    private static ArgumentException newInvalidEscapedCsvFieldException(CharSequence value, int index) {
+        return new ArgumentException("invalid escaped CSV field: " + value + " index: " + index);
     }
 
     /**

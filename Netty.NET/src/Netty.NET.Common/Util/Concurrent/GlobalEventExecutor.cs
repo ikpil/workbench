@@ -41,10 +41,10 @@ using java.util.concurrent.atomic.AtomicBoolean;
  * (default is 1 second).  Please note it is not scalable to schedule large number of tasks to this executor;
  * use a dedicated executor.
  */
-public final class GlobalEventExecutor extends AbstractScheduledEventExecutor implements OrderedEventExecutor {
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(GlobalEventExecutor.class);
+public sealed class GlobalEventExecutor extends AbstractScheduledEventExecutor implements OrderedEventExecutor {
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(GlobalEventExecutor.class);
 
-    private static final long SCHEDULE_QUIET_PERIOD_INTERVAL;
+    private static readonly long SCHEDULE_QUIET_PERIOD_INTERVAL;
 
     static {
         int quietPeriod = SystemPropertyUtil.getInt("io.netty.globalEventExecutor.quietPeriodSeconds", 1);
@@ -56,7 +56,7 @@ public final class GlobalEventExecutor extends AbstractScheduledEventExecutor im
         SCHEDULE_QUIET_PERIOD_INTERVAL = TimeUnit.SECONDS.toNanos(quietPeriod);
     }
 
-    public static final GlobalEventExecutor INSTANCE = new GlobalEventExecutor();
+    public static readonly GlobalEventExecutor INSTANCE = new GlobalEventExecutor();
 
     final BlockingQueue<Runnable> taskQueue = new LinkedBlockingQueue<Runnable>();
     final ScheduledFutureTask<Void> quietPeriodTask = new ScheduledFutureTask<Void>(
@@ -66,7 +66,7 @@ public final class GlobalEventExecutor extends AbstractScheduledEventExecutor im
             // NOOP
         }
     }, null),
-            // note: the getCurrentTimeNanos() call here only works because this is a final class, otherwise the method
+            // note: the getCurrentTimeNanos() call here only works because this is a sealed class, otherwise the method
             // could be overridden leading to unsafe initialization here!
             deadlineNanos(getCurrentTimeNanos(), SCHEDULE_QUIET_PERIOD_INTERVAL),
             -SCHEDULE_QUIET_PERIOD_INTERVAL
@@ -77,11 +77,11 @@ public final class GlobalEventExecutor extends AbstractScheduledEventExecutor im
     // be sticky about its thread group
     // visible for testing
     final ThreadFactory threadFactory;
-    private final TaskRunner taskRunner = new TaskRunner();
-    private final AtomicBoolean started = new AtomicBoolean();
+    private readonly TaskRunner taskRunner = new TaskRunner();
+    private readonly AtomicBoolean started = new AtomicBoolean();
     volatile Thread thread;
 
-    private final Future<?> terminationFuture;
+    private readonly Task<?> terminationFuture;
 
     private GlobalEventExecutor() {
         scheduledTaskQueue().add(quietPeriodTask);
@@ -167,12 +167,12 @@ public final class GlobalEventExecutor extends AbstractScheduledEventExecutor im
     }
 
     @Override
-    public Future<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
+    public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
         return terminationFuture();
     }
 
     @Override
-    public Future<?> terminationFuture() {
+    public Task<?> terminationFuture() {
         return terminationFuture;
     }
 
@@ -274,7 +274,7 @@ public final class GlobalEventExecutor extends AbstractScheduledEventExecutor im
         });
     }
 
-    final class TaskRunner implements Runnable {
+    sealed class TaskRunner implements Runnable {
         @Override
         public void run() {
             for (;;) {
@@ -282,7 +282,7 @@ public final class GlobalEventExecutor extends AbstractScheduledEventExecutor im
                 if (task != null) {
                     try {
                         runTask(task);
-                    } catch (Throwable t) {
+                    } catch (Exception t) {
                         logger.warn("Unexpected exception from the global event executor: ", t);
                     }
 

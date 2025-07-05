@@ -17,21 +17,21 @@
 namespace Netty.NET.Common.Util.concurrent;
 
 /**
- * A {@link Future} which is used to indicate the progress of an operation.
+ * A {@link Task} which is used to indicate the progress of an operation.
  */
-public interface ProgressiveFuture<V> extends Future<V> {
+public interface ProgressiveFuture<V> extends Task<V> {
 
     @Override
-    ProgressiveFuture<V> addListener(GenericFutureListener<? extends Future<? super V>> listener);
+    ProgressiveFuture<V> addListener(GenericFutureListener<? extends Task<? super V>> listener);
 
     @Override
-    ProgressiveFuture<V> addListeners(GenericFutureListener<? extends Future<? super V>>... listeners);
+    ProgressiveFuture<V> addListeners(GenericFutureListener<? extends Task<? super V>>... listeners);
 
     @Override
-    ProgressiveFuture<V> removeListener(GenericFutureListener<? extends Future<? super V>> listener);
+    ProgressiveFuture<V> removeListener(GenericFutureListener<? extends Task<? super V>> listener);
 
     @Override
-    ProgressiveFuture<V> removeListeners(GenericFutureListener<? extends Future<? super V>>... listeners);
+    ProgressiveFuture<V> removeListeners(GenericFutureListener<? extends Task<? super V>>... listeners);
 
     @Override
     ProgressiveFuture<V> sync() throws InterruptedException;

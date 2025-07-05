@@ -83,58 +83,58 @@ using static java.lang.invoke.MethodType.methodType;
  * You can disable the use of {@code sun.misc.Unsafe} if you specify
  * the system property <strong>io.netty.noUnsafe</strong>.
  */
-public final class PlatformDependent {
+public sealed class PlatformDependent {
 
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(PlatformDependent.class);
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(PlatformDependent.class);
 
     private static Pattern MAX_DIRECT_MEMORY_SIZE_ARG_PATTERN;
-    private static final bool MAYBE_SUPER_USER;
+    private static readonly bool MAYBE_SUPER_USER;
 
-    private static final bool CAN_ENABLE_TCP_NODELAY_BY_DEFAULT = !isAndroid();
+    private static readonly bool CAN_ENABLE_TCP_NODELAY_BY_DEFAULT = !isAndroid();
 
-    private static final Throwable UNSAFE_UNAVAILABILITY_CAUSE = unsafeUnavailabilityCause0();
-    private static final bool DIRECT_BUFFER_PREFERRED;
-    private static final bool EXPLICIT_NO_PREFER_DIRECT;
-    private static final long MAX_DIRECT_MEMORY = estimateMaxDirectMemory();
+    private static readonly Exception UNSAFE_UNAVAILABILITY_CAUSE = unsafeUnavailabilityCause0();
+    private static readonly bool DIRECT_BUFFER_PREFERRED;
+    private static readonly bool EXPLICIT_NO_PREFER_DIRECT;
+    private static readonly long MAX_DIRECT_MEMORY = estimateMaxDirectMemory();
 
-    private static final int MPSC_CHUNK_SIZE =  1024;
-    private static final int MIN_MAX_MPSC_CAPACITY =  MPSC_CHUNK_SIZE * 2;
-    private static final int MAX_ALLOWED_MPSC_CAPACITY = Pow2.MAX_POW2;
+    private static readonly int MPSC_CHUNK_SIZE =  1024;
+    private static readonly int MIN_MAX_MPSC_CAPACITY =  MPSC_CHUNK_SIZE * 2;
+    private static readonly int MAX_ALLOWED_MPSC_CAPACITY = Pow2.MAX_POW2;
 
-    private static final long BYTE_ARRAY_BASE_OFFSET = byteArrayBaseOffset0();
+    private static readonly long BYTE_ARRAY_BASE_OFFSET = byteArrayBaseOffset0();
 
-    private static final File TMPDIR = tmpdir0();
+    private static readonly File TMPDIR = tmpdir0();
 
-    private static final int BIT_MODE = bitMode0();
-    private static final string NORMALIZED_ARCH = normalizeArch(SystemPropertyUtil.get("os.arch", ""));
-    private static final string NORMALIZED_OS = normalizeOs(SystemPropertyUtil.get("os.name", ""));
+    private static readonly int BIT_MODE = bitMode0();
+    private static readonly string NORMALIZED_ARCH = normalizeArch(SystemPropertyUtil.get("os.arch", ""));
+    private static readonly string NORMALIZED_OS = normalizeOs(SystemPropertyUtil.get("os.name", ""));
 
-    private static final Set<string> LINUX_OS_CLASSIFIERS;
+    private static readonly Set<string> LINUX_OS_CLASSIFIERS;
 
-    private static final bool IS_WINDOWS = isWindows0();
-    private static final bool IS_OSX = isOsx0();
-    private static final bool IS_J9_JVM = isJ9Jvm0();
-    private static final bool IS_IVKVM_DOT_NET = isIkvmDotNet0();
+    private static readonly bool IS_WINDOWS = isWindows0();
+    private static readonly bool IS_OSX = isOsx0();
+    private static readonly bool IS_J9_JVM = isJ9Jvm0();
+    private static readonly bool IS_IVKVM_DOT_NET = isIkvmDotNet0();
 
-    private static final int ADDRESS_SIZE = addressSize0();
-    private static final bool USE_DIRECT_BUFFER_NO_CLEANER;
-    private static final AtomicLong DIRECT_MEMORY_COUNTER;
-    private static final long DIRECT_MEMORY_LIMIT;
-    private static final Cleaner CLEANER;
-    private static final Cleaner DIRECT_CLEANER;
-    private static final Cleaner LEGACY_CLEANER;
-    private static final bool HAS_ALLOCATE_UNINIT_ARRAY;
-    private static final string LINUX_ID_PREFIX = "ID=";
-    private static final string LINUX_ID_LIKE_PREFIX = "ID_LIKE=";
-    public static final bool BIG_ENDIAN_NATIVE_ORDER = ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN;
+    private static readonly int ADDRESS_SIZE = addressSize0();
+    private static readonly bool USE_DIRECT_BUFFER_NO_CLEANER;
+    private static readonly AtomicLong DIRECT_MEMORY_COUNTER;
+    private static readonly long DIRECT_MEMORY_LIMIT;
+    private static readonly Cleaner CLEANER;
+    private static readonly Cleaner DIRECT_CLEANER;
+    private static readonly Cleaner LEGACY_CLEANER;
+    private static readonly bool HAS_ALLOCATE_UNINIT_ARRAY;
+    private static readonly string LINUX_ID_PREFIX = "ID=";
+    private static readonly string LINUX_ID_LIKE_PREFIX = "ID_LIKE=";
+    public static readonly bool BIG_ENDIAN_NATIVE_ORDER = ByteOrder.nativeOrder() == ByteOrder.BIG_ENDIAN;
 
-    private static final bool JFR;
+    private static readonly bool JFR;
 
-    private static final Cleaner NOOP = new Cleaner() {
+    private static readonly Cleaner NOOP = new Cleaner() {
         @Override
         public CleanableDirectBuffer allocate(int capacity) {
             return new CleanableDirectBuffer() {
-                private final ByteBuffer byteBuffer = ByteBuffer.allocateDirect(capacity);
+                private readonly ByteBuffer byteBuffer = ByteBuffer.allocateDirect(capacity);
 
                 @Override
                 public ByteBuffer buffer() {
@@ -244,11 +244,11 @@ public final class PlatformDependent {
         LINUX_OS_CLASSIFIERS = Collections.unmodifiableSet(availableClassifiers);
 
         bool jfrAvailable;
-        Throwable jfrFailure = null;
+        Exception jfrFailure = null;
         try {
             //noinspection Since15
             jfrAvailable = FlightRecorder.isAvailable();
-        } catch (Throwable t) {
+        } catch (Exception t) {
             jfrFailure = t;
             jfrAvailable = false;
         }
@@ -270,7 +270,7 @@ public final class PlatformDependent {
 
     private static bool processOsReleaseFile(string osReleaseFileName, Set<string> availableClassifiers) {
         Path file = Paths.get(osReleaseFileName);
-        return AccessController.doPrivileged((PrivilegedAction<Boolean>) () -> {
+        return AccessController.doPrivileged((PrivilegedAction<bool>) () -> {
             try {
                 if (Files.exists(file)) {
                     try (BufferedReader reader = new BufferedReader(new InputStreamReader(
@@ -318,13 +318,13 @@ public final class PlatformDependent {
         }
         string[] classifiers = osClassifiers.split(",");
         if (classifiers.length == 0) {
-            throw new IllegalArgumentException(
+            throw new ArgumentException(
                     osClassifiersPropertyName + " property is not empty, but contains no classifiers: "
                             + osClassifiers);
         }
         // at most ID, ID_LIKE classifiers
         if (classifiers.length > 2) {
-            throw new IllegalArgumentException(
+            throw new ArgumentException(
                     osClassifiersPropertyName + " property contains more than 2 classifiers: " + osClassifiers);
         }
         for (string classifier : classifiers) {
@@ -407,7 +407,7 @@ public final class PlatformDependent {
     /**
      * Return the reason (if any) why {@code sun.misc.Unsafe} was not available.
      */
-    public static Throwable getUnsafeUnavailabilityCause() {
+    public static Exception getUnsafeUnavailabilityCause() {
         return UNSAFE_UNAVAILABILITY_CAUSE;
     }
 
@@ -499,7 +499,7 @@ public final class PlatformDependent {
     /**
      * Raises an exception bypassing compiler checks for checked exceptions.
      */
-    public static void throwException(Throwable t) {
+    public static void throwException(Exception t) {
         PlatformDependent0.throwException(t);
     }
 
@@ -839,7 +839,7 @@ public final class PlatformDependent {
         incrementMemoryCounter(capacity);
         try {
             return PlatformDependent0.allocateDirectNoCleaner(capacity);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             decrementMemoryCounter(capacity);
             throwException(e);
             return null;
@@ -867,7 +867,7 @@ public final class PlatformDependent {
         incrementMemoryCounter(len);
         try {
             return PlatformDependent0.reallocateDirectNoCleaner(buffer, capacity);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             decrementMemoryCounter(len);
             throwException(e);
             return null;
@@ -904,7 +904,7 @@ public final class PlatformDependent {
 
     public static ByteBuffer alignDirectBuffer(ByteBuffer buffer, int alignment) {
         if (!buffer.isDirect()) {
-            throw new IllegalArgumentException("Cannot get aligned slice of non-direct byte buffer.");
+            throw new ArgumentException("Cannot get aligned slice of non-direct byte buffer.");
         }
         if (PlatformDependent0.hasAlignSliceMethod()) {
             return PlatformDependent0.alignSlice(buffer, alignment);
@@ -1072,8 +1072,8 @@ public final class PlatformDependent {
         return hash;
     }
 
-    private static final class Mpsc {
-        private static final bool USE_MPSC_CHUNKED_ARRAY_QUEUE;
+    private static class Mpsc {
+        private static readonly bool USE_MPSC_CHUNKED_ARRAY_QUEUE;
 
         static {
             object unsafe = null;
@@ -1239,7 +1239,7 @@ public final class PlatformDependent {
         return "root".equals(username) || "toor".equals(username);
     }
 
-    private static Throwable unsafeUnavailabilityCause0() {
+    private static Exception unsafeUnavailabilityCause0() {
         if (isAndroid()) {
             logger.debug("sun.misc.Unsafe: unavailable (Android)");
             return new UnsupportedOperationException("sun.misc.Unsafe: unavailable (Android)");
@@ -1250,7 +1250,7 @@ public final class PlatformDependent {
             return new UnsupportedOperationException("sun.misc.Unsafe: unavailable (IKVM.NET)");
         }
 
-        Throwable cause = PlatformDependent0.getUnsafeUnavailabilityCause();
+        Exception cause = PlatformDependent0.getUnsafeUnavailabilityCause();
         if (cause != null) {
             return cause;
         }
@@ -1259,7 +1259,7 @@ public final class PlatformDependent {
             bool hasUnsafe = PlatformDependent0.hasUnsafe();
             logger.debug("sun.misc.Unsafe: {}", hasUnsafe ? "available" : "unavailable");
             return null;
-        } catch (Throwable t) {
+        } catch (Exception t) {
             logger.trace("Could not determine if Unsafe is available", t);
             // Probably failed to initialize PlatformDependent0.
             return new UnsupportedOperationException("Could not determine if Unsafe is available", t);
@@ -1341,7 +1341,7 @@ public final class PlatformDependent {
                     continue;
                 }
 
-                maxDirectMemory = Long.parseLong(m.group(1));
+                maxDirectMemory = long.parseLong(m.group(1));
                 switch (m.group(2).charAt(0)) {
                     case 'k': case 'K':
                         maxDirectMemory *= 1024;
@@ -1357,7 +1357,7 @@ public final class PlatformDependent {
                 }
                 break;
             }
-        } catch (Throwable ignored) {
+        } catch (Exception ignored) {
             // Ignore
         }
 
@@ -1415,7 +1415,7 @@ public final class PlatformDependent {
                     return f;
                 }
             }
-        } catch (Throwable ignored) {
+        } catch (Exception ignored) {
             // Environment variable inaccessible
         }
 
@@ -1487,7 +1487,7 @@ public final class PlatformDependent {
         Pattern bitPattern = Pattern.compile("([1-9][0-9]+)-?bit");
         Matcher m = bitPattern.matcher(vm);
         if (m.find()) {
-            return Integer.parseInt(m.group(1));
+            return int.parseInt(m.group(1));
         } else {
             return 64;
         }

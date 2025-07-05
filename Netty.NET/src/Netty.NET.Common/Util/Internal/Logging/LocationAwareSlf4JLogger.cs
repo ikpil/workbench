@@ -23,15 +23,15 @@ using static org.slf4j.spi.LocationAwareLogger.*;
  * <a href="https://www.slf4j.org/">SLF4J</a> logger which is location aware and so will log the correct origin of the
  * logging event by filter out the wrapper itself.
  */
-final class LocationAwareSlf4JLogger extends AbstractInternalLogger {
+sealed class LocationAwareSlf4JLogger extends AbstractInternalLogger {
 
     // IMPORTANT: All our log methods first check if the log level is enabled before call the wrapped
     // LocationAwareLogger.log(...) method. This is done to reduce GC creation that is caused by varargs.
 
-    static final string FQCN = LocationAwareSlf4JLogger.class.getName();
-    private static final long serialVersionUID = -8292030083201538180L;
+    static readonly string FQCN = LocationAwareSlf4JLogger.class.getName();
+    private static readonly long serialVersionUID = -8292030083201538180L;
 
-    private final transient LocationAwareLogger logger;
+    private readonly transient LocationAwareLogger logger;
 
     LocationAwareSlf4JLogger(LocationAwareLogger logger) {
         super(logger.getName());
@@ -42,7 +42,7 @@ final class LocationAwareSlf4JLogger extends AbstractInternalLogger {
         logger.log(null, FQCN, level, message, null, null);
     }
 
-    private void log(final int level, final string message, Throwable cause) {
+    private void log(final int level, final string message, Exception cause) {
         logger.log(null, FQCN, level, message, null, cause);
     }
 
@@ -84,7 +84,7 @@ final class LocationAwareSlf4JLogger extends AbstractInternalLogger {
     }
 
     @Override
-    public void trace(string msg, Throwable t) {
+    public void trace(string msg, Exception t) {
         if (isTraceEnabled()) {
             log(TRACE_INT, msg, t);
         }
@@ -124,7 +124,7 @@ final class LocationAwareSlf4JLogger extends AbstractInternalLogger {
     }
 
     @Override
-    public void debug(string msg, Throwable t) {
+    public void debug(string msg, Exception t) {
         if (isDebugEnabled()) {
             log(DEBUG_INT, msg, t);
         }
@@ -164,7 +164,7 @@ final class LocationAwareSlf4JLogger extends AbstractInternalLogger {
     }
 
     @Override
-    public void info(string msg, Throwable t) {
+    public void info(string msg, Exception t) {
         if (isInfoEnabled()) {
             log(INFO_INT, msg, t);
         }
@@ -204,7 +204,7 @@ final class LocationAwareSlf4JLogger extends AbstractInternalLogger {
     }
 
     @Override
-    public void warn(string msg, Throwable t) {
+    public void warn(string msg, Exception t) {
         if (isWarnEnabled()) {
             log(WARN_INT, msg, t);
         }
@@ -244,7 +244,7 @@ final class LocationAwareSlf4JLogger extends AbstractInternalLogger {
     }
 
     @Override
-    public void error(string msg, Throwable t) {
+    public void error(string msg, Exception t) {
         if (isErrorEnabled()) {
             log(ERROR_INT, msg, t);
         }

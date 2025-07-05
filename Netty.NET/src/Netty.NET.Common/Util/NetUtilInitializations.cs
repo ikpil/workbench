@@ -31,11 +31,11 @@ using java.util.Collections;
 using java.util.Enumeration;
 using java.util.List;
 
-final class NetUtilInitializations {
+sealed class NetUtilInitializations {
     /**
      * The logger being used by this class
      */
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(NetUtilInitializations.class);
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(NetUtilInitializations.class);
 
     private NetUtilInitializations() {
     }
@@ -69,7 +69,7 @@ final class NetUtilInitializations {
     }
 
     static Collection<NetworkInterface> networkInterfaces() {
-        List<NetworkInterface> networkInterfaces = new ArrayList<NetworkInterface>();
+        List<NetworkInterface> networkInterfaces = new List<NetworkInterface>();
         try {
             Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
             if (interfaces != null) {
@@ -79,7 +79,7 @@ final class NetUtilInitializations {
             }
         } catch (SocketException e) {
             logger.warn("Failed to retrieve the list of available network interfaces", e);
-        } catch (NullPointerException e) {
+        } catch (ArgumentNullException e) {
             if (!PlatformDependent.isAndroid()) {
                 throw e;
             }
@@ -92,7 +92,7 @@ final class NetUtilInitializations {
     static NetworkIfaceAndInetAddress determineLoopback(
             Collection<NetworkInterface> networkInterfaces, Inet4Address localhost4, Inet6Address localhost6) {
         // Retrieve the list of available network interfaces.
-        List<NetworkInterface> ifaces = new ArrayList<NetworkInterface>();
+        List<NetworkInterface> ifaces = new List<NetworkInterface>();
         for (NetworkInterface iface: networkInterfaces) {
             // Use the interface with proper INET addresses only.
             if (SocketUtils.addressesFromNetworkInterface(iface).hasMoreElements()) {
@@ -168,9 +168,9 @@ final class NetUtilInitializations {
         return new NetworkIfaceAndInetAddress(loopbackIface, loopbackAddr);
     }
 
-    static final class NetworkIfaceAndInetAddress {
-        private final NetworkInterface iface;
-        private final InetAddress address;
+    static class NetworkIfaceAndInetAddress {
+        private readonly NetworkInterface iface;
+        private readonly InetAddress address;
 
         NetworkIfaceAndInetAddress(NetworkInterface iface, InetAddress address) {
             this.iface = iface;

@@ -108,9 +108,9 @@ using java.util.Set;
  * {@link #format(string, object, object)} and
  * {@link #arrayFormat(string, object[])} methods for more details.
  */
-public final class MessageFormatter {
-    private static final string DELIM_STR = "{}";
-    private static final char ESCAPE_CHAR = '\\';
+public sealed class MessageFormatter {
+    private static readonly string DELIM_STR = "{}";
+    private static readonly char ESCAPE_CHAR = '\\';
 
     /**
      * Performs single argument substitution for the 'messagePattern' passed as
@@ -175,7 +175,7 @@ public final class MessageFormatter {
 
         int lastArrIdx = argArray.length - 1;
         object lastEntry = argArray[lastArrIdx];
-        Throwable throwable = lastEntry instanceof Throwable? (Throwable) lastEntry : null;
+        Exception throwable = lastEntry instanceof Exception? (Exception) lastEntry : null;
 
         if (messagePattern == null) {
             return new FormattingTuple(null, throwable);
@@ -230,9 +230,9 @@ public final class MessageFormatter {
         if (!objClass.isArray()) {
             if (Number.class.isAssignableFrom(objClass)) {
                 // Prevent string instantiation for some number types
-                if (objClass == Long.class) {
-                    sbuf.append(((Long) o).longValue());
-                } else if (objClass == Integer.class || objClass == Short.class || objClass == Byte.class) {
+                if (objClass == long.class) {
+                    sbuf.append(((long) o).longValue());
+                } else if (objClass == int.class || objClass == Short.class || objClass == Byte.class) {
                     sbuf.append(((Number) o).intValue());
                 } else if (objClass == Double.class) {
                     sbuf.append(((Double) o).doubleValue());
@@ -275,7 +275,7 @@ public final class MessageFormatter {
         try {
             string oAsString = o.toString();
             sbuf.append(oAsString);
-        } catch (Throwable t) {
+        } catch (Exception t) {
             System.err
                     .println("SLF4J: Failed toString() invocation on an object of type ["
                             + o.getClass().getName() + ']');

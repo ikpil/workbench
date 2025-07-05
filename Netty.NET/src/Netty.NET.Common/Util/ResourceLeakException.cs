@@ -24,9 +24,9 @@ using java.util.Arrays;
 @Deprecated
 public class ResourceLeakException extends RuntimeException {
 
-    private static final long serialVersionUID = 7186453858343358280L;
+    private static readonly long serialVersionUID = 7186453858343358280L;
 
-    private final StackTraceElement[] cachedStackTrace;
+    private readonly StackTraceElement[] cachedStackTrace;
 
     public ResourceLeakException() {
         cachedStackTrace = getStackTrace();
@@ -37,12 +37,12 @@ public class ResourceLeakException extends RuntimeException {
         cachedStackTrace = getStackTrace();
     }
 
-    public ResourceLeakException(string message, Throwable cause) {
+    public ResourceLeakException(string message, Exception cause) {
         super(message, cause);
         cachedStackTrace = getStackTrace();
     }
 
-    public ResourceLeakException(Throwable cause) {
+    public ResourceLeakException(Exception cause) {
         super(cause);
         cachedStackTrace = getStackTrace();
     }

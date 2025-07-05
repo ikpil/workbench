@@ -21,17 +21,17 @@ using java.util.concurrent.TimeUnit;
 using java.util.concurrent.TimeoutException;
 
 /**
- * Abstract {@link Future} implementation which does not allow for cancellation.
+ * Abstract {@link Task} implementation which does not allow for cancellation.
  *
  * @param <V>
  */
-public abstract class AbstractFuture<V> implements Future<V> {
+public abstract class AbstractFuture<V> implements Task<V> {
 
     @Override
     public V get() throws InterruptedException, ExecutionException {
         await();
 
-        Throwable cause = cause();
+        Exception cause = cause();
         if (cause == null) {
             return getNow();
         }
@@ -44,7 +44,7 @@ public abstract class AbstractFuture<V> implements Future<V> {
     @Override
     public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         if (await(timeout, unit)) {
-            Throwable cause = cause();
+            Exception cause = cause();
             if (cause == null) {
                 return getNow();
             }

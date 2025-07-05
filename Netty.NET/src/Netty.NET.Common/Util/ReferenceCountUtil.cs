@@ -23,9 +23,9 @@ using Netty.NET.Common.Util.Internal.logging.InternalLoggerFactory;
 /**
  * Collection of method to handle objects that may implement {@link ReferenceCounted}.
  */
-public final class ReferenceCountUtil {
+public sealed class ReferenceCountUtil {
 
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(ReferenceCountUtil.class);
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(ReferenceCountUtil.class);
 
     static {
         ResourceLeakDetector.addExclusions(ReferenceCountUtil.class, "touch");
@@ -114,7 +114,7 @@ public final class ReferenceCountUtil {
     public static void safeRelease(object msg) {
         try {
             release(msg);
-        } catch (Throwable t) {
+        } catch (Exception t) {
             logger.warn("Failed to release a message: {}", msg, t);
         }
     }
@@ -130,7 +130,7 @@ public final class ReferenceCountUtil {
         try {
             ObjectUtil.checkPositive(decrement, "decrement");
             release(msg, decrement);
-        } catch (Throwable t) {
+        } catch (Exception t) {
             if (logger.isWarnEnabled()) {
                 logger.warn("Failed to release a message: {} (decrement: {})", msg, decrement, t);
             }
@@ -176,10 +176,10 @@ public final class ReferenceCountUtil {
     /**
      * Releases the objects when the thread that called {@link #releaseLater(object)} has been terminated.
      */
-    private static final class ReleasingTask implements Runnable {
+    private static class ReleasingTask implements Runnable {
 
-        private final ReferenceCounted obj;
-        private final int decrement;
+        private readonly ReferenceCounted obj;
+        private readonly int decrement;
 
         ReleasingTask(ReferenceCounted obj, int decrement) {
             this.obj = obj;

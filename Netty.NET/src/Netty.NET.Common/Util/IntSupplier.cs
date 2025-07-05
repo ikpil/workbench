@@ -13,17 +13,18 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+
 namespace Netty.NET.Common.Util;
 
 /**
  * Represents a supplier of {@code int}-valued results.
  */
-public interface IntSupplier {
-
+public interface IntSupplier
+{
     /**
      * Gets a result.
      *
      * @return a result
      */
-    int get() throws Exception;
+    int get();
 }

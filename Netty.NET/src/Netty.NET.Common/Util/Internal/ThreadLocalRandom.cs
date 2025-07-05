@@ -49,7 +49,7 @@ using static Netty.NET.Common.Util.Internal.ObjectUtil.checkPositive;
  *
  * <p>Usages of this class should typically be of the form:
  * {@code ThreadLocalRandom.current().nextX(...)} (where
- * {@code X} is {@code Int}, {@code Long}, etc).
+ * {@code X} is {@code Int}, {@code long}, etc).
  * When all usages are of this form, it is never possible to
  * accidentally share a {@code ThreadLocalRandom} across multiple threads.
  *
@@ -61,17 +61,17 @@ using static Netty.NET.Common.Util.Internal.ObjectUtil.checkPositive;
  */
 @Deprecated
 @SuppressWarnings("all")
-public final class ThreadLocalRandom extends Random {
+public sealed class ThreadLocalRandom extends Random {
 
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(ThreadLocalRandom.class);
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(ThreadLocalRandom.class);
 
-    private static final AtomicLong seedUniquifier = new AtomicLong();
+    private static readonly AtomicLong seedUniquifier = new AtomicLong();
 
     private static volatile long initialSeedUniquifier;
 
-    private static final Thread seedGeneratorThread;
-    private static final BlockingQueue<Long> seedQueue;
-    private static final long seedGeneratorStartTime;
+    private static readonly Thread seedGeneratorThread;
+    private static readonly BlockingQueue<long> seedQueue;
+    private static readonly long seedGeneratorStartTime;
     private static volatile long seedGeneratorEndTime;
 
     static {
@@ -79,7 +79,7 @@ public final class ThreadLocalRandom extends Random {
         if (initialSeedUniquifier == 0) {
             bool secureRandom = SystemPropertyUtil.getBoolean("java.util.secureRandomSeed", false);
             if (secureRandom) {
-                seedQueue = new LinkedBlockingQueue<Long>();
+                seedQueue = new LinkedBlockingQueue<long>();
                 seedGeneratorStartTime = System.nanoTime();
 
                 // Try to generate a real random number from /dev/random.
@@ -104,7 +104,7 @@ public final class ThreadLocalRandom extends Random {
                 seedGeneratorThread.setDaemon(true);
                 seedGeneratorThread.setUncaughtExceptionHandler(new UncaughtExceptionHandler() {
                     @Override
-                    public void uncaughtException(Thread t, Throwable e) {
+                    public void uncaughtException(Thread t, Exception e) {
                         logger.debug("An exception has been raised by {}", t.getName(), e);
                     }
                 });
@@ -146,7 +146,7 @@ public final class ThreadLocalRandom extends Random {
             for (;;) {
                 final long waitTime = deadLine - System.nanoTime();
                 try {
-                    final Long seed;
+                    final long seed;
                     if (waitTime <= 0) {
                         seed = seedQueue.poll();
                     } else {
@@ -175,7 +175,7 @@ public final class ThreadLocalRandom extends Random {
 
             // Just in case the initialSeedUniquifier is zero or some other constant
             initialSeedUniquifier ^= 0x3255ecdc33bae119L; // just a meaningless random number
-            initialSeedUniquifier ^= Long.reverse(System.nanoTime());
+            initialSeedUniquifier ^= long.reverse(System.nanoTime());
 
             ThreadLocalRandom.initialSeedUniquifier = initialSeedUniquifier;
 
@@ -229,9 +229,9 @@ public final class ThreadLocalRandom extends Random {
     }
 
     // same constants as Random, but must be redeclared because private
-    private static final long multiplier = 0x5DEECE66DL;
-    private static final long addend = 0xBL;
-    private static final long mask = (1L << 48) - 1;
+    private static readonly long multiplier = 0x5DEECE66DL;
+    private static readonly long addend = 0xBL;
+    private static readonly long mask = (1L << 48) - 1;
 
     /**
      * The random seed. We can't use super.seed.
@@ -294,13 +294,13 @@ public final class ThreadLocalRandom extends Random {
      *
      * @param least the least value returned
      * @param bound the upper bound (exclusive)
-     * @throws IllegalArgumentException if least greater than or equal
+     * @throws ArgumentException if least greater than or equal
      * to bound
      * @return the next value
      */
     public int nextInt(int least, int bound) {
         if (least >= bound) {
-            throw new IllegalArgumentException();
+            throw new ArgumentException();
         }
         return nextInt(bound - least) + least;
     }
@@ -312,7 +312,7 @@ public final class ThreadLocalRandom extends Random {
      * @param n the bound on the random number to be returned.  Must be
      *        positive.
      * @return the next value
-     * @throws IllegalArgumentException if n is not positive
+     * @throws ArgumentException if n is not positive
      */
     public long nextLong(long n) {
         checkPositive(n, "n");
@@ -323,7 +323,7 @@ public final class ThreadLocalRandom extends Random {
         // (offset) and whether to continue with the lower vs upper
         // half (which makes a difference only if odd).
         long offset = 0;
-        while (n >= Integer.MAX_VALUE) {
+        while (n >= int.MAX_VALUE) {
             int bits = next(2);
             long half = n >>> 1;
             long nextn = ((bits & 2) == 0) ? half : n - half;
@@ -342,12 +342,12 @@ public final class ThreadLocalRandom extends Random {
      * @param least the least value returned
      * @param bound the upper bound (exclusive)
      * @return the next value
-     * @throws IllegalArgumentException if least greater than or equal
+     * @throws ArgumentException if least greater than or equal
      * to bound
      */
     public long nextLong(long least, long bound) {
         if (least >= bound) {
-            throw new IllegalArgumentException();
+            throw new ArgumentException();
         }
         return nextLong(bound - least) + least;
     }
@@ -359,7 +359,7 @@ public final class ThreadLocalRandom extends Random {
      * @param n the bound on the random number to be returned.  Must be
      *        positive.
      * @return the next value
-     * @throws IllegalArgumentException if n is not positive
+     * @throws ArgumentException if n is not positive
      */
     public double nextDouble(double n) {
         checkPositive(n, "n");
@@ -373,15 +373,15 @@ public final class ThreadLocalRandom extends Random {
      * @param least the least value returned
      * @param bound the upper bound (exclusive)
      * @return the next value
-     * @throws IllegalArgumentException if least greater than or equal
+     * @throws ArgumentException if least greater than or equal
      * to bound
      */
     public double nextDouble(double least, double bound) {
         if (least >= bound) {
-            throw new IllegalArgumentException();
+            throw new ArgumentException();
         }
         return nextDouble() * (bound - least) + least;
     }
 
-    private static final long serialVersionUID = -5851777807851030925L;
+    private static readonly long serialVersionUID = -5851777807851030925L;
 }

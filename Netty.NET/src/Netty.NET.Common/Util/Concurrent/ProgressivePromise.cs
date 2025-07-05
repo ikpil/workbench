@@ -18,7 +18,7 @@ namespace Netty.NET.Common.Util.concurrent;
 /**
  * Special {@link ProgressiveFuture} which is writable.
  */
-public interface ProgressivePromise<V> extends Promise<V>, ProgressiveFuture<V> {
+public interface ProgressivePromise<V> extends TaskCompletionSource<V>, ProgressiveFuture<V> {
 
     /**
      * Sets the current progress of the operation and notifies the listeners that implement
@@ -37,19 +37,19 @@ public interface ProgressivePromise<V> extends Promise<V>, ProgressiveFuture<V> 
     ProgressivePromise<V> setSuccess(V result);
 
     @Override
-    ProgressivePromise<V> setFailure(Throwable cause);
+    ProgressivePromise<V> setFailure(Exception cause);
 
     @Override
-    ProgressivePromise<V> addListener(GenericFutureListener<? extends Future<? super V>> listener);
+    ProgressivePromise<V> addListener(GenericFutureListener<? extends Task<? super V>> listener);
 
     @Override
-    ProgressivePromise<V> addListeners(GenericFutureListener<? extends Future<? super V>>... listeners);
+    ProgressivePromise<V> addListeners(GenericFutureListener<? extends Task<? super V>>... listeners);
 
     @Override
-    ProgressivePromise<V> removeListener(GenericFutureListener<? extends Future<? super V>> listener);
+    ProgressivePromise<V> removeListener(GenericFutureListener<? extends Task<? super V>> listener);
 
     @Override
-    ProgressivePromise<V> removeListeners(GenericFutureListener<? extends Future<? super V>>... listeners);
+    ProgressivePromise<V> removeListeners(GenericFutureListener<? extends Task<? super V>>... listeners);
 
     @Override
     ProgressivePromise<V> await() throws InterruptedException;

@@ -20,7 +20,7 @@ using com.oracle.svm.core.annotate.RecomputeFieldValue;
 using com.oracle.svm.core.annotate.TargetClass;
 
 @TargetClass(className = "Netty.NET.Common.Util.Internal.PlatformDependent0")
-final class PlatformDependent0Substitution {
+sealed class PlatformDependent0Substitution {
     private PlatformDependent0Substitution() {
     }
 

@@ -39,9 +39,9 @@ using java.util.concurrent.atomic.AtomicReference;
  * executors of type {@link OrderedEventExecutor}.
  */
 @UnstableApi
-public final class NonStickyEventExecutorGroup implements EventExecutorGroup {
-    private final EventExecutorGroup group;
-    private final int maxTaskExecutePerRun;
+public sealed class NonStickyEventExecutorGroup implements EventExecutorGroup {
+    private readonly EventExecutorGroup group;
+    private readonly int maxTaskExecutePerRun;
 
     /**
      * Creates a new instance. Be aware that the given {@link EventExecutorGroup} <strong>MUST NOT</strong> contain
@@ -65,7 +65,7 @@ public final class NonStickyEventExecutorGroup implements EventExecutorGroup {
         while (executors.hasNext()) {
             EventExecutor executor = executors.next();
             if (executor instanceof OrderedEventExecutor) {
-                throw new IllegalArgumentException("EventExecutorGroup " + group
+                throw new ArgumentException("EventExecutorGroup " + group
                         + " contains OrderedEventExecutors: " + executor);
             }
         }
@@ -82,17 +82,17 @@ public final class NonStickyEventExecutorGroup implements EventExecutorGroup {
     }
 
     @Override
-    public Future<?> shutdownGracefully() {
+    public Task<?> shutdownGracefully() {
         return group.shutdownGracefully();
     }
 
     @Override
-    public Future<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
+    public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
         return group.shutdownGracefully(quietPeriod, timeout, unit);
     }
 
     @Override
-    public Future<?> terminationFuture() {
+    public Task<?> terminationFuture() {
         return group.terminationFuture();
     }
 
@@ -135,17 +135,17 @@ public final class NonStickyEventExecutorGroup implements EventExecutorGroup {
     }
 
     @Override
-    public Future<?> submit(Runnable task) {
+    public Task<?> submit(Runnable task) {
         return group.submit(task);
     }
 
     @Override
-    public <T> Future<T> submit(Runnable task, T result) {
+    public <T> Task<T> submit(Runnable task, T result) {
         return group.submit(task, result);
     }
 
     @Override
-    public <T> Future<T> submit(Callable<T> task) {
+    public <T> Task<T> submit(Callable<T> task) {
         return group.submit(task);
     }
 
@@ -185,13 +185,13 @@ public final class NonStickyEventExecutorGroup implements EventExecutorGroup {
     }
 
     @Override
-    public <T> List<java.util.concurrent.Future<T>> invokeAll(
+    public <T> List<java.util.concurrent.Task<T>> invokeAll(
             Collection<? extends Callable<T>> tasks) throws InterruptedException {
         return group.invokeAll(tasks);
     }
 
     @Override
-    public <T> List<java.util.concurrent.Future<T>> invokeAll(
+    public <T> List<java.util.concurrent.Task<T>> invokeAll(
             Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException {
         return group.invokeAll(tasks, timeout, unit);
     }
@@ -212,19 +212,19 @@ public final class NonStickyEventExecutorGroup implements EventExecutorGroup {
         group.execute(command);
     }
 
-    private static final class NonStickyOrderedEventExecutor extends AbstractEventExecutor
+    private static class NonStickyOrderedEventExecutor extends AbstractEventExecutor
             implements Runnable, OrderedEventExecutor {
-        private final EventExecutor executor;
-        private final Queue<Runnable> tasks = PlatformDependent.newMpscQueue();
+        private readonly EventExecutor executor;
+        private readonly Queue<Runnable> tasks = PlatformDependent.newMpscQueue();
 
-        private static final int NONE = 0;
-        private static final int SUBMITTED = 1;
-        private static final int RUNNING = 2;
+        private static readonly int NONE = 0;
+        private static readonly int SUBMITTED = 1;
+        private static readonly int RUNNING = 2;
 
-        private final AtomicInteger state = new AtomicInteger();
-        private final int maxTaskExecutePerRun;
+        private readonly AtomicInteger state = new AtomicInteger();
+        private readonly int maxTaskExecutePerRun;
 
-        private final AtomicReference<Thread> executingThread = new AtomicReference<Thread>();
+        private readonly AtomicReference<Thread> executingThread = new AtomicReference<Thread>();
 
         NonStickyOrderedEventExecutor(EventExecutor executor, int maxTaskExecutePerRun) {
             super(executor);
@@ -257,7 +257,7 @@ public final class NonStickyEventExecutorGroup implements EventExecutorGroup {
                             executingThread.compareAndSet(current, null);
                             executor.execute(this);
                             return; // done
-                        } catch (Throwable ignore) {
+                        } catch (Exception ignore) {
                             // Reset the state back to running as we will keep on executing tasks.
                             state.set(RUNNING);
                             // if an error happened we should just ignore it and let the loop run again as there is not
@@ -302,12 +302,12 @@ public final class NonStickyEventExecutorGroup implements EventExecutorGroup {
         }
 
         @Override
-        public Future<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
+        public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
             return executor.shutdownGracefully(quietPeriod, timeout, unit);
         }
 
         @Override
-        public Future<?> terminationFuture() {
+        public Task<?> terminationFuture() {
             return executor.terminationFuture();
         }
 

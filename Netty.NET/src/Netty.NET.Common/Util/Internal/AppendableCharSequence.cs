@@ -15,12 +15,11 @@
  */
 namespace Netty.NET.Common.Util.Internal;
 
-using static Netty.NET.Common.Util.Internal.ObjectUtil.checkPositive;
-using static Netty.NET.Common.Util.Internal.ObjectUtil.checkNonEmpty;
+using static ObjectUtil;
 
 using java.util.Arrays;
 
-public final class AppendableCharSequence implements CharSequence, Appendable {
+public sealed class AppendableCharSequence : CharSequence, Appendable {
     private char[] chars;
     private int pos;
 
@@ -35,7 +34,7 @@ public final class AppendableCharSequence implements CharSequence, Appendable {
 
     public void setLength(int length) {
         if (length < 0 || length > pos) {
-            throw new IllegalArgumentException("length: " + length + " (length: >= 0, <= " + pos + ')');
+            throw new ArgumentException("length: " + length + " (length: >= 0, <= " + pos + ')');
         }
         this.pos = length;
     }

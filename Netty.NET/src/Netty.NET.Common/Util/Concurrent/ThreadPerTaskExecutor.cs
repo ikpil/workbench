@@ -20,8 +20,8 @@ using Netty.NET.Common.Util.Internal.ObjectUtil;
 using java.util.concurrent.Executor;
 using java.util.concurrent.ThreadFactory;
 
-public final class ThreadPerTaskExecutor implements Executor {
-    private final ThreadFactory threadFactory;
+public sealed class ThreadPerTaskExecutor implements Executor {
+    private readonly ThreadFactory threadFactory;
 
     public ThreadPerTaskExecutor(ThreadFactory threadFactory) {
         this.threadFactory = ObjectUtil.checkNotNull(threadFactory, "threadFactory");

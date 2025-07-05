@@ -13,13 +13,14 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+
 namespace Netty.NET.Common.Util;
 
 /**
  * A singleton which is safe to compare via the {@code ==} operator. Created and managed by {@link ConstantPool}.
  */
-public interface Constant<T extends Constant<T>> extends Comparable<T> {
-
+public interface Constant<in T> : IComparable<T> where T : Constant<T>
+{
     /**
      * Returns the unique number assigned to this {@link Constant}.
      */

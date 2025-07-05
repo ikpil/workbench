@@ -23,9 +23,9 @@ namespace Netty.NET.Common.Util;
  * @deprecated Use {@link DomainWildcardMappingBuilder} instead.
  */
 @Deprecated
-public final class DomainMappingBuilder<V> {
+public sealed class DomainMappingBuilder<V> {
 
-    private final DomainNameMappingBuilder<V> builder;
+    private readonly DomainNameMappingBuilder<V> builder;
 
     /**
      * Constructor with default initial capacity of the map holding the mappings

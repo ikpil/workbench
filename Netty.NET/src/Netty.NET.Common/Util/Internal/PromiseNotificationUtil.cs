@@ -15,22 +15,22 @@
  */
 namespace Netty.NET.Common.Util.Internal;
 
-using Netty.NET.Common.Util.concurrent.Promise;
+using Netty.NET.Common.Util.concurrent.TaskCompletionSource;
 using Netty.NET.Common.Util.Internal.logging.InternalLogger;
 
 /**
- * Internal utilities to notify {@link Promise}s.
+ * Internal utilities to notify {@link TaskCompletionSource}s.
  */
-public final class PromiseNotificationUtil {
+public sealed class PromiseNotificationUtil {
 
     private PromiseNotificationUtil() { }
 
     /**
-     * Try to cancel the {@link Promise} and log if {@code logger} is not {@code null} in case this fails.
+     * Try to cancel the {@link TaskCompletionSource} and log if {@code logger} is not {@code null} in case this fails.
      */
-    public static void tryCancel(Promise<?> p, InternalLogger logger) {
+    public static void tryCancel(TaskCompletionSource<?> p, InternalLogger logger) {
         if (!p.cancel(false) && logger != null) {
-            Throwable err = p.cause();
+            Exception err = p.cause();
             if (err == null) {
                 logger.warn("Failed to cancel promise because it has succeeded already: {}", p);
             } else {
@@ -42,11 +42,11 @@ public final class PromiseNotificationUtil {
     }
 
     /**
-     * Try to mark the {@link Promise} as success and log if {@code logger} is not {@code null} in case this fails.
+     * Try to mark the {@link TaskCompletionSource} as success and log if {@code logger} is not {@code null} in case this fails.
      */
-    public static <V> void trySuccess(Promise<? super V> p, V result, InternalLogger logger) {
+    public static <V> void trySuccess(TaskCompletionSource<? super V> p, V result, InternalLogger logger) {
         if (!p.trySuccess(result) && logger != null) {
-            Throwable err = p.cause();
+            Exception err = p.cause();
             if (err == null) {
                 logger.warn("Failed to mark a promise as success because it has succeeded already: {}", p);
             } else {
@@ -58,11 +58,11 @@ public final class PromiseNotificationUtil {
     }
 
     /**
-     * Try to mark the {@link Promise} as failure and log if {@code logger} is not {@code null} in case this fails.
+     * Try to mark the {@link TaskCompletionSource} as failure and log if {@code logger} is not {@code null} in case this fails.
      */
-    public static void tryFailure(Promise<?> p, Throwable cause, InternalLogger logger) {
+    public static void tryFailure(TaskCompletionSource<?> p, Exception cause, InternalLogger logger) {
         if (!p.tryFailure(cause) && logger != null) {
-            Throwable err = p.cause();
+            Exception err = p.cause();
             if (err == null) {
                 logger.warn("Failed to mark a promise as failure because it has succeeded already: {}", p, cause);
             } else if (logger.isWarnEnabled()) {

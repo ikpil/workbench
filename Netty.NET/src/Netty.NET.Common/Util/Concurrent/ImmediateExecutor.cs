@@ -22,8 +22,8 @@ using java.util.concurrent.Executor;
 /**
  * {@link Executor} which execute tasks in the callers thread.
  */
-public final class ImmediateExecutor implements Executor {
-    public static final ImmediateExecutor INSTANCE = new ImmediateExecutor();
+public sealed class ImmediateExecutor implements Executor {
+    public static readonly ImmediateExecutor INSTANCE = new ImmediateExecutor();
 
     private ImmediateExecutor() {
         // use static instance

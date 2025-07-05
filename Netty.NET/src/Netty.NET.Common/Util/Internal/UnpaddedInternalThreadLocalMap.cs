@@ -18,6 +18,6 @@ namespace Netty.NET.Common.Util.Internal;
 /**
  * @deprecated This class will be removed in the future.
  */
-class UnpaddedInternalThreadLocalMap {
+public class UnpaddedInternalThreadLocalMap {
     // We cannot remove this in 4.1 because it could break compatibility.
 }

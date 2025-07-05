@@ -41,19 +41,19 @@ using static Netty.NET.Common.Util.Internal.StringUtil.simpleClassName;
 
 public class ResourceLeakDetector<T> {
 
-    private static final string PROP_LEVEL_OLD = "io.netty.leakDetectionLevel";
-    private static final string PROP_LEVEL = "io.netty.leakDetection.level";
-    private static final Level DEFAULT_LEVEL = Level.SIMPLE;
+    private static readonly string PROP_LEVEL_OLD = "io.netty.leakDetectionLevel";
+    private static readonly string PROP_LEVEL = "io.netty.leakDetection.level";
+    private static readonly Level DEFAULT_LEVEL = Level.SIMPLE;
 
-    private static final string PROP_TARGET_RECORDS = "io.netty.leakDetection.targetRecords";
-    private static final int DEFAULT_TARGET_RECORDS = 4;
+    private static readonly string PROP_TARGET_RECORDS = "io.netty.leakDetection.targetRecords";
+    private static readonly int DEFAULT_TARGET_RECORDS = 4;
 
-    private static final string PROP_SAMPLING_INTERVAL = "io.netty.leakDetection.samplingInterval";
+    private static readonly string PROP_SAMPLING_INTERVAL = "io.netty.leakDetection.samplingInterval";
     // There is a minor performance benefit in TLR if this is a power of 2.
-    private static final int DEFAULT_SAMPLING_INTERVAL = 128;
+    private static readonly int DEFAULT_SAMPLING_INTERVAL = 128;
 
-    private static final int TARGET_RECORDS;
-    static final int SAMPLING_INTERVAL;
+    private static readonly int TARGET_RECORDS;
+    static readonly int SAMPLING_INTERVAL;
 
     /**
      * Represents the level of resource leak detection.
@@ -98,7 +98,7 @@ public class ResourceLeakDetector<T> {
 
     private static Level level;
 
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(ResourceLeakDetector.class);
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(ResourceLeakDetector.class);
 
     static {
         final bool disabled;
@@ -161,13 +161,13 @@ public class ResourceLeakDetector<T> {
     }
 
     /** the collection of active resources */
-    private final Set<DefaultResourceLeak<?>> allLeaks = ConcurrentHashMap.newKeySet();
+    private readonly Set<DefaultResourceLeak<?>> allLeaks = ConcurrentHashMap.newKeySet();
 
-    private final ReferenceQueue<object> refQueue = new ReferenceQueue<>();
-    private final Set<string> reportedLeaks = ConcurrentHashMap.newKeySet();
+    private readonly ReferenceQueue<object> refQueue = new ReferenceQueue<>();
+    private readonly Set<string> reportedLeaks = ConcurrentHashMap.newKeySet();
 
-    private final string resourceType;
-    private final int samplingInterval;
+    private readonly string resourceType;
+    private readonly int samplingInterval;
 
     /**
      * Will be notified once a leak is detected.
@@ -187,7 +187,7 @@ public class ResourceLeakDetector<T> {
      */
     @Deprecated
     public ResourceLeakDetector(string resourceType) {
-        this(resourceType, DEFAULT_SAMPLING_INTERVAL, Long.MAX_VALUE);
+        this(resourceType, DEFAULT_SAMPLING_INTERVAL, long.MAX_VALUE);
     }
 
     /**
@@ -211,7 +211,7 @@ public class ResourceLeakDetector<T> {
      */
     @SuppressWarnings("deprecation")
     public ResourceLeakDetector(Class<?> resourceType, int samplingInterval) {
-        this(simpleClassName(resourceType), samplingInterval, Long.MAX_VALUE);
+        this(simpleClassName(resourceType), samplingInterval, long.MAX_VALUE);
     }
 
     /**
@@ -383,16 +383,16 @@ public class ResourceLeakDetector<T> {
     }
 
     @SuppressWarnings("deprecation")
-    private static final class DefaultResourceLeak<T>
+    private static class DefaultResourceLeak<T>
             extends WeakReference<object> implements ResourceLeakTracker<T>, ResourceLeak {
 
         @SuppressWarnings("unchecked") // generics and updaters do not mix.
-        private static final AtomicReferenceFieldUpdater<DefaultResourceLeak<?>, TraceRecord> headUpdater =
+        private static readonly AtomicReferenceFieldUpdater<DefaultResourceLeak<?>, TraceRecord> headUpdater =
                 (AtomicReferenceFieldUpdater)
                         AtomicReferenceFieldUpdater.newUpdater(DefaultResourceLeak.class, TraceRecord.class, "head");
 
         @SuppressWarnings("unchecked") // generics and updaters do not mix.
-        private static final AtomicIntegerFieldUpdater<DefaultResourceLeak<?>> droppedRecordsUpdater =
+        private static readonly AtomicIntegerFieldUpdater<DefaultResourceLeak<?>> droppedRecordsUpdater =
                 (AtomicIntegerFieldUpdater)
                         AtomicIntegerFieldUpdater.newUpdater(DefaultResourceLeak.class, "droppedRecords");
 
@@ -401,8 +401,8 @@ public class ResourceLeakDetector<T> {
         @SuppressWarnings("unused")
         private volatile int droppedRecords;
 
-        private final Set<DefaultResourceLeak<?>> allLeaks;
-        private final int trackedHash;
+        private readonly Set<DefaultResourceLeak<?>> allLeaks;
+        private readonly int trackedHash;
 
         DefaultResourceLeak(
                 object referent,
@@ -613,7 +613,7 @@ public class ResourceLeakDetector<T> {
         }
     }
 
-    private static final AtomicReference<string[]> excludedMethods =
+    private static readonly AtomicReference<string[]> excludedMethods =
             new AtomicReference<string[]>(EmptyArrays.EMPTY_STRINGS);
 
     public static void addExclusions(Class clz, string ... methodNames) {
@@ -626,7 +626,7 @@ public class ResourceLeakDetector<T> {
             }
         }
         if (!nameSet.isEmpty()) {
-            throw new IllegalArgumentException("Can't find '" + nameSet + "' in " + clz.getName());
+            throw new ArgumentException("Can't find '" + nameSet + "' in " + clz.getName());
         }
         string[] oldMethods;
         string[] newMethods;
@@ -640,24 +640,24 @@ public class ResourceLeakDetector<T> {
         } while (!excludedMethods.compareAndSet(oldMethods, newMethods));
     }
 
-    private static class TraceRecord extends Throwable {
-        private static final long serialVersionUID = 6065153674892850720L;
+    private static class TraceRecord extends Exception {
+        private static readonly long serialVersionUID = 6065153674892850720L;
 
-        private static final TraceRecord BOTTOM = new TraceRecord() {
-            private static final long serialVersionUID = 7396077602074694571L;
+        private static readonly TraceRecord BOTTOM = new TraceRecord() {
+            private static readonly long serialVersionUID = 7396077602074694571L;
 
             // Override fillInStackTrace() so we not populate the backtrace via a native call and so leak the
             // Classloader.
             // See https://github.com/netty/netty/pull/10691
             @Override
-            public Throwable fillInStackTrace() {
+            public Exception fillInStackTrace() {
                 return this;
             }
         };
 
-        private final string hintString;
-        private final TraceRecord next;
-        private final int pos;
+        private readonly string hintString;
+        private readonly TraceRecord next;
+        private readonly int pos;
 
         TraceRecord(TraceRecord next, object hint) {
             // This needs to be generated even if toString() is never called as it may change later on.

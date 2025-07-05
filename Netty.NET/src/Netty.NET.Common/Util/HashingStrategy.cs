@@ -58,7 +58,6 @@ public interface HashingStrategy<T> {
      * A {@link HashingStrategy} which delegates to java's {@link object#hashCode()}
      * and {@link object#equals(object)}.
      */
-    @SuppressWarnings("rawtypes")
     HashingStrategy JAVA_HASHER = new HashingStrategy() {
         @Override
         public int hashCode(object obj) {

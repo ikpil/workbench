@@ -28,7 +28,7 @@ using java.lang.reflect.Constructor;
  * This static factory should be used to load {@link ResourceLeakDetector}s as needed
  */
 public abstract class ResourceLeakDetectorFactory {
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(ResourceLeakDetectorFactory.class);
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(ResourceLeakDetectorFactory.class);
 
     private static volatile ResourceLeakDetectorFactory factoryInstance = new DefaultResourceLeakDetectorFactory();
 
@@ -89,21 +89,21 @@ public abstract class ResourceLeakDetectorFactory {
     @SuppressWarnings("deprecation")
     public <T> ResourceLeakDetector<T> newResourceLeakDetector(Class<T> resource, int samplingInterval) {
         ObjectUtil.checkPositive(samplingInterval, "samplingInterval");
-        return newResourceLeakDetector(resource, samplingInterval, Long.MAX_VALUE);
+        return newResourceLeakDetector(resource, samplingInterval, long.MAX_VALUE);
     }
 
     /**
      * Default implementation that loads custom leak detector via system property
      */
-    private static final class DefaultResourceLeakDetectorFactory extends ResourceLeakDetectorFactory {
-        private final Constructor<?> obsoleteCustomClassConstructor;
-        private final Constructor<?> customClassConstructor;
+    private static class DefaultResourceLeakDetectorFactory extends ResourceLeakDetectorFactory {
+        private readonly Constructor<?> obsoleteCustomClassConstructor;
+        private readonly Constructor<?> customClassConstructor;
 
         DefaultResourceLeakDetectorFactory() {
             string customLeakDetector;
             try {
                 customLeakDetector = SystemPropertyUtil.get("io.netty.customResourceLeakDetector");
-            } catch (Throwable cause) {
+            } catch (Exception cause) {
                 logger.error("Could not access System property: io.netty.customResourceLeakDetector", cause);
                 customLeakDetector = null;
             }
@@ -125,7 +125,7 @@ public abstract class ResourceLeakDetectorFactory {
                 } else {
                     logger.error("Class {} does not inherit from ResourceLeakDetector.", customLeakDetector);
                 }
-            } catch (Throwable t) {
+            } catch (Exception t) {
                 logger.error("Could not load custom resource leak detector class provided: {}",
                         customLeakDetector, t);
             }
@@ -142,7 +142,7 @@ public abstract class ResourceLeakDetectorFactory {
                 } else {
                     logger.error("Class {} does not inherit from ResourceLeakDetector.", customLeakDetector);
                 }
-            } catch (Throwable t) {
+            } catch (Exception t) {
                 logger.error("Could not load custom resource leak detector class provided: {}",
                         customLeakDetector, t);
             }
@@ -162,7 +162,7 @@ public abstract class ResourceLeakDetectorFactory {
                     logger.debug("Loaded custom ResourceLeakDetector: {}",
                             obsoleteCustomClassConstructor.getDeclaringClass().getName());
                     return leakDetector;
-                } catch (Throwable t) {
+                } catch (Exception t) {
                     logger.error(
                             "Could not load custom resource leak detector provided: {} with the given resource: {}",
                             obsoleteCustomClassConstructor.getDeclaringClass().getName(), resource, t);
@@ -185,7 +185,7 @@ public abstract class ResourceLeakDetectorFactory {
                     logger.debug("Loaded custom ResourceLeakDetector: {}",
                             customClassConstructor.getDeclaringClass().getName());
                     return leakDetector;
-                } catch (Throwable t) {
+                } catch (Exception t) {
                     logger.error(
                             "Could not load custom resource leak detector provided: {} with the given resource: {}",
                             customClassConstructor.getDeclaringClass().getName(), resource, t);

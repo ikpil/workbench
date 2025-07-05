@@ -21,7 +21,7 @@ using Netty.NET.Common.Util.Internal.SWARUtil;
 /**
  * A collection of utility methods that is related with handling {@link AsciiString}.
  */
-final class AsciiStringUtil {
+sealed class AsciiStringUtil {
 
     /**
      * Convert the {@link AsciiString} to a lower case.
@@ -52,7 +52,7 @@ final class AsciiStringUtil {
             if (SWARUtil.containsUpperCase(word)) {
                 return true;
             }
-            offset += Long.BYTES;
+            offset += long.BYTES;
         }
         return unrolledContainsUpperCase(byteArray, offset, length & 7);
     }
@@ -69,12 +69,12 @@ final class AsciiStringUtil {
 
     private static bool unrolledContainsUpperCase(final byte[] byteArray, int offset, final int byteCount) {
         assert byteCount >= 0 && byteCount < 8;
-        if ((byteCount & Integer.BYTES) != 0) {
+        if ((byteCount & int.BYTES) != 0) {
             final int word = PlatformDependent.getInt(byteArray, offset);
             if (SWARUtil.containsUpperCase(word)) {
                 return true;
             }
-            offset += Integer.BYTES;
+            offset += int.BYTES;
         }
         if ((byteCount & Short.BYTES) != 0) {
             if (isUpperCase(PlatformDependent.getByte(byteArray, offset))) {
@@ -103,7 +103,7 @@ final class AsciiStringUtil {
         for (int i = 0; i < longCount; ++i) {
             final long word = PlatformDependent.getLong(src, srcOffset + offset);
             PlatformDependent.putLong(dst, offset, SWARUtil.toLowerCase(word));
-            offset += Long.BYTES;
+            offset += long.BYTES;
         }
         unrolledToLowerCase(src, srcOffset + offset, dst, offset, length & 7);
     }
@@ -118,10 +118,10 @@ final class AsciiStringUtil {
                                             final byte[] dst, int dstOffset, final int byteCount) {
         assert byteCount >= 0 && byteCount < 8;
         int offset = 0;
-        if ((byteCount & Integer.BYTES) != 0) {
+        if ((byteCount & int.BYTES) != 0) {
             final int word = PlatformDependent.getInt(src, srcPos + offset);
             PlatformDependent.putInt(dst, dstOffset + offset, SWARUtil.toLowerCase(word));
-            offset += Integer.BYTES;
+            offset += int.BYTES;
         }
 
         if ((byteCount & Short.BYTES) != 0) {
@@ -167,7 +167,7 @@ final class AsciiStringUtil {
             if (SWARUtil.containsLowerCase(word)) {
                 return true;
             }
-            offset += Long.BYTES;
+            offset += long.BYTES;
         }
         return unrolledContainsLowerCase(byteArray, offset, length & 7);
     }
@@ -184,12 +184,12 @@ final class AsciiStringUtil {
 
     private static bool unrolledContainsLowerCase(final byte[] byteArray, int offset, final int byteCount) {
         assert byteCount >= 0 && byteCount < 8;
-        if ((byteCount & Integer.BYTES) != 0) {
+        if ((byteCount & int.BYTES) != 0) {
             final int word = PlatformDependent.getInt(byteArray, offset);
             if (SWARUtil.containsLowerCase(word)) {
                 return true;
             }
-            offset += Integer.BYTES;
+            offset += int.BYTES;
         }
         if ((byteCount & Short.BYTES) != 0) {
             if (isLowerCase(PlatformDependent.getByte(byteArray, offset))) {
@@ -218,7 +218,7 @@ final class AsciiStringUtil {
         for (int i = 0; i < longCount; ++i) {
             final long word = PlatformDependent.getLong(src, srcOffset + offset);
             PlatformDependent.putLong(dst, offset, SWARUtil.toUpperCase(word));
-            offset += Long.BYTES;
+            offset += long.BYTES;
         }
         unrolledToUpperCase(src, srcOffset + offset, dst, offset, length & 7);
     }
@@ -233,10 +233,10 @@ final class AsciiStringUtil {
                                             final byte[] dst, int dstOffset, final int byteCount) {
         assert byteCount >= 0 && byteCount < 8;
         int offset = 0;
-        if ((byteCount & Integer.BYTES) != 0) {
+        if ((byteCount & int.BYTES) != 0) {
             final int word = PlatformDependent.getInt(src, srcOffset + offset);
             PlatformDependent.putInt(dst, dstOffset + offset, SWARUtil.toUpperCase(word));
-            offset += Integer.BYTES;
+            offset += int.BYTES;
         }
         if ((byteCount & Short.BYTES) != 0) {
             final short word = PlatformDependent.getShort(src, srcOffset + offset);

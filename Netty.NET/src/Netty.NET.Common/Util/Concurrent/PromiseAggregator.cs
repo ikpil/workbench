@@ -24,44 +24,44 @@ using java.util.Set;
 /**
  * @deprecated Use {@link PromiseCombiner#PromiseCombiner(EventExecutor)}.
  *
- * {@link GenericFutureListener} implementation which consolidates multiple {@link Future}s
- * into one, by listening to individual {@link Future}s and producing an aggregated result
- * (success/failure) when all {@link Future}s have completed.
+ * {@link GenericFutureListener} implementation which consolidates multiple {@link Task}s
+ * into one, by listening to individual {@link Task}s and producing an aggregated result
+ * (success/failure) when all {@link Task}s have completed.
  *
- * @param <V> the type of value returned by the {@link Future}
- * @param <F> the type of {@link Future}
+ * @param <V> the type of value returned by the {@link Task}
+ * @param <F> the type of {@link Task}
  */
 @Deprecated
-public class PromiseAggregator<V, F extends Future<V>> implements GenericFutureListener<F> {
+public class PromiseAggregator<V, F extends Task<V>> implements GenericFutureListener<F> {
 
-    private final Promise<?> aggregatePromise;
-    private final bool failPending;
-    private Set<Promise<V>> pendingPromises;
+    private readonly TaskCompletionSource<?> aggregatePromise;
+    private readonly bool failPending;
+    private Set<TaskCompletionSource<V>> pendingPromises;
 
     /**
      * Creates a new instance.
      *
-     * @param aggregatePromise  the {@link Promise} to notify
+     * @param aggregatePromise  the {@link TaskCompletionSource} to notify
      * @param failPending  {@code true} to fail pending promises, false to leave them unaffected
      */
-    public PromiseAggregator(Promise<Void> aggregatePromise, bool failPending) {
+    public PromiseAggregator(TaskCompletionSource<Void> aggregatePromise, bool failPending) {
         this.aggregatePromise = ObjectUtil.checkNotNull(aggregatePromise, "aggregatePromise");
         this.failPending = failPending;
     }
 
     /**
-     * See {@link PromiseAggregator#PromiseAggregator(Promise, bool)}.
+     * See {@link PromiseAggregator#PromiseAggregator(TaskCompletionSource, bool)}.
      * Defaults {@code failPending} to true.
      */
-    public PromiseAggregator(Promise<Void> aggregatePromise) {
+    public PromiseAggregator(TaskCompletionSource<Void> aggregatePromise) {
         this(aggregatePromise, true);
     }
 
     /**
-     * Add the given {@link Promise}s to the aggregator.
+     * Add the given {@link TaskCompletionSource}s to the aggregator.
      */
     @SafeVarargs
-    public final PromiseAggregator<V, F> add(Promise<V>... promises) {
+    public final PromiseAggregator<V, F> add(TaskCompletionSource<V>... promises) {
         ObjectUtil.checkNotNull(promises, "promises");
         if (promises.length == 0) {
             return this;
@@ -74,9 +74,9 @@ public class PromiseAggregator<V, F extends Future<V>> implements GenericFutureL
                 } else {
                     size = 2;
                 }
-                pendingPromises = new LinkedHashSet<Promise<V>>(size);
+                pendingPromises = new LinkedHashSet<TaskCompletionSource<V>>(size);
             }
-            for (Promise<V> p : promises) {
+            for (TaskCompletionSource<V> p : promises) {
                 if (p == null) {
                     continue;
                 }
@@ -94,10 +94,10 @@ public class PromiseAggregator<V, F extends Future<V>> implements GenericFutureL
         } else {
             pendingPromises.remove(future);
             if (!future.isSuccess()) {
-                Throwable cause = future.cause();
+                Exception cause = future.cause();
                 aggregatePromise.setFailure(cause);
                 if (failPending) {
-                    for (Promise<V> pendingFuture : pendingPromises) {
+                    for (TaskCompletionSource<V> pendingFuture : pendingPromises) {
                         pendingFuture.setFailure(cause);
                     }
                 }

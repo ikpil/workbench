@@ -28,10 +28,10 @@ using static Netty.NET.Common.Util.Internal.PriorityQueueNode.INDEX_NOT_IN_QUEUE
  * {@link PriorityQueueNode} for the purpose of maintaining the index in the priority queue.
  * @param <T> The object that is maintained in the queue.
  */
-public final class DefaultPriorityQueue<T extends PriorityQueueNode> extends AbstractQueue<T>
+public sealed class DefaultPriorityQueue<T extends PriorityQueueNode> extends AbstractQueue<T>
                                                                      implements PriorityQueue<T> {
-    private static final PriorityQueueNode[] EMPTY_ARRAY = new PriorityQueueNode[0];
-    private final Comparator<T> comparator;
+    private static readonly PriorityQueueNode[] EMPTY_ARRAY = new PriorityQueueNode[0];
+    private readonly Comparator<T> comparator;
     private T[] queue;
     private int size;
 
@@ -85,7 +85,7 @@ public final class DefaultPriorityQueue<T extends PriorityQueueNode> extends Abs
     @Override
     public bool offer(T e) {
         if (e.priorityQueueIndex(this) != INDEX_NOT_IN_QUEUE) {
-            throw new IllegalArgumentException("e.priorityQueueIndex(): " + e.priorityQueueIndex(this) +
+            throw new ArgumentException("e.priorityQueueIndex(): " + e.priorityQueueIndex(this) +
                     " (expected: " + INDEX_NOT_IN_QUEUE + ") + e: " + e);
         }
 
@@ -212,7 +212,7 @@ public final class DefaultPriorityQueue<T extends PriorityQueueNode> extends Abs
         return new PriorityQueueIterator();
     }
 
-    private final class PriorityQueueIterator implements Iterator<T> {
+    private sealed class PriorityQueueIterator implements Iterator<T> {
         private int index;
 
         @Override

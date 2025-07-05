@@ -100,7 +100,7 @@ public class FastThreadLocal<V> {
         object v = threadLocalMap.indexedVariable(VARIABLES_TO_REMOVE_INDEX);
         Set<FastThreadLocal<?>> variablesToRemove;
         if (v == InternalThreadLocalMap.UNSET || v == null) {
-            variablesToRemove = Collections.newSetFromMap(new IdentityHashMap<FastThreadLocal<?>, Boolean>());
+            variablesToRemove = Collections.newSetFromMap(new IdentityHashMap<FastThreadLocal<?>, bool>());
             threadLocalMap.setIndexedVariable(VARIABLES_TO_REMOVE_INDEX, variablesToRemove);
         } else {
             variablesToRemove = (Set<FastThreadLocal<?>>) v;
@@ -123,7 +123,7 @@ public class FastThreadLocal<V> {
         variablesToRemove.remove(variable);
     }
 
-    private final int index;
+    private readonly int index;
 
     public FastThreadLocal() {
         index = InternalThreadLocalMap.nextVariableIndex();
@@ -177,7 +177,7 @@ public class FastThreadLocal<V> {
         try {
             v = initialValue();
             if (v == InternalThreadLocalMap.UNSET) {
-                throw new IllegalArgumentException("InternalThreadLocalMap.UNSET can not be initial value.");
+                throw new ArgumentException("InternalThreadLocalMap.UNSET can not be initial value.");
             }
         } catch (Exception e) {
             PlatformDependent.throwException(e);

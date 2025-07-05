@@ -20,11 +20,11 @@ namespace Netty.NET.Common.Util;
  * A special {@link Error} which is used to signal some state or request by throwing it.
  * {@link Signal} has an empty stack trace and has no cause to save the instantiation overhead.
  */
-public final class Signal extends Error implements Constant<Signal> {
+public sealed class Signal extends Error implements Constant<Signal> {
 
-    private static final long serialVersionUID = -221145131122459977L;
+    private static readonly long serialVersionUID = -221145131122459977L;
 
-    private static final ConstantPool<Signal> pool = new ConstantPool<Signal>() {
+    private static readonly ConstantPool<Signal> pool = new ConstantPool<Signal>() {
         @Override
         protected Signal newConstant(int id, string name) {
             return new Signal(id, name);
@@ -45,7 +45,7 @@ public final class Signal extends Error implements Constant<Signal> {
         return pool.valueOf(firstNameComponent, secondNameComponent);
     }
 
-    private final SignalConstant constant;
+    private readonly SignalConstant constant;
 
     /**
      * Creates a new {@link Signal} with the specified {@code name}.
@@ -66,13 +66,13 @@ public final class Signal extends Error implements Constant<Signal> {
 
     // Suppress a warning since the method doesn't need synchronization
     @Override
-    public Throwable initCause(Throwable cause) {
+    public Exception initCause(Exception cause) {
         return this;
     }
 
     // Suppress a warning since the method doesn't need synchronization
     @Override
-    public Throwable fillInStackTrace() {
+    public Exception fillInStackTrace() {
         return this;
     }
 
@@ -110,7 +110,7 @@ public final class Signal extends Error implements Constant<Signal> {
         return name();
     }
 
-    private static final class SignalConstant extends AbstractConstant<SignalConstant> {
+    private static class SignalConstant extends AbstractConstant<SignalConstant> {
         SignalConstant(int id, string name) {
             super(id, name);
         }

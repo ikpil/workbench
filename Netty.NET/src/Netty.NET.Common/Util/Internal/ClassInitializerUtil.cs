@@ -18,7 +18,7 @@ namespace Netty.NET.Common.Util.Internal;
 /**
  * Utility which ensures that classes are loaded by the {@link ClassLoader}.
  */
-public final class ClassInitializerUtil {
+public sealed class ClassInitializerUtil {
 
     private ClassInitializerUtil() { }
 

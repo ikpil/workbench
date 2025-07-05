@@ -19,10 +19,10 @@ namespace Netty.NET.Common.Util.concurrent;
 /**
  * A subtype of {@link GenericFutureListener} that hides type parameter for convenience.
  * <pre>
- * Future f = new DefaultPromise(..);
+ * Task f = new DefaultPromise(..);
  * f.addListener(new FutureListener() {
- *     public void operationComplete(Future f) { .. }
+ *     public void operationComplete(Task f) { .. }
  * });
  * </pre>
  */
-public interface FutureListener<V> extends GenericFutureListener<Future<V>> { }
+public interface FutureListener<V> extends GenericFutureListener<Task<V>> { }

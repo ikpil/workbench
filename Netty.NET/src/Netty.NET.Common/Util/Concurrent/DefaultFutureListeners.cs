@@ -17,15 +17,15 @@ namespace Netty.NET.Common.Util.concurrent;
 
 using java.util.Arrays;
 
-final class DefaultFutureListeners {
+sealed class DefaultFutureListeners {
 
-    private GenericFutureListener<? extends Future<?>>[] listeners;
+    private GenericFutureListener<? extends Task<?>>[] listeners;
     private int size;
     private int progressiveSize; // the number of progressive listeners
 
     @SuppressWarnings("unchecked")
     DefaultFutureListeners(
-            GenericFutureListener<? extends Future<?>> first, GenericFutureListener<? extends Future<?>> second) {
+            GenericFutureListener<? extends Task<?>> first, GenericFutureListener<? extends Task<?>> second) {
         listeners = new GenericFutureListener[2];
         listeners[0] = first;
         listeners[1] = second;
@@ -38,8 +38,8 @@ final class DefaultFutureListeners {
         }
     }
 
-    public void add(GenericFutureListener<? extends Future<?>> l) {
-        GenericFutureListener<? extends Future<?>>[] listeners = this.listeners;
+    public void add(GenericFutureListener<? extends Task<?>> l) {
+        GenericFutureListener<? extends Task<?>>[] listeners = this.listeners;
         final int size = this.size;
         if (size == listeners.length) {
             this.listeners = listeners = Arrays.copyOf(listeners, size << 1);
@@ -52,8 +52,8 @@ final class DefaultFutureListeners {
         }
     }
 
-    public void remove(GenericFutureListener<? extends Future<?>> l) {
-        final GenericFutureListener<? extends Future<?>>[] listeners = this.listeners;
+    public void remove(GenericFutureListener<? extends Task<?>> l) {
+        final GenericFutureListener<? extends Task<?>>[] listeners = this.listeners;
         int size = this.size;
         for (int i = 0; i < size; i ++) {
             if (listeners[i] == l) {
@@ -72,7 +72,7 @@ final class DefaultFutureListeners {
         }
     }
 
-    public GenericFutureListener<? extends Future<?>>[] listeners() {
+    public GenericFutureListener<? extends Task<?>>[] listeners() {
         return listeners;
     }
 

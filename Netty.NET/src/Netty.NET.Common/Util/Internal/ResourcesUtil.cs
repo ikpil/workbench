@@ -22,7 +22,7 @@ using java.net.URLDecoder;
  * A utility class that provides various common operations and constants
  * related to loading resources
  */
-public final class ResourcesUtil {
+public sealed class ResourcesUtil {
 
     /**
      * Returns a {@link File} named {@code fileName} associated with {@link Class} {@code resourceClass} .

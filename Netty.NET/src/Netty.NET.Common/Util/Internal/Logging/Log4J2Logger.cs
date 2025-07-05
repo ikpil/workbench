@@ -28,16 +28,16 @@ using static Netty.NET.Common.Util.Internal.logging.AbstractInternalLogger.EXCEP
 
 class Log4J2Logger extends ExtendedLoggerWrapper implements InternalLogger {
 
-    private static final long serialVersionUID = 5485418394879791397L;
-    private static final bool VARARGS_ONLY;
+    private static readonly long serialVersionUID = 5485418394879791397L;
+    private static readonly bool VARARGS_ONLY;
 
     static {
         // Older Log4J2 versions have only log methods that takes the format + varargs. So we should not use
         // Log4J2 if the version is too old.
         // See https://github.com/netty/netty/issues/8217
-        VARARGS_ONLY = AccessController.doPrivileged(new PrivilegedAction<Boolean>() {
+        VARARGS_ONLY = AccessController.doPrivileged(new PrivilegedAction<bool>() {
             @Override
-            public Boolean run() {
+            public bool run() {
                 try {
                     Logger.class.getMethod("debug", string.class, object.class);
                     return false;
@@ -65,27 +65,27 @@ class Log4J2Logger extends ExtendedLoggerWrapper implements InternalLogger {
     }
 
     @Override
-    public void trace(Throwable t) {
+    public void trace(Exception t) {
         log(Level.TRACE, EXCEPTION_MESSAGE, t);
     }
 
     @Override
-    public void debug(Throwable t) {
+    public void debug(Exception t) {
         log(Level.DEBUG, EXCEPTION_MESSAGE, t);
     }
 
     @Override
-    public void info(Throwable t) {
+    public void info(Exception t) {
         log(Level.INFO, EXCEPTION_MESSAGE, t);
     }
 
     @Override
-    public void warn(Throwable t) {
+    public void warn(Exception t) {
         log(Level.WARN, EXCEPTION_MESSAGE, t);
     }
 
     @Override
-    public void error(Throwable t) {
+    public void error(Exception t) {
         log(Level.ERROR, EXCEPTION_MESSAGE, t);
     }
 
@@ -115,12 +115,12 @@ class Log4J2Logger extends ExtendedLoggerWrapper implements InternalLogger {
     }
 
     @Override
-    public void log(InternalLogLevel level, string msg, Throwable t) {
+    public void log(InternalLogLevel level, string msg, Exception t) {
         log(toLevel(level), msg, t);
     }
 
     @Override
-    public void log(InternalLogLevel level, Throwable t) {
+    public void log(InternalLogLevel level, Exception t) {
         log(toLevel(level), EXCEPTION_MESSAGE, t);
     }
 

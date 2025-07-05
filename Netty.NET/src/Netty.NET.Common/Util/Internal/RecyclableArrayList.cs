@@ -27,13 +27,13 @@ using java.util.RandomAccess;
 /**
  * A simple list which is recyclable. This implementation does not allow {@code null} elements to be added.
  */
-public final class RecyclableArrayList extends ArrayList<object> {
+public sealed class RecyclableArrayList extends ArrayList<object> {
 
-    private static final long serialVersionUID = -8605125654176467947L;
+    private static readonly long serialVersionUID = -8605125654176467947L;
 
-    private static final int DEFAULT_INITIAL_CAPACITY = 8;
+    private static readonly int DEFAULT_INITIAL_CAPACITY = 8;
 
-    private static final ObjectPool<RecyclableArrayList> RECYCLER = ObjectPool.newPool(
+    private static readonly ObjectPool<RecyclableArrayList> RECYCLER = ObjectPool.newPool(
             new ObjectCreator<RecyclableArrayList>() {
         @Override
         public RecyclableArrayList newObject(Handle<RecyclableArrayList> handle) {
@@ -59,7 +59,7 @@ public final class RecyclableArrayList extends ArrayList<object> {
         return ret;
     }
 
-    private final Handle<RecyclableArrayList> handle;
+    private readonly Handle<RecyclableArrayList> handle;
 
     private RecyclableArrayList(Handle<RecyclableArrayList> handle) {
         this(handle, DEFAULT_INITIAL_CAPACITY);
@@ -97,13 +97,13 @@ public final class RecyclableArrayList extends ArrayList<object> {
             int size = list.size();
             for (int i = 0; i  < size; i++) {
                 if (list.get(i) == null) {
-                    throw new IllegalArgumentException("c contains null values");
+                    throw new ArgumentException("c contains null values");
                 }
             }
         } else {
             for (object element: c) {
                 if (element == null) {
-                    throw new IllegalArgumentException("c contains null values");
+                    throw new ArgumentException("c contains null values");
                 }
             }
         }

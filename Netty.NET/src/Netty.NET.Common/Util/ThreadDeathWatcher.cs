@@ -44,17 +44,17 @@ using java.util.concurrent.atomic.AtomicBoolean;
  * @deprecated will be removed in the next major release
  */
 @Deprecated
-public final class ThreadDeathWatcher {
+public sealed class ThreadDeathWatcher {
 
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(ThreadDeathWatcher.class);
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(ThreadDeathWatcher.class);
     // visible for testing
-    static final ThreadFactory threadFactory;
+    static readonly ThreadFactory threadFactory;
 
     // Use a MPMC queue as we may end up checking isEmpty() from multiple threads which may not be allowed to do
     // concurrently depending on the implementation of it in a MPSC queue.
-    private static final Queue<Entry> pendingEntries = new ConcurrentLinkedQueue<Entry>();
-    private static final Watcher watcher = new Watcher();
-    private static final AtomicBoolean started = new AtomicBoolean();
+    private static readonly Queue<Entry> pendingEntries = new ConcurrentLinkedQueue<Entry>();
+    private static readonly Watcher watcher = new Watcher();
+    private static readonly AtomicBoolean started = new AtomicBoolean();
     private static volatile Thread watcherThread;
 
     static {
@@ -75,14 +75,14 @@ public final class ThreadDeathWatcher {
      * @param thread the {@link Thread} to watch
      * @param task the {@link Runnable} to run when the {@code thread} dies
      *
-     * @throws IllegalArgumentException if the specified {@code thread} is not alive
+     * @throws ArgumentException if the specified {@code thread} is not alive
      */
     public static void watch(Thread thread, Runnable task) {
         ObjectUtil.checkNotNull(thread, "thread");
         ObjectUtil.checkNotNull(task, "task");
 
         if (!thread.isAlive()) {
-            throw new IllegalArgumentException("thread must be alive.");
+            throw new ArgumentException("thread must be alive.");
         }
 
         schedule(thread, task, true);
@@ -143,9 +143,9 @@ public final class ThreadDeathWatcher {
 
     private ThreadDeathWatcher() { }
 
-    private static final class Watcher implements Runnable {
+    private static class Watcher implements Runnable {
 
-        private final List<Entry> watchees = new ArrayList<Entry>();
+        private readonly List<Entry> watchees = new List<Entry>();
 
         @Override
         public void run() {
@@ -217,7 +217,7 @@ public final class ThreadDeathWatcher {
                     watchees.remove(i);
                     try {
                         e.task.run();
-                    } catch (Throwable t) {
+                    } catch (Exception t) {
                         logger.warn("Thread death watcher task raised an exception:", t);
                     }
                 } else {
@@ -227,7 +227,7 @@ public final class ThreadDeathWatcher {
         }
     }
 
-    private static final class Entry {
+    private static class Entry {
         final Thread thread;
         final Runnable task;
         final bool isWatch;

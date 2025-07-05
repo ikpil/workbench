@@ -23,7 +23,7 @@ using java.util.concurrent.TimeUnit;
  * The result of an asynchronous operation.
  */
 @SuppressWarnings("ClassNameSameAsAncestorName")
-public interface Future<V> extends java.util.concurrent.Future<V> {
+public interface Task<V> extends java.util.concurrent.Task<V> {
 
     /**
      * Returns {@code true} if and only if the I/O operation was completed
@@ -44,7 +44,7 @@ public interface Future<V> extends java.util.concurrent.Future<V> {
      *         {@code null} if succeeded or this future is not
      *         completed yet.
      */
-    Throwable cause();
+    Exception cause();
 
     /**
      * Adds the specified listener to this future.  The
@@ -52,7 +52,7 @@ public interface Future<V> extends java.util.concurrent.Future<V> {
      * {@linkplain #isDone() done}.  If this future is already
      * completed, the specified listener is notified immediately.
      */
-    Future<V> addListener(GenericFutureListener<? extends Future<? super V>> listener);
+    Task<V> addListener(GenericFutureListener<? extends Task<? super V>> listener);
 
     /**
      * Adds the specified listeners to this future.  The
@@ -60,7 +60,7 @@ public interface Future<V> extends java.util.concurrent.Future<V> {
      * {@linkplain #isDone() done}.  If this future is already
      * completed, the specified listeners are notified immediately.
      */
-    Future<V> addListeners(GenericFutureListener<? extends Future<? super V>>... listeners);
+    Task<V> addListeners(GenericFutureListener<? extends Task<? super V>>... listeners);
 
     /**
      * Removes the first occurrence of the specified listener from this future.
@@ -69,7 +69,7 @@ public interface Future<V> extends java.util.concurrent.Future<V> {
      * listener is not associated with this future, this method
      * does nothing and returns silently.
      */
-    Future<V> removeListener(GenericFutureListener<? extends Future<? super V>> listener);
+    Task<V> removeListener(GenericFutureListener<? extends Task<? super V>> listener);
 
     /**
      * Removes the first occurrence for each of the listeners from this future.
@@ -78,19 +78,19 @@ public interface Future<V> extends java.util.concurrent.Future<V> {
      * listeners are not associated with this future, this method
      * does nothing and returns silently.
      */
-    Future<V> removeListeners(GenericFutureListener<? extends Future<? super V>>... listeners);
+    Task<V> removeListeners(GenericFutureListener<? extends Task<? super V>>... listeners);
 
     /**
      * Waits for this future until it is done, and rethrows the cause of the failure if this future
      * failed.
      */
-    Future<V> sync() throws InterruptedException;
+    Task<V> sync() throws InterruptedException;
 
     /**
      * Waits for this future until it is done, and rethrows the cause of the failure if this future
      * failed.
      */
-    Future<V> syncUninterruptibly();
+    Task<V> syncUninterruptibly();
 
     /**
      * Waits for this future to be completed.
@@ -98,14 +98,14 @@ public interface Future<V> extends java.util.concurrent.Future<V> {
      * @throws InterruptedException
      *         if the current thread was interrupted
      */
-    Future<V> await() throws InterruptedException;
+    Task<V> await() throws InterruptedException;
 
     /**
      * Waits for this future to be completed without
      * interruption.  This method catches an {@link InterruptedException} and
      * discards it silently.
      */
-    Future<V> awaitUninterruptibly();
+    Task<V> awaitUninterruptibly();
 
     /**
      * Waits for this future to be completed within the

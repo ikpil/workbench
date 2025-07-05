@@ -18,7 +18,7 @@ namespace Netty.NET.Common.Util.Internal;
 /**
  * Utility class for SWAR (SIMD within a register) operations.
  */
-public final class SWARUtil {
+public sealed class SWARUtil {
 
     /**
      * Compiles given byte into a long pattern suitable for SWAR operations.
@@ -51,8 +51,8 @@ public final class SWARUtil {
      * @return the index of the first occurrence of the specified pattern in the specified word.
      * If no pattern is found, returns 8.
      */
-    public static int getIndex(final long word, final bool isBigEndian) {
-        final int zeros = isBigEndian? Long.numberOfLeadingZeros(word) : Long.numberOfTrailingZeros(word);
+    public static int getIndex(long word, bool isBigEndian) {
+        final int zeros = isBigEndian? long.numberOfLeadingZeros(word) : long.numberOfTrailingZeros(word);
         return zeros >>> 3;
     }
 
@@ -73,7 +73,7 @@ public final class SWARUtil {
     /**
      * Returns a word where each ASCII uppercase byte has the highest bit set.
      */
-    private static int applyUpperCasePattern(final int word) {
+    private static int applyUpperCasePattern(int word) {
         int rotated = word & 0x7F7F7F7F;
         rotated += 0x25252525;
         rotated &= 0x7F7F7F7F;

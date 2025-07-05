@@ -49,94 +49,94 @@ using static Netty.NET.Common.Util.AsciiString.indexOf;
  * <a href="https://svn.apache.org/repos/asf/harmony/enhanced/java/branches/java6/classlib/modules/luni/
  * src/main/java/org/apache/harmony/luni/util/Inet6Util.java">Inet6Util class</a> which was part of Apache Harmony.
  */
-public final class NetUtil {
+public sealed class NetUtil {
 
     /**
      * The {@link Inet4Address} that represents the IPv4 loopback address '127.0.0.1'
      */
-    public static final Inet4Address LOCALHOST4;
+    public static readonly Inet4Address LOCALHOST4;
 
     /**
      * The {@link Inet6Address} that represents the IPv6 loopback address '::1'
      */
-    public static final Inet6Address LOCALHOST6;
+    public static readonly Inet6Address LOCALHOST6;
 
     /**
      * The {@link InetAddress} that represents the loopback address. If IPv6 stack is available, it will refer to
      * {@link #LOCALHOST6}.  Otherwise, {@link #LOCALHOST4}.
      */
-    public static final InetAddress LOCALHOST;
+    public static readonly InetAddress LOCALHOST;
 
     /**
      * The loopback {@link NetworkInterface} of the current machine
      */
-    public static final NetworkInterface LOOPBACK_IF;
+    public static readonly NetworkInterface LOOPBACK_IF;
 
     /**
      * An unmodifiable Collection of all the interfaces on this machine.
      */
-    public static final Collection<NetworkInterface> NETWORK_INTERFACES;
+    public static readonly Collection<NetworkInterface> NETWORK_INTERFACES;
 
     /**
      * The SOMAXCONN value of the current machine.  If failed to get the value,  {@code 200} is used as a
      * default value for Windows and {@code 128} for others.
      */
-    public static final int SOMAXCONN;
+    public static readonly int SOMAXCONN;
 
     /**
      * This defines how many words (represented as ints) are needed to represent an IPv6 address
      */
-    private static final int IPV6_WORD_COUNT = 8;
+    private static readonly int IPV6_WORD_COUNT = 8;
 
     /**
      * The maximum number of characters for an IPV6 string with no scope
      */
-    private static final int IPV6_MAX_CHAR_COUNT = 39;
+    private static readonly int IPV6_MAX_CHAR_COUNT = 39;
 
     /**
      * Number of bytes needed to represent an IPV6 value
      */
-    private static final int IPV6_BYTE_COUNT = 16;
+    private static readonly int IPV6_BYTE_COUNT = 16;
 
     /**
      * Maximum amount of value adding characters in between IPV6 separators
      */
-    private static final int IPV6_MAX_CHAR_BETWEEN_SEPARATOR = 4;
+    private static readonly int IPV6_MAX_CHAR_BETWEEN_SEPARATOR = 4;
 
     /**
      * Minimum number of separators that must be present in an IPv6 string
      */
-    private static final int IPV6_MIN_SEPARATORS = 2;
+    private static readonly int IPV6_MIN_SEPARATORS = 2;
 
     /**
      * Maximum number of separators that must be present in an IPv6 string
      */
-    private static final int IPV6_MAX_SEPARATORS = 8;
+    private static readonly int IPV6_MAX_SEPARATORS = 8;
 
     /**
      * Maximum amount of value adding characters in between IPV4 separators
      */
-    private static final int IPV4_MAX_CHAR_BETWEEN_SEPARATOR = 3;
+    private static readonly int IPV4_MAX_CHAR_BETWEEN_SEPARATOR = 3;
 
     /**
      * Number of separators that must be present in an IPv4 string
      */
-    private static final int IPV4_SEPARATORS = 3;
+    private static readonly int IPV4_SEPARATORS = 3;
 
     /**
      * {@code true} if IPv4 should be used even if the system supports both IPv4 and IPv6.
      */
-    private static final bool IPV4_PREFERRED = SystemPropertyUtil.getBoolean("java.net.preferIPv4Stack", false);
+    private static readonly bool IPV4_PREFERRED = SystemPropertyUtil.getBoolean("java.net.preferIPv4Stack", false);
 
     /**
      * {@code true} if an IPv6 address should be preferred when a host has both an IPv4 address and an IPv6 address.
      */
-    private static final bool IPV6_ADDRESSES_PREFERRED;
+    private static readonly bool IPV6_ADDRESSES_PREFERRED;
 
     /**
      * The logger being used by this class
      */
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(NetUtil.class);
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(NetUtil.class);
 
     static {
         string prefer = SystemPropertyUtil.get("java.net.preferIPv6Addresses", "false");
@@ -168,9 +168,9 @@ public final class NetUtil {
         SOMAXCONN = AccessController.doPrivileged(new SoMaxConnAction());
     }
 
-    private static final class SoMaxConnAction implements PrivilegedAction<Integer> {
+    private static class SoMaxConnAction implements PrivilegedAction<int> {
         @Override
-        public Integer run() {
+        public int run() {
             // Determine the default somaxconn (server socket backlog) value of the platform.
             // The known defaults:
             // - Windows NT Server 4.0+: 200
@@ -192,14 +192,14 @@ public final class NetUtil {
                 if (file.exists()) {
                     try (BufferedReader in = new BufferedReader(new InputStreamReader(
                             new BoundedInputStream(new FileInputStream(file))))) {
-                        somaxconn = Integer.parseInt(in.readLine());
+                        somaxconn = int.parseInt(in.readLine());
                         if (logger.isDebugEnabled()) {
                             logger.debug("{}: {}", file, somaxconn);
                         }
                     }
                 } else {
                     // Try to get from sysctl
-                    Integer tmp = null;
+                    int tmp = null;
                     if (SystemPropertyUtil.getBoolean("io.netty.net.somaxconn.trySysctl", false)) {
                         tmp = sysctlGetInt("kern.ipc.somaxconn");
                         if (tmp == null) {
@@ -232,7 +232,7 @@ public final class NetUtil {
      * @param sysctlKey The key which the return value corresponds to.
      * @return The <a href ="https://www.freebsd.org/cgi/man.cgi?sysctl(8)">sysctl</a> value for {@code sysctlKey}.
      */
-    private static Integer sysctlGetInt(string sysctlKey) throws IOException {
+    private static int sysctlGetInt(string sysctlKey) throws IOException {
         Process process = new ProcessBuilder("sysctl", sysctlKey).start();
         try {
             // Suppress warnings about resource leaks since the buffered reader is closed below
@@ -243,7 +243,7 @@ public final class NetUtil {
                 if (line != null && line.startsWith(sysctlKey)) {
                     for (int i = line.length() - 1; i > sysctlKey.length(); --i) {
                         if (!Character.isDigit(line.charAt(i))) {
-                            return Integer.valueOf(line.substring(i + 1));
+                            return int.valueOf(line.substring(i + 1));
                         }
                     }
                 }
@@ -326,7 +326,7 @@ public final class NetUtil {
             int percentPos = ipAddressString.indexOf('%');
             if (percentPos >= 0) {
                 try {
-                    int scopeId = Integer.parseInt(ipAddressString.substring(percentPos + 1));
+                    int scopeId = int.parseInt(ipAddressString.substring(percentPos + 1));
                     ipAddressString = ipAddressString.substring(0, percentPos);
                     byte[] bytes = getIPv6ByName(ipAddressString, true);
                     if (bytes == null) {
@@ -415,7 +415,7 @@ public final class NetUtil {
     /**
      * Converts 4-byte or 16-byte data into an IPv4 or IPv6 string respectively.
      *
-     * @throws IllegalArgumentException
+     * @throws ArgumentException
      *         if {@code length} is not {@code 4} nor {@code 16}
      */
     public static string bytesToIpAddress(byte[] bytes) {
@@ -425,7 +425,7 @@ public final class NetUtil {
     /**
      * Converts 4-byte or 16-byte data into an IPv4 or IPv6 string respectively.
      *
-     * @throws IllegalArgumentException
+     * @throws ArgumentException
      *         if {@code length} is not {@code 4} nor {@code 16}
      */
     public static string bytesToIpAddress(byte[] bytes, int offset, int length) {
@@ -443,7 +443,7 @@ public final class NetUtil {
             case 16:
                 return toAddressString(bytes, offset, false);
             default:
-                throw new IllegalArgumentException("length: " + length + " (expected: 4 or 16)");
+                throw new ArgumentException("length: " + length + " (expected: 4 or 16)");
         }
     }
 
@@ -979,7 +979,7 @@ public final class NetUtil {
             return ip.getHostAddress();
         }
         if (!(ip instanceof Inet6Address)) {
-            throw new IllegalArgumentException("Unhandled type: " + ip);
+            throw new ArgumentException("Unhandled type: " + ip);
         }
 
         return toAddressString(ip.getAddress(), 0, ipv4Mapped);
@@ -1029,10 +1029,10 @@ public final class NetUtil {
         final int shortestEnd = shortestStart + shortestLength;
         final StringBuilder b = new StringBuilder(IPV6_MAX_CHAR_COUNT);
         if (shortestEnd < 0) { // Optimization when there is no compressing needed
-            b.append(Integer.toHexString(words[0]));
+            b.append(int.toHexString(words[0]));
             for (int i = 1; i < words.length; ++i) {
                 b.append(':');
-                b.append(Integer.toHexString(words[i]));
+                b.append(int.toHexString(words[i]));
             }
         } else { // General case that can handle compressing (and not compressing)
             // Loop unroll the first index (so we don't constantly check i==0 cases in loop)
@@ -1041,7 +1041,7 @@ public final class NetUtil {
                 b.append("::");
                 isIpv4Mapped = ipv4Mapped && (shortestEnd == 5 && words[5] == 0xffff);
             } else {
-                b.append(Integer.toHexString(words[0]));
+                b.append(int.toHexString(words[0]));
                 isIpv4Mapped = false;
             }
             for (int i = 1; i < words.length; ++i) {
@@ -1059,7 +1059,7 @@ public final class NetUtil {
                         b.append('.');
                         b.append(words[i] & 0xff);
                     } else {
-                        b.append(Integer.toHexString(words[i]));
+                        b.append(int.toHexString(words[i]));
                     }
                 } else if (!inRangeEndExclusive(i - 1, shortestStart, shortestEnd)) {
                     // If we are in the shortened sequence and the last index was not

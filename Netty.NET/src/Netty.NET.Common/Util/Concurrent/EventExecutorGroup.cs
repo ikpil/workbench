@@ -40,7 +40,7 @@ public interface EventExecutorGroup extends ScheduledExecutorService, Iterable<E
      *
      * @return the {@link #terminationFuture()}
      */
-    Future<?> shutdownGracefully();
+    Task<?> shutdownGracefully();
 
     /**
      * Signals this executor that the caller wants the executor to be shut down.  Once this method is called,
@@ -56,13 +56,13 @@ public interface EventExecutorGroup extends ScheduledExecutorService, Iterable<E
      *
      * @return the {@link #terminationFuture()}
      */
-    Future<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit);
+    Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit);
 
     /**
-     * Returns the {@link Future} which is notified when all {@link EventExecutor}s managed by this
+     * Returns the {@link Task} which is notified when all {@link EventExecutor}s managed by this
      * {@link EventExecutorGroup} have been terminated.
      */
-    Future<?> terminationFuture();
+    Task<?> terminationFuture();
 
     /**
      * @deprecated {@link #shutdownGracefully(long, long, TimeUnit)} or {@link #shutdownGracefully()} instead.
@@ -87,13 +87,13 @@ public interface EventExecutorGroup extends ScheduledExecutorService, Iterable<E
     Iterator<EventExecutor> iterator();
 
     @Override
-    Future<?> submit(Runnable task);
+    Task<?> submit(Runnable task);
 
     @Override
-    <T> Future<T> submit(Runnable task, T result);
+    <T> Task<T> submit(Runnable task, T result);
 
     @Override
-    <T> Future<T> submit(Callable<T> task);
+    <T> Task<T> submit(Callable<T> task);
 
     /**
      * The ticker for this executor. Usually the {@link #schedule} methods will follow the

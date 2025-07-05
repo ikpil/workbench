@@ -18,9 +18,9 @@ namespace Netty.NET.Common.Util.concurrent;
 using java.util.Objects;
 using java.util.concurrent.TimeUnit;
 
-final class SystemTicker implements Ticker {
-    static final SystemTicker INSTANCE = new SystemTicker();
-    private static final long START_TIME = System.nanoTime();
+sealed class SystemTicker implements Ticker {
+    static readonly SystemTicker INSTANCE = new SystemTicker();
+    private static readonly long START_TIME = System.nanoTime();
 
     @Override
     public long initialNanoTime() {

@@ -20,8 +20,8 @@ using java.util.Collections;
 using java.util.Iterator;
 using java.util.NoSuchElementException;
 
-public final class EmptyPriorityQueue<T> implements PriorityQueue<T> {
-    private static final PriorityQueue<object> INSTANCE = new EmptyPriorityQueue<object>();
+public sealed class EmptyPriorityQueue<T> implements PriorityQueue<T> {
+    private static readonly PriorityQueue<object> INSTANCE = new EmptyPriorityQueue<object>();
 
     private EmptyPriorityQueue() {
     }

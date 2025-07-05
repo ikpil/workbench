@@ -14,11 +14,11 @@
  */
 namespace Netty.NET.Common.Util;
 
-final class ByteProcessorUtils {
-    static final byte SPACE = (byte) ' ';
-    static final byte HTAB = (byte) '\t';
-    static final byte CARRIAGE_RETURN = (byte) '\r';
-    static final byte LINE_FEED = (byte) '\n';
+sealed class ByteProcessorUtils {
+    static readonly byte SPACE = (byte) ' ';
+    static readonly byte HTAB = (byte) '\t';
+    static readonly byte CARRIAGE_RETURN = (byte) '\r';
+    static readonly byte LINE_FEED = (byte) '\n';
 
     private ByteProcessorUtils() {
     }

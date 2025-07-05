@@ -21,23 +21,23 @@ using Netty.NET.Common.Util.Internal.logging.InternalLoggerFactory;
 
 /**
  *
- * @deprecated use {@link PromiseNotifier#cascade(bool, Future, Promise)}.
+ * @deprecated use {@link PromiseNotifier#cascade(bool, Task, TaskCompletionSource)}.
  */
 @Deprecated
-public final class UnaryPromiseNotifier<T> implements FutureListener<T> {
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(UnaryPromiseNotifier.class);
-    private final Promise<? super T> promise;
+public sealed class UnaryPromiseNotifier<T> implements FutureListener<T> {
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(UnaryPromiseNotifier.class);
+    private readonly TaskCompletionSource<? super T> promise;
 
-    public UnaryPromiseNotifier(Promise<? super T> promise) {
+    public UnaryPromiseNotifier(TaskCompletionSource<? super T> promise) {
         this.promise = ObjectUtil.checkNotNull(promise, "promise");
     }
 
     @Override
-    public void operationComplete(Future<T> future) throws Exception {
+    public void operationComplete(Task<T> future) throws Exception {
         cascadeTo(future, promise);
     }
 
-    public static <X> void cascadeTo(Future<X> completedFuture, Promise<? super X> promise) {
+    public static <X> void cascadeTo(Task<X> completedFuture, TaskCompletionSource<? super X> promise) {
         if (completedFuture.isSuccess()) {
             if (!promise.trySuccess(completedFuture.getNow())) {
                 logger.warn("Failed to mark a promise as success because it is done already: {}", promise);

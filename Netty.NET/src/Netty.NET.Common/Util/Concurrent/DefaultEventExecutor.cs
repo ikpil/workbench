@@ -22,7 +22,7 @@ using java.util.concurrent.ThreadFactory;
  * Default {@link SingleThreadEventExecutor} implementation which just execute all submitted task in a
  * serial fashion.
  */
-public final class DefaultEventExecutor extends SingleThreadEventExecutor {
+public sealed class DefaultEventExecutor extends SingleThreadEventExecutor {
 
     public DefaultEventExecutor() {
         this((EventExecutorGroup) null);

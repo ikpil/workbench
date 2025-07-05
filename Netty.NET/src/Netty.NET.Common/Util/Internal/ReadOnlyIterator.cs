@@ -18,8 +18,8 @@ namespace Netty.NET.Common.Util.Internal;
 
 using java.util.Iterator;
 
-public final class ReadOnlyIterator<T> implements Iterator<T> {
-    private final Iterator<? extends T> iterator;
+public sealed class ReadOnlyIterator<T> implements Iterator<T> {
+    private readonly Iterator<? extends T> iterator;
 
     public ReadOnlyIterator(Iterator<? extends T> iterator) {
         this.iterator = ObjectUtil.checkNotNull(iterator, "iterator");

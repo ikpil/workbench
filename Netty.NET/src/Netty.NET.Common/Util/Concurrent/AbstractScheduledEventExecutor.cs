@@ -29,7 +29,7 @@ using java.util.concurrent.TimeUnit;
  * Abstract base class for {@link EventExecutor}s that want to support scheduling.
  */
 public abstract class AbstractScheduledEventExecutor extends AbstractEventExecutor {
-    private static final Comparator<ScheduledFutureTask<?>> SCHEDULED_FUTURE_TASK_COMPARATOR =
+    private static readonly Comparator<ScheduledFutureTask<?>> SCHEDULED_FUTURE_TASK_COMPARATOR =
             new Comparator<ScheduledFutureTask<?>>() {
                 @Override
                 public int compare(ScheduledFutureTask<?> o1, ScheduledFutureTask<?> o2) {
@@ -37,7 +37,7 @@ public abstract class AbstractScheduledEventExecutor extends AbstractEventExecut
                 }
             };
 
-    static final Runnable WAKEUP_TASK = new Runnable() {
+    static readonly Runnable WAKEUP_TASK = new Runnable() {
        @Override
        public void run() { } // Do nothing
     };
@@ -95,7 +95,7 @@ public abstract class AbstractScheduledEventExecutor extends AbstractEventExecut
     static long deadlineNanos(long nanoTime, long delay) {
         long deadlineNanos = nanoTime + delay;
         // Guard against overflow
-        return deadlineNanos < 0 ? Long.MAX_VALUE : deadlineNanos;
+        return deadlineNanos < 0 ? long.MAX_VALUE : deadlineNanos;
     }
 
     /**
@@ -283,11 +283,11 @@ public abstract class AbstractScheduledEventExecutor extends AbstractEventExecut
         ObjectUtil.checkNotNull(command, "command");
         ObjectUtil.checkNotNull(unit, "unit");
         if (initialDelay < 0) {
-            throw new IllegalArgumentException(
+            throw new ArgumentException(
                     string.format("initialDelay: %d (expected: >= 0)", initialDelay));
         }
         if (period <= 0) {
-            throw new IllegalArgumentException(
+            throw new ArgumentException(
                     string.format("period: %d (expected: > 0)", period));
         }
         validateScheduled0(initialDelay, unit);
@@ -302,11 +302,11 @@ public abstract class AbstractScheduledEventExecutor extends AbstractEventExecut
         ObjectUtil.checkNotNull(command, "command");
         ObjectUtil.checkNotNull(unit, "unit");
         if (initialDelay < 0) {
-            throw new IllegalArgumentException(
+            throw new ArgumentException(
                     string.format("initialDelay: %d (expected: >= 0)", initialDelay));
         }
         if (delay <= 0) {
-            throw new IllegalArgumentException(
+            throw new ArgumentException(
                     string.format("delay: %d (expected: > 0)", delay));
         }
 

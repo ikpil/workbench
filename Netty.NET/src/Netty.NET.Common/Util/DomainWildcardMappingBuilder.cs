@@ -27,8 +27,8 @@ using static Netty.NET.Common.Util.Internal.ObjectUtil.checkNotNull;
  */
 public class DomainWildcardMappingBuilder<V> {
 
-    private final V defaultValue;
-    private final Map<string, V> map;
+    private readonly V defaultValue;
+    private readonly Map<string, V> map;
 
     /**
      * Constructor with default initial capacity of the map holding the mappings
@@ -78,12 +78,12 @@ public class DomainWildcardMappingBuilder<V> {
     private string normalizeHostName(string hostname) {
         checkNotNull(hostname, "hostname");
         if (hostname.isEmpty() || hostname.charAt(0) == '.') {
-            throw new IllegalArgumentException("Hostname '" + hostname + "' not valid");
+            throw new ArgumentException("Hostname '" + hostname + "' not valid");
         }
         hostname = ImmutableDomainWildcardMapping.normalize(checkNotNull(hostname, "hostname"));
         if (hostname.charAt(0) == '*') {
             if (hostname.length() < 3 || hostname.charAt(1) != '.') {
-                throw new IllegalArgumentException("Wildcard Hostname '" + hostname + "'not valid");
+                throw new ArgumentException("Wildcard Hostname '" + hostname + "'not valid");
             }
             return hostname.substring(1);
         }
@@ -98,13 +98,13 @@ public class DomainWildcardMappingBuilder<V> {
         return new ImmutableDomainWildcardMapping<V>(defaultValue, map);
     }
 
-    private static final class ImmutableDomainWildcardMapping<V> implements Mapping<string, V> {
-        private static final string REPR_HEADER = "ImmutableDomainWildcardMapping(default: ";
-        private static final string REPR_MAP_OPENING = ", map: ";
-        private static final string REPR_MAP_CLOSING = ")";
+    private static class ImmutableDomainWildcardMapping<V> implements Mapping<string, V> {
+        private static readonly string REPR_HEADER = "ImmutableDomainWildcardMapping(default: ";
+        private static readonly string REPR_MAP_OPENING = ", map: ";
+        private static readonly string REPR_MAP_CLOSING = ")";
 
-        private final V defaultValue;
-        private final Map<string, V> map;
+        private readonly V defaultValue;
+        private readonly Map<string, V> map;
 
         ImmutableDomainWildcardMapping(V defaultValue, Map<string, V> map) {
             this.defaultValue = defaultValue;

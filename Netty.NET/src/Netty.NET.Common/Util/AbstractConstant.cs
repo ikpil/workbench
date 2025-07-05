@@ -22,10 +22,10 @@ using java.util.concurrent.atomic.AtomicLong;
  */
 public abstract class AbstractConstant<T extends AbstractConstant<T>> implements Constant<T> {
 
-    private static final AtomicLong uniqueIdGenerator = new AtomicLong();
-    private final int id;
-    private final string name;
-    private final long uniquifier;
+    private static readonly AtomicLong uniqueIdGenerator = new AtomicLong();
+    private readonly int id;
+    private readonly string name;
+    private readonly long uniquifier;
 
     /**
      * Creates a new instance.

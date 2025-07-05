@@ -32,17 +32,17 @@ using static java.lang.Math.max;
  * Allows a way to register some {@link Runnable} that will executed once there are no references to an {@link object}
  * anymore.
  */
-public final class ObjectCleaner {
-    private static final int REFERENCE_QUEUE_POLL_TIMEOUT_MS =
+public sealed class ObjectCleaner {
+    private static readonly int REFERENCE_QUEUE_POLL_TIMEOUT_MS =
             max(500, getInt("Netty.NET.Common.Util.Internal.ObjectCleaner.refQueuePollTimeout", 10000));
 
     // Package-private for testing
-    static final string CLEANER_THREAD_NAME = ObjectCleaner.class.getSimpleName() + "Thread";
+    static readonly string CLEANER_THREAD_NAME = ObjectCleaner.class.getSimpleName() + "Thread";
     // This will hold a reference to the AutomaticCleanerReference which will be removed once we called cleanup()
-    private static final Set<AutomaticCleanerReference> LIVE_SET = ConcurrentHashMap.newKeySet();
-    private static final ReferenceQueue<object> REFERENCE_QUEUE = new ReferenceQueue<>();
-    private static final AtomicBoolean CLEANER_RUNNING = new AtomicBoolean(false);
-    private static final Runnable CLEANER_TASK = new Runnable() {
+    private static readonly Set<AutomaticCleanerReference> LIVE_SET = ConcurrentHashMap.newKeySet();
+    private static readonly ReferenceQueue<object> REFERENCE_QUEUE = new ReferenceQueue<>();
+    private static readonly AtomicBoolean CLEANER_RUNNING = new AtomicBoolean(false);
+    private static readonly Runnable CLEANER_TASK = new Runnable() {
         @Override
         public void run() {
             bool interrupted = false;
@@ -61,7 +61,7 @@ public final class ObjectCleaner {
                     if (reference != null) {
                         try {
                             reference.cleanup();
-                        } catch (Throwable ignored) {
+                        } catch (Exception ignored) {
                             // ignore exceptions, and don't log in case the logger throws an exception, blocks, or has
                             // other unexpected side effects.
                         }
@@ -132,8 +132,8 @@ public final class ObjectCleaner {
         // Only contains a static method.
     }
 
-    private static final class AutomaticCleanerReference extends WeakReference<object> {
-        private final Runnable cleanupTask;
+    private static class AutomaticCleanerReference extends WeakReference<object> {
+        private readonly Runnable cleanupTask;
 
         AutomaticCleanerReference(object referent, Runnable cleanupTask) {
             super(referent, REFERENCE_QUEUE);

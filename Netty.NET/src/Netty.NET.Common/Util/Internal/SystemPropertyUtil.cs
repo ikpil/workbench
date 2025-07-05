@@ -26,9 +26,9 @@ using java.security.PrivilegedAction;
 /**
  * A collection of utility methods to retrieve and parse the values of the Java system properties.
  */
-public final class SystemPropertyUtil {
+public sealed class SystemPropertyUtil {
 
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(SystemPropertyUtil.class);
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(SystemPropertyUtil.class);
 
     /**
      * Returns {@code true} if and only if the system property with the specified {@code key}
@@ -57,7 +57,7 @@ public final class SystemPropertyUtil {
      *         {@code def} if there's no such property or if an access to the
      *         specified property is not allowed.
      */
-    public static string get(final string key, string def) {
+    public static string get(string key, string def) {
         checkNonEmpty(key, "key");
 
         string value = null;
@@ -98,16 +98,16 @@ public final class SystemPropertyUtil {
             return def;
         }
 
-        value = value.trim().toLowerCase();
-        if (value.isEmpty()) {
+        value = value.Trim().ToLower();
+        if (string.IsNullOrEmpty(value)) {
             return def;
         }
 
-        if ("true".equals(value) || "yes".equals(value) || "1".equals(value)) {
+        if ("true".Equals(value) || "yes".Equals(value) || "1".Equals(value)) {
             return true;
         }
 
-        if ("false".equals(value) || "no".equals(value) || "0".equals(value)) {
+        if ("false".Equals(value) || "no".Equals(value) || "0".Equals(value)) {
             return false;
         }
 
@@ -134,9 +134,9 @@ public final class SystemPropertyUtil {
             return def;
         }
 
-        value = value.trim();
+        value = value.Trim();
         try {
-            return Integer.parseInt(value);
+            return int.Parse(value);
         } catch (Exception e) {
             // Ignore
         }
@@ -164,9 +164,9 @@ public final class SystemPropertyUtil {
             return def;
         }
 
-        value = value.trim();
+        value = value.Trim();
         try {
-            return Long.parseLong(value);
+            return long.Parse(value);
         } catch (Exception e) {
             // Ignore
         }

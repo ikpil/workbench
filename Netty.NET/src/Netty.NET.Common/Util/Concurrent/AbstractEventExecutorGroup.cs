@@ -31,17 +31,17 @@ using static Netty.NET.Common.Util.concurrent.AbstractEventExecutor.*;
  */
 public abstract class AbstractEventExecutorGroup implements EventExecutorGroup {
     @Override
-    public Future<?> submit(Runnable task) {
+    public Task<?> submit(Runnable task) {
         return next().submit(task);
     }
 
     @Override
-    public <T> Future<T> submit(Runnable task, T result) {
+    public <T> Task<T> submit(Runnable task, T result) {
         return next().submit(task, result);
     }
 
     @Override
-    public <T> Future<T> submit(Callable<T> task) {
+    public <T> Task<T> submit(Callable<T> task) {
         return next().submit(task);
     }
 
@@ -66,7 +66,7 @@ public abstract class AbstractEventExecutorGroup implements EventExecutorGroup {
     }
 
     @Override
-    public Future<?> shutdownGracefully() {
+    public Task<?> shutdownGracefully() {
         return shutdownGracefully(DEFAULT_SHUTDOWN_QUIET_PERIOD, DEFAULT_SHUTDOWN_TIMEOUT, TimeUnit.SECONDS);
     }
 
@@ -88,13 +88,13 @@ public abstract class AbstractEventExecutorGroup implements EventExecutorGroup {
     }
 
     @Override
-    public <T> List<java.util.concurrent.Future<T>> invokeAll(Collection<? extends Callable<T>> tasks)
+    public <T> List<java.util.concurrent.Task<T>> invokeAll(Collection<? extends Callable<T>> tasks)
             throws InterruptedException {
         return next().invokeAll(tasks);
     }
 
     @Override
-    public <T> List<java.util.concurrent.Future<T>> invokeAll(
+    public <T> List<java.util.concurrent.Task<T>> invokeAll(
             Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException {
         return next().invokeAll(tasks, timeout, unit);
     }

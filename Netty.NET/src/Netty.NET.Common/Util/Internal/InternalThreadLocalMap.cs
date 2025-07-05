@@ -38,27 +38,27 @@ using java.util.concurrent.atomic.AtomicInteger;
  * Note that this class is for internal use only and is subject to change at any time.  Use {@link FastThreadLocal}
  * unless you know what you are doing.
  */
-public final class InternalThreadLocalMap extends UnpaddedInternalThreadLocalMap {
-    private static final ThreadLocal<InternalThreadLocalMap> slowThreadLocalMap =
+public sealed class InternalThreadLocalMap : UnpaddedInternalThreadLocalMap {
+    private static readonly ThreadLocal<InternalThreadLocalMap> slowThreadLocalMap =
             new ThreadLocal<InternalThreadLocalMap>();
-    private static final AtomicInteger nextIndex = new AtomicInteger();
+    private static readonly AtomicInteger nextIndex = new AtomicInteger();
     // Internal use only.
-    public static final int VARIABLES_TO_REMOVE_INDEX = nextVariableIndex();
+    public static readonly int VARIABLES_TO_REMOVE_INDEX = nextVariableIndex();
 
-    private static final int DEFAULT_ARRAY_LIST_INITIAL_CAPACITY = 8;
-    private static final int ARRAY_LIST_CAPACITY_EXPAND_THRESHOLD = 1 << 30;
+    private static readonly int DEFAULT_ARRAY_LIST_INITIAL_CAPACITY = 8;
+    private static readonly int ARRAY_LIST_CAPACITY_EXPAND_THRESHOLD = 1 << 30;
     // Reference: https://hg.openjdk.java.net/jdk8/jdk8/jdk/file/tip/src/share/classes/java/util/ArrayList.java#l229
-    private static final int ARRAY_LIST_CAPACITY_MAX_SIZE = Integer.MAX_VALUE - 8;
+    private static readonly int ARRAY_LIST_CAPACITY_MAX_SIZE = int.MAX_VALUE - 8;
 
-    private static final int HANDLER_SHARABLE_CACHE_INITIAL_CAPACITY = 4;
-    private static final int INDEXED_VARIABLE_TABLE_INITIAL_SIZE = 32;
+    private static readonly int HANDLER_SHARABLE_CACHE_INITIAL_CAPACITY = 4;
+    private static readonly int INDEXED_VARIABLE_TABLE_INITIAL_SIZE = 32;
 
-    private static final int STRING_BUILDER_INITIAL_SIZE;
-    private static final int STRING_BUILDER_MAX_SIZE;
+    private static readonly int STRING_BUILDER_INITIAL_SIZE;
+    private static readonly int STRING_BUILDER_MAX_SIZE;
 
-    private static final InternalLogger logger;
+    private static readonly InternalLogger logger;
     /** Internal use only. */
-    public static final object UNSET = new object();
+    public static readonly object UNSET = new object();
 
     /** Used by {@link FastThreadLocal} */
     private object[] indexedVariables;
@@ -66,7 +66,7 @@ public final class InternalThreadLocalMap extends UnpaddedInternalThreadLocalMap
     // Core thread-locals
     private int futureListenerStackDepth;
     private int localChannelReaderStackDepth;
-    private Map<Class<?>, Boolean> handlerSharableCache;
+    private Map<Class<?>, bool> handlerSharableCache;
     private Map<Class<?>, TypeParameterMatcher> typeParameterMatcherGetCache;
     private Map<Class<?>, Map<string, TypeParameterMatcher>> typeParameterMatcherFindCache;
 
@@ -247,7 +247,7 @@ public final class InternalThreadLocalMap extends UnpaddedInternalThreadLocalMap
     public <E> ArrayList<E> arrayList(int minCapacity) {
         ArrayList<E> list = (ArrayList<E>) arrayList;
         if (list == null) {
-            arrayList = new ArrayList<>(minCapacity);
+            arrayList = new List<>(minCapacity);
             return (ArrayList<E>) arrayList;
         }
         list.clear();
@@ -297,8 +297,8 @@ public final class InternalThreadLocalMap extends UnpaddedInternalThreadLocalMap
         // No-op.
     }
 
-    public Map<Class<?>, Boolean> handlerSharableCache() {
-        Map<Class<?>, Boolean> cache = handlerSharableCache;
+    public Map<Class<?>, bool> handlerSharableCache() {
+        Map<Class<?>, bool> cache = handlerSharableCache;
         if (cache == null) {
             // Start with small capacity to keep memory overhead as low as possible.
             handlerSharableCache = cache = new WeakHashMap<>(HANDLER_SHARABLE_CACHE_INITIAL_CAPACITY);

@@ -114,14 +114,14 @@ public interface InternalLogger {
      * @param msg the message accompanying the exception
      * @param t   the exception (throwable) to log
      */
-    void trace(string msg, Throwable t);
+    void trace(string msg, Exception t);
 
     /**
      * Log an exception (throwable) at the TRACE level.
      *
      * @param t   the exception (throwable) to log
      */
-    void trace(Throwable t);
+    void trace(Exception t);
 
     /**
      * Is the logger instance enabled for the DEBUG level?
@@ -186,14 +186,14 @@ public interface InternalLogger {
      * @param msg the message accompanying the exception
      * @param t   the exception (throwable) to log
      */
-    void debug(string msg, Throwable t);
+    void debug(string msg, Exception t);
 
     /**
      * Log an exception (throwable) at the DEBUG level.
      *
      * @param t   the exception (throwable) to log
      */
-    void debug(Throwable t);
+    void debug(Exception t);
 
     /**
      * Is the logger instance enabled for the INFO level?
@@ -258,14 +258,14 @@ public interface InternalLogger {
      * @param msg the message accompanying the exception
      * @param t   the exception (throwable) to log
      */
-    void info(string msg, Throwable t);
+    void info(string msg, Exception t);
 
     /**
      * Log an exception (throwable) at the INFO level.
      *
      * @param t   the exception (throwable) to log
      */
-    void info(Throwable t);
+    void info(Exception t);
 
     /**
      * Is the logger instance enabled for the WARN level?
@@ -330,14 +330,14 @@ public interface InternalLogger {
      * @param msg the message accompanying the exception
      * @param t   the exception (throwable) to log
      */
-    void warn(string msg, Throwable t);
+    void warn(string msg, Exception t);
 
     /**
      * Log an exception (throwable) at the WARN level.
      *
      * @param t   the exception (throwable) to log
      */
-    void warn(Throwable t);
+    void warn(Exception t);
 
     /**
      * Is the logger instance enabled for the ERROR level?
@@ -402,14 +402,14 @@ public interface InternalLogger {
      * @param msg the message accompanying the exception
      * @param t   the exception (throwable) to log
      */
-    void error(string msg, Throwable t);
+    void error(string msg, Exception t);
 
     /**
      * Log an exception (throwable) at the ERROR level.
      *
      * @param t   the exception (throwable) to log
      */
-    void error(Throwable t);
+    void error(Exception t);
 
     /**
      * Is the logger instance enabled for the specified {@code level}?
@@ -475,12 +475,12 @@ public interface InternalLogger {
      * @param msg the message accompanying the exception
      * @param t   the exception (throwable) to log
      */
-    void log(InternalLogLevel level, string msg, Throwable t);
+    void log(InternalLogLevel level, string msg, Exception t);
 
     /**
      * Log an exception (throwable) at the specified {@code level}.
      *
      * @param t   the exception (throwable) to log
      */
-    void log(InternalLogLevel level, Throwable t);
+    void log(InternalLogLevel level, Exception t);
 }

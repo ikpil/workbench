@@ -15,7 +15,6 @@
 */
 namespace Netty.NET.Common.Util.Internal;
 
-using java.nio.ByteBuffer;
 
 /**
  * Allows to free direct {@link ByteBuffer}s.
@@ -29,13 +28,4 @@ interface Cleaner {
      * @return The new {@link CleanableDirectBuffer} instance.
      */
     CleanableDirectBuffer allocate(int capacity);
-
-    /**
-     * Free a direct {@link ByteBuffer} if possible
-     *
-     * @deprecated Instead allocate buffers from {@link #allocate(int)}
-     * and use the associated {@link CleanableDirectBuffer#clean()} method.
-     */
-    @Deprecated
-    void freeDirectBuffer(ByteBuffer buffer);
 }

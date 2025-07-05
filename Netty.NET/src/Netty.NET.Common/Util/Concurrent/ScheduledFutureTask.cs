@@ -24,13 +24,13 @@ using java.util.concurrent.Delayed;
 using java.util.concurrent.TimeUnit;
 
 @SuppressWarnings("ComparableImplementedButEqualsNotOverridden")
-final class ScheduledFutureTask<V> extends PromiseTask<V> implements ScheduledFuture<V>, PriorityQueueNode {
+sealed class ScheduledFutureTask<V> extends PromiseTask<V> implements ScheduledFuture<V>, PriorityQueueNode {
     // set once when added to priority queue
     private long id;
 
     private long deadlineNanos;
     /* 0 - no repeat, >0 - repeat at fixed rate, <0 - repeat with fixed delay */
-    private final long periodNanos;
+    private readonly long periodNanos;
 
     private int queueIndex = INDEX_NOT_IN_QUEUE;
 
@@ -68,7 +68,7 @@ final class ScheduledFutureTask<V> extends PromiseTask<V> implements ScheduledFu
 
     private static long validatePeriod(long period) {
         if (period == 0) {
-            throw new IllegalArgumentException("period: 0 (expected: != 0)");
+            throw new ArgumentException("period: 0 (expected: != 0)");
         }
         return period;
     }
@@ -172,7 +172,7 @@ final class ScheduledFutureTask<V> extends PromiseTask<V> implements ScheduledFu
                     }
                 }
             }
-        } catch (Throwable cause) {
+        } catch (Exception cause) {
             setFailureInternal(cause);
         }
     }

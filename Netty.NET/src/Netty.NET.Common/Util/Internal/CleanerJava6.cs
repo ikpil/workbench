@@ -18,29 +18,20 @@ namespace Netty.NET.Common.Util.Internal;
 using Netty.NET.Common.Util.Internal.logging.InternalLogger;
 using Netty.NET.Common.Util.Internal.logging.InternalLoggerFactory;
 
-using java.lang.invoke.MethodHandle;
-using java.lang.invoke.MethodHandles;
-using java.nio.ByteBuffer;
-using java.security.AccessController;
-using java.security.PrivilegedAction;
-using java.util.Objects;
-
-using static java.lang.invoke.MethodType.methodType;
-
 /**
  * Allows to free direct {@link ByteBuffer} by using Cleaner. This is encapsulated in an extra class to be able
  * to use {@link PlatformDependent0} on Android without problems.
  * <p>
  * For more details see <a href="https://github.com/netty/netty/issues/2604">#2604</a>.
  */
-final class CleanerJava6 implements Cleaner {
-    private static final MethodHandle CLEAN_METHOD;
+sealed class CleanerJava6 : Cleaner {
+    private static readonly MethodHandle CLEAN_METHOD;
 
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(CleanerJava6.class);
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(CleanerJava6.class);
 
     static {
         MethodHandle clean;
-        Throwable error = null;
+        Exception error = null;
         final ByteBuffer direct = ByteBuffer.allocateDirect(1);
         try {
             object mayBeCleanerField = AccessController.doPrivileged(new PrivilegedAction<object>() {
@@ -70,18 +61,18 @@ final class CleanerJava6 implements Cleaner {
                         clean = MethodHandles.explicitCastArguments(clean,
                                 methodType(void.class, ByteBuffer.class));
                         return clean;
-                    } catch (Throwable cause) {
+                    } catch (Exception cause) {
                         return cause;
                     }
                 }
             });
-            if (mayBeCleanerField instanceof Throwable) {
-                throw (Throwable) mayBeCleanerField;
+            if (mayBeCleanerField instanceof Exception) {
+                throw (Exception) mayBeCleanerField;
             }
 
             clean = (MethodHandle) mayBeCleanerField;
             clean.invokeExact(direct);
-        } catch (Throwable t) {
+        } catch (Exception t) {
             // We don't have ByteBuffer.cleaner().
             clean = null;
             error = t;
@@ -104,11 +95,6 @@ final class CleanerJava6 implements Cleaner {
         return new CleanableDirectBufferImpl(ByteBuffer.allocateDirect(capacity));
     }
 
-    @Deprecated
-    @Override
-    public void freeDirectBuffer(ByteBuffer buffer) {
-        freeDirectBufferStatic(buffer);
-    }
 
     private static void freeDirectBufferStatic(ByteBuffer buffer) {
         if (!buffer.isDirect()) {
@@ -117,7 +103,7 @@ final class CleanerJava6 implements Cleaner {
         if (System.getSecurityManager() == null) {
             try {
                 freeDirectBuffer0(buffer);
-            } catch (Throwable cause) {
+            } catch (Exception cause) {
                 PlatformDependent0.throwException(cause);
             }
         } else {
@@ -126,13 +112,13 @@ final class CleanerJava6 implements Cleaner {
     }
 
     private static void freeDirectBufferPrivileged(final ByteBuffer buffer) {
-        Throwable cause = AccessController.doPrivileged(new PrivilegedAction<Throwable>() {
+        Exception cause = AccessController.doPrivileged(new PrivilegedAction<Exception>() {
             @Override
-            public Throwable run() {
+            public Exception run() {
                 try {
                     freeDirectBuffer0(buffer);
                     return null;
-                } catch (Throwable cause) {
+                } catch (Exception cause) {
                     return cause;
                 }
             }
@@ -142,12 +128,12 @@ final class CleanerJava6 implements Cleaner {
         }
     }
 
-    private static void freeDirectBuffer0(ByteBuffer buffer) throws Throwable {
+    private static void freeDirectBuffer0(ByteBuffer buffer) throws Exception {
         CLEAN_METHOD.invokeExact(buffer);
     }
 
-    private static final class CleanableDirectBufferImpl implements CleanableDirectBuffer {
-        private final ByteBuffer buffer;
+    private static class CleanableDirectBufferImpl implements CleanableDirectBuffer {
+        private readonly ByteBuffer buffer;
 
         private CleanableDirectBufferImpl(ByteBuffer buffer) {
             this.buffer = buffer;

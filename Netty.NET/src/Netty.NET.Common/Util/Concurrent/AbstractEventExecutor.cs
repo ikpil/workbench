@@ -34,13 +34,13 @@ using java.util.concurrent.TimeUnit;
  * Abstract base class for {@link EventExecutor} implementations.
  */
 public abstract class AbstractEventExecutor extends AbstractExecutorService implements EventExecutor {
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(AbstractEventExecutor.class);
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(AbstractEventExecutor.class);
 
-    static final long DEFAULT_SHUTDOWN_QUIET_PERIOD = 2;
-    static final long DEFAULT_SHUTDOWN_TIMEOUT = 15;
+    static readonly long DEFAULT_SHUTDOWN_QUIET_PERIOD = 2;
+    static readonly long DEFAULT_SHUTDOWN_TIMEOUT = 15;
 
-    private final EventExecutorGroup parent;
-    private final Collection<EventExecutor> selfCollection = Collections.<EventExecutor>singleton(this);
+    private readonly EventExecutorGroup parent;
+    private readonly Collection<EventExecutor> selfCollection = Collections.<EventExecutor>singleton(this);
 
     protected AbstractEventExecutor() {
         this(null);
@@ -66,7 +66,7 @@ public abstract class AbstractEventExecutor extends AbstractExecutorService impl
     }
 
     @Override
-    public Future<?> shutdownGracefully() {
+    public Task<?> shutdownGracefully() {
         return shutdownGracefully(DEFAULT_SHUTDOWN_QUIET_PERIOD, DEFAULT_SHUTDOWN_TIMEOUT, TimeUnit.SECONDS);
     }
 
@@ -88,18 +88,18 @@ public abstract class AbstractEventExecutor extends AbstractExecutorService impl
     }
 
     @Override
-    public Future<?> submit(Runnable task) {
-        return (Future<?>) super.submit(task);
+    public Task<?> submit(Runnable task) {
+        return (Task<?>) super.submit(task);
     }
 
     @Override
-    public <T> Future<T> submit(Runnable task, T result) {
-        return (Future<T>) super.submit(task, result);
+    public <T> Task<T> submit(Runnable task, T result) {
+        return (Task<T>) super.submit(task, result);
     }
 
     @Override
-    public <T> Future<T> submit(Callable<T> task) {
-        return (Future<T>) super.submit(task);
+    public <T> Task<T> submit(Callable<T> task) {
+        return (Task<T>) super.submit(task);
     }
 
     @Override
@@ -134,12 +134,12 @@ public abstract class AbstractEventExecutor extends AbstractExecutorService impl
     }
 
     /**
-     * Try to execute the given {@link Runnable} and just log if it throws a {@link Throwable}.
+     * Try to execute the given {@link Runnable} and just log if it throws a {@link Exception}.
      */
     protected static void safeExecute(Runnable task) {
         try {
             runTask(task);
-        } catch (Throwable t) {
+        } catch (Exception t) {
             logger.warn("A task raised an exception. Task: {}", task, t);
         }
     }

@@ -50,9 +50,9 @@ public interface EventExecutor extends EventExecutorGroup, ThreadAwareExecutor {
     bool inEventLoop(Thread thread);
 
     /**
-     * Return a new {@link Promise}.
+     * Return a new {@link TaskCompletionSource}.
      */
-    default <V> Promise<V> newPromise() {
+    default <V> TaskCompletionSource<V> newPromise() {
         return new DefaultPromise<>(this);
     }
 
@@ -64,20 +64,20 @@ public interface EventExecutor extends EventExecutorGroup, ThreadAwareExecutor {
     }
 
     /**
-     * Create a new {@link Future} which is marked as succeeded already. So {@link Future#isSuccess()}
+     * Create a new {@link Task} which is marked as succeeded already. So {@link Task#isSuccess()}
      * will return {@code true}. All {@link FutureListener} added to it will be notified directly. Also
      * every call of blocking methods will just return without blocking.
      */
-    default <V> Future<V> newSucceededFuture(V result) {
+    default <V> Task<V> newSucceededFuture(V result) {
         return new SucceededFuture<>(this, result);
     }
 
     /**
-     * Create a new {@link Future} which is marked as failed already. So {@link Future#isSuccess()}
+     * Create a new {@link Task} which is marked as failed already. So {@link Task#isSuccess()}
      * will return {@code false}. All {@link FutureListener} added to it will be notified directly. Also
      * every call of blocking methods will just return without blocking.
      */
-    default <V> Future<V> newFailedFuture(Throwable cause) {
+    default <V> Task<V> newFailedFuture(Exception cause) {
         return new FailedFuture<>(this, cause);
     }
 

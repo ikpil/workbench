@@ -15,14 +15,11 @@
  */
 namespace Netty.NET.Common.Util;
 
-using Netty.NET.Common.Util.concurrent.Future;
-using Netty.NET.Common.Util.concurrent.Promise;
-
 public interface AsyncMapping<IN, OUT> {
 
     /**
-     * Returns the {@link Future} that will provide the result of the mapping. The given {@link Promise} will
+     * Returns the {@link Task} that will provide the result of the mapping. The given {@link TaskCompletionSource} will
      * be fulfilled when the result is available.
      */
-    Future<OUT> map(IN input, Promise<OUT> promise);
+    Task<OUT> map(IN input, TaskCompletionSource<OUT> promise);
 }

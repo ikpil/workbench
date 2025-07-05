@@ -16,15 +16,15 @@
 namespace Netty.NET.Common.Util.Internal;
 
 using Netty.NET.Common.Util.ReferenceCountUtil;
-using Netty.NET.Common.Util.concurrent.Promise;
+using Netty.NET.Common.Util.concurrent.TaskCompletionSource;
 using Netty.NET.Common.Util.Internal.ObjectPool.Handle;
 using Netty.NET.Common.Util.Internal.ObjectPool.ObjectCreator;
 
 /**
  * Some pending write which should be picked up later.
  */
-public final class PendingWrite {
-    private static final ObjectPool<PendingWrite> RECYCLER = ObjectPool.newPool(new ObjectCreator<PendingWrite>() {
+public sealed class PendingWrite {
+    private static readonly ObjectPool<PendingWrite> RECYCLER = ObjectPool.newPool(new ObjectCreator<PendingWrite>() {
         @Override
         public PendingWrite newObject(Handle<PendingWrite> handle) {
             return new PendingWrite(handle);
@@ -34,16 +34,16 @@ public final class PendingWrite {
     /**
      * Create a new empty {@link RecyclableArrayList} instance
      */
-    public static PendingWrite newInstance(object msg, Promise<Void> promise) {
+    public static PendingWrite newInstance(object msg, TaskCompletionSource<Void> promise) {
         PendingWrite pending = RECYCLER.get();
         pending.msg = msg;
         pending.promise = promise;
         return pending;
     }
 
-    private final Handle<PendingWrite> handle;
+    private readonly Handle<PendingWrite> handle;
     private object msg;
-    private Promise<Void> promise;
+    private TaskCompletionSource<Void> promise;
 
     private PendingWrite(Handle<PendingWrite> handle) {
         this.handle = handle;
@@ -60,9 +60,9 @@ public final class PendingWrite {
     }
 
     /**
-     * Fails the underlying {@link Promise} with the given cause and recycle this instance.
+     * Fails the underlying {@link TaskCompletionSource} with the given cause and recycle this instance.
      */
-    public bool failAndRecycle(Throwable cause) {
+    public bool failAndRecycle(Exception cause) {
         ReferenceCountUtil.release(msg);
         if (promise != null) {
             promise.setFailure(cause);
@@ -71,7 +71,7 @@ public final class PendingWrite {
     }
 
     /**
-     * Mark the underlying {@link Promise} successfully and recycle this instance.
+     * Mark the underlying {@link TaskCompletionSource} successfully and recycle this instance.
      */
     public bool successAndRecycle() {
         if (promise != null) {
@@ -84,15 +84,15 @@ public final class PendingWrite {
         return msg;
     }
 
-    public Promise<Void> promise() {
+    public TaskCompletionSource<Void> promise() {
         return promise;
     }
 
     /**
-     * Recycle this instance and return the {@link Promise}.
+     * Recycle this instance and return the {@link TaskCompletionSource}.
      */
-    public Promise<Void> recycleAndGet() {
-        Promise<Void> promise = this.promise;
+    public TaskCompletionSource<Void> recycleAndGet() {
+        TaskCompletionSource<Void> promise = this.promise;
         recycle();
         return promise;
     }

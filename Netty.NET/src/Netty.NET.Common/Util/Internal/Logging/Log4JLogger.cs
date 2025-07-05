@@ -48,15 +48,15 @@ using org.apache.log4j.Logger;
  */
 class Log4JLogger extends AbstractInternalLogger {
 
-    private static final long serialVersionUID = 2851357342488183058L;
+    private static readonly long serialVersionUID = 2851357342488183058L;
 
-    private final transient Logger logger;
+    private readonly transient Logger logger;
 
     /**
      * Following the pattern discussed in pages 162 through 168 of "The complete
      * log4j manual".
      */
-    static final string FQCN = Log4JLogger.class.getName();
+    static readonly string FQCN = Log4JLogger.class.getName();
 
     // Does the log4j version in use recognize the TRACE level?
     // The trace level was introduced in log4j 1.2.12.
@@ -182,7 +182,7 @@ class Log4JLogger extends AbstractInternalLogger {
      *          the exception (throwable) to log
      */
     @Override
-    public void trace(string msg, Throwable t) {
+    public void trace(string msg, Exception t) {
         logger.log(FQCN, traceCapable ? Level.TRACE : Level.DEBUG, msg, t);
     }
 
@@ -283,7 +283,7 @@ class Log4JLogger extends AbstractInternalLogger {
      *          the exception (throwable) to log
      */
     @Override
-    public void debug(string msg, Throwable t) {
+    public void debug(string msg, Exception t) {
         logger.log(FQCN, Level.DEBUG, msg, t);
     }
 
@@ -385,7 +385,7 @@ class Log4JLogger extends AbstractInternalLogger {
      *          the exception (throwable) to log
      */
     @Override
-    public void info(string msg, Throwable t) {
+    public void info(string msg, Exception t) {
         logger.log(FQCN, Level.INFO, msg, t);
     }
 
@@ -488,7 +488,7 @@ class Log4JLogger extends AbstractInternalLogger {
      *          the exception (throwable) to log
      */
     @Override
-    public void warn(string msg, Throwable t) {
+    public void warn(string msg, Exception t) {
         logger.log(FQCN, Level.WARN, msg, t);
     }
 
@@ -591,7 +591,7 @@ class Log4JLogger extends AbstractInternalLogger {
      *          the exception (throwable) to log
      */
     @Override
-    public void error(string msg, Throwable t) {
+    public void error(string msg, Exception t) {
         logger.log(FQCN, Level.ERROR, msg, t);
     }
 }

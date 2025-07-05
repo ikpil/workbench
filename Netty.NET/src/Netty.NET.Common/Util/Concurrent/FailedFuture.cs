@@ -20,12 +20,12 @@ using Netty.NET.Common.Util.Internal.PlatformDependent;
 
 /**
  * The {@link CompleteFuture} which is failed already.  It is
- * recommended to use {@link EventExecutor#newFailedFuture(Throwable)}
+ * recommended to use {@link EventExecutor#newFailedFuture(Exception)}
  * instead of calling the constructor of this future.
  */
-public final class FailedFuture<V> extends CompleteFuture<V> {
+public sealed class FailedFuture<V> extends CompleteFuture<V> {
 
-    private final Throwable cause;
+    private readonly Exception cause;
 
     /**
      * Creates a new instance.
@@ -33,13 +33,13 @@ public final class FailedFuture<V> extends CompleteFuture<V> {
      * @param executor the {@link EventExecutor} associated with this future
      * @param cause   the cause of failure
      */
-    public FailedFuture(EventExecutor executor, Throwable cause) {
+    public FailedFuture(EventExecutor executor, Exception cause) {
         super(executor);
         this.cause = ObjectUtil.checkNotNull(cause, "cause");
     }
 
     @Override
-    public Throwable cause() {
+    public Exception cause() {
         return cause;
     }
 
@@ -49,13 +49,13 @@ public final class FailedFuture<V> extends CompleteFuture<V> {
     }
 
     @Override
-    public Future<V> sync() {
+    public Task<V> sync() {
         PlatformDependent.throwException(cause);
         return this;
     }
 
     @Override
-    public Future<V> syncUninterruptibly() {
+    public Task<V> syncUninterruptibly() {
         PlatformDependent.throwException(cause);
         return this;
     }

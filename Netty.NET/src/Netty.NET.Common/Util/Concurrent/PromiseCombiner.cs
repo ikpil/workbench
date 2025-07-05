@@ -25,21 +25,21 @@ using Netty.NET.Common.Util.Internal.ObjectUtil;
  * futures fails, exactly which cause of failure will be assigned to the aggregate promise is undefined.</p>
  *
  * <p>Callers may populate a promise combiner with any number of futures to be combined via the
- * {@link PromiseCombiner#add(Future)} and {@link PromiseCombiner#addAll(Future[])} methods. When all futures to be
+ * {@link PromiseCombiner#add(Task)} and {@link PromiseCombiner#addAll(Task[])} methods. When all futures to be
  * combined have been added, callers must provide an aggregate promise to be notified when all combined promises have
- * finished via the {@link PromiseCombiner#finish(Promise)} method.</p>
+ * finished via the {@link PromiseCombiner#finish(TaskCompletionSource)} method.</p>
  *
  * <p>This implementation is <strong>NOT</strong> thread-safe and all methods must be called
  * from the {@link EventExecutor} thread.</p>
  */
-public final class PromiseCombiner {
+public sealed class PromiseCombiner {
     private int expectedCount;
     private int doneCount;
-    private Promise<Void> aggregatePromise;
-    private Throwable cause;
-    private final GenericFutureListener<Future<?>> listener = new GenericFutureListener<Future<?>>() {
+    private TaskCompletionSource<Void> aggregatePromise;
+    private Exception cause;
+    private readonly GenericFutureListener<Task<?>> listener = new GenericFutureListener<Task<?>>() {
         @Override
-        public void operationComplete(final Future<?> future) {
+        public void operationComplete(final Task<?> future) {
             if (executor.inEventLoop()) {
                 operationComplete0(future);
             } else {
@@ -52,7 +52,7 @@ public final class PromiseCombiner {
             }
         }
 
-        private void operationComplete0(Future<?> future) {
+        private void operationComplete0(Task<?> future) {
             assert executor.inEventLoop();
             ++doneCount;
             if (!future.isSuccess() && cause == null) {
@@ -64,7 +64,7 @@ public final class PromiseCombiner {
         }
     };
 
-    private final EventExecutor executor;
+    private readonly EventExecutor executor;
 
     /**
      * Deprecated use {@link PromiseCombiner#PromiseCombiner(EventExecutor)}.
@@ -75,8 +75,8 @@ public final class PromiseCombiner {
     }
 
     /**
-     * The {@link EventExecutor} to use for notifications. You must call {@link #add(Future)}, {@link #addAll(Future[])}
-     * and {@link #finish(Promise)} from within the {@link EventExecutor} thread.
+     * The {@link EventExecutor} to use for notifications. You must call {@link #add(Task)}, {@link #addAll(Task[])}
+     * and {@link #finish(TaskCompletionSource)} from within the {@link EventExecutor} thread.
      *
      * @param executor the {@link EventExecutor} to use for notifications.
      */
@@ -86,25 +86,25 @@ public final class PromiseCombiner {
 
     /**
      * Adds a new promise to be combined. New promises may be added until an aggregate promise is added via the
-     * {@link PromiseCombiner#finish(Promise)} method.
+     * {@link PromiseCombiner#finish(TaskCompletionSource)} method.
      *
      * @param promise the promise to add to this promise combiner
      *
-     * @deprecated Replaced by {@link PromiseCombiner#add(Future)}.
+     * @deprecated Replaced by {@link PromiseCombiner#add(Task)}.
      */
     @Deprecated
-    public void add(Promise promise) {
-        add((Future) promise);
+    public void add(TaskCompletionSource promise) {
+        add((Task) promise);
     }
 
     /**
      * Adds a new future to be combined. New futures may be added until an aggregate promise is added via the
-     * {@link PromiseCombiner#finish(Promise)} method.
+     * {@link PromiseCombiner#finish(TaskCompletionSource)} method.
      *
      * @param future the future to add to this promise combiner
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public void add(Future future) {
+    public void add(Task future) {
         checkAddAllowed();
         checkInEventLoop();
         ++expectedCount;
@@ -113,26 +113,26 @@ public final class PromiseCombiner {
 
     /**
      * Adds new promises to be combined. New promises may be added until an aggregate promise is added via the
-     * {@link PromiseCombiner#finish(Promise)} method.
+     * {@link PromiseCombiner#finish(TaskCompletionSource)} method.
      *
      * @param promises the promises to add to this promise combiner
      *
-     * @deprecated Replaced by {@link PromiseCombiner#addAll(Future[])}
+     * @deprecated Replaced by {@link PromiseCombiner#addAll(Task[])}
      */
     @Deprecated
-    public void addAll(Promise... promises) {
-        addAll((Future[]) promises);
+    public void addAll(TaskCompletionSource... promises) {
+        addAll((Task[]) promises);
     }
 
     /**
      * Adds new futures to be combined. New futures may be added until an aggregate promise is added via the
-     * {@link PromiseCombiner#finish(Promise)} method.
+     * {@link PromiseCombiner#finish(TaskCompletionSource)} method.
      *
      * @param futures the futures to add to this promise combiner
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public void addAll(Future... futures) {
-        for (Future future : futures) {
+    public void addAll(Task... futures) {
+        for (Task future : futures) {
             this.add(future);
         }
     }
@@ -143,12 +143,12 @@ public final class PromiseCombiner {
      * fail with the cause of one of the failed futures. If more than one combined future fails, then exactly which
      * failure will be assigned to the aggregate promise is undefined.</p>
      *
-     * <p>After this method is called, no more futures may be added via the {@link PromiseCombiner#add(Future)} or
-     * {@link PromiseCombiner#addAll(Future[])} methods.</p>
+     * <p>After this method is called, no more futures may be added via the {@link PromiseCombiner#add(Task)} or
+     * {@link PromiseCombiner#addAll(Task[])} methods.</p>
      *
      * @param aggregatePromise the promise to notify when all combined futures have finished
      */
-    public void finish(Promise<Void> aggregatePromise) {
+    public void finish(TaskCompletionSource<Void> aggregatePromise) {
         ObjectUtil.checkNotNull(aggregatePromise, "aggregatePromise");
         checkInEventLoop();
         if (this.aggregatePromise != null) {

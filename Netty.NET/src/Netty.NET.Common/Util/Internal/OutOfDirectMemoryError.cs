@@ -21,8 +21,8 @@ using java.nio.ByteBuffer;
  * {@link OutOfMemoryError} that is throws if {@link PlatformDependent#allocateDirectNoCleaner(int)} can not allocate
  * a new {@link ByteBuffer} due memory restrictions.
  */
-public final class OutOfDirectMemoryError extends OutOfMemoryError {
-    private static final long serialVersionUID = 4228264016184011555L;
+public sealed class OutOfDirectMemoryError extends OutOfMemoryError {
+    private static readonly long serialVersionUID = 4228264016184011555L;
 
     OutOfDirectMemoryError(string s) {
         super(s);

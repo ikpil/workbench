@@ -25,12 +25,12 @@ using java.nio.ByteBuffer;
 
 using static java.lang.invoke.MethodType.methodType;
 
-public class CleanerJava24Linker implements Cleaner {
-    private static final InternalLogger logger;
+public class CleanerJava24Linker : Cleaner {
+    private static readonly InternalLogger logger;
 
-    private static final MethodHandle INVOKE_MALLOC;
-    private static final MethodHandle INVOKE_CREATE_BYTEBUFFER;
-    private static final MethodHandle INVOKE_FREE;
+    private static readonly MethodHandle INVOKE_MALLOC;
+    private static readonly MethodHandle INVOKE_CREATE_BYTEBUFFER;
+    private static readonly MethodHandle INVOKE_FREE;
 
     static {
         bool suitableJavaVersion;
@@ -39,7 +39,7 @@ public class CleanerJava24Linker implements Cleaner {
             // we need to initialize CleanerJava24Linker at build time.
             string v = System.getProperty("java.specification.version");
             try {
-                suitableJavaVersion = Integer.parseInt(v) >= 25;
+                suitableJavaVersion = int.parseInt(v) >= 25;
             } catch (NumberFormatException e) {
                 suitableJavaVersion = false;
             }
@@ -59,7 +59,7 @@ public class CleanerJava24Linker implements Cleaner {
         MethodHandle mallocMethod;
         MethodHandle wrapMethod;
         MethodHandle freeMethod;
-        Throwable error;
+        Exception error;
 
         if (suitableJavaVersion) {
             try {
@@ -90,7 +90,7 @@ public class CleanerJava24Linker implements Cleaner {
                 MethodHandle byteSize = lookup.findVirtual(valueLayoutAddressCls, "byteSize", methodType(long.class));
                 MethodHandle byteSizeOfAddress = MethodHandles.foldArguments(byteSize, addressLayoutGetter);
                 long addressSize = (long) byteSizeOfAddress.invokeExact();
-                if (addressSize != Long.BYTES) {
+                if (addressSize != long.BYTES) {
                     throw new UnsupportedOperationException(
                             "Linking to malloc and free is only supported on 64-bit platforms.");
                 }
@@ -164,7 +164,7 @@ public class CleanerJava24Linker implements Cleaner {
                         asByteBuffer);
 
                 error = null;
-            } catch (Throwable throwable) {
+            } catch (Exception throwable) {
                 mallocMethod = null;
                 wrapMethod = null;
                 freeMethod = null;
@@ -207,7 +207,7 @@ public class CleanerJava24Linker implements Cleaner {
         final long addr;
         try {
             addr = (long) INVOKE_MALLOC.invokeExact((long) capacity);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new Error(e); // Should not happen.
         }
         if (addr == 0) {
@@ -219,25 +219,25 @@ public class CleanerJava24Linker implements Cleaner {
     static void free(long memoryAddress) {
         try {
             INVOKE_FREE.invokeExact(memoryAddress);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             throw new Error(e); // Should not happen.
         }
     }
 
-    private static final class CleanableDirectBufferImpl implements CleanableDirectBuffer {
-        private final ByteBuffer buffer;
-        private final long memoryAddress;
+    private static class CleanableDirectBufferImpl implements CleanableDirectBuffer {
+        private readonly ByteBuffer buffer;
+        private readonly long memoryAddress;
 
         private CleanableDirectBufferImpl(int capacity) {
             long addr = malloc(capacity);
             try {
                 memoryAddress = addr;
                 buffer = (ByteBuffer) INVOKE_CREATE_BYTEBUFFER.invokeExact(addr, (long) capacity);
-            } catch (Throwable throwable) {
+            } catch (Exception throwable) {
                 Error error = new Error(throwable);
                 try {
                     free(addr);
-                } catch (Throwable e) {
+                } catch (Exception e) {
                     error.addSuppressed(e);
                 }
                 throw error;

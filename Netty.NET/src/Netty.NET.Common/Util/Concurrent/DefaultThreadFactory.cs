@@ -28,12 +28,12 @@ using java.util.concurrent.atomic.AtomicInteger;
  */
 public class DefaultThreadFactory implements ThreadFactory {
 
-    private static final AtomicInteger poolId = new AtomicInteger();
+    private static readonly AtomicInteger poolId = new AtomicInteger();
 
-    private final AtomicInteger nextId = new AtomicInteger();
-    private final string prefix;
-    private final bool daemon;
-    private final int priority;
+    private readonly AtomicInteger nextId = new AtomicInteger();
+    private readonly string prefix;
+    private readonly bool daemon;
+    private readonly int priority;
     protected final ThreadGroup threadGroup;
 
     public DefaultThreadFactory(Class<?> poolType) {
@@ -86,7 +86,7 @@ public class DefaultThreadFactory implements ThreadFactory {
         ObjectUtil.checkNotNull(poolName, "poolName");
 
         if (priority < Thread.MIN_PRIORITY || priority > Thread.MAX_PRIORITY) {
-            throw new IllegalArgumentException(
+            throw new ArgumentException(
                     "priority: " + priority + " (expected: Thread.MIN_PRIORITY <= priority <= Thread.MAX_PRIORITY)");
         }
 

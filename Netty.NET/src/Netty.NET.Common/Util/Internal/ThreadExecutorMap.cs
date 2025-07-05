@@ -24,9 +24,9 @@ using java.util.concurrent.ThreadFactory;
 /**
  * Allow to retrieve the {@link EventExecutor} for the calling {@link Thread}.
  */
-public final class ThreadExecutorMap {
+public sealed class ThreadExecutorMap {
 
-    private static final FastThreadLocal<EventExecutor> mappings = new FastThreadLocal<EventExecutor>();
+    private static readonly FastThreadLocal<EventExecutor> mappings = new FastThreadLocal<EventExecutor>();
 
     private ThreadExecutorMap() { }
 

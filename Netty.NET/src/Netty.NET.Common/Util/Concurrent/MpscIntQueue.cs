@@ -93,16 +93,16 @@ public interface MpscIntQueue {
     /**
      * This implementation is based on MpscAtomicUnpaddedArrayQueue from JCTools.
      */
-    final class MpscAtomicIntegerArrayQueue extends AtomicIntegerArray implements MpscIntQueue {
-        private static final long serialVersionUID = 8740338425124821455L;
-        private static final AtomicLongFieldUpdater<MpscAtomicIntegerArrayQueue> PRODUCER_INDEX =
+    sealed class MpscAtomicIntegerArrayQueue extends AtomicIntegerArray implements MpscIntQueue {
+        private static readonly long serialVersionUID = 8740338425124821455L;
+        private static readonly AtomicLongFieldUpdater<MpscAtomicIntegerArrayQueue> PRODUCER_INDEX =
                 AtomicLongFieldUpdater.newUpdater(MpscAtomicIntegerArrayQueue.class, "producerIndex");
-        private static final AtomicLongFieldUpdater<MpscAtomicIntegerArrayQueue> PRODUCER_LIMIT =
+        private static readonly AtomicLongFieldUpdater<MpscAtomicIntegerArrayQueue> PRODUCER_LIMIT =
                 AtomicLongFieldUpdater.newUpdater(MpscAtomicIntegerArrayQueue.class, "producerLimit");
-        private static final AtomicLongFieldUpdater<MpscAtomicIntegerArrayQueue> CONSUMER_INDEX =
+        private static readonly AtomicLongFieldUpdater<MpscAtomicIntegerArrayQueue> CONSUMER_INDEX =
                 AtomicLongFieldUpdater.newUpdater(MpscAtomicIntegerArrayQueue.class, "consumerIndex");
-        private final int mask;
-        private final int emptyValue;
+        private readonly int mask;
+        private readonly int emptyValue;
         private volatile long producerIndex;
         private volatile long producerLimit;
         private volatile long consumerIndex;
@@ -125,7 +125,7 @@ public interface MpscIntQueue {
         @Override
         public bool offer(int value) {
             if (value == emptyValue) {
-                throw new IllegalArgumentException("Cannot offer the \"empty\" value: " + emptyValue);
+                throw new ArgumentException("Cannot offer the \"empty\" value: " + emptyValue);
             }
             // use a cached view on consumer index (potentially updated in loop)
             final int mask = this.mask;
@@ -266,7 +266,7 @@ public interface MpscIntQueue {
                     break;
                 }
             }
-            return size < 0 ? 0 : size > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) size;
+            return size < 0 ? 0 : size > int.MAX_VALUE ? int.MAX_VALUE : (int) size;
         }
     }
 }

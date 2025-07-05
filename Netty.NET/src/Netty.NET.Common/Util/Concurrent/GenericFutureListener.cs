@@ -18,15 +18,15 @@ namespace Netty.NET.Common.Util.concurrent;
 using java.util.EventListener;
 
 /**
- * Listens to the result of a {@link Future}.  The result of the asynchronous operation is notified once this listener
- * is added by calling {@link Future#addListener(GenericFutureListener)}.
+ * Listens to the result of a {@link Task}.  The result of the asynchronous operation is notified once this listener
+ * is added by calling {@link Task#addListener(GenericFutureListener)}.
  */
-public interface GenericFutureListener<F extends Future<?>> extends EventListener {
+public interface GenericFutureListener<F extends Task<?>> extends EventListener {
 
     /**
-     * Invoked when the operation associated with the {@link Future} has been completed.
+     * Invoked when the operation associated with the {@link Task} has been completed.
      *
-     * @param future  the source {@link Future} which called this callback
+     * @param future  the source {@link Task} which called this callback
      */
     void operationComplete(F future) throws Exception;
 }

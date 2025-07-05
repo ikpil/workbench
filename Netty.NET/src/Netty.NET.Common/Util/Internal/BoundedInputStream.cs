@@ -21,9 +21,9 @@ using java.io.FilterInputStream;
 using java.io.IOException;
 using java.io.InputStream;
 
-public final class BoundedInputStream extends FilterInputStream {
+public sealed class BoundedInputStream extends FilterInputStream {
 
-    private final int maxBytesRead;
+    private readonly int maxBytesRead;
     private int numRead;
 
     public BoundedInputStream(@NotNull InputStream in, int maxBytesRead) {

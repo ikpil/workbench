@@ -17,8 +17,8 @@ namespace Netty.NET.Common.Util.concurrent;
 
 using Netty.NET.Common.Util.Internal.ObjectUtil;
 
-final class FastThreadLocalRunnable implements Runnable {
-    private final Runnable runnable;
+sealed class FastThreadLocalRunnable implements Runnable {
+    private readonly Runnable runnable;
 
     private FastThreadLocalRunnable(Runnable runnable) {
         this.runnable = ObjectUtil.checkNotNull(runnable, "runnable");

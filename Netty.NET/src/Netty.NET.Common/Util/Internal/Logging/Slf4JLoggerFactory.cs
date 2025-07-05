@@ -25,27 +25,24 @@ using org.slf4j.spi.LocationAwareLogger;
  * Logger factory which creates a <a href="https://www.slf4j.org/">SLF4J</a>
  * logger.
  */
-public class Slf4JLoggerFactory extends InternalLoggerFactory {
+public class Slf4JLoggerFactory : InternalLoggerFactory {
 
-    @SuppressWarnings("deprecation")
-    public static final InternalLoggerFactory INSTANCE = new Slf4JLoggerFactory();
+    //@SuppressWarnings("deprecation")
+    public static readonly InternalLoggerFactory INSTANCE = new Slf4JLoggerFactory();
 
-    /**
-     * @deprecated Use {@link #INSTANCE} instead.
-     */
-    @Deprecated
-    public Slf4JLoggerFactory() {
+    private Slf4JLoggerFactory()
+    {
+        
     }
 
-    Slf4JLoggerFactory(bool failIfNOP) {
+    private Slf4JLoggerFactory(bool failIfNOP) {
         assert failIfNOP; // Should be always called with true.
         if (LoggerFactory.getILoggerFactory() instanceof NOPLoggerFactory) {
             throw new NoClassDefFoundError("NOPLoggerFactory not supported");
         }
     }
 
-    @Override
-    public InternalLogger newInstance(string name) {
+    public override InternalLogger newInstance(string name) {
         return wrapLogger(LoggerFactory.getLogger(name));
     }
 
@@ -59,7 +56,7 @@ public class Slf4JLoggerFactory extends InternalLoggerFactory {
         return NopInstanceHolder.INSTANCE_WITH_NOP_CHECK;
     }
 
-    private static final class NopInstanceHolder {
-        private static final InternalLoggerFactory INSTANCE_WITH_NOP_CHECK = new Slf4JLoggerFactory(true);
+    private static class NopInstanceHolder {
+        internal static readonly InternalLoggerFactory INSTANCE_WITH_NOP_CHECK = new Slf4JLoggerFactory(true);
     }
 }

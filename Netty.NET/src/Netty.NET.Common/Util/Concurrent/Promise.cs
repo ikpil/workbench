@@ -16,9 +16,9 @@
 namespace Netty.NET.Common.Util.concurrent;
 
 /**
- * Special {@link Future} which is writable.
+ * Special {@link Task} which is writable.
  */
-public interface Promise<V> extends Future<V> {
+public interface TaskCompletionSource<V> extends Task<V> {
 
     /**
      * Marks this future as a success and notifies all
@@ -26,7 +26,7 @@ public interface Promise<V> extends Future<V> {
      *
      * If it is success or failed already it will throw an {@link IllegalStateException}.
      */
-    Promise<V> setSuccess(V result);
+    TaskCompletionSource<V> setSuccess(V result);
 
     /**
      * Marks this future as a success and notifies all
@@ -44,7 +44,7 @@ public interface Promise<V> extends Future<V> {
      *
      * If it is success or failed already it will throw an {@link IllegalStateException}.
      */
-    Promise<V> setFailure(Throwable cause);
+    TaskCompletionSource<V> setFailure(Exception cause);
 
     /**
      * Marks this future as a failure and notifies all
@@ -54,7 +54,7 @@ public interface Promise<V> extends Future<V> {
      *         a failure. Otherwise {@code false} because this future is
      *         already marked as either a success or a failure.
      */
-    bool tryFailure(Throwable cause);
+    bool tryFailure(Exception cause);
 
     /**
      * Make this future impossible to cancel.
@@ -65,26 +65,26 @@ public interface Promise<V> extends Future<V> {
     bool setUncancellable();
 
     @Override
-    Promise<V> addListener(GenericFutureListener<? extends Future<? super V>> listener);
+    TaskCompletionSource<V> addListener(GenericFutureListener<? extends Task<? super V>> listener);
 
     @Override
-    Promise<V> addListeners(GenericFutureListener<? extends Future<? super V>>... listeners);
+    TaskCompletionSource<V> addListeners(GenericFutureListener<? extends Task<? super V>>... listeners);
 
     @Override
-    Promise<V> removeListener(GenericFutureListener<? extends Future<? super V>> listener);
+    TaskCompletionSource<V> removeListener(GenericFutureListener<? extends Task<? super V>> listener);
 
     @Override
-    Promise<V> removeListeners(GenericFutureListener<? extends Future<? super V>>... listeners);
+    TaskCompletionSource<V> removeListeners(GenericFutureListener<? extends Task<? super V>>... listeners);
 
     @Override
-    Promise<V> await() throws InterruptedException;
+    TaskCompletionSource<V> await() throws InterruptedException;
 
     @Override
-    Promise<V> awaitUninterruptibly();
+    TaskCompletionSource<V> awaitUninterruptibly();
 
     @Override
-    Promise<V> sync() throws InterruptedException;
+    TaskCompletionSource<V> sync() throws InterruptedException;
 
     @Override
-    Promise<V> syncUninterruptibly();
+    TaskCompletionSource<V> syncUninterruptibly();
 }

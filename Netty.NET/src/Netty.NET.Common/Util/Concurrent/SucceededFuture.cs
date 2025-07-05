@@ -20,8 +20,8 @@ namespace Netty.NET.Common.Util.concurrent;
  * recommended to use {@link EventExecutor#newSucceededFuture(object)} instead of
  * calling the constructor of this future.
  */
-public final class SucceededFuture<V> extends CompleteFuture<V> {
-    private final V result;
+public sealed class SucceededFuture<V> extends CompleteFuture<V> {
+    private readonly V result;
 
     /**
      * Creates a new instance.
@@ -34,7 +34,7 @@ public final class SucceededFuture<V> extends CompleteFuture<V> {
     }
 
     @Override
-    public Throwable cause() {
+    public Exception cause() {
         return null;
     }
 

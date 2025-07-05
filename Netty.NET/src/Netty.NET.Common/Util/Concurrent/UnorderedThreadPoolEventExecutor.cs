@@ -48,13 +48,13 @@ using static java.util.concurrent.TimeUnit.NANOSECONDS;
  * off-loading to their own thread-pools.
  */
 @Deprecated
-public final class UnorderedThreadPoolEventExecutor extends ScheduledThreadPoolExecutor implements EventExecutor {
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(
+public sealed class UnorderedThreadPoolEventExecutor extends ScheduledThreadPoolExecutor implements EventExecutor {
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(
             UnorderedThreadPoolEventExecutor.class);
 
-    private final Promise<?> terminationFuture = GlobalEventExecutor.INSTANCE.newPromise();
-    private final Set<EventExecutor> executorSet = Collections.singleton(this);
-    private final Set<Thread> eventLoopThreads = ConcurrentHashMap.newKeySet();
+    private readonly TaskCompletionSource<?> terminationFuture = GlobalEventExecutor.INSTANCE.newPromise();
+    private readonly Set<EventExecutor> executorSet = Collections.singleton(this);
+    private readonly Set<Thread> eventLoopThreads = ConcurrentHashMap.newKeySet();
 
     /**
      * Calls {@link UnorderedThreadPoolEventExecutor#UnorderedThreadPoolEventExecutor(int, ThreadFactory)}
@@ -110,7 +110,7 @@ public final class UnorderedThreadPoolEventExecutor extends ScheduledThreadPoolE
     }
 
     @Override
-    public <V> Promise<V> newPromise() {
+    public <V> TaskCompletionSource<V> newPromise() {
         return new DefaultPromise<V>(this);
     }
 
@@ -120,12 +120,12 @@ public final class UnorderedThreadPoolEventExecutor extends ScheduledThreadPoolE
     }
 
     @Override
-    public <V> Future<V> newSucceededFuture(V result) {
+    public <V> Task<V> newSucceededFuture(V result) {
         return new SucceededFuture<V>(this, result);
     }
 
     @Override
-    public <V> Future<V> newFailedFuture(Throwable cause) {
+    public <V> Task<V> newFailedFuture(Exception cause) {
         return new FailedFuture<V>(this, cause);
     }
 
@@ -148,12 +148,12 @@ public final class UnorderedThreadPoolEventExecutor extends ScheduledThreadPoolE
     }
 
     @Override
-    public Future<?> shutdownGracefully() {
+    public Task<?> shutdownGracefully() {
         return shutdownGracefully(2, 15, TimeUnit.SECONDS);
     }
 
     @Override
-    public Future<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
+    public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
         // TODO: At the moment this just calls shutdown but we may be able to do something more smart here which
         //       respects the quietPeriod and timeout.
         shutdown();
@@ -161,7 +161,7 @@ public final class UnorderedThreadPoolEventExecutor extends ScheduledThreadPoolE
     }
 
     @Override
-    public Future<?> terminationFuture() {
+    public Task<?> terminationFuture() {
         return terminationFuture;
     }
 
@@ -202,18 +202,18 @@ public final class UnorderedThreadPoolEventExecutor extends ScheduledThreadPoolE
     }
 
     @Override
-    public Future<?> submit(Runnable task) {
-        return (Future<?>) super.submit(task);
+    public Task<?> submit(Runnable task) {
+        return (Task<?>) super.submit(task);
     }
 
     @Override
-    public <T> Future<T> submit(Runnable task, T result) {
-        return (Future<T>) super.submit(task, result);
+    public <T> Task<T> submit(Runnable task, T result) {
+        return (Task<T>) super.submit(task, result);
     }
 
     @Override
-    public <T> Future<T> submit(Callable<T> task) {
-        return (Future<T>) super.submit(task);
+    public <T> Task<T> submit(Callable<T> task) {
+        return (Task<T>) super.submit(task);
     }
 
     @Override
@@ -221,10 +221,10 @@ public final class UnorderedThreadPoolEventExecutor extends ScheduledThreadPoolE
         super.schedule(new NonNotifyRunnable(command), 0, NANOSECONDS);
     }
 
-    private static final class RunnableScheduledFutureTask<V> extends PromiseTask<V>
+    private static class RunnableScheduledFutureTask<V> extends PromiseTask<V>
             implements RunnableScheduledFuture<V>, ScheduledFuture<V> {
-        private final RunnableScheduledFuture<V> future;
-        private final bool wasCallable;
+        private readonly RunnableScheduledFuture<V> future;
+        private readonly bool wasCallable;
 
         RunnableScheduledFutureTask(EventExecutor executor, RunnableScheduledFuture<V> future, bool wasCallable) {
             super(executor, future);
@@ -233,7 +233,7 @@ public final class UnorderedThreadPoolEventExecutor extends ScheduledThreadPoolE
         }
 
         @Override
-        V runTask() throws Throwable {
+        V runTask() throws Exception {
             V result =  super.runTask();
             if (result == null && wasCallable) {
                 // If this RunnableScheduledFutureTask wraps a RunnableScheduledFuture that wraps a Callable we need
@@ -259,7 +259,7 @@ public final class UnorderedThreadPoolEventExecutor extends ScheduledThreadPoolE
                 try {
                     // Its a periodic task so we need to ignore the return value
                     runTask();
-                } catch (Throwable cause) {
+                } catch (Exception cause) {
                     if (!tryFailureInternal(cause)) {
                         logger.warn("Failure during execution of task", cause);
                     }
@@ -290,9 +290,9 @@ public final class UnorderedThreadPoolEventExecutor extends ScheduledThreadPoolE
     // EventExecutor.execute(...) when notify the listeners of the promise.
     //
     // See https://github.com/netty/netty/issues/6507
-    private static final class NonNotifyRunnable implements Runnable {
+    private static class NonNotifyRunnable implements Runnable {
 
-        private final Runnable task;
+        private readonly Runnable task;
 
         NonNotifyRunnable(Runnable task) {
             this.task = task;
@@ -304,9 +304,9 @@ public final class UnorderedThreadPoolEventExecutor extends ScheduledThreadPoolE
         }
     }
 
-    private static final class AccountingThreadFactory implements ThreadFactory {
-        private final ThreadFactory delegate;
-        private final Set<Thread> threads;
+    private static class AccountingThreadFactory implements ThreadFactory {
+        private readonly ThreadFactory delegate;
+        private readonly Set<Thread> threads;
 
         private AccountingThreadFactory(ThreadFactory delegate, Set<Thread> threads) {
             this.delegate = delegate;

@@ -42,12 +42,12 @@ namespace Netty.NET.Common.Util.Internal.logging;
 /**
  * Holds the results of formatting done by {@link MessageFormatter}.
  */
-public final class FormattingTuple {
+public sealed class FormattingTuple {
 
-    private final string message;
-    private final Throwable throwable;
+    private readonly string message;
+    private readonly Exception throwable;
 
-    public FormattingTuple(string message, Throwable throwable) {
+    public FormattingTuple(string message, Exception throwable) {
         this.message = message;
         this.throwable = throwable;
     }
@@ -56,7 +56,7 @@ public final class FormattingTuple {
         return message;
     }
 
-    public Throwable getThrowable() {
+    public Exception getThrowable() {
         return throwable;
     }
 }

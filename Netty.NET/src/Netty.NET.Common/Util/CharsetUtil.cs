@@ -15,55 +15,45 @@
  */
 namespace Netty.NET.Common.Util;
 
-using Netty.NET.Common.Util.Internal.InternalThreadLocalMap;
-using static Netty.NET.Common.Util.Internal.ObjectUtil.checkNotNull;
-
-using java.nio.charset.Charset;
-using java.nio.charset.CharsetDecoder;
-using java.nio.charset.CharsetEncoder;
-using java.nio.charset.CodingErrorAction;
-using java.nio.charset.StandardCharsets;
-using java.util.Map;
-
 /**
  * A utility class that provides various common operations and constants
  * related with {@link Charset} and its relevant classes.
  */
-public final class CharsetUtil {
+public sealed class CharsetUtil {
 
     /**
      * 16-bit UTF (UCS Transformation Format) whose byte order is identified by
      * an optional byte-order mark
      */
-    public static final Charset UTF_16 = StandardCharsets.UTF_16;
+    public static readonly Charset UTF_16 = StandardCharsets.UTF_16;
 
     /**
      * 16-bit UTF (UCS Transformation Format) whose byte order is big-endian
      */
-    public static final Charset UTF_16BE = StandardCharsets.UTF_16BE;
+    public static readonly Charset UTF_16BE = StandardCharsets.UTF_16BE;
 
     /**
      * 16-bit UTF (UCS Transformation Format) whose byte order is little-endian
      */
-    public static final Charset UTF_16LE = StandardCharsets.UTF_16LE;
+    public static readonly Charset UTF_16LE = StandardCharsets.UTF_16LE;
 
     /**
      * 8-bit UTF (UCS Transformation Format)
      */
-    public static final Charset UTF_8 = StandardCharsets.UTF_8;
+    public static readonly Charset UTF_8 = StandardCharsets.UTF_8;
 
     /**
      * ISO Latin Alphabet No. 1, as known as <tt>ISO-LATIN-1</tt>
      */
-    public static final Charset ISO_8859_1 = StandardCharsets.ISO_8859_1;
+    public static readonly Charset ISO_8859_1 = StandardCharsets.ISO_8859_1;
 
     /**
      * 7-bit ASCII, as known as ISO646-US or the Basic Latin block of the
      * Unicode character set
      */
-    public static final Charset US_ASCII = StandardCharsets.US_ASCII;
+    public static readonly Charset US_ASCII = StandardCharsets.US_ASCII;
 
-    private static final Charset[] CHARSETS = new Charset[]
+    private static readonly Charset[] CHARSETS = new Charset[]
             { UTF_16, UTF_16BE, UTF_16LE, UTF_8, ISO_8859_1, US_ASCII };
 
     public static Charset[] values() {

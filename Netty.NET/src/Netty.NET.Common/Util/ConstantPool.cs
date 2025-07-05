@@ -30,9 +30,9 @@ using java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class ConstantPool<T extends Constant<T>> {
 
-    private final ConcurrentMap<string, T> constants = new ConcurrentHashMap<>();
+    private readonly ConcurrentMap<string, T> constants = new ConcurrentHashMap<>();
 
-    private final AtomicInteger nextId = new AtomicInteger(1);
+    private readonly AtomicInteger nextId = new AtomicInteger(1);
 
     /**
      * Shortcut of {@link #valueOf(string) valueOf(firstNameComponent.getName() + "#" + secondNameComponent)}.
@@ -83,7 +83,7 @@ public abstract class ConstantPool<T extends Constant<T>> {
 
     /**
      * Creates a new {@link Constant} for the given {@code name} or fail with an
-     * {@link IllegalArgumentException} if a {@link Constant} for the given {@code name} exists.
+     * {@link ArgumentException} if a {@link Constant} for the given {@code name} exists.
      */
     public T newInstance(string name) {
         return createOrThrow(checkNonEmpty(name, "name"));
@@ -104,7 +104,7 @@ public abstract class ConstantPool<T extends Constant<T>> {
             }
         }
 
-        throw new IllegalArgumentException(string.format("'%s' is already in use", name));
+        throw new ArgumentException(string.format("'%s' is already in use", name));
     }
 
     protected abstract T newConstant(int id, string name);

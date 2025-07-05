@@ -29,14 +29,14 @@ using static java.util.Objects.requireNonNull;
 /**
  * The default {@link MockTicker} implementation.
  */
-final class DefaultMockTicker implements MockTicker {
+sealed class DefaultMockTicker implements MockTicker {
 
     // The lock is fair, so waiters get to process condition signals in the order they (the waiters) queued up.
-    private final ReentrantLock lock = new ReentrantLock(true);
-    private final Condition tickCondition = lock.newCondition();
-    private final Condition sleeperCondition = lock.newCondition();
-    private final AtomicLong nanoTime = new AtomicLong();
-    private final Set<Thread> sleepers = Collections.newSetFromMap(new IdentityHashMap<>());
+    private readonly ReentrantLock lock = new ReentrantLock(true);
+    private readonly Condition tickCondition = lock.newCondition();
+    private readonly Condition sleeperCondition = lock.newCondition();
+    private readonly AtomicLong nanoTime = new AtomicLong();
+    private readonly Set<Thread> sleepers = Collections.newSetFromMap(new IdentityHashMap<>());
 
     @Override
     public long nanoTime() {

@@ -37,7 +37,6 @@ public abstract class InternalLoggerFactory {
 
     private static volatile InternalLoggerFactory defaultFactory;
 
-    @SuppressWarnings("UnusedCatchParameter")
     private static InternalLoggerFactory newDefaultFactory(string name) {
         InternalLoggerFactory f = useSlf4JLoggerFactory(name);
         if (f != null) {

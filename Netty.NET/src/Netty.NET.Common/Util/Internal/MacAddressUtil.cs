@@ -32,11 +32,11 @@ using java.util.concurrent.ThreadLocalRandom;
 
 using static Netty.NET.Common.Util.Internal.EmptyArrays.EMPTY_BYTES;
 
-public final class MacAddressUtil {
-    private static final InternalLogger logger = InternalLoggerFactory.getInstance(MacAddressUtil.class);
+public sealed class MacAddressUtil {
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(MacAddressUtil.class);
 
-    private static final int EUI64_MAC_ADDRESS_LENGTH = 8;
-    private static final int EUI48_MAC_ADDRESS_LENGTH = 6;
+    private static readonly int EUI64_MAC_ADDRESS_LENGTH = 8;
+    private static readonly int EUI48_MAC_ADDRESS_LENGTH = 6;
 
     /**
      * Obtains the best MAC address found on local network interfaces.
@@ -158,7 +158,7 @@ public final class MacAddressUtil {
                 machineId = new byte[EUI64_MAC_ADDRESS_LENGTH];
                 break;
             default:
-                throw new IllegalArgumentException("value is not supported [MAC-48, EUI-48, EUI-64]");
+                throw new ArgumentException("value is not supported [MAC-48, EUI-48, EUI-64]");
         }
 
         final int end = machineId.length - 1;
@@ -167,7 +167,7 @@ public final class MacAddressUtil {
             final int sIndex = j + 2;
             machineId[i] = StringUtil.decodeHexByte(value, j);
             if (value.charAt(sIndex) != separator) {
-                throw new IllegalArgumentException("expected separator '" + separator + " but got '" +
+                throw new ArgumentException("expected separator '" + separator + " but got '" +
                         value.charAt(sIndex) + "' at index: " + sIndex);
             }
         }
@@ -179,7 +179,7 @@ public final class MacAddressUtil {
 
     private static void validateMacSeparator(char separator) {
         if (separator != ':' && separator != '-') {
-            throw new IllegalArgumentException("unsupported separator: " + separator + " (expected: [:-])");
+            throw new ArgumentException("unsupported separator: " + separator + " (expected: [:-])");
         }
     }
 

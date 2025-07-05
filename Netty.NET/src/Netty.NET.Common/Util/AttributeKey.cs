@@ -22,9 +22,9 @@ namespace Netty.NET.Common.Util;
  * @param <T>   the type of the {@link Attribute} which can be accessed via this {@link AttributeKey}.
  */
 @SuppressWarnings("UnusedDeclaration") // 'T' is used only at compile time
-public final class AttributeKey<T> extends AbstractConstant<AttributeKey<T>> {
+public sealed class AttributeKey<T> extends AbstractConstant<AttributeKey<T>> {
 
-    private static final ConstantPool<AttributeKey<object>> pool = new ConstantPool<AttributeKey<object>>() {
+    private static readonly ConstantPool<AttributeKey<object>> pool = new ConstantPool<AttributeKey<object>>() {
         @Override
         protected AttributeKey<object> newConstant(int id, string name) {
             return new AttributeKey<object>(id, name);
@@ -48,7 +48,7 @@ public final class AttributeKey<T> extends AbstractConstant<AttributeKey<T>> {
 
     /**
      * Creates a new {@link AttributeKey} for the given {@code name} or fail with an
-     * {@link IllegalArgumentException} if a {@link AttributeKey} for the given {@code name} exists.
+     * {@link ArgumentException} if a {@link AttributeKey} for the given {@code name} exists.
      */
     @SuppressWarnings("unchecked")
     public static <T> AttributeKey<T> newInstance(string name) {

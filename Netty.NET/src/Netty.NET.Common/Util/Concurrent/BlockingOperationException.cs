@@ -23,7 +23,7 @@ namespace Netty.NET.Common.Util.concurrent;
  */
 public class BlockingOperationException extends IllegalStateException {
 
-    private static final long serialVersionUID = 2462223247762460301L;
+    private static readonly long serialVersionUID = 2462223247762460301L;
 
     public BlockingOperationException() { }
 
@@ -31,11 +31,11 @@ public class BlockingOperationException extends IllegalStateException {
         super(s);
     }
 
-    public BlockingOperationException(Throwable cause) {
+    public BlockingOperationException(Exception cause) {
         super(cause);
     }
 
-    public BlockingOperationException(string message, Throwable cause) {
+    public BlockingOperationException(string message, Exception cause) {
         super(message, cause);
     }
 }
