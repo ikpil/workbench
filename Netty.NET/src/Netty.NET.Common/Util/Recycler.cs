@@ -13,34 +13,21 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+
+using Netty.NET.Common.Util.concurrent;
+using Netty.NET.Common.Util.Internal;
+using Netty.NET.Common.Util.Internal.logging;
+
 namespace Netty.NET.Common.Util;
-
-using Netty.NET.Common.Util.concurrent.FastThreadLocal;
-using Netty.NET.Common.Util.concurrent.FastThreadLocalThread;
-using Netty.NET.Common.Util.Internal.ObjectPool;
-using Netty.NET.Common.Util.Internal.PlatformDependent;
-using Netty.NET.Common.Util.Internal.SystemPropertyUtil;
-using Netty.NET.Common.Util.Internal.UnstableApi;
-using Netty.NET.Common.Util.Internal.logging.InternalLogger;
-using Netty.NET.Common.Util.Internal.logging.InternalLoggerFactory;
-using org.jctools.queues.MessagePassingQueue;
-using org.jetbrains.annotations.VisibleForTesting;
-
-using java.util.ArrayDeque;
-using java.util.Queue;
-using java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
-
-using static Netty.NET.Common.Util.Internal.PlatformDependent.newMpscQueue;
-using static java.lang.Math.max;
-using static java.lang.Math.min;
 
 /**
  * Light-weight object pool based on a thread-local stack.
  *
  * @param <T> the type of the pooled object
  */
-public abstract class Recycler<T> {
-    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(Recycler.class);
+public abstract class Recycler<T>
+{
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance<Recycler<T>();
     private static readonly EnhancedHandle<?> NOOP_HANDLE = new EnhancedHandle<object>() {
         @Override
         public void recycle(object object) {
@@ -64,7 +51,8 @@ public abstract class Recycler<T> {
     private static readonly bool BLOCKING_POOL;
     private static readonly bool BATCH_FAST_TL_ONLY;
 
-    static {
+    static Recycler() 
+    {
         // In the future, we might have different maxCapacity for different object types.
         // e.g. io.netty.recycler.maxCapacity.writeTask
         //      io.netty.recycler.maxCapacity.outboundBuffer

@@ -13,36 +13,27 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+
 namespace Netty.NET.Common.Util;
 
 /**
  * Represents a supplier of {@code bool}-valued results which doesn't throw any checked exceptions.
  */
-public interface UncheckedBooleanSupplier extends BooleanSupplier {
+public interface UncheckedBooleanSupplier : BooleanSupplier
+{
     /**
      * Gets a bool value.
      * @return a bool value.
      */
-    @Override
     bool get();
 
     /**
      * A supplier which always returns {@code false} and never throws.
      */
-    UncheckedBooleanSupplier FALSE_SUPPLIER = new UncheckedBooleanSupplier() {
-        @Override
-        public bool get() {
-            return false;
-        }
-    };
+    public static readonly BooleanSupplier FALSE_SUPPLIER = new ConstantSupplier(false);
 
     /**
      * A supplier which always returns {@code true} and never throws.
      */
-    UncheckedBooleanSupplier TRUE_SUPPLIER = new UncheckedBooleanSupplier() {
-        @Override
-        public bool get() {
-            return true;
-        }
-    };
+    public static readonly BooleanSupplier TRUE_SUPPLIER = new ConstantSupplier(true);
 }

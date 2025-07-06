@@ -18,7 +18,7 @@ namespace Netty.NET.Common.Util.concurrent;
 using Netty.NET.Common.Util.Internal.ObjectUtil;
 
 using java.util.concurrent.RejectedExecutionException;
-using java.util.concurrent.TimeUnit;
+using java.util.concurrent.TimeSpan;
 using java.util.concurrent.locks.LockSupport;
 
 /**
@@ -46,7 +46,7 @@ public sealed class RejectedExecutionHandlers {
      * is only done if the task was added from outside of the event loop which means
      * {@link EventExecutor#inEventLoop()} returns {@code false}.
      */
-    public static RejectedExecutionHandler backoff(final int retries, long backoffAmount, TimeUnit unit) {
+    public static RejectedExecutionHandler backoff(final int retries, long backoffAmount, TimeSpan unit) {
         ObjectUtil.checkPositive(retries, "retries");
         final long backOffNanos = unit.toNanos(backoffAmount);
         return new RejectedExecutionHandler() {

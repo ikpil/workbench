@@ -38,7 +38,7 @@ using java.util.concurrent.Executor;
 using java.util.concurrent.LinkedBlockingQueue;
 using java.util.concurrent.RejectedExecutionException;
 using java.util.concurrent.ThreadFactory;
-using java.util.concurrent.TimeUnit;
+using java.util.concurrent.TimeSpan;
 using java.util.concurrent.TimeoutException;
 using java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
 using java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
@@ -302,7 +302,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
                 Runnable task = null;
                 if (delayNanos > 0) {
                     try {
-                        task = taskQueue.poll(delayNanos, TimeUnit.NANOSECONDS);
+                        task = taskQueue.poll(delayNanos, TimeSpan.NANOSECONDS);
                     } catch (InterruptedException e) {
                         // Waken up.
                         return null;
@@ -706,7 +706,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
     }
 
     @Override
-    public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
+    public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeSpan unit) {
         ObjectUtil.checkPositiveOrZero(quietPeriod, "quietPeriod");
         if (timeout < quietPeriod) {
             throw new ArgumentException(
@@ -847,7 +847,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
     }
 
     @Override
-    public bool awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+    public bool awaitTermination(long timeout, TimeSpan unit) throws InterruptedException {
         ObjectUtil.checkNotNull(unit, "unit");
         if (inEventLoop()) {
             throw new IllegalStateException("cannot await termination of the current thread");
@@ -936,7 +936,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
     }
 
     @Override
-    public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+    public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeSpan unit)
             throws InterruptedException, ExecutionException, TimeoutException {
         throwIfInEventLoop("invokeAny");
         return super.invokeAny(tasks, timeout, unit);
@@ -951,7 +951,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
 
     @Override
     public <T> List<java.util.concurrent.Task<T>> invokeAll(
-            Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException {
+            Collection<? extends Callable<T>> tasks, long timeout, TimeSpan unit) throws InterruptedException {
         throwIfInEventLoop("invokeAll");
         return super.invokeAll(tasks, timeout, unit);
     }
@@ -1016,7 +1016,7 @@ public abstract class SingleThreadEventExecutor extends AbstractScheduledEventEx
 
     // ScheduledExecutorService implementation
 
-    private static readonly long SCHEDULE_PURGE_INTERVAL = TimeUnit.SECONDS.toNanos(1);
+    private static readonly long SCHEDULE_PURGE_INTERVAL = TimeSpan.SECONDS.toNanos(1);
 
     private void startThread() {
         int currentState = state;

@@ -13,15 +13,20 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+
+using System.Collections.ObjectModel;
+using System.Net;
+using System.Net.NetworkInformation;
+
 namespace Netty.NET.Common.Util;
 
 using com.oracle.svm.core.annotate.Alias;
 using com.oracle.svm.core.annotate.InjectAccessors;
 using com.oracle.svm.core.annotate.TargetClass;
 
-using java.net.Inet4Address;
-using java.net.Inet6Address;
-using java.net.InetAddress;
+using java.net.IPAddress;
+using java.net.IPAddress;
+using java.net.IPAddress;
 using java.net.NetworkInterface;
 using java.util.Collection;
 
@@ -32,63 +37,63 @@ sealed class NetUtilSubstitutions {
 
     @Alias
     @InjectAccessors(NetUtilLocalhost4Accessor.class)
-    public static Inet4Address LOCALHOST4;
+    public static IPAddress LOCALHOST4;
 
     @Alias
     @InjectAccessors(NetUtilLocalhost6Accessor.class)
-    public static Inet6Address LOCALHOST6;
+    public static IPAddress LOCALHOST6;
 
     @Alias
     @InjectAccessors(NetUtilLocalhostAccessor.class)
-    public static InetAddress LOCALHOST;
+    public static IPAddress LOCALHOST;
 
     @Alias
     @InjectAccessors(NetUtilNetworkInterfacesAccessor.class)
     public static Collection<NetworkInterface> NETWORK_INTERFACES;
 
     private static class NetUtilLocalhost4Accessor {
-        static Inet4Address get() {
+        static IPAddress get() {
             // using https://en.wikipedia.org/wiki/Initialization-on-demand_holder_idiom
             return NetUtilLocalhost4LazyHolder.LOCALHOST4;
         }
 
-        static void set(Inet4Address ignored) {
+        static void set(IPAddress ignored) {
             // a no-op setter to avoid exceptions when NetUtil is initialized at run-time
         }
     }
 
     private static class NetUtilLocalhost4LazyHolder {
-        private static readonly Inet4Address LOCALHOST4 = NetUtilInitializations.createLocalhost4();
+        private static readonly IPAddress LOCALHOST4 = NetUtilInitializations.createLocalhost4();
     }
 
     private static class NetUtilLocalhost6Accessor {
-        static Inet6Address get() {
+        static IPAddress get() {
             // using https://en.wikipedia.org/wiki/Initialization-on-demand_holder_idiom
             return NetUtilLocalhost6LazyHolder.LOCALHOST6;
         }
 
-        static void set(Inet6Address ignored) {
+        static void set(IPAddress ignored) {
             // a no-op setter to avoid exceptions when NetUtil is initialized at run-time
         }
     }
 
     private static class NetUtilLocalhost6LazyHolder {
-        private static readonly Inet6Address LOCALHOST6 = NetUtilInitializations.createLocalhost6();
+        public static readonly IPAddress LOCALHOST6 = NetUtilInitializations.createLocalhost6();
     }
 
     private static class NetUtilLocalhostAccessor {
-        static InetAddress get() {
+        static IPAddress get() {
             // using https://en.wikipedia.org/wiki/Initialization-on-demand_holder_idiom
             return NetUtilLocalhostLazyHolder.LOCALHOST;
         }
 
-        static void set(InetAddress ignored) {
+        static void set(IPAddress ignored) {
             // a no-op setter to avoid exceptions when NetUtil is initialized at run-time
         }
     }
 
     private static class NetUtilLocalhostLazyHolder {
-        private static readonly InetAddress LOCALHOST = NetUtilInitializations
+        private static readonly IPAddress LOCALHOST = NetUtilInitializations
                 .determineLoopback(NetUtilNetworkInterfacesLazyHolder.NETWORK_INTERFACES,
                         NetUtilLocalhost4LazyHolder.LOCALHOST4, NetUtilLocalhost6LazyHolder.LOCALHOST6)
                 .address();

@@ -31,9 +31,9 @@ using java.util.concurrent.RejectedExecutionHandler;
 using java.util.concurrent.RunnableScheduledFuture;
 using java.util.concurrent.ScheduledThreadPoolExecutor;
 using java.util.concurrent.ThreadFactory;
-using java.util.concurrent.TimeUnit;
+using java.util.concurrent.TimeSpan;
 
-using static java.util.concurrent.TimeUnit.NANOSECONDS;
+using static java.util.concurrent.TimeSpan.NANOSECONDS;
 
 /**
  * {@link EventExecutor} implementation which makes no guarantees about the ordering of task execution that
@@ -149,11 +149,11 @@ public sealed class UnorderedThreadPoolEventExecutor extends ScheduledThreadPool
 
     @Override
     public Task<?> shutdownGracefully() {
-        return shutdownGracefully(2, 15, TimeUnit.SECONDS);
+        return shutdownGracefully(2, 15, TimeSpan.SECONDS);
     }
 
     @Override
-    public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
+    public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeSpan unit) {
         // TODO: At the moment this just calls shutdown but we may be able to do something more smart here which
         //       respects the quietPeriod and timeout.
         shutdown();
@@ -182,22 +182,22 @@ public sealed class UnorderedThreadPoolEventExecutor extends ScheduledThreadPool
     }
 
     @Override
-    public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
+    public ScheduledFuture<?> schedule(Runnable command, long delay, TimeSpan unit) {
         return (ScheduledFuture<?>) super.schedule(command, delay, unit);
     }
 
     @Override
-    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
+    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeSpan unit) {
         return (ScheduledFuture<V>) super.schedule(callable, delay, unit);
     }
 
     @Override
-    public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
+    public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeSpan unit) {
         return (ScheduledFuture<?>) super.scheduleAtFixedRate(command, initialDelay, period, unit);
     }
 
     @Override
-    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
+    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeSpan unit) {
         return (ScheduledFuture<?>) super.scheduleWithFixedDelay(command, initialDelay, delay, unit);
     }
 
@@ -273,7 +273,7 @@ public sealed class UnorderedThreadPoolEventExecutor extends ScheduledThreadPool
         }
 
         @Override
-        public long getDelay(TimeUnit unit) {
+        public long getDelay(TimeSpan unit) {
             return future.getDelay(unit);
         }
 

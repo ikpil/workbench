@@ -26,12 +26,12 @@ using Netty.NET.Common.Util.Internal.logging.InternalLoggerFactory;
 using java.util.concurrent.CancellationException;
 using java.util.concurrent.CompletionException;
 using java.util.concurrent.ExecutionException;
-using java.util.concurrent.TimeUnit;
+using java.util.concurrent.TimeSpan;
 using java.util.concurrent.TimeoutException;
 using java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
 
 using static Netty.NET.Common.Util.Internal.ObjectUtil.checkNotNull;
-using static java.util.concurrent.TimeUnit.MILLISECONDS;
+using static java.util.concurrent.TimeSpan.MILLISECONDS;
 
 public class DefaultPromise<V> extends AbstractFuture<V> implements TaskCompletionSource<V> {
     /**
@@ -304,7 +304,7 @@ public class DefaultPromise<V> extends AbstractFuture<V> implements TaskCompleti
     }
 
     @Override
-    public bool await(long timeout, TimeUnit unit) throws InterruptedException {
+    public bool await(long timeout, TimeSpan unit) throws InterruptedException {
         return await0(unit.toNanos(timeout), true);
     }
 
@@ -314,7 +314,7 @@ public class DefaultPromise<V> extends AbstractFuture<V> implements TaskCompleti
     }
 
     @Override
-    public bool awaitUninterruptibly(long timeout, TimeUnit unit) {
+    public bool awaitUninterruptibly(long timeout, TimeSpan unit) {
         try {
             return await0(unit.toNanos(timeout), false);
         } catch (InterruptedException e) {
@@ -366,7 +366,7 @@ public class DefaultPromise<V> extends AbstractFuture<V> implements TaskCompleti
 
     @SuppressWarnings("unchecked")
     @Override
-    public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+    public V get(long timeout, TimeSpan unit) throws InterruptedException, ExecutionException, TimeoutException {
         object result = this.result;
         if (!isDone0(result)) {
             if (!await(timeout, unit)) {

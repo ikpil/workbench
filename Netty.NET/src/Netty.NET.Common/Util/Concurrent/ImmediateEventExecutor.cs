@@ -21,7 +21,7 @@ using Netty.NET.Common.Util.Internal.logging.InternalLoggerFactory;
 
 using java.util.ArrayDeque;
 using java.util.Queue;
-using java.util.concurrent.TimeUnit;
+using java.util.concurrent.TimeSpan;
 
 /**
  * Executes {@link Runnable} objects in the caller's thread. If the {@link #execute(Runnable)} is reentrant it will be
@@ -68,7 +68,7 @@ public sealed class ImmediateEventExecutor extends AbstractEventExecutor {
     }
 
     @Override
-    public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
+    public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeSpan unit) {
         return terminationFuture();
     }
 
@@ -97,7 +97,7 @@ public sealed class ImmediateEventExecutor extends AbstractEventExecutor {
     }
 
     @Override
-    public bool awaitTermination(long timeout, TimeUnit unit) {
+    public bool awaitTermination(long timeout, TimeSpan unit) {
         return false;
     }
 

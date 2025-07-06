@@ -13,36 +13,33 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+
 namespace Netty.NET.Common.Util;
 
 /**
  * Represents a supplier of {@code bool}-valued results.
  */
-public interface BooleanSupplier {
+public interface BooleanSupplier
+{
     /**
      * Gets a bool value.
      * @return a bool value.
      * @throws Exception If an exception occurs.
      */
-    bool get() throws Exception;
+    bool get();
+}
 
-    /**
-     * A supplier which always returns {@code false} and never throws.
-     */
-    BooleanSupplier FALSE_SUPPLIER = new BooleanSupplier() {
-        @Override
-        public bool get() {
-            return false;
-        }
-    };
+public class ConstantSupplier : BooleanSupplier
+{
+    private readonly bool constant;
 
-    /**
-     * A supplier which always returns {@code true} and never throws.
-     */
-    BooleanSupplier TRUE_SUPPLIER = new BooleanSupplier() {
-        @Override
-        public bool get() {
-            return true;
-        }
-    };
+    public ConstantSupplier(bool constant)
+    {
+        this.constant = constant;
+    }
+
+    public bool get()
+    {
+        return constant;
+    }
 }

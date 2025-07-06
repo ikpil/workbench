@@ -20,7 +20,7 @@ using Netty.NET.Common.Util.NetUtil;
 using Netty.NET.Common.Util.Internal.logging.InternalLogger;
 using Netty.NET.Common.Util.Internal.logging.InternalLoggerFactory;
 
-using java.net.InetAddress;
+using java.net.IPAddress;
 using java.net.NetworkInterface;
 using java.net.SocketException;
 using java.util.Arrays;
@@ -48,24 +48,24 @@ public sealed class MacAddressUtil {
     public static byte[] bestAvailableMac() {
         // Find the best MAC address available.
         byte[] bestMacAddr = EMPTY_BYTES;
-        InetAddress bestInetAddr = NetUtil.LOCALHOST4;
+        IPAddress bestInetAddr = NetUtil.LOCALHOST4;
 
         // Retrieve the list of available network interfaces.
-        Map<NetworkInterface, InetAddress> ifaces = new LinkedHashMap<NetworkInterface, InetAddress>();
+        Map<NetworkInterface, IPAddress> ifaces = new LinkedHashMap<NetworkInterface, IPAddress>();
         for (NetworkInterface iface: NetUtil.NETWORK_INTERFACES) {
             // Use the interface with proper INET addresses only.
-            Enumeration<InetAddress> addrs = SocketUtils.addressesFromNetworkInterface(iface);
+            Enumeration<IPAddress> addrs = SocketUtils.addressesFromNetworkInterface(iface);
             if (addrs.hasMoreElements()) {
-                InetAddress a = addrs.nextElement();
+                IPAddress a = addrs.nextElement();
                 if (!a.isLoopbackAddress()) {
                     ifaces.put(iface, a);
                 }
             }
         }
 
-        for (Entry<NetworkInterface, InetAddress> entry: ifaces.entrySet()) {
+        for (Entry<NetworkInterface, IPAddress> entry: ifaces.entrySet()) {
             NetworkInterface iface = entry.getKey();
-            InetAddress inetAddr = entry.getValue();
+            IPAddress inetAddr = entry.getValue();
             if (iface.isVirtual()) {
                 continue;
             }
@@ -245,11 +245,11 @@ public sealed class MacAddressUtil {
     /**
      * @return positive - current is better, 0 - cannot tell, negative - candidate is better
      */
-    private static int compareAddresses(InetAddress current, InetAddress candidate) {
+    private static int compareAddresses(IPAddress current, IPAddress candidate) {
         return scoreAddress(current) - scoreAddress(candidate);
     }
 
-    private static int scoreAddress(InetAddress addr) {
+    private static int scoreAddress(IPAddress addr) {
         if (addr.isAnyLocalAddress() || addr.isLoopbackAddress()) {
             return 0;
         }

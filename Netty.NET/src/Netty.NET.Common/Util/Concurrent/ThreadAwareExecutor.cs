@@ -15,12 +15,11 @@
  */
 namespace Netty.NET.Common.Util.concurrent;
 
-using java.util.concurrent.Executor;
 
 /**
  * Executor that is aware its execution thread.
  */
-public interface ThreadAwareExecutor extends Executor {
+public interface ThreadAwareExecutor : Executor {
     /**
      * Return {@code true} if the given {@link Thread} is used by this {@link ThreadAwareExecutor} to execute
      * work.

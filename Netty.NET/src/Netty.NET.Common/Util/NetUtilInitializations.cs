@@ -13,23 +13,15 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+
+using System.Collections.ObjectModel;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Net.Sockets;
+using Netty.NET.Common.Util.Internal;
+using Netty.NET.Common.Util.Internal.logging;
+
 namespace Netty.NET.Common.Util;
-
-using Netty.NET.Common.Util.Internal.PlatformDependent;
-using Netty.NET.Common.Util.Internal.SocketUtils;
-using Netty.NET.Common.Util.Internal.logging.InternalLogger;
-using Netty.NET.Common.Util.Internal.logging.InternalLoggerFactory;
-
-using java.net.Inet4Address;
-using java.net.Inet6Address;
-using java.net.InetAddress;
-using java.net.NetworkInterface;
-using java.net.SocketException;
-using java.util.ArrayList;
-using java.util.Collection;
-using java.util.Collections;
-using java.util.Enumeration;
-using java.util.List;
 
 sealed class NetUtilInitializations {
     /**
@@ -40,12 +32,12 @@ sealed class NetUtilInitializations {
     private NetUtilInitializations() {
     }
 
-    static Inet4Address createLocalhost4() {
+    static IPAddress createLocalhost4() {
         byte[] LOCALHOST4_BYTES = {127, 0, 0, 1};
 
-        Inet4Address localhost4 = null;
+        IPAddress localhost4 = null;
         try {
-            localhost4 = (Inet4Address) InetAddress.getByAddress("localhost", LOCALHOST4_BYTES);
+            localhost4 = (IPAddress) IPAddress.getByAddress("localhost", LOCALHOST4_BYTES);
         } catch (Exception e) {
             // We should not get here as long as the length of the address is correct.
             PlatformDependent.throwException(e);
@@ -54,12 +46,12 @@ sealed class NetUtilInitializations {
         return localhost4;
     }
 
-    static Inet6Address createLocalhost6() {
+    public static IPAddress createLocalhost6() {
         byte[] LOCALHOST6_BYTES = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1};
 
-        Inet6Address localhost6 = null;
+        IPAddress localhost6 = null;
         try {
-            localhost6 = (Inet6Address) InetAddress.getByAddress("localhost", LOCALHOST6_BYTES);
+            localhost6 = (IPAddress) IPAddress.getByAddress("localhost", LOCALHOST6_BYTES);
         } catch (Exception e) {
             // We should not get here as long as the length of the address is correct.
             PlatformDependent.throwException(e);
@@ -68,10 +60,11 @@ sealed class NetUtilInitializations {
         return localhost6;
     }
 
-    static Collection<NetworkInterface> networkInterfaces() {
+    public static ICollection<NetworkInterface> networkInterfaces() {
         List<NetworkInterface> networkInterfaces = new List<NetworkInterface>();
-        try {
-            Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+        try
+        {
+            NetworkInterface[] interfaces = NetworkInterface.GetAllNetworkInterfaces();
             if (interfaces != null) {
                 while (interfaces.hasMoreElements()) {
                     networkInterfaces.add(interfaces.nextElement());
@@ -90,7 +83,7 @@ sealed class NetUtilInitializations {
     }
 
     static NetworkIfaceAndInetAddress determineLoopback(
-            Collection<NetworkInterface> networkInterfaces, Inet4Address localhost4, Inet6Address localhost6) {
+            Collection<NetworkInterface> networkInterfaces, IPAddress localhost4, IPAddress localhost6) {
         // Retrieve the list of available network interfaces.
         List<NetworkInterface> ifaces = new List<NetworkInterface>();
         for (NetworkInterface iface: networkInterfaces) {
@@ -104,10 +97,10 @@ sealed class NetUtilInitializations {
         // Note that we do not use NetworkInterface.isLoopback() in the first place because it takes long time
         // on a certain environment. (e.g. Windows with -Djava.net.preferIPv4Stack=true)
         NetworkInterface loopbackIface = null;
-        InetAddress loopbackAddr = null;
+        IPAddress loopbackAddr = null;
         loop: for (NetworkInterface iface: ifaces) {
-            for (Enumeration<InetAddress> i = SocketUtils.addressesFromNetworkInterface(iface); i.hasMoreElements();) {
-                InetAddress addr = i.nextElement();
+            for (Enumeration<IPAddress> i = SocketUtils.addressesFromNetworkInterface(iface); i.hasMoreElements();) {
+                IPAddress addr = i.nextElement();
                 if (addr.isLoopbackAddress()) {
                     // Found
                     loopbackIface = iface;
@@ -122,7 +115,7 @@ sealed class NetUtilInitializations {
             try {
                 for (NetworkInterface iface: ifaces) {
                     if (iface.isLoopback()) {
-                        Enumeration<InetAddress> i = SocketUtils.addressesFromNetworkInterface(iface);
+                        Enumeration<IPAddress> i = SocketUtils.addressesFromNetworkInterface(iface);
                         if (i.hasMoreElements()) {
                             // Found the one with INET address.
                             loopbackIface = iface;
@@ -170,9 +163,9 @@ sealed class NetUtilInitializations {
 
     static class NetworkIfaceAndInetAddress {
         private readonly NetworkInterface iface;
-        private readonly InetAddress address;
+        private readonly IPAddress address;
 
-        NetworkIfaceAndInetAddress(NetworkInterface iface, InetAddress address) {
+        NetworkIfaceAndInetAddress(NetworkInterface iface, IPAddress address) {
             this.iface = iface;
             this.address = address;
         }
@@ -181,7 +174,7 @@ sealed class NetUtilInitializations {
             return iface;
         }
 
-        public InetAddress address() {
+        public IPAddress address() {
             return address;
         }
     }

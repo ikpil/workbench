@@ -13,6 +13,9 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+
+using Netty.NET.Common.Util.Internal;
+
 namespace Netty.NET.Common.Util;
 
 using Netty.NET.Common.Util.Internal.PlatformDependent;
@@ -29,7 +32,7 @@ sealed class AsciiStringUtil {
      * @param string the {@link AsciiString} to convert
      * @return the new {@link AsciiString} in lower case
      */
-    static AsciiString toLowerCase(final AsciiString string) {
+    static AsciiString toLowerCase(AsciiString string) {
         final byte[] byteArray = string.array();
         final int offset = string.arrayOffset();
         final int length = string.length();

@@ -18,7 +18,7 @@ namespace Netty.NET.Common.Util.concurrent;
 
 using Netty.NET.Common.Util.Internal.ObjectUtil;
 
-using java.util.concurrent.TimeUnit;
+using java.util.concurrent.TimeSpan;
 
 /**
  * A skeletal {@link Task} implementation which represents a {@link Task} which has been completed already.
@@ -83,7 +83,7 @@ public abstract class CompleteFuture<V> extends AbstractFuture<V> {
     }
 
     @Override
-    public bool await(long timeout, TimeUnit unit) throws InterruptedException {
+    public bool await(long timeout, TimeSpan unit) throws InterruptedException {
         if (Thread.interrupted()) {
             throw new InterruptedException();
         }
@@ -114,7 +114,7 @@ public abstract class CompleteFuture<V> extends AbstractFuture<V> {
     }
 
     @Override
-    public bool awaitUninterruptibly(long timeout, TimeUnit unit) {
+    public bool awaitUninterruptibly(long timeout, TimeSpan unit) {
         return true;
     }
 

@@ -13,12 +13,15 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+
+
 namespace Netty.NET.Common.Util;
 
 /**
  * Abstraction for hash code generation and equality comparison.
  */
-public interface HashingStrategy<T> {
+public interface HashingStrategy<T>
+{
     /**
      * Generate a hash code for {@code obj}.
      * <p>
@@ -53,20 +56,27 @@ public interface HashingStrategy<T> {
      * </ul>
      */
     bool equals(T a, T b);
+}
 
+public class HashingStrategyDefault : HashingStrategy<object>
+{
     /**
      * A {@link HashingStrategy} which delegates to java's {@link object#hashCode()}
      * and {@link object#equals(object)}.
      */
-    HashingStrategy JAVA_HASHER = new HashingStrategy() {
-        @Override
-        public int hashCode(object obj) {
-            return obj != null ? obj.hashCode() : 0;
-        }
+    public static readonly HashingStrategyDefault JAVA_HASHER = new HashingStrategyDefault();
 
-        @Override
-        public bool equals(object a, object b) {
-            return (a == b) || (a != null && a.equals(b));
-        }
-    };
+    private HashingStrategyDefault()
+    {
+    }
+
+    public int hashCode(object obj)
+    {
+        return obj != null ? obj.GetHashCode() : 0;
+    }
+
+    public bool equals(object a, object b)
+    {
+        return (a == b) || (a != null && a.Equals(b));
+    }
 }

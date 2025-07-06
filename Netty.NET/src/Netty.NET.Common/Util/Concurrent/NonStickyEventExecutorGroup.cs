@@ -26,7 +26,7 @@ using java.util.Queue;
 using java.util.concurrent.Callable;
 using java.util.concurrent.ExecutionException;
 using java.util.concurrent.RejectedExecutionException;
-using java.util.concurrent.TimeUnit;
+using java.util.concurrent.TimeSpan;
 using java.util.concurrent.TimeoutException;
 using java.util.concurrent.atomic.AtomicInteger;
 using java.util.concurrent.atomic.AtomicReference;
@@ -87,7 +87,7 @@ public sealed class NonStickyEventExecutorGroup implements EventExecutorGroup {
     }
 
     @Override
-    public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
+    public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeSpan unit) {
         return group.shutdownGracefully(quietPeriod, timeout, unit);
     }
 
@@ -150,22 +150,22 @@ public sealed class NonStickyEventExecutorGroup implements EventExecutorGroup {
     }
 
     @Override
-    public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
+    public ScheduledFuture<?> schedule(Runnable command, long delay, TimeSpan unit) {
         return group.schedule(command, delay, unit);
     }
 
     @Override
-    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
+    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeSpan unit) {
         return group.schedule(callable, delay, unit);
     }
 
     @Override
-    public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
+    public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeSpan unit) {
         return group.scheduleAtFixedRate(command, initialDelay, period, unit);
     }
 
     @Override
-    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
+    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeSpan unit) {
         return group.scheduleWithFixedDelay(command, initialDelay, delay, unit);
     }
 
@@ -180,7 +180,7 @@ public sealed class NonStickyEventExecutorGroup implements EventExecutorGroup {
     }
 
     @Override
-    public bool awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+    public bool awaitTermination(long timeout, TimeSpan unit) throws InterruptedException {
         return group.awaitTermination(timeout, unit);
     }
 
@@ -192,7 +192,7 @@ public sealed class NonStickyEventExecutorGroup implements EventExecutorGroup {
 
     @Override
     public <T> List<java.util.concurrent.Task<T>> invokeAll(
-            Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit) throws InterruptedException {
+            Collection<? extends Callable<T>> tasks, long timeout, TimeSpan unit) throws InterruptedException {
         return group.invokeAll(tasks, timeout, unit);
     }
 
@@ -202,7 +202,7 @@ public sealed class NonStickyEventExecutorGroup implements EventExecutorGroup {
     }
 
     @Override
-    public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeUnit unit)
+    public <T> T invokeAny(Collection<? extends Callable<T>> tasks, long timeout, TimeSpan unit)
             throws InterruptedException, ExecutionException, TimeoutException {
         return group.invokeAny(tasks, timeout, unit);
     }
@@ -302,7 +302,7 @@ public sealed class NonStickyEventExecutorGroup implements EventExecutorGroup {
         }
 
         @Override
-        public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
+        public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeSpan unit) {
             return executor.shutdownGracefully(quietPeriod, timeout, unit);
         }
 
@@ -327,7 +327,7 @@ public sealed class NonStickyEventExecutorGroup implements EventExecutorGroup {
         }
 
         @Override
-        public bool awaitTermination(long timeout, TimeUnit unit) throws InterruptedException {
+        public bool awaitTermination(long timeout, TimeSpan unit) throws InterruptedException {
             return executor.awaitTermination(timeout, unit);
         }
 

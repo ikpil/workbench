@@ -30,7 +30,7 @@ using java.security.SecureRandom;
 using java.util.Random;
 using java.util.concurrent.BlockingQueue;
 using java.util.concurrent.LinkedBlockingQueue;
-using java.util.concurrent.TimeUnit;
+using java.util.concurrent.TimeSpan;
 using java.util.concurrent.atomic.AtomicLong;
 
 using static Netty.NET.Common.Util.Internal.ObjectUtil.checkPositive;
@@ -141,7 +141,7 @@ public sealed class ThreadLocalRandom extends Random {
 
             // Get the random seed from the generator thread with timeout.
             final long timeoutSeconds = 3;
-            final long deadLine = seedGeneratorStartTime + TimeUnit.SECONDS.toNanos(timeoutSeconds);
+            final long deadLine = seedGeneratorStartTime + TimeSpan.SECONDS.toNanos(timeoutSeconds);
             bool interrupted = false;
             for (;;) {
                 final long waitTime = deadLine - System.nanoTime();
@@ -150,7 +150,7 @@ public sealed class ThreadLocalRandom extends Random {
                     if (waitTime <= 0) {
                         seed = seedQueue.poll();
                     } else {
-                        seed = seedQueue.poll(waitTime, TimeUnit.NANOSECONDS);
+                        seed = seedQueue.poll(waitTime, TimeSpan.NANOSECONDS);
                     }
 
                     if (seed != null) {
@@ -210,7 +210,7 @@ public sealed class ThreadLocalRandom extends Random {
                         logger.debug(string.format(
                                 "-Dio.netty.initialSeedUniquifier: 0x%016x (took %d ms)",
                                 actualCurrent,
-                                TimeUnit.NANOSECONDS.toMillis(seedGeneratorEndTime - seedGeneratorStartTime)));
+                                TimeSpan.NANOSECONDS.toMillis(seedGeneratorEndTime - seedGeneratorStartTime)));
                     } else {
                         logger.debug(string.format("-Dio.netty.initialSeedUniquifier: 0x%016x", actualCurrent));
                     }

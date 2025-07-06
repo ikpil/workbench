@@ -23,7 +23,7 @@ using java.util.LinkedHashSet;
 using java.util.Set;
 using java.util.concurrent.Executor;
 using java.util.concurrent.ThreadFactory;
-using java.util.concurrent.TimeUnit;
+using java.util.concurrent.TimeSpan;
 using java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -96,7 +96,7 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
                         EventExecutor e = children[j];
                         try {
                             while (!e.isTerminated()) {
-                                e.awaitTermination(int.MAX_VALUE, TimeUnit.SECONDS);
+                                e.awaitTermination(int.MAX_VALUE, TimeSpan.SECONDS);
                             }
                         } catch (InterruptedException interrupted) {
                             // Let the caller handle the interruption.
@@ -158,7 +158,7 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
     protected abstract EventExecutor newChild(Executor executor, object... args) throws Exception;
 
     @Override
-    public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
+    public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeSpan unit) {
         for (EventExecutor l: children) {
             l.shutdownGracefully(quietPeriod, timeout, unit);
         }
@@ -209,7 +209,7 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
     }
 
     @Override
-    public bool awaitTermination(long timeout, TimeUnit unit)
+    public bool awaitTermination(long timeout, TimeSpan unit)
             throws InterruptedException {
         long deadline = System.nanoTime() + unit.toNanos(timeout);
         loop: for (EventExecutor l: children) {
@@ -218,7 +218,7 @@ public abstract class MultithreadEventExecutorGroup extends AbstractEventExecuto
                 if (timeLeft <= 0) {
                     break loop;
                 }
-                if (l.awaitTermination(timeLeft, TimeUnit.NANOSECONDS)) {
+                if (l.awaitTermination(timeLeft, TimeSpan.NANOSECONDS)) {
                     break;
                 }
             }

@@ -16,7 +16,7 @@
 namespace Netty.NET.Common.Util.concurrent;
 
 using java.util.concurrent.CancellationException;
-using java.util.concurrent.TimeUnit;
+using java.util.concurrent.TimeSpan;
 
 
 /**
@@ -117,7 +117,7 @@ public interface Task<V> extends java.util.concurrent.Task<V> {
      * @throws InterruptedException
      *         if the current thread was interrupted
      */
-    bool await(long timeout, TimeUnit unit) throws InterruptedException;
+    bool await(long timeout, TimeSpan unit) throws InterruptedException;
 
     /**
      * Waits for this future to be completed within the
@@ -139,7 +139,7 @@ public interface Task<V> extends java.util.concurrent.Task<V> {
      * @return {@code true} if and only if the future was completed within
      *         the specified time limit
      */
-    bool awaitUninterruptibly(long timeout, TimeUnit unit);
+    bool awaitUninterruptibly(long timeout, TimeSpan unit);
 
     /**
      * Waits for this future to be completed within the

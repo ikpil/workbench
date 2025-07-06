@@ -13,34 +13,16 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+
+using System.Collections.ObjectModel;
+using System.Net;
+using System.Net.NetworkInformation;
+using System.Text;
+using Netty.NET.Common.Util;
+using Netty.NET.Common.Util.Internal;
+using Netty.NET.Common.Util.Internal.logging;
+
 namespace Netty.NET.Common.Util;
-
-using Netty.NET.Common.Util.NetUtilInitializations.NetworkIfaceAndInetAddress;
-using Netty.NET.Common.Util.Internal.BoundedInputStream;
-using Netty.NET.Common.Util.Internal.PlatformDependent;
-using Netty.NET.Common.Util.Internal.StringUtil;
-using Netty.NET.Common.Util.Internal.SystemPropertyUtil;
-using Netty.NET.Common.Util.Internal.logging.InternalLogger;
-using Netty.NET.Common.Util.Internal.logging.InternalLoggerFactory;
-
-using java.io.BufferedReader;
-using java.io.File;
-using java.io.FileInputStream;
-using java.io.IOException;
-using java.io.InputStream;
-using java.io.InputStreamReader;
-using java.net.Inet4Address;
-using java.net.Inet6Address;
-using java.net.InetAddress;
-using java.net.InetSocketAddress;
-using java.net.NetworkInterface;
-using java.net.UnknownHostException;
-using java.security.AccessController;
-using java.security.PrivilegedAction;
-using java.util.Arrays;
-using java.util.Collection;
-
-using static Netty.NET.Common.Util.AsciiString.indexOf;
 
 /**
  * A class that holds a number of network-related constants.
@@ -52,20 +34,20 @@ using static Netty.NET.Common.Util.AsciiString.indexOf;
 public sealed class NetUtil {
 
     /**
-     * The {@link Inet4Address} that represents the IPv4 loopback address '127.0.0.1'
+     * The {@link IPAddress} that represents the IPv4 loopback address '127.0.0.1'
      */
-    public static readonly Inet4Address LOCALHOST4;
+    public static readonly IPAddress LOCALHOST4;
 
     /**
-     * The {@link Inet6Address} that represents the IPv6 loopback address '::1'
+     * The {@link IPAddress} that represents the IPv6 loopback address '::1'
      */
-    public static readonly Inet6Address LOCALHOST6;
+    public static readonly IPAddress LOCALHOST6;
 
     /**
-     * The {@link InetAddress} that represents the loopback address. If IPv6 stack is available, it will refer to
+     * The {@link IPAddress} that represents the loopback address. If IPv6 stack is available, it will refer to
      * {@link #LOCALHOST6}.  Otherwise, {@link #LOCALHOST4}.
      */
-    public static readonly InetAddress LOCALHOST;
+    public static readonly IPAddress LOCALHOST;
 
     /**
      * The loopback {@link NetworkInterface} of the current machine
@@ -136,9 +118,10 @@ public sealed class NetUtil {
     /**
      * The logger being used by this class
      */
-    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(NetUtil.class);
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance<NetUtil>();
 
-    static {
+    static NetUtil()
+    {
         string prefer = SystemPropertyUtil.get("java.net.preferIPv6Addresses", "false");
         if ("true".equalsIgnoreCase(prefer.trim())) {
             IPV6_ADDRESSES_PREFERRED = true;
@@ -146,8 +129,8 @@ public sealed class NetUtil {
             // Let's just use false in this case as only true is "forcing" ipv6.
             IPV6_ADDRESSES_PREFERRED = false;
         }
-        logger.debug("-Djava.net.preferIPv4Stack: {}", IPV4_PREFERRED);
-        logger.debug("-Djava.net.preferIPv6Addresses: {}", prefer);
+        logger.debug($"-Djava.net.preferIPv4Stack: {IPV4_PREFERRED}");
+        logger.debug($"-Djava.net.preferIPv6Addresses: {prefer}");
 
         NETWORK_INTERFACES = NetUtilInitializations.networkInterfaces();
 
@@ -304,14 +287,14 @@ public sealed class NetUtil {
     }
 
     /**
-     * Creates an {@link InetAddress} based on an ipAddressString or might return null if it can't be parsed.
+     * Creates an {@link IPAddress} based on an ipAddressString or might return null if it can't be parsed.
      * No error handling is performed here.
      */
-    public static InetAddress createInetAddressFromIpAddressString(string ipAddressString) {
+    public static IPAddress createInetAddressFromIpAddressString(string ipAddressString) {
         if (isValidIpV4Address(ipAddressString)) {
             byte[] bytes = validIpV4ToBytes(ipAddressString);
             try {
-                return InetAddress.getByAddress(bytes);
+                return IPAddress.getByAddress(bytes);
             } catch (UnknownHostException e) {
                 // Should never happen!
                 throw new IllegalStateException(e);
@@ -333,7 +316,7 @@ public sealed class NetUtil {
                         return null;
                     }
                     try {
-                        return Inet6Address.getByAddress(null, bytes, scopeId);
+                        return IPAddress.getByAddress(null, bytes, scopeId);
                     } catch (UnknownHostException e) {
                         // Should never happen!
                         throw new IllegalStateException(e);
@@ -347,7 +330,7 @@ public sealed class NetUtil {
                 return null;
             }
             try {
-                return InetAddress.getByAddress(bytes);
+                return IPAddress.getByAddress(bytes);
             } catch (UnknownHostException e) {
                 // Should never happen!
                 throw new IllegalStateException(e);
@@ -386,9 +369,9 @@ public sealed class NetUtil {
     }
 
     /**
-     * Convert {@link Inet4Address} into {@code int}
+     * Convert {@link IPAddress} into {@code int}
      */
-    public static int ipv4AddressToInt(Inet4Address ipAddress) {
+    public static int ipv4AddressToInt(IPAddress ipAddress) {
         byte[] octets = ipAddress.getAddress();
 
         return  (octets[0] & 0xff) << 24 |
@@ -672,37 +655,37 @@ public sealed class NetUtil {
     }
 
     /**
-     * Returns the {@link Inet6Address} representation of a {@link CharSequence} IP address.
+     * Returns the {@link IPAddress} representation of a {@link CharSequence} IP address.
      * <p>
      * This method will treat all IPv4 type addresses as "IPv4 mapped" (see {@link #getByName(CharSequence, bool)})
-     * @param ip {@link CharSequence} IP address to be converted to a {@link Inet6Address}
-     * @return {@link Inet6Address} representation of the {@code ip} or {@code null} if not a valid IP address.
+     * @param ip {@link CharSequence} IP address to be converted to a {@link IPAddress}
+     * @return {@link IPAddress} representation of the {@code ip} or {@code null} if not a valid IP address.
      */
-    public static Inet6Address getByName(CharSequence ip) {
+    public static IPAddress getByName(CharSequence ip) {
         return getByName(ip, true);
     }
 
     /**
-     * Returns the {@link Inet6Address} representation of a {@link CharSequence} IP address.
+     * Returns the {@link IPAddress} representation of a {@link CharSequence} IP address.
      * <p>
      * The {@code ipv4Mapped} parameter specifies how IPv4 addresses should be treated.
      * "IPv4 mapped" format as
      * defined in <a href="https://tools.ietf.org/html/rfc4291#section-2.5.5">rfc 4291 section 2</a> is supported.
-     * @param ip {@link CharSequence} IP address to be converted to a {@link Inet6Address}
+     * @param ip {@link CharSequence} IP address to be converted to a {@link IPAddress}
      * @param ipv4Mapped
      * <ul>
-     * <li>{@code true} To allow IPv4 mapped inputs to be translated into {@link Inet6Address}</li>
+     * <li>{@code true} To allow IPv4 mapped inputs to be translated into {@link IPAddress}</li>
      * <li>{@code false} Consider IPv4 mapped addresses as invalid.</li>
      * </ul>
-     * @return {@link Inet6Address} representation of the {@code ip} or {@code null} if not a valid IP address.
+     * @return {@link IPAddress} representation of the {@code ip} or {@code null} if not a valid IP address.
      */
-    public static Inet6Address getByName(CharSequence ip, bool ipv4Mapped) {
+    public static IPAddress getByName(CharSequence ip, bool ipv4Mapped) {
         byte[] bytes = getIPv6ByName(ip, ipv4Mapped);
         if (bytes == null) {
             return null;
         }
         try {
-            return Inet6Address.getByAddress(null, bytes, -1);
+            return IPAddress.getByAddress(null, bytes, -1);
         } catch (UnknownHostException e) {
             throw new RuntimeException(e); // Should never happen
         }
@@ -714,10 +697,10 @@ public sealed class NetUtil {
      * The {@code ipv4Mapped} parameter specifies how IPv4 addresses should be treated.
      * "IPv4 mapped" format as
      * defined in <a href="https://tools.ietf.org/html/rfc4291#section-2.5.5">rfc 4291 section 2</a> is supported.
-     * @param ip {@link CharSequence} IP address to be converted to a {@link Inet6Address}
+     * @param ip {@link CharSequence} IP address to be converted to a {@link IPAddress}
      * @param ipv4Mapped
      * <ul>
-     * <li>{@code true} To allow IPv4 mapped inputs to be translated into {@link Inet6Address}</li>
+     * <li>{@code true} To allow IPv4 mapped inputs to be translated into {@link IPAddress}</li>
      * <li>{@code false} Consider IPv4 mapped addresses as invalid.</li>
      * </ul>
      * @return byte array representation of the {@code ip} or {@code null} if not a valid IP address.
@@ -904,9 +887,9 @@ public sealed class NetUtil {
             string hostname = getHostname(addr);
             sb = newSocketAddressStringBuilder(hostname, port, !isValidIpV6Address(hostname));
         } else {
-            InetAddress address = addr.getAddress();
+            IPAddress address = addr.getAddress();
             string hostString = toAddressString(address);
-            sb = newSocketAddressStringBuilder(hostString, port, address instanceof Inet4Address);
+            sb = newSocketAddressStringBuilder(hostString, port, address instanceof IPAddress);
         }
         return sb.append(':').append(port).toString();
     }
@@ -935,26 +918,26 @@ public sealed class NetUtil {
     }
 
     /**
-     * Returns the {@link string} representation of an {@link InetAddress}.
+     * Returns the {@link string} representation of an {@link IPAddress}.
      * <ul>
-     * <li>Inet4Address results are identical to {@link InetAddress#getHostAddress()}</li>
-     * <li>Inet6Address results adhere to
+     * <li>IPAddress results are identical to {@link IPAddress#getHostAddress()}</li>
+     * <li>IPAddress results adhere to
      * <a href="https://tools.ietf.org/html/rfc5952#section-4">rfc 5952 section 4</a></li>
      * </ul>
      * <p>
      * The output does not include Scope ID.
-     * @param ip {@link InetAddress} to be converted to an address string
+     * @param ip {@link IPAddress} to be converted to an address string
      * @return {@code string} containing the text-formatted IP address
      */
-    public static string toAddressString(InetAddress ip) {
+    public static string toAddressString(IPAddress ip) {
         return toAddressString(ip, false);
     }
 
     /**
-     * Returns the {@link string} representation of an {@link InetAddress}.
+     * Returns the {@link string} representation of an {@link IPAddress}.
      * <ul>
-     * <li>Inet4Address results are identical to {@link InetAddress#getHostAddress()}</li>
-     * <li>Inet6Address results adhere to
+     * <li>IPAddress results are identical to {@link IPAddress#getHostAddress()}</li>
+     * <li>IPAddress results adhere to
      * <a href="https://tools.ietf.org/html/rfc5952#section-4">rfc 5952 section 4</a> if
      * {@code ipv4Mapped} is false.  If {@code ipv4Mapped} is true then "IPv4 mapped" format
      * from <a href="https://tools.ietf.org/html/rfc4291#section-2.5.5">rfc 4291 section 2</a> will be supported.
@@ -963,7 +946,7 @@ public sealed class NetUtil {
      * </ul>
      * <p>
      * The output does not include Scope ID.
-     * @param ip {@link InetAddress} to be converted to an address string
+     * @param ip {@link IPAddress} to be converted to an address string
      * @param ipv4Mapped
      * <ul>
      * <li>{@code true} to stray from strict rfc 5952 and support the "IPv4 mapped" format
@@ -974,11 +957,11 @@ public sealed class NetUtil {
      * </ul>
      * @return {@code string} containing the text-formatted IP address
      */
-    public static string toAddressString(InetAddress ip, bool ipv4Mapped) {
-        if (ip instanceof Inet4Address) {
+    public static string toAddressString(IPAddress ip, bool ipv4Mapped) {
+        if (ip instanceof IPAddress) {
             return ip.getHostAddress();
         }
-        if (!(ip instanceof Inet6Address)) {
+        if (!(ip instanceof IPAddress)) {
             throw new ArgumentException("Unhandled type: " + ip);
         }
 

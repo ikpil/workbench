@@ -17,7 +17,7 @@ namespace Netty.NET.Common.Util.concurrent;
 
 using java.util.concurrent.CancellationException;
 using java.util.concurrent.ExecutionException;
-using java.util.concurrent.TimeUnit;
+using java.util.concurrent.TimeSpan;
 using java.util.concurrent.TimeoutException;
 
 /**
@@ -42,7 +42,7 @@ public abstract class AbstractFuture<V> implements Task<V> {
     }
 
     @Override
-    public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+    public V get(long timeout, TimeSpan unit) throws InterruptedException, ExecutionException, TimeoutException {
         if (await(timeout, unit)) {
             Exception cause = cause();
             if (cause == null) {

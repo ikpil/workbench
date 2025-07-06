@@ -23,7 +23,7 @@ using java.util.Comparator;
 using java.util.Objects;
 using java.util.Queue;
 using java.util.concurrent.Callable;
-using java.util.concurrent.TimeUnit;
+using java.util.concurrent.TimeSpan;
 
 /**
  * Abstract base class for {@link EventExecutor}s that want to support scheduling.
@@ -95,7 +95,7 @@ public abstract class AbstractScheduledEventExecutor extends AbstractEventExecut
     static long deadlineNanos(long nanoTime, long delay) {
         long deadlineNanos = nanoTime + delay;
         // Guard against overflow
-        return deadlineNanos < 0 ? long.MAX_VALUE : deadlineNanos;
+        return deadlineNanos < 0 ? long.MaxValue : deadlineNanos;
     }
 
     /**
@@ -251,7 +251,7 @@ public abstract class AbstractScheduledEventExecutor extends AbstractEventExecut
     }
 
     @Override
-    public ScheduledFuture<?> schedule(Runnable command, long delay, TimeUnit unit) {
+    public ScheduledFuture<?> schedule(Runnable command, long delay, TimeSpan unit) {
         ObjectUtil.checkNotNull(command, "command");
         ObjectUtil.checkNotNull(unit, "unit");
         if (delay < 0) {
@@ -266,7 +266,7 @@ public abstract class AbstractScheduledEventExecutor extends AbstractEventExecut
     }
 
     @Override
-    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeUnit unit) {
+    public <V> ScheduledFuture<V> schedule(Callable<V> callable, long delay, TimeSpan unit) {
         ObjectUtil.checkNotNull(callable, "callable");
         ObjectUtil.checkNotNull(unit, "unit");
         if (delay < 0) {
@@ -279,7 +279,7 @@ public abstract class AbstractScheduledEventExecutor extends AbstractEventExecut
     }
 
     @Override
-    public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
+    public ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeSpan unit) {
         ObjectUtil.checkNotNull(command, "command");
         ObjectUtil.checkNotNull(unit, "unit");
         if (initialDelay < 0) {
@@ -298,7 +298,7 @@ public abstract class AbstractScheduledEventExecutor extends AbstractEventExecut
     }
 
     @Override
-    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeUnit unit) {
+    public ScheduledFuture<?> scheduleWithFixedDelay(Runnable command, long initialDelay, long delay, TimeSpan unit) {
         ObjectUtil.checkNotNull(command, "command");
         ObjectUtil.checkNotNull(unit, "unit");
         if (initialDelay < 0) {
@@ -318,7 +318,7 @@ public abstract class AbstractScheduledEventExecutor extends AbstractEventExecut
     }
 
     @SuppressWarnings("deprecation")
-    private void validateScheduled0(long amount, TimeUnit unit) {
+    private void validateScheduled0(long amount, TimeSpan unit) {
         validateScheduled(amount, unit);
     }
 
@@ -328,7 +328,7 @@ public abstract class AbstractScheduledEventExecutor extends AbstractEventExecut
      * @deprecated will be removed in the future.
      */
     @Deprecated
-    protected void validateScheduled(long amount, TimeUnit unit) {
+    protected void validateScheduled(long amount, TimeSpan unit) {
         // NOOP
     }
 

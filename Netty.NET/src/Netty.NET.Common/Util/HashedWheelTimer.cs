@@ -13,33 +13,16 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+
+using System.Text;
+using Netty.NET.Common.Util;
+using Netty.NET.Common.Util.concurrent;
+using Netty.NET.Common.Util.Internal;
+using Netty.NET.Common.Util.Internal.logging;
+using static Netty.NET.Common.Util.Internal.ObjectUtil;
+using static Netty.NET.Common.Util.Internal.StringUtil;
+
 namespace Netty.NET.Common.Util;
-
-using static Netty.NET.Common.Util.Internal.ObjectUtil.checkPositive;
-using static Netty.NET.Common.Util.Internal.ObjectUtil.checkNotNull;
-
-using Netty.NET.Common.Util.concurrent.ImmediateExecutor;
-using Netty.NET.Common.Util.Internal.MathUtil;
-using Netty.NET.Common.Util.Internal.PlatformDependent;
-using Netty.NET.Common.Util.Internal.logging.InternalLogger;
-using Netty.NET.Common.Util.Internal.logging.InternalLoggerFactory;
-
-using java.util.Collections;
-using java.util.HashSet;
-using java.util.Queue;
-using java.util.Set;
-using java.util.concurrent.CountDownLatch;
-using java.util.concurrent.Executor;
-using java.util.concurrent.Executors;
-using java.util.concurrent.RejectedExecutionException;
-using java.util.concurrent.ThreadFactory;
-using java.util.concurrent.TimeUnit;
-using java.util.concurrent.atomic.AtomicBoolean;
-using java.util.concurrent.atomic.AtomicInteger;
-using java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
-using java.util.concurrent.atomic.AtomicLong;
-
-using static Netty.NET.Common.Util.Internal.StringUtil.simpleClassName;
 
 /**
  * A {@link Timer} optimized for approximated I/O timeout scheduling.
@@ -82,15 +65,15 @@ using static Netty.NET.Common.Util.Internal.StringUtil.simpleClassName;
  * timer facility'</a>.  More comprehensive slides are located
  * <a href="https://www.cse.wustl.edu/~cdgill/courses/cs6874/TimingWheels.ppt">here</a>.
  */
-public class HashedWheelTimer implements Timer {
-
-    static readonly InternalLogger logger =
-            InternalLoggerFactory.getInstance(HashedWheelTimer.class);
+public class HashedWheelTimer : Timer
+{
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance<HashedWheelTimer>();
 
     private static readonly AtomicInteger INSTANCE_COUNTER = new AtomicInteger();
     private static readonly AtomicBoolean WARNED_TOO_MANY_INSTANCES = new AtomicBoolean();
     private static readonly int INSTANCE_COUNT_LIMIT = 64;
-    private static readonly long MILLISECOND_NANOS = TimeUnit.MILLISECONDS.toNanos(1);
+    private static readonly long MILLISECOND_NANOS = TimeSpan.MILLISECONDS.toNanos(1);
+    
     private static readonly ResourceLeakDetector<HashedWheelTimer> leakDetector = ResourceLeakDetectorFactory.instance()
             .newResourceLeakDetector(HashedWheelTimer.class, 1);
 
@@ -138,7 +121,7 @@ public class HashedWheelTimer implements Timer {
      * @throws ArgumentNullException     if {@code unit} is {@code null}
      * @throws ArgumentException if {@code tickDuration} is &lt;= 0
      */
-    public HashedWheelTimer(long tickDuration, TimeUnit unit) {
+    public HashedWheelTimer(long tickDuration, TimeSpan unit) {
         this(Executors.defaultThreadFactory(), tickDuration, unit);
     }
 
@@ -152,7 +135,7 @@ public class HashedWheelTimer implements Timer {
      * @throws ArgumentNullException     if {@code unit} is {@code null}
      * @throws ArgumentException if either of {@code tickDuration} and {@code ticksPerWheel} is &lt;= 0
      */
-    public HashedWheelTimer(long tickDuration, TimeUnit unit, int ticksPerWheel) {
+    public HashedWheelTimer(long tickDuration, TimeSpan unit, int ticksPerWheel) {
         this(Executors.defaultThreadFactory(), tickDuration, unit, ticksPerWheel);
     }
 
@@ -166,7 +149,7 @@ public class HashedWheelTimer implements Timer {
      * @throws ArgumentNullException if {@code threadFactory} is {@code null}
      */
     public HashedWheelTimer(ThreadFactory threadFactory) {
-        this(threadFactory, 100, TimeUnit.MILLISECONDS);
+        this(threadFactory, 100, TimeSpan.MILLISECONDS);
     }
 
     /**
@@ -181,7 +164,7 @@ public class HashedWheelTimer implements Timer {
      * @throws ArgumentException if {@code tickDuration} is &lt;= 0
      */
     public HashedWheelTimer(
-            ThreadFactory threadFactory, long tickDuration, TimeUnit unit) {
+            ThreadFactory threadFactory, long tickDuration, TimeSpan unit) {
         this(threadFactory, tickDuration, unit, 512);
     }
 
@@ -199,7 +182,7 @@ public class HashedWheelTimer implements Timer {
      */
     public HashedWheelTimer(
             ThreadFactory threadFactory,
-            long tickDuration, TimeUnit unit, int ticksPerWheel) {
+            long tickDuration, TimeSpan unit, int ticksPerWheel) {
         this(threadFactory, tickDuration, unit, ticksPerWheel, true);
     }
 
@@ -220,7 +203,7 @@ public class HashedWheelTimer implements Timer {
      */
     public HashedWheelTimer(
             ThreadFactory threadFactory,
-            long tickDuration, TimeUnit unit, int ticksPerWheel, bool leakDetection) {
+            long tickDuration, TimeSpan unit, int ticksPerWheel, bool leakDetection) {
         this(threadFactory, tickDuration, unit, ticksPerWheel, leakDetection, -1);
     }
 
@@ -246,7 +229,7 @@ public class HashedWheelTimer implements Timer {
      */
     public HashedWheelTimer(
             ThreadFactory threadFactory,
-            long tickDuration, TimeUnit unit, int ticksPerWheel, bool leakDetection,
+            long tickDuration, TimeSpan unit, int ticksPerWheel, bool leakDetection,
             long maxPendingTimeouts) {
         this(threadFactory, tickDuration, unit, ticksPerWheel, leakDetection,
                 maxPendingTimeouts, ImmediateExecutor.INSTANCE);
@@ -276,7 +259,7 @@ public class HashedWheelTimer implements Timer {
      */
     public HashedWheelTimer(
             ThreadFactory threadFactory,
-            long tickDuration, TimeUnit unit, int ticksPerWheel, bool leakDetection,
+            long tickDuration, TimeSpan unit, int ticksPerWheel, bool leakDetection,
             long maxPendingTimeouts, Executor taskExecutor) {
 
         checkNotNull(threadFactory, "threadFactory");
@@ -293,10 +276,10 @@ public class HashedWheelTimer implements Timer {
         long duration = unit.toNanos(tickDuration);
 
         // Prevent overflow.
-        if (duration >= long.MAX_VALUE / wheel.length) {
+        if (duration >= long.MaxValue / wheel.length) {
             throw new ArgumentException(string.format(
                     "tickDuration: %d (expected: 0 < tickDuration in nanos < %d",
-                    tickDuration, long.MAX_VALUE / wheel.length));
+                    tickDuration, long.MaxValue / wheel.length));
         }
 
         if (duration < MILLISECOND_NANOS) {
@@ -361,7 +344,7 @@ public class HashedWheelTimer implements Timer {
             case WORKER_STATE_SHUTDOWN:
                 throw new IllegalStateException("cannot be started once stopped");
             default:
-                throw new Error("Invalid WorkerState");
+                throw new JSType.Error("Invalid WorkerState");
         }
 
         // Wait until the startTime is initialized by the worker.
@@ -428,7 +411,7 @@ public class HashedWheelTimer implements Timer {
     }
 
     @Override
-    public Timeout newTimeout(TimerTask task, long delay, TimeUnit unit) {
+    public Timeout newTimeout(TimerTask task, long delay, TimeSpan unit) {
         checkNotNull(task, "task");
         checkNotNull(unit, "unit");
 
@@ -449,7 +432,7 @@ public class HashedWheelTimer implements Timer {
 
         // Guard against overflow.
         if (delay > 0 && deadline < 0) {
-            deadline = long.MAX_VALUE;
+            deadline = long.MaxValue;
         }
         HashedWheelTimeout timeout = new HashedWheelTimeout(this, task, deadline);
         timeouts.add(timeout);
@@ -575,7 +558,7 @@ public class HashedWheelTimer implements Timer {
 
                 if (sleepTimeMs <= 0) {
                     if (currentTime == long.MIN_VALUE) {
-                        return -long.MAX_VALUE;
+                        return -long.MaxValue;
                     } else {
                         return currentTime;
                     }

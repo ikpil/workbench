@@ -16,7 +16,7 @@
 namespace Netty.NET.Common.Util.concurrent;
 
 using java.util.concurrent.Callable;
-using java.util.concurrent.TimeUnit;
+using java.util.concurrent.TimeSpan;
 
 /**
  * The {@link EventExecutor} is a special {@link EventExecutorGroup} which comes
@@ -24,7 +24,7 @@ using java.util.concurrent.TimeUnit;
  * Besides this, it also extends the {@link EventExecutorGroup} to allow for a generic
  * way to access methods.
  */
-public interface EventExecutor extends EventExecutorGroup, ThreadAwareExecutor {
+public interface EventExecutor : EventExecutorGroup, ThreadAwareExecutor {
 
     /**
      * Return the {@link EventExecutorGroup} which is the parent of this {@link EventExecutor},
@@ -97,10 +97,10 @@ public interface EventExecutor extends EventExecutorGroup, ThreadAwareExecutor {
      * by submitting work to it via one of the following methods:
      * <ul>
      *   <li>{@link #execute(Runnable)}</li>
-     *   <li>{@link #schedule(Runnable, long, TimeUnit)}</li>
-     *   <li>{@link #schedule(Callable, long, TimeUnit)}</li>
-     *   <li>{@link #scheduleAtFixedRate(Runnable, long, long, TimeUnit)}</li>
-     *   <li>{@link #scheduleWithFixedDelay(Runnable, long, long, TimeUnit)}</li>
+     *   <li>{@link #schedule(Runnable, long, TimeSpan)}</li>
+     *   <li>{@link #schedule(Callable, long, TimeSpan)}</li>
+     *   <li>{@link #scheduleAtFixedRate(Runnable, long, long, TimeSpan)}</li>
+     *   <li>{@link #scheduleWithFixedDelay(Runnable, long, long, TimeSpan)}</li>
      * </ul>
      *
      * Even if this method returns {@code true} it might take some time for the {@link EventExecutor} to fully suspend

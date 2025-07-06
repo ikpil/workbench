@@ -13,6 +13,10 @@
  * License for the specific language governing permissions and limitations
  * under the License.
  */
+
+using Netty.NET.Common.Util.Internal;
+using Netty.NET.Common.Util.Internal.logging;
+
 namespace Netty.NET.Common.Util;
 
 using Netty.NET.Common.Util.Internal.ObjectUtil;
@@ -25,10 +29,11 @@ using Netty.NET.Common.Util.Internal.logging.InternalLoggerFactory;
  */
 public sealed class ReferenceCountUtil {
 
-    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(ReferenceCountUtil.class);
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance<ReferenceCountUtil>();
 
-    static {
-        ResourceLeakDetector.addExclusions(ReferenceCountUtil.class, "touch");
+    static ReferenceCountUtil() 
+    {
+        ResourceLeakDetector<ReferenceCountUtil>.addExclusions("touch");
     }
 
     /**

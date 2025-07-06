@@ -14,21 +14,18 @@
  * under the License.
  */
 
+using System.Reflection;
+using Netty.NET.Common.Util;
+using Netty.NET.Common.Util.Internal;
+using Netty.NET.Common.Util.Internal.logging;
+
 namespace Netty.NET.Common.Util;
-
-using Netty.NET.Common.Util.Internal.ObjectUtil;
-using Netty.NET.Common.Util.Internal.PlatformDependent;
-using Netty.NET.Common.Util.Internal.SystemPropertyUtil;
-using Netty.NET.Common.Util.Internal.logging.InternalLogger;
-using Netty.NET.Common.Util.Internal.logging.InternalLoggerFactory;
-
-using java.lang.reflect.Constructor;
 
 /**
  * This static factory should be used to load {@link ResourceLeakDetector}s as needed
  */
-public abstract class ResourceLeakDetectorFactory {
-    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(ResourceLeakDetectorFactory.class);
+public class ResourceLeakDetectorFactory {
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance<ResourceLeakDetectorFactory>();
 
     private static volatile ResourceLeakDetectorFactory factoryInstance = new DefaultResourceLeakDetectorFactory();
 
@@ -59,26 +56,11 @@ public abstract class ResourceLeakDetectorFactory {
      * @param <T> the type of the resource class
      * @return a new instance of {@link ResourceLeakDetector}
      */
-    public final <T> ResourceLeakDetector<T> newResourceLeakDetector(Class<T> resource) {
-        return newResourceLeakDetector(resource, ResourceLeakDetector.SAMPLING_INTERVAL);
+    public ResourceLeakDetector<T> newResourceLeakDetector<T>() {
+        return newResourceLeakDetector<T>(ResourceLeakDetector<T>.SAMPLING_INTERVAL);
     }
 
     /**
-     * @deprecated Use {@link #newResourceLeakDetector(Class, int)} instead.
-     * <p>
-     * Returns a new instance of a {@link ResourceLeakDetector} with the given resource class.
-     *
-     * @param resource the resource class used to initialize the {@link ResourceLeakDetector}
-     * @param samplingInterval the interval on which sampling takes place
-     * @param maxActive This is deprecated and will be ignored.
-     * @param <T> the type of the resource class
-     * @return a new instance of {@link ResourceLeakDetector}
-     */
-    @Deprecated
-    public abstract <T> ResourceLeakDetector<T> newResourceLeakDetector(
-            Class<T> resource, int samplingInterval, long maxActive);
-
-    /**
      * Returns a new instance of a {@link ResourceLeakDetector} with the given resource class.
      *
      * @param resource the resource class used to initialize the {@link ResourceLeakDetector}
@@ -86,20 +68,22 @@ public abstract class ResourceLeakDetectorFactory {
      * @param <T> the type of the resource class
      * @return a new instance of {@link ResourceLeakDetector}
      */
-    @SuppressWarnings("deprecation")
-    public <T> ResourceLeakDetector<T> newResourceLeakDetector(Class<T> resource, int samplingInterval) {
+    public virtual ResourceLeakDetector<T> newResourceLeakDetector<T>(int samplingInterval) {
         ObjectUtil.checkPositive(samplingInterval, "samplingInterval");
-        return newResourceLeakDetector(resource, samplingInterval, long.MAX_VALUE);
+        return newResourceLeakDetector<T>(samplingInterval, long.MaxValue);
     }
+    
+    public virtual ResourceLeakDetector<T> newResourceLeakDetector<T>(int samplingInterval, long maxActive);
+
 
     /**
      * Default implementation that loads custom leak detector via system property
      */
-    private static class DefaultResourceLeakDetectorFactory extends ResourceLeakDetectorFactory {
-        private readonly Constructor<?> obsoleteCustomClassConstructor;
-        private readonly Constructor<?> customClassConstructor;
+    private class DefaultResourceLeakDetectorFactory : ResourceLeakDetectorFactory {
+        private readonly ConstructorInfo obsoleteCustomClassConstructor;
+        private readonly ConstructorInfo customClassConstructor;
 
-        DefaultResourceLeakDetectorFactory() {
+        public DefaultResourceLeakDetectorFactory() {
             string customLeakDetector;
             try {
                 customLeakDetector = SystemPropertyUtil.get("io.netty.customResourceLeakDetector");
@@ -115,12 +99,12 @@ public abstract class ResourceLeakDetectorFactory {
             }
         }
 
-        private static Constructor<?> obsoleteCustomClassConstructor(string customLeakDetector) {
+        private static ConstructorInfo obsoleteCustomClassConstructor(string customLeakDetector) {
             try {
                 final Class<?> detectorClass = Class.forName(customLeakDetector, true,
                         PlatformDependent.getSystemClassLoader());
 
-                if (ResourceLeakDetector.class.isAssignableFrom(detectorClass)) {
+                if (ResourceLeakDetector<>.class.isAssignableFrom(detectorClass)) {
                     return detectorClass.getConstructor(Class.class, int.class, long.class);
                 } else {
                     logger.error("Class {} does not inherit from ResourceLeakDetector.", customLeakDetector);
@@ -132,7 +116,7 @@ public abstract class ResourceLeakDetectorFactory {
             return null;
         }
 
-        private static Constructor<?> customClassConstructor(string customLeakDetector) {
+        private static ConstructorInfo customClassConstructor(string customLeakDetector) {
             try {
                 final Class<?> detectorClass = Class.forName(customLeakDetector, true,
                         PlatformDependent.getSystemClassLoader());
@@ -149,10 +133,7 @@ public abstract class ResourceLeakDetectorFactory {
             return null;
         }
 
-        @SuppressWarnings("deprecation")
-        @Override
-        public <T> ResourceLeakDetector<T> newResourceLeakDetector(Class<T> resource, int samplingInterval,
-                                                                   long maxActive) {
+        public override ResourceLeakDetector<T> newResourceLeakDetector<T>(int samplingInterval, long maxActive) {
             if (obsoleteCustomClassConstructor != null) {
                 try {
                     @SuppressWarnings("unchecked")
@@ -169,14 +150,13 @@ public abstract class ResourceLeakDetectorFactory {
                 }
             }
 
-            ResourceLeakDetector<T> resourceLeakDetector = new ResourceLeakDetector<T>(resource, samplingInterval,
+            ResourceLeakDetector<T> resourceLeakDetector = new ResourceLeakDetector<T>(samplingInterval,
                                                                                        maxActive);
             logger.debug("Loaded default ResourceLeakDetector: {}", resourceLeakDetector);
             return resourceLeakDetector;
         }
 
-        @Override
-        public <T> ResourceLeakDetector<T> newResourceLeakDetector(Class<T> resource, int samplingInterval) {
+        public override ResourceLeakDetector<T> newResourceLeakDetector<T>(int samplingInterval) {
             if (customClassConstructor != null) {
                 try {
                     @SuppressWarnings("unchecked")

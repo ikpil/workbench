@@ -26,7 +26,7 @@ public interface ByteProcessor {
     /**
      * A {@link ByteProcessor} which finds the first appearance of a specific byte.
      */
-    class IndexOfProcessor implements ByteProcessor {
+    class IndexOfProcessor : ByteProcessor {
         private readonly byte byteToFind;
 
         public IndexOfProcessor(byte byteToFind) {

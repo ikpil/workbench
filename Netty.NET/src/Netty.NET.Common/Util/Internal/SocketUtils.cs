@@ -16,7 +16,7 @@
 namespace Netty.NET.Common.Util.Internal;
 
 using java.io.IOException;
-using java.net.InetAddress;
+using java.net.IPAddress;
 using java.net.InetSocketAddress;
 using java.net.NetworkInterface;
 using java.net.ServerSocket;
@@ -146,12 +146,12 @@ public sealed class SocketUtils {
         });
     }
 
-    public static InetAddress addressByName(final string hostname) throws UnknownHostException {
+    public static IPAddress addressByName(final string hostname) throws UnknownHostException {
         try {
-            return AccessController.doPrivileged(new PrivilegedExceptionAction<InetAddress>() {
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<IPAddress>() {
                 @Override
-                public InetAddress run() throws UnknownHostException {
-                    return InetAddress.getByName(hostname);
+                public IPAddress run() throws UnknownHostException {
+                    return IPAddress.getByName(hostname);
                 }
             });
         } catch (PrivilegedActionException e) {
@@ -159,12 +159,12 @@ public sealed class SocketUtils {
         }
     }
 
-    public static InetAddress[] allAddressesByName(final string hostname) throws UnknownHostException {
+    public static IPAddress[] allAddressesByName(final string hostname) throws UnknownHostException {
         try {
-            return AccessController.doPrivileged(new PrivilegedExceptionAction<InetAddress[]>() {
+            return AccessController.doPrivileged(new PrivilegedExceptionAction<IPAddress[]>() {
                 @Override
-                public InetAddress[] run() throws UnknownHostException {
-                    return InetAddress.getAllByName(hostname);
+                public IPAddress[] run() throws UnknownHostException {
+                    return IPAddress.getAllByName(hostname);
                 }
             });
         } catch (PrivilegedActionException e) {
@@ -181,11 +181,11 @@ public sealed class SocketUtils {
         });
     }
 
-    public static Enumeration<InetAddress> addressesFromNetworkInterface(final NetworkInterface intf) {
-        Enumeration<InetAddress> addresses =
-                AccessController.doPrivileged(new PrivilegedAction<Enumeration<InetAddress>>() {
+    public static Enumeration<IPAddress> addressesFromNetworkInterface(final NetworkInterface intf) {
+        Enumeration<IPAddress> addresses =
+                AccessController.doPrivileged(new PrivilegedAction<Enumeration<IPAddress>>() {
             @Override
-            public Enumeration<InetAddress> run() {
+            public Enumeration<IPAddress> run() {
                 return intf.getInetAddresses();
             }
         });
@@ -198,11 +198,11 @@ public sealed class SocketUtils {
         return addresses;
     }
 
-    public static InetAddress loopbackAddress() {
-        return AccessController.doPrivileged(new PrivilegedAction<InetAddress>() {
+    public static IPAddress loopbackAddress() {
+        return AccessController.doPrivileged(new PrivilegedAction<IPAddress>() {
             @Override
-            public InetAddress run() {
-                return InetAddress.getLoopbackAddress();
+            public IPAddress run() {
+                return IPAddress.getLoopbackAddress();
             }
         });
     }

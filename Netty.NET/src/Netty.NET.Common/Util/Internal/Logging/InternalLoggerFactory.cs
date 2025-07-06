@@ -16,8 +16,6 @@
 
 namespace Netty.NET.Common.Util.Internal.logging;
 
-using Netty.NET.Common.Util.Internal.ObjectUtil;
-
 /**
  * Creates an {@link InternalLogger} or changes the default factory
  * implementation.  This factory allows you to choose what logging framework
@@ -122,8 +120,8 @@ public abstract class InternalLoggerFactory {
     /**
      * Creates a new logger instance with the name of the specified class.
      */
-    public static InternalLogger getInstance(Class<?> clazz) {
-        return getInstance(clazz.getName());
+    public static InternalLogger getInstance<T>() {
+        return getInstance(typeof(T).Name);
     }
 
     /**

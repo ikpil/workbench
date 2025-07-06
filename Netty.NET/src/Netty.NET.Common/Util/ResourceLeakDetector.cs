@@ -16,29 +16,6 @@
 
 namespace Netty.NET.Common.Util;
 
-using Netty.NET.Common.Util.Internal.EmptyArrays;
-using Netty.NET.Common.Util.Internal.ObjectUtil;
-using Netty.NET.Common.Util.Internal.SystemPropertyUtil;
-using Netty.NET.Common.Util.Internal.logging.InternalLogger;
-using Netty.NET.Common.Util.Internal.logging.InternalLoggerFactory;
-
-using java.lang.ref.ReferenceQueue;
-using java.lang.ref.WeakReference;
-using java.lang.reflect.Method;
-using java.util.Arrays;
-using java.util.Collections;
-using java.util.HashSet;
-using java.util.Set;
-using java.util.concurrent.ConcurrentHashMap;
-using java.util.concurrent.ThreadLocalRandom;
-using java.util.concurrent.atomic.AtomicIntegerFieldUpdater;
-using java.util.concurrent.atomic.AtomicReference;
-using java.util.concurrent.atomic.AtomicReferenceFieldUpdater;
-
-using static Netty.NET.Common.Util.Internal.StringUtil.EMPTY_STRING;
-using static Netty.NET.Common.Util.Internal.StringUtil.NEWLINE;
-using static Netty.NET.Common.Util.Internal.StringUtil.simpleClassName;
-
 public class ResourceLeakDetector<T> {
 
     private static readonly string PROP_LEVEL_OLD = "io.netty.leakDetectionLevel";
@@ -53,7 +30,7 @@ public class ResourceLeakDetector<T> {
     private static readonly int DEFAULT_SAMPLING_INTERVAL = 128;
 
     private static readonly int TARGET_RECORDS;
-    static readonly int SAMPLING_INTERVAL;
+    public static readonly int SAMPLING_INTERVAL;
 
     /**
      * Represents the level of resource leak detection.
@@ -78,27 +55,28 @@ public class ResourceLeakDetector<T> {
          * at the cost of the highest possible overhead (for testing purposes only).
          */
         PARANOID;
-
+        
         /**
          * Returns level based on string value. Accepts also string that represents ordinal number of enum.
          *
          * @param levelStr - level string : DISABLED, SIMPLE, ADVANCED, PARANOID. Ignores case.
          * @return corresponding level or SIMPLE level in case of no match.
          */
-        static Level parseLevel(string levelStr) {
-            string trimmedLevelStr = levelStr.trim();
-            for (Level l : values()) {
-                if (trimmedLevelStr.equalsIgnoreCase(l.name()) || trimmedLevelStr.equals(string.valueOf(l.ordinal()))) {
-                    return l;
+            public static Level parseLevel(string levelStr) {
+                string trimmedLevelStr = levelStr.Trim();
+                foreach (Level l in values()) {
+                    if (trimmedLevelStr.equalsIgnoreCase(l.name()) || trimmedLevelStr.equals(string.valueOf(l.ordinal()))) {
+                        return l;
+                    }
                 }
+                return DEFAULT_LEVEL;
             }
-            return DEFAULT_LEVEL;
-        }
     }
+    
 
     private static Level level;
 
-    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance(ResourceLeakDetector.class);
+    private static readonly InternalLogger logger = InternalLoggerFactory.getInstance<ResourceLeakDetector>();
 
     static {
         final bool disabled;
@@ -187,7 +165,7 @@ public class ResourceLeakDetector<T> {
      */
     @Deprecated
     public ResourceLeakDetector(string resourceType) {
-        this(resourceType, DEFAULT_SAMPLING_INTERVAL, long.MAX_VALUE);
+        this(resourceType, DEFAULT_SAMPLING_INTERVAL, long.MaxValue);
     }
 
     /**
@@ -211,7 +189,7 @@ public class ResourceLeakDetector<T> {
      */
     @SuppressWarnings("deprecation")
     public ResourceLeakDetector(Class<?> resourceType, int samplingInterval) {
-        this(simpleClassName(resourceType), samplingInterval, long.MAX_VALUE);
+        this(simpleClassName(resourceType), samplingInterval, long.MaxValue);
     }
 
     /**
@@ -616,11 +594,11 @@ public class ResourceLeakDetector<T> {
     private static readonly AtomicReference<string[]> excludedMethods =
             new AtomicReference<string[]>(EmptyArrays.EMPTY_STRINGS);
 
-    public static void addExclusions(Class clz, string ... methodNames) {
-        Set<string> nameSet = new HashSet<string>(Arrays.asList(methodNames));
+    public static void addExclusions(Type clz, params string[] methodNames) {
+        ISet<string> nameSet = new HashSet<string>(methodNames);
         // Use loop rather than lookup. This avoids knowing the parameters, and doesn't have to handle
         // NoSuchMethodException.
-        for (Method method : clz.getDeclaredMethods()) {
+        foreach (Method method in clz.getDeclaredMethods()) {
             if (nameSet.remove(method.getName()) && nameSet.isEmpty()) {
                 break;
             }

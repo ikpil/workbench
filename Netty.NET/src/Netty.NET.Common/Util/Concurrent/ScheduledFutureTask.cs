@@ -21,7 +21,7 @@ using Netty.NET.Common.Util.Internal.PriorityQueueNode;
 
 using java.util.concurrent.Callable;
 using java.util.concurrent.Delayed;
-using java.util.concurrent.TimeUnit;
+using java.util.concurrent.TimeSpan;
 
 @SuppressWarnings("ComparableImplementedButEqualsNotOverridden")
 sealed class ScheduledFutureTask<V> extends PromiseTask<V> implements ScheduledFuture<V>, PriorityQueueNode {
@@ -114,8 +114,8 @@ sealed class ScheduledFutureTask<V> extends PromiseTask<V> implements ScheduledF
     }
 
     @Override
-    public long getDelay(TimeUnit unit) {
-        return unit.convert(delayNanos(), TimeUnit.NANOSECONDS);
+    public long getDelay(TimeSpan unit) {
+        return unit.convert(delayNanos(), TimeSpan.NANOSECONDS);
     }
 
     @Override

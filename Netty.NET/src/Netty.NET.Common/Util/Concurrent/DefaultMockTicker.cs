@@ -18,7 +18,7 @@ namespace Netty.NET.Common.Util.concurrent;
 using java.util.Collections;
 using java.util.IdentityHashMap;
 using java.util.Set;
-using java.util.concurrent.TimeUnit;
+using java.util.concurrent.TimeSpan;
 using java.util.concurrent.atomic.AtomicLong;
 using java.util.concurrent.locks.Condition;
 using java.util.concurrent.locks.ReentrantLock;
@@ -44,7 +44,7 @@ sealed class DefaultMockTicker implements MockTicker {
     }
 
     @Override
-    public void sleep(long delay, TimeUnit unit) throws InterruptedException {
+    public void sleep(long delay, TimeSpan unit) throws InterruptedException {
         checkPositiveOrZero(delay, "delay");
         requireNonNull(unit, "unit");
 
@@ -68,7 +68,7 @@ sealed class DefaultMockTicker implements MockTicker {
     }
 
     /**
-     * Wait for the given thread to enter the {@link #sleep(long, TimeUnit)} method, and block.
+     * Wait for the given thread to enter the {@link #sleep(long, TimeSpan)} method, and block.
      */
     public void awaitSleepingThread(Thread thread) throws InterruptedException {
         lock.lockInterruptibly();
@@ -82,7 +82,7 @@ sealed class DefaultMockTicker implements MockTicker {
     }
 
     @Override
-    public void advance(long amount, TimeUnit unit) {
+    public void advance(long amount, TimeSpan unit) {
         checkPositiveOrZero(amount, "amount");
         requireNonNull(unit, "unit");
 

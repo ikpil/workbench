@@ -32,7 +32,7 @@ using java.util.concurrent.Executors;
 using java.util.concurrent.LinkedBlockingQueue;
 using java.util.concurrent.RejectedExecutionException;
 using java.util.concurrent.ThreadFactory;
-using java.util.concurrent.TimeUnit;
+using java.util.concurrent.TimeSpan;
 using java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -53,7 +53,7 @@ public sealed class GlobalEventExecutor extends AbstractScheduledEventExecutor i
         }
         logger.debug("-Dio.netty.globalEventExecutor.quietPeriodSeconds: {}", quietPeriod);
 
-        SCHEDULE_QUIET_PERIOD_INTERVAL = TimeUnit.SECONDS.toNanos(quietPeriod);
+        SCHEDULE_QUIET_PERIOD_INTERVAL = TimeSpan.SECONDS.toNanos(quietPeriod);
     }
 
     public static readonly GlobalEventExecutor INSTANCE = new GlobalEventExecutor();
@@ -115,7 +115,7 @@ public sealed class GlobalEventExecutor extends AbstractScheduledEventExecutor i
                 Runnable task = null;
                 if (delayNanos > 0) {
                     try {
-                        task = taskQueue.poll(delayNanos, TimeUnit.NANOSECONDS);
+                        task = taskQueue.poll(delayNanos, TimeSpan.NANOSECONDS);
                     } catch (InterruptedException e) {
                         // Waken up.
                         return null;
@@ -167,7 +167,7 @@ public sealed class GlobalEventExecutor extends AbstractScheduledEventExecutor i
     }
 
     @Override
-    public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeUnit unit) {
+    public Task<?> shutdownGracefully(long quietPeriod, long timeout, TimeSpan unit) {
         return terminationFuture();
     }
 
@@ -198,7 +198,7 @@ public sealed class GlobalEventExecutor extends AbstractScheduledEventExecutor i
     }
 
     @Override
-    public bool awaitTermination(long timeout, TimeUnit unit) {
+    public bool awaitTermination(long timeout, TimeSpan unit) {
         return false;
     }
 
@@ -210,7 +210,7 @@ public sealed class GlobalEventExecutor extends AbstractScheduledEventExecutor i
      *
      * @return {@code true} if and only if the worker thread has been terminated
      */
-    public bool awaitInactivity(long timeout, TimeUnit unit) throws InterruptedException {
+    public bool awaitInactivity(long timeout, TimeSpan unit) throws InterruptedException {
         ObjectUtil.checkNotNull(unit, "unit");
 
         final Thread thread = this.thread;
