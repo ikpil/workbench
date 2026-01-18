@@ -1,36 +1,20 @@
 import 'package:flutter/material.dart';
+import 'pages/root_page.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'First app',
+      title: 'Apple Glass Style',
       theme: ThemeData(
         primarySwatch: Colors.blue,
+        useMaterial3: true,
       ),
-      home: MyHomePage(),
-    );
-  }
-}
-
-class MyHomePage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('First App'),
-      ),
-      body: Center(
-        child: Column(
-          children: [
-            Text('Hello'),
-            Text('Hello'),
-            Text('Hello'),
-          ],
-        ),
-      ),
+      home: const RootPage(),
     );
   }
 }

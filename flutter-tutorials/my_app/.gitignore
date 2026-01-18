@@ -21,18 +21,13 @@ migrate_working_dir/
 # is commented out by default.
 #.vscode/
 
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.packages
-.pub-cache/
-.pub/
+# Build directories
 /build/
+*.apk
+*.aab
 
-# Symbolication related
+# Flutter/Dart tool
+.dart_tool/
 app.*.symbols
 
 # Obfuscation related
@@ -42,3 +37,56 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Android build directories
+**/android/.gradle
+**/android/**/local.properties
+**/android/**/GeneratedPluginRegistrant.java
+
+# iOS/macOS build directories
+**/ios/Flutter/Generated.xcconfig
+**/ios/Flutter/ephemeral/
+**/ios/Flutter/Flutter.podspec
+**/ios/Pods/
+**/macos/Flutter/GeneratedPluginRegistrant.swift
+**/macos/Flutter/ephemeral/
+**/macos/Pods/
+
+# Web build directories
+**/web/generated/
+
+# Windows build directories
+windows/flutter/generated_plugins.cmake
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugin_registrant.h
+windows/CMakeFiles/
+windows/cmake_install.cmake
+windows/CMakeCache.txt
+windows/*.vcxproj
+windows/*.vcxproj.filters
+windows/*.sln
+windows/install_manifest.txt
+windows/x64/
+
+# Linux build directories
+linux/flutter/generated_plugins.cmake
+linux/flutter/generated_plugin_registrant.cc
+linux/flutter/generated_plugin_registrant.h
+linux/CMakeFiles/
+linux/cmake_install.cmake
+linux/CMakeCache.txt
+linux/*.cmake
+linux/install_manifest.txt
+linux/build/
+
+# CMake related (general)
+**/CMakeFiles/
+**/cmake_install.cmake
+**/CMakeCache.txt
+**/install_manifest.txt
+
+# Coverage
+coverage/
+
+# Exceptions to above rules
+!/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
