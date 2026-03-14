@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 48f7f55ecbfc04ae18763b448b92fcbd
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268492
+  packageName: QuizU - A UI toolkit sample
+  packageVersion: 1.2.0
+  assetPath: Assets/AddressableAssetsData/AssetGroups/Schemas/Localization-String-Tables-English
+    (en)_BundledAssetGroupSchema.asset
+  uploadId: 865362

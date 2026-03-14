@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 4f069814e2ec3446faa72c6e25f96068
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 268492
+  packageName: QuizU - A UI toolkit sample
+  packageVersion: 1.2.0
+  assetPath: Assets/AddressableAssetsData/AssetGroups/Localization-Assets-English
+    (en).asset
+  uploadId: 865362

@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:editor="UnityEditor.UIElements" xmlns:engine="UnityEngine.UIElements" xmlns:AddressablesGUI="UnityEditor.AddressableAssets.GUIElements" xmlns="UnityEditor.AddressableAssets.Diagnostics" elementFormDefault="qualified" targetNamespace="Demos" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:import schemaLocation="UnityEngine.UIElements.xsd" namespace="UnityEngine.UIElements" />
+  <xs:complexType name="StepByStepQuadVectorElementType">
+    <xs:complexContent mixed="false">
+      <xs:restriction base="engine:VisualElementType">
+        <xs:attribute default="" name="name" type="xs:string" use="optional" />
+        <xs:attribute default="true" name="enabled" type="xs:boolean" use="optional" />
+        <xs:attribute default="" name="view-data-key" type="xs:string" use="optional" />
+        <xs:attribute default="Position" name="picking-mode" type="engine:VisualElement_picking-mode_Type" use="optional" />
+        <xs:attribute default="" name="tooltip" type="xs:string" use="optional" />
+        <xs:attribute default="None" name="usage-hints" type="engine:VisualElement_usage-hints_Type" use="optional" />
+        <xs:attribute default="0" name="tabindex" type="xs:int" use="optional" />
+        <xs:attribute default="false" name="focusable" type="xs:boolean" use="optional" />
+        <xs:attribute default="Inherit" name="language-direction" type="engine:VisualElement_language-direction_Type" use="optional" />
+        <xs:attribute default="" name="data-source" type="xs:string" use="optional" />
+        <xs:attribute default="" name="data-source-path" type="xs:string" use="optional" />
+        <xs:attribute default="" name="data-source-type" type="xs:string" use="optional" />
+        <xs:attribute default="10" name="line-width" type="xs:float" use="optional" />
+        <xs:attribute default="RGBA(1.000, 1.000, 1.000, 1.000)" name="stroke-color" type="xs:string" use="optional" />
+        <xs:attribute default="RGBA(0.000, 0.498, 0.851, 1.000)" name="fill-color" type="xs:string" use="optional" />
+        <xs:attribute default="0.75" name="step-delay-seconds" type="xs:float" use="optional" />
+        <xs:attribute default="1.5" name="restart-delay-seconds" type="xs:float" use="optional" />
+        <xs:attribute default="" name="content-container" type="xs:string" use="optional" />
+        <xs:attribute default="" name="class" type="xs:string" use="optional" />
+        <xs:attribute default="" name="style" type="xs:string" use="optional" />
+        <xs:anyAttribute processContents="lax" />
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="StepByStepQuadVectorElement" substitutionGroup="engine:VisualElement" xmlns:q1="Demos" type="q1:StepByStepQuadVectorElementType" />
+  <xs:complexType name="SlideToggleType">
+    <xs:complexContent mixed="false">
+      <xs:restriction base="engine:VisualElementType">
+        <xs:attribute default="" name="name" type="xs:string" use="optional" />
+        <xs:attribute default="true" name="enabled" type="xs:boolean" use="optional" />
+        <xs:attribute default="" name="view-data-key" type="xs:string" use="optional" />
+        <xs:attribute default="Position" name="picking-mode" type="engine:VisualElement_picking-mode_Type" use="optional" />
+        <xs:attribute default="" name="tooltip" type="xs:string" use="optional" />
+        <xs:attribute default="None" name="usage-hints" type="engine:VisualElement_usage-hints_Type" use="optional" />
+        <xs:attribute default="0" name="tabindex" type="xs:int" use="optional" />
+        <xs:attribute default="true" name="focusable" type="xs:boolean" use="optional" />
+        <xs:attribute default="Inherit" name="language-direction" type="engine:VisualElement_language-direction_Type" use="optional" />
+        <xs:attribute default="" name="data-source" type="xs:string" use="optional" />
+        <xs:attribute default="" name="data-source-path" type="xs:string" use="optional" />
+        <xs:attribute default="" name="data-source-type" type="xs:string" use="optional" />
+        <xs:attribute default="" name="binding-path" type="xs:string" use="optional" />
+        <xs:attribute default="Enabled" name="label" type="xs:string" use="optional" />
+        <xs:attribute default="true" name="value" type="xs:boolean" use="optional" />
+        <xs:attribute default="Enabled" name="enabled-text" type="xs:string" use="optional" />
+        <xs:attribute default="Disabled" name="disabled-text" type="xs:string" use="optional" />
+        <xs:attribute default="RGBA(0.000, 0.500, 0.850, 1.000)" name="enabled-background-color" type="xs:string" use="optional" />
+        <xs:attribute default="RGBA(0.500, 0.500, 0.500, 1.000)" name="disabled-background-color" type="xs:string" use="optional" />
+        <xs:attribute default="" name="content-container" type="xs:string" use="optional" />
+        <xs:attribute default="" name="class" type="xs:string" use="optional" />
+        <xs:attribute default="" name="style" type="xs:string" use="optional" />
+        <xs:anyAttribute processContents="lax" />
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="SlideToggle" substitutionGroup="engine:VisualElement" xmlns:q2="Demos" type="q2:SlideToggleType" />
+  <xs:simpleType name="FillHoleVectorElement_fill-rule_Type">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="NonZero" />
+      <xs:enumeration value="OddEven" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:complexType name="FillHoleVectorElementType">
+    <xs:complexContent mixed="false">
+      <xs:restriction base="engine:VisualElementType">
+        <xs:attribute default="" name="name" type="xs:string" use="optional" />
+        <xs:attribute default="true" name="enabled" type="xs:boolean" use="optional" />
+        <xs:attribute default="" name="view-data-key" type="xs:string" use="optional" />
+        <xs:attribute default="Ignore" name="picking-mode" type="engine:VisualElement_picking-mode_Type" use="optional" />
+        <xs:attribute default="" name="tooltip" type="xs:string" use="optional" />
+        <xs:attribute default="None" name="usage-hints" type="engine:VisualElement_usage-hints_Type" use="optional" />
+        <xs:attribute default="0" name="tabindex" type="xs:int" use="optional" />
+        <xs:attribute default="false" name="focusable" type="xs:boolean" use="optional" />
+        <xs:attribute default="Inherit" name="language-direction" type="engine:VisualElement_language-direction_Type" use="optional" />
+        <xs:attribute default="" name="data-source" type="xs:string" use="optional" />
+        <xs:attribute default="" name="data-source-path" type="xs:string" use="optional" />
+        <xs:attribute default="" name="data-source-type" type="xs:string" use="optional" />
+        <xs:attribute default="OddEven" name="fill-rule" xmlns:q3="Demos" type="q3:FillHoleVectorElement_fill-rule_Type" use="optional" />
+        <xs:attribute default="false" name="reverse-winding" type="xs:boolean" use="optional" />
+        <xs:attribute default="true" name="show-arrows" type="xs:boolean" use="optional" />
+        <xs:attribute default="(10.00, 10.00)" name="outer-top-left" type="xs:string" use="optional" />
+        <xs:attribute default="(300.00, 10.00)" name="outer-top-right" type="xs:string" use="optional" />
+        <xs:attribute default="(300.00, 150.00)" name="outer-bottom-right" type="xs:string" use="optional" />
+        <xs:attribute default="(10.00, 150.00)" name="outer-bottom-left" type="xs:string" use="optional" />
+        <xs:attribute default="(150.00, 50.00)" name="inner-top" type="xs:string" use="optional" />
+        <xs:attribute default="(175.00, 75.00)" name="inner-right" type="xs:string" use="optional" />
+        <xs:attribute default="(150.00, 100.00)" name="inner-bottom" type="xs:string" use="optional" />
+        <xs:attribute default="(125.00, 75.00)" name="inner-left" type="xs:string" use="optional" />
+        <xs:attribute default="" name="content-container" type="xs:string" use="optional" />
+        <xs:attribute default="" name="class" type="xs:string" use="optional" />
+        <xs:attribute default="" name="style" type="xs:string" use="optional" />
+        <xs:anyAttribute processContents="lax" />
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="FillHoleVectorElement" substitutionGroup="engine:VisualElement" xmlns:q4="Demos" type="q4:FillHoleVectorElementType" />
+  <xs:complexType name="ExampleElementType">
+    <xs:complexContent mixed="false">
+      <xs:restriction base="engine:VisualElementType">
+        <xs:attribute default="" name="name" type="xs:string" use="optional" />
+        <xs:attribute default="true" name="enabled" type="xs:boolean" use="optional" />
+        <xs:attribute default="" name="view-data-key" type="xs:string" use="optional" />
+        <xs:attribute default="Position" name="picking-mode" type="engine:VisualElement_picking-mode_Type" use="optional" />
+        <xs:attribute default="" name="tooltip" type="xs:string" use="optional" />
+        <xs:attribute default="None" name="usage-hints" type="engine:VisualElement_usage-hints_Type" use="optional" />
+        <xs:attribute default="0" name="tabindex" type="xs:int" use="optional" />
+        <xs:attribute default="false" name="focusable" type="xs:boolean" use="optional" />
+        <xs:attribute default="Inherit" name="language-direction" type="engine:VisualElement_language-direction_Type" use="optional" />
+        <xs:attribute default="" name="data-source" type="xs:string" use="optional" />
+        <xs:attribute default="" name="data-source-path" type="xs:string" use="optional" />
+        <xs:attribute default="" name="data-source-type" type="xs:string" use="optional" />
+        <xs:attribute default="" name="my-text" type="xs:string" use="optional" />
+        <xs:attribute default="0" name="my-int-value" type="xs:int" use="optional" />
+        <xs:attribute default="0" name="my-float-value" type="xs:float" use="optional" />
+        <xs:attribute default="" name="my-list-of-ints" type="xs:string" use="optional" />
+        <xs:attribute default="" name="my-type" type="xs:string" use="optional" />
+        <xs:attribute default="" name="my-texture" type="xs:string" use="optional" />
+        <xs:attribute default="RGBA(0.000, 0.000, 0.000, 0.000)" name="my-color" type="xs:string" use="optional" />
+        <xs:attribute default="" name="content-container" type="xs:string" use="optional" />
+        <xs:attribute default="" name="class" type="xs:string" use="optional" />
+        <xs:attribute default="" name="style" type="xs:string" use="optional" />
+        <xs:anyAttribute processContents="lax" />
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="ExampleElement" substitutionGroup="engine:VisualElement" xmlns:q5="Demos" type="q5:ExampleElementType" />
+  <xs:complexType name="PolygonVectorElementType">
+    <xs:complexContent mixed="false">
+      <xs:restriction base="engine:VisualElementType">
+        <xs:attribute default="" name="name" type="xs:string" use="optional" />
+        <xs:attribute default="true" name="enabled" type="xs:boolean" use="optional" />
+        <xs:attribute default="" name="view-data-key" type="xs:string" use="optional" />
+        <xs:attribute default="Position" name="picking-mode" type="engine:VisualElement_picking-mode_Type" use="optional" />
+        <xs:attribute default="" name="tooltip" type="xs:string" use="optional" />
+        <xs:attribute default="None" name="usage-hints" type="engine:VisualElement_usage-hints_Type" use="optional" />
+        <xs:attribute default="0" name="tabindex" type="xs:int" use="optional" />
+        <xs:attribute default="false" name="focusable" type="xs:boolean" use="optional" />
+        <xs:attribute default="Inherit" name="language-direction" type="engine:VisualElement_language-direction_Type" use="optional" />
+        <xs:attribute default="" name="data-source" type="xs:string" use="optional" />
+        <xs:attribute default="" name="data-source-path" type="xs:string" use="optional" />
+        <xs:attribute default="" name="data-source-type" type="xs:string" use="optional" />
+        <xs:attribute default="5" name="sides" type="xs:int" use="optional" />
+        <xs:attribute default="50" name="radius" type="xs:float" use="optional" />
+        <xs:attribute default="5" name="line-width" type="xs:float" use="optional" />
+        <xs:attribute default="0" name="rotation" type="xs:float" use="optional" />
+        <xs:attribute default="RGBA(1.000, 1.000, 1.000, 1.000)" name="stroke-color" type="xs:string" use="optional" />
+        <xs:attribute default="RGBA(0.000, 0.498, 0.851, 1.000)" name="fill-color" type="xs:string" use="optional" />
+        <xs:attribute default="" name="content-container" type="xs:string" use="optional" />
+        <xs:attribute default="" name="class" type="xs:string" use="optional" />
+        <xs:attribute default="" name="style" type="xs:string" use="optional" />
+        <xs:anyAttribute processContents="lax" />
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="PolygonVectorElement" substitutionGroup="engine:VisualElement" xmlns:q6="Demos" type="q6:PolygonVectorElementType" />
+  <xs:complexType name="ArcVectorElementType">
+    <xs:complexContent mixed="false">
+      <xs:restriction base="engine:VisualElementType">
+        <xs:attribute default="" name="name" type="xs:string" use="optional" />
+        <xs:attribute default="true" name="enabled" type="xs:boolean" use="optional" />
+        <xs:attribute default="" name="view-data-key" type="xs:string" use="optional" />
+        <xs:attribute default="Position" name="picking-mode" type="engine:VisualElement_picking-mode_Type" use="optional" />
+        <xs:attribute default="" name="tooltip" type="xs:string" use="optional" />
+        <xs:attribute default="None" name="usage-hints" type="engine:VisualElement_usage-hints_Type" use="optional" />
+        <xs:attribute default="0" name="tabindex" type="xs:int" use="optional" />
+        <xs:attribute default="false" name="focusable" type="xs:boolean" use="optional" />
+        <xs:attribute default="Inherit" name="language-direction" type="engine:VisualElement_language-direction_Type" use="optional" />
+        <xs:attribute default="" name="data-source" type="xs:string" use="optional" />
+        <xs:attribute default="" name="data-source-path" type="xs:string" use="optional" />
+        <xs:attribute default="" name="data-source-type" type="xs:string" use="optional" />
+        <xs:attribute default="10" name="line-width" type="xs:float" use="optional" />
+        <xs:attribute default="RGBA(1.000, 1.000, 1.000, 1.000)" name="stroke-color" type="xs:string" use="optional" />
+        <xs:attribute default="RGBA(0.000, 0.498, 0.851, 1.000)" name="fill-color" type="xs:string" use="optional" />
+        <xs:attribute default="(0.00, 0.00)" name="start-position" type="xs:string" use="optional" />
+        <xs:attribute default="250" name="radius" type="xs:float" use="optional" />
+        <xs:attribute default="0" name="start-angle" type="xs:float" use="optional" />
+        <xs:attribute default="90" name="end-angle" type="xs:float" use="optional" />
+        <xs:attribute default="" name="content-container" type="xs:string" use="optional" />
+        <xs:attribute default="" name="class" type="xs:string" use="optional" />
+        <xs:attribute default="" name="style" type="xs:string" use="optional" />
+        <xs:anyAttribute processContents="lax" />
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="ArcVectorElement" substitutionGroup="engine:VisualElement" xmlns:q7="Demos" type="q7:ArcVectorElementType" />
+  <xs:complexType name="ZigZagVectorElementType">
+    <xs:complexContent mixed="false">
+      <xs:restriction base="engine:VisualElementType">
+        <xs:attribute default="" name="name" type="xs:string" use="optional" />
+        <xs:attribute default="true" name="enabled" type="xs:boolean" use="optional" />
+        <xs:attribute default="" name="view-data-key" type="xs:string" use="optional" />
+        <xs:attribute default="Position" name="picking-mode" type="engine:VisualElement_picking-mode_Type" use="optional" />
+        <xs:attribute default="" name="tooltip" type="xs:string" use="optional" />
+        <xs:attribute default="None" name="usage-hints" type="engine:VisualElement_usage-hints_Type" use="optional" />
+        <xs:attribute default="0" name="tabindex" type="xs:int" use="optional" />
+        <xs:attribute default="false" name="focusable" type="xs:boolean" use="optional" />
+        <xs:attribute default="Inherit" name="language-direction" type="engine:VisualElement_language-direction_Type" use="optional" />
+        <xs:attribute default="" name="data-source" type="xs:string" use="optional" />
+        <xs:attribute default="" name="data-source-path" type="xs:string" use="optional" />
+        <xs:attribute default="" name="data-source-type" type="xs:string" use="optional" />
+        <xs:attribute default="RGBA(1.000, 1.000, 1.000, 1.000)" name="color" type="xs:string" use="optional" />
+        <xs:attribute default="5" name="oscillations" type="xs:int" use="optional" />
+        <xs:attribute default="10" name="line-width" type="xs:float" use="optional" />
+        <xs:attribute default="0.25" name="amplitude-factor" type="xs:float" use="optional" />
+        <xs:attribute default="0" name="start-x-offset" type="xs:float" use="optional" />
+        <xs:attribute default="" name="content-container" type="xs:string" use="optional" />
+        <xs:attribute default="" name="class" type="xs:string" use="optional" />
+        <xs:attribute default="" name="style" type="xs:string" use="optional" />
+        <xs:anyAttribute processContents="lax" />
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="ZigZagVectorElement" substitutionGroup="engine:VisualElement" xmlns:q8="Demos" type="q8:ZigZagVectorElementType" />
+  <xs:complexType name="QuadraticCurveVectorElementType">
+    <xs:complexContent mixed="false">
+      <xs:restriction base="engine:VisualElementType">
+        <xs:attribute default="" name="name" type="xs:string" use="optional" />
+        <xs:attribute default="true" name="enabled" type="xs:boolean" use="optional" />
+        <xs:attribute default="" name="view-data-key" type="xs:string" use="optional" />
+        <xs:attribute default="Ignore" name="picking-mode" type="engine:VisualElement_picking-mode_Type" use="optional" />
+        <xs:attribute default="" name="tooltip" type="xs:string" use="optional" />
+        <xs:attribute default="None" name="usage-hints" type="engine:VisualElement_usage-hints_Type" use="optional" />
+        <xs:attribute default="0" name="tabindex" type="xs:int" use="optional" />
+        <xs:attribute default="false" name="focusable" type="xs:boolean" use="optional" />
+        <xs:attribute default="Inherit" name="language-direction" type="engine:VisualElement_language-direction_Type" use="optional" />
+        <xs:attribute default="" name="data-source" type="xs:string" use="optional" />
+        <xs:attribute default="" name="data-source-path" type="xs:string" use="optional" />
+        <xs:attribute default="" name="data-source-type" type="xs:string" use="optional" />
+        <xs:attribute default="(0.00, 100.00)" name="start-point" type="xs:string" use="optional" />
+        <xs:attribute default="(50.00, 0.00)" name="control-point" type="xs:string" use="optional" />
+        <xs:attribute default="(100.00, 100.00)" name="end-point" type="xs:string" use="optional" />
+        <xs:attribute default="10" name="line-width" type="xs:float" use="optional" />
+        <xs:attribute default="RGBA(0.000, 0.498, 0.851, 1.000)" name="stroke-color" type="xs:string" use="optional" />
+        <xs:attribute default="" name="content-container" type="xs:string" use="optional" />
+        <xs:attribute default="" name="class" type="xs:string" use="optional" />
+        <xs:attribute default="" name="style" type="xs:string" use="optional" />
+        <xs:anyAttribute processContents="lax" />
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="QuadraticCurveVectorElement" substitutionGroup="engine:VisualElement" xmlns:q9="Demos" type="q9:QuadraticCurveVectorElementType" />
+  <xs:complexType name="LineVectorElementType">
+    <xs:complexContent mixed="false">
+      <xs:restriction base="engine:VisualElementType">
+        <xs:attribute default="" name="name" type="xs:string" use="optional" />
+        <xs:attribute default="true" name="enabled" type="xs:boolean" use="optional" />
+        <xs:attribute default="" name="view-data-key" type="xs:string" use="optional" />
+        <xs:attribute default="Ignore" name="picking-mode" type="engine:VisualElement_picking-mode_Type" use="optional" />
+        <xs:attribute default="" name="tooltip" type="xs:string" use="optional" />
+        <xs:attribute default="None" name="usage-hints" type="engine:VisualElement_usage-hints_Type" use="optional" />
+        <xs:attribute default="0" name="tabindex" type="xs:int" use="optional" />
+        <xs:attribute default="false" name="focusable" type="xs:boolean" use="optional" />
+        <xs:attribute default="Inherit" name="language-direction" type="engine:VisualElement_language-direction_Type" use="optional" />
+        <xs:attribute default="" name="data-source" type="xs:string" use="optional" />
+        <xs:attribute default="" name="data-source-path" type="xs:string" use="optional" />
+        <xs:attribute default="" name="data-source-type" type="xs:string" use="optional" />
+        <xs:attribute default="(0.00, 0.00)" name="start-point" type="xs:string" use="optional" />
+        <xs:attribute default="(0.00, 0.00)" name="end-point" type="xs:string" use="optional" />
+        <xs:attribute default="10" name="line-thickness" type="xs:float" use="optional" />
+        <xs:attribute default="" name="content-container" type="xs:string" use="optional" />
+        <xs:attribute default="" name="class" type="xs:string" use="optional" />
+        <xs:attribute default="" name="style" type="xs:string" use="optional" />
+        <xs:anyAttribute processContents="lax" />
+      </xs:restriction>
+    </xs:complexContent>
+  </xs:complexType>
+  <xs:element name="LineVectorElement" substitutionGroup="engine:VisualElement" xmlns:q10="Demos" type="q10:LineVectorElementType" />
+</xs:schema>
