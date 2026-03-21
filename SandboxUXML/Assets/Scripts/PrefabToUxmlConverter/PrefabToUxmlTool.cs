@@ -9,8 +9,10 @@ namespace DefaultNamespace
         public static void ConvertSelectedPrefab()
         {
             var prefabPath = "Assets/Prefabs/Panel.prefab";
-            var model = PrefabParser.Parse(prefabPath);
-            UxmlWriter.Write(model);
+            var factory = UniPrefabDocumentFactory.CreateDefault();
+            var doc = factory.LoadFromFile(prefabPath);
+            // var model = PrefabParser.Parse(prefabPath);
+            // UxmlWriter.Write(model);
         }
     }
 }
