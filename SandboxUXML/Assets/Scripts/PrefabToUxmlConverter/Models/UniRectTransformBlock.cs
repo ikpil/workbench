@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using YamlDotNet.RepresentationModel;
 
@@ -18,17 +19,40 @@ public class UniRectTransformBlock : UniComponentBlock
 
     public override void ApplyTo(UxmlElement element)
     {
-        // Unity anchor 좌표계 (Y: 아래=0, 위=1) → CSS (Y: 위=0)
-        float left   = m_AnchorMin.x;
-        float top    = 1f - m_AnchorMax.y;
-        float width  = m_AnchorMax.x - m_AnchorMin.x;
-        float height = m_AnchorMax.y  - m_AnchorMin.y;
+        // offsetMin/offsetMax: 앵커 기준점에서 요소 모서리까지의 픽셀 오프셋
+        // Unity 공식: offsetMin = anchoredPosition - sizeDelta * pivot
+        //             offsetMax = anchoredPosition + sizeDelta * (1 - pivot)
+        float offsetMinX = m_AnchoredPosition.x - m_SizeDelta.x * m_Pivot.x;
+        float offsetMinY = m_AnchoredPosition.y - m_SizeDelta.y * m_Pivot.y;
+        float offsetMaxX = m_AnchoredPosition.x + m_SizeDelta.x * (1f - m_Pivot.x);
+        float offsetMaxY = m_AnchoredPosition.y + m_SizeDelta.y * (1f - m_Pivot.y);
 
         element.Style["position"] = "absolute";
-        element.Style["left"]     = $"{left   * 100f:F2}%";
-        element.Style["top"]      = $"{top    * 100f:F2}%";
-        element.Style["width"]    = $"{width  * 100f:F2}%";
-        element.Style["height"]   = $"{height * 100f:F2}%";
+        element.Style["overflow"] = "visible";
+
+        // 4개 모서리를 anchor% + offset px 로 정의 (Unity RectTransform → CSS 직접 매핑)
+        // left   = anchorMin.x * 100% + offsetMin.x
+        element.Style["left"] = FormatEdge(m_AnchorMin.x, offsetMinX);
+        // right  = (1 - anchorMax.x) * 100% - offsetMax.x
+        element.Style["right"] = FormatEdge(1f - m_AnchorMax.x, -offsetMaxX);
+        // top    = (1 - anchorMax.y) * 100% - offsetMax.y   (Unity Y-up → CSS Y-down)
+        element.Style["top"] = FormatEdge(1f - m_AnchorMax.y, -offsetMaxY);
+        // bottom = anchorMin.y * 100% + offsetMin.y
+        element.Style["bottom"] = FormatEdge(m_AnchorMin.y, offsetMinY);
+    }
+
+    // anchor 비율(%)과 pixel 오프셋을 하나의 CSS 값으로 포맷
+    private static string FormatEdge(float pct, float px)
+    {
+        bool hasPct = Math.Abs(pct) > 0.0001f;
+        bool hasPx = Math.Abs(px) > 0.01f;
+
+        if (!hasPct && !hasPx) return "0";
+        if (!hasPx) return $"{pct * 100f:F2}%";
+        if (!hasPct) return $"{px:F2}px";
+
+        string sign = px >= 0 ? "+" : "-";
+        return $"calc({pct * 100f:F2}% {sign} {Math.Abs(px):F2}px)";
     }
 
     public static bool CanHandle(string blockName, YamlMappingNode _)

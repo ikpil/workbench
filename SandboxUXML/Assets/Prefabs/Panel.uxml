@@ -4,7 +4,7 @@
     xmlns:ui="UnityEngine.UIElements"
     xmlns:uie="UnityEditor.UIElements"
     xsi:noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd">
-    <ui:VisualElement name="Panel" style="position: absolute; left: 34.18%; top: 31.10%; width: 39.29%; height: 35.40%; background-color: rgba(255,255,255,0.392);">
-        <ui:VisualElement name="Image" style="position: absolute; left: 50.00%; top: 50.00%; width: 0.00%; height: 0.00%; background-color: rgba(255,255,255,1.000);" />
+    <ui:VisualElement name="Panel" style="position: absolute; overflow: visible; left: 34.18%; right: 26.53%; top: 31.10%; bottom: 33.50%; background-color: rgba(255,255,255,0.392);">
+        <ui:VisualElement name="Image" style="position: absolute; overflow: visible; left: calc(50.00% - 494.00px); right: calc(50.00% - 106.09px); top: calc(50.00% - 401.00px); bottom: calc(50.00% + 301.00px); background-color: rgba(255,255,255,1.000);" />
     </ui:VisualElement>
 </ui:UXML>
