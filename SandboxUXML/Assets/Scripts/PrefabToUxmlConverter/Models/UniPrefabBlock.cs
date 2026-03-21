@@ -10,6 +10,8 @@ public class UniPrefabBlock
     public long m_PrefabInstance;
     public long m_PrefabAsset;
 
+    public virtual void ApplyTo(UxmlElement element) { }
+
     public virtual void MergeFrom(YamlMappingNode block)
     {
         m_ObjectHideFlags = YamlHelper.GetInt(block, "m_ObjectHideFlags");

@@ -15,8 +15,8 @@ public class SimpleUIController : MonoBehaviour
     {
         var root = document.rootVisualElement;
 
-        var button = root.Q<Button>("start-button");
+        // var button = root.Q<Button>("start-button");
 
-        button.clicked += () => { Debug.Log("Start Clicked"); };
+        // button.clicked += () => { Debug.Log("Start Clicked"); };
     }
 }

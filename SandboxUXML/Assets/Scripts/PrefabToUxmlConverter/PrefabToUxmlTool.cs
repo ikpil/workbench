@@ -11,8 +11,9 @@ namespace DefaultNamespace
             var prefabPath = "Assets/Prefabs/Panel.prefab";
             var factory = UniPrefabDocumentFactory.CreateDefault();
             var doc = factory.LoadFromFile(prefabPath);
-            // var model = PrefabParser.Parse(prefabPath);
-            // UxmlWriter.Write(model);
+
+            var hierarchy = UniPrefabHierarchy.Build(doc);
+            UxmlWriter.Write(hierarchy, prefabPath);
         }
     }
 }

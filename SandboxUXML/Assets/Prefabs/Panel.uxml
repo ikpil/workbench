@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ui:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ui="UnityEngine.UIElements"
+    xmlns:uie="UnityEditor.UIElements"
+    xsi:noNamespaceSchemaLocation="../UIElementsSchema/UIElements.xsd">
+    <ui:VisualElement name="Panel" style="position: absolute; left: 34.18%; top: 31.10%; width: 39.29%; height: 35.40%; background-color: rgba(255,255,255,0.392);">
+        <ui:VisualElement name="Image" style="position: absolute; left: 50.00%; top: 50.00%; width: 0.00%; height: 0.00%; background-color: rgba(255,255,255,1.000);" />
+    </ui:VisualElement>
+</ui:UXML>

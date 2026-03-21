@@ -13,6 +13,11 @@ public class UniGameObjectBlock : UniPrefabBlock
     public int m_StaticEditorFlags;
     public int m_IsActive;
 
+    public override void ApplyTo(UxmlElement element)
+    {
+        element.Attributes["name"] = m_Name ?? "";
+    }
+
     public static bool CanHandle(string blockName, YamlMappingNode _)
         => blockName == "GameObject";
 

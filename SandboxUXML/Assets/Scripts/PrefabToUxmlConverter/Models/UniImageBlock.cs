@@ -1,8 +1,7 @@
 using YamlDotNet.RepresentationModel;
 
-public class UniImageBlock : UniPrefabBlock
+public class UniImageBlock : UniComponentBlock
 {
-    public long m_GameObject;
     public int m_Enabled;
     public int m_EditorHideFlags;
     public UniAssetRef m_Script;
@@ -24,6 +23,14 @@ public class UniImageBlock : UniPrefabBlock
     public int m_UseSpriteMesh;
     public float m_PixelsPerUnitMultiplier;
 
+    public override void ApplyTo(UxmlElement element)
+    {
+        int r = (int)(m_Color.r * 255);
+        int g = (int)(m_Color.g * 255);
+        int b = (int)(m_Color.b * 255);
+        element.Style["background-color"] = $"rgba({r},{g},{b},{m_Color.a:F3})";
+    }
+
     public static bool CanHandle(string blockName, YamlMappingNode block)
         => blockName == "MonoBehaviour"
         && YamlHelper.GetString(block, "m_EditorClassIdentifier")?.Contains("UnityEngine.UI.Image") == true;
@@ -31,7 +38,6 @@ public class UniImageBlock : UniPrefabBlock
     public override void MergeFrom(YamlMappingNode block)
     {
         base.MergeFrom(block);
-        m_GameObject = YamlHelper.GetFileId(block, "m_GameObject");
         m_Enabled = YamlHelper.GetInt(block, "m_Enabled");
         m_EditorHideFlags = YamlHelper.GetInt(block, "m_EditorHideFlags");
         m_Script = YamlHelper.GetAssetRef(block, "m_Script");
